@@ -8,12 +8,6 @@ const supabaseAdmin = createAdmin(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-webpush.setVapidDetails(
-  'mailto:paul.j.cox@gmail.com',
-  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-  process.env.VAPID_PRIVATE_KEY!
-)
-
 // POST /api/admin/notify — send a push notification to all subscribers
 export async function POST(request: NextRequest) {
   // Verify admin session
@@ -22,6 +16,13 @@ export async function POST(request: NextRequest) {
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+
+  // Initialise VAPID inside handler (not module level) so it never runs at build time
+  webpush.setVapidDetails(
+    'mailto:paul.j.cox@gmail.com',
+    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
+    process.env.VAPID_PRIVATE_KEY!
+  )
 
   const { title, body, url } = await request.json()
   if (!title?.trim() || !body?.trim()) {
