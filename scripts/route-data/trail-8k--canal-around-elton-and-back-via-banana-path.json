@@ -1,0 +1,52 @@
+{
+  "slug": "trail-8k--canal-around-elton-and-back-via-banana-path",
+  "distance_km": 9.09,
+  "elev_gain_m": 63,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 0.5,
+      "change_m": 14,
+      "direction": "climb"
+    },
+    {
+      "start_km": 0.5,
+      "end_km": 3.5,
+      "change_m": 11,
+      "direction": "climb"
+    },
+    {
+      "start_km": 3.5,
+      "end_km": 4.8,
+      "change_m": 9,
+      "direction": "climb"
+    },
+    {
+      "start_km": 6.5,
+      "end_km": 8.2,
+      "change_m": -21,
+      "direction": "descent"
+    },
+    {
+      "start_km": 8.2,
+      "end_km": 9.2,
+      "change_m": -16,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Manchester Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 0.9,
+      "last_km": 8.1
+    },
+    {
+      "name": "Elton Reservoir",
+      "type": "reservoir",
+      "first_km": 3.3,
+      "last_km": 4.2
+    }
+  ],
+  "road_names": []
+}

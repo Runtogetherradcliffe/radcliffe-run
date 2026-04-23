@@ -1,0 +1,58 @@
+{
+  "slug": "trail-8k--kirkless-trail",
+  "distance_km": 9.0,
+  "elev_gain_m": 89,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 1.2,
+      "change_m": -11,
+      "direction": "descent"
+    },
+    {
+      "start_km": 1.2,
+      "end_km": 2.2,
+      "change_m": 22,
+      "direction": "climb"
+    },
+    {
+      "start_km": 2.2,
+      "end_km": 4.0,
+      "change_m": 16,
+      "direction": "climb"
+    },
+    {
+      "start_km": 4.0,
+      "end_km": 5.8,
+      "change_m": -9,
+      "direction": "descent"
+    },
+    {
+      "start_km": 5.8,
+      "end_km": 6.2,
+      "change_m": 8,
+      "direction": "climb"
+    },
+    {
+      "start_km": 6.2,
+      "end_km": 8.5,
+      "change_m": -41,
+      "direction": "descent"
+    },
+    {
+      "start_km": 8.5,
+      "end_km": 9.2,
+      "change_m": 14,
+      "direction": "climb"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Elton Vale",
+      "type": "park",
+      "first_km": 5.8,
+      "last_km": 6.3
+    }
+  ],
+  "road_names": []
+}

@@ -1,0 +1,64 @@
+{
+  "slug": "trail-5k--exploring-elton",
+  "distance_km": 5.48,
+  "elev_gain_m": 44,
+  "terrain": [
+    {
+      "start_km": 0.5,
+      "end_km": 1.8,
+      "change_m": 12,
+      "direction": "climb"
+    },
+    {
+      "start_km": 1.8,
+      "end_km": 2.8,
+      "change_m": -9,
+      "direction": "descent"
+    },
+    {
+      "start_km": 2.8,
+      "end_km": 5.0,
+      "change_m": -9,
+      "direction": "descent"
+    },
+    {
+      "start_km": 5.0,
+      "end_km": 5.5,
+      "change_m": 14,
+      "direction": "climb"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Deardens Lodge",
+      "type": "reservoir",
+      "first_km": 0.7,
+      "last_km": 0.7
+    },
+    {
+      "name": "Elton Reservoir Southwest Shore Path",
+      "type": "path",
+      "first_km": 1.8,
+      "last_km": 2.0
+    },
+    {
+      "name": "Elton Reservoir",
+      "type": "reservoir",
+      "first_km": 1.9,
+      "last_km": 4.0
+    },
+    {
+      "name": "Elton Reservoir Southwest Shore Path",
+      "type": "path",
+      "first_km": 2.1,
+      "last_km": 2.7
+    },
+    {
+      "name": "Manchester Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 2.5,
+      "last_km": 3.6
+    }
+  ],
+  "road_names": []
+}

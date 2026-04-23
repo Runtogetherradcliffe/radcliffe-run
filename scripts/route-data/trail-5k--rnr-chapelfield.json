@@ -1,0 +1,52 @@
+{
+  "slug": "trail-5k--rnr-chapelfield",
+  "distance_km": 5.01,
+  "elev_gain_m": 77,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 2.5,
+      "change_m": 50,
+      "direction": "climb"
+    },
+    {
+      "start_km": 2.5,
+      "end_km": 3.8,
+      "change_m": -37,
+      "direction": "descent"
+    },
+    {
+      "start_km": 4.0,
+      "end_km": 5.2,
+      "change_m": -25,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Coronation Park",
+      "type": "park",
+      "first_km": 0.7,
+      "last_km": 0.7
+    },
+    {
+      "name": "Springwater Park",
+      "type": "park",
+      "first_km": 0.8,
+      "last_km": 0.9
+    },
+    {
+      "name": "Nursery Brow",
+      "type": "path",
+      "first_km": 1.9,
+      "last_km": 1.9
+    },
+    {
+      "name": "Outwood Country Park",
+      "type": "park",
+      "first_km": 3.5,
+      "last_km": 4.3
+    }
+  ],
+  "road_names": []
+}

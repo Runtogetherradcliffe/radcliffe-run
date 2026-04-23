@@ -1,0 +1,164 @@
+@import "tailwindcss";
+
+/* ── Inter font faces ── */
+@font-face { font-family: 'Inter'; src: url('/fonts/Inter-Light.ttf');     font-weight: 300; font-display: swap; }
+@font-face { font-family: 'Inter'; src: url('/fonts/Inter-Regular.ttf');   font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Inter'; src: url('/fonts/Inter-Medium.ttf');    font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Inter'; src: url('/fonts/Inter-Bold.ttf');      font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Inter'; src: url('/fonts/Inter-ExtraBold.ttf'); font-weight: 800; font-display: swap; }
+
+/* ── CSS Design Tokens ── */
+:root {
+  --bg:          #0a0a0a;
+  --card:        #111111;
+  --card-hi:     #1a1a1a;
+  --border:      #1e1e1e;
+  --border-2:    #2a2a2a;
+  --orange:      #f5a623;
+  --orange-lt:   #ffc966;
+  --orange-dk:   #c47d0e;
+  --white:       #ffffff;
+  --dim:         #aaaaaa;
+  --muted:       #888888;
+  --faint:       #555555;
+  --purple:      #c4a8e8;
+  --purple-bg:   #0f0a1e;
+  --green:       #7cb87c;
+  --green-bg:    #0a120a;
+  --blue:        #6b9fd4;
+  --amber-col:   #d4a84b;
+  --radius-card: 12px;
+  --radius-btn:  8px;
+
+  /* ── Responsive tokens (desktop defaults) ── */
+  --stats-pad:        40px 32px;
+  --stats-gap:        24px;
+  --stat-num-size:    48px;
+  --stat-label-size:  13px;
+  --stat-label-mt:    6px;
+
+  /* About page */
+  --about-stats-cols: repeat(4, 1fr);
+  --about-2col:       1fr 320px;
+  --about-2col-gap:   48px;
+  --about-pace-cols:  repeat(3, 1fr);
+
+  /* Run detail page */
+  --run-stats-cols:   repeat(3, 1fr);
+  --run-content-pad:  40px 32px 80px;
+  --run-nav-pad:      0 32px;
+
+  /* Join form */
+  --join-outer-pad:   64px 24px 80px;
+  --join-card-pad:    36px;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --stats-pad:        14px 16px;
+    --stats-gap:        8px;
+    --stat-num-size:    22px;
+    --stat-label-size:  10px;
+    --stat-label-mt:    2px;
+
+    /* About page */
+    --about-stats-cols: repeat(2, 1fr);
+    --about-2col:       1fr;
+    --about-2col-gap:   24px;
+    --about-pace-cols:  1fr;
+
+    /* Run detail page */
+    --run-stats-cols:   1fr;
+    --run-content-pad:  24px 16px 48px;
+    --run-nav-pad:      0 16px;
+
+    /* Join form */
+    --join-outer-pad:   32px 16px 48px;
+    --join-card-pad:    24px;
+  }
+}
+
+/* ── Base reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: #fff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-weight: 300;
+  line-height: 1.6;
+}
+
+/* ── Page transition ── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+.page-enter { animation: fadeIn 0.25s ease both; }
+
+/* ── Leaflet dark overrides ── */
+.leaflet-popup-content-wrapper {
+  background: #111 !important;
+  border: 1px solid #2a2a2a !important;
+  border-radius: 10px !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,.5) !important;
+}
+.leaflet-popup-content { color: #ccc; font-family: 'Inter', sans-serif; }
+.leaflet-popup-tip { background: #111 !important; }
+.leaflet-popup-close-button { color: #555 !important; }
+.leaflet-control-zoom a { background: #111 !important; color: #888 !important; border-color: #222 !important; }
+.leaflet-control-zoom a:hover { background: #1a1a1a !important; color: #fff !important; }
+.leaflet-control-attribution { background: rgba(10,10,10,.7) !important; color: #333 !important; font-size: 10px !important; }
+
+/* ── Roundup archive link hover ── */
+.roundup-archive-link { transition: background 0.15s, border-color 0.15s; }
+.roundup-archive-link:hover { background: #111 !important; border-color: #1e1e1e !important; }
+
+/* ── Responsive layout ── */
+.rtr-hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 80px 32px;
+  min-height: calc(92vh - 60px);
+}
+.rtr-stats-bar    { background: #f5a623; }
+.rtr-stats-grid   { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; max-width: 1200px; margin: 0 auto; padding: 40px 32px; }
+.rtr-stat-num     { font-size: 48px; font-weight: 800; color: #0a0a0a; letter-spacing: -0.04em; line-height: 1; }
+.rtr-stat-label   { font-size: 13px; font-weight: 600; color: rgba(10,10,10,0.5); margin-top: 6px; }
+.rtr-cards-grid   { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+.rtr-roundup-grid { display: grid; grid-template-columns: 1fr 360px; gap: 32px; position: relative; }
+.rtr-section      { max-width: 1200px; margin: 0 auto; padding: 80px 32px; }
+.rtr-cta-section  { max-width: 1200px; margin: 0 auto; padding: 80px 32px; }
+
+/* Nav — visibility is now JS-driven (no CSS needed for show/hide) */
+
+/* Hero image panel */
+.rtr-hero-image-panel { display: block; }
+
+@media (max-width: 768px) {
+  .rtr-hero {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 32px 20px 48px;
+    min-height: unset;
+  }
+  .rtr-hero-image-panel { display: none; }
+  .rtr-stats-grid   { grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 14px 16px; }
+  .rtr-stat-num     { font-size: 22px; }
+  .rtr-stat-label   { font-size: 10px; margin-top: 2px; }
+  .rtr-cards-grid   { grid-template-columns: 1fr; }
+  .rtr-roundup-grid { grid-template-columns: 1fr; }
+  .rtr-section      { padding: 48px 20px; }
+  .rtr-cta-section  { padding: 48px 20px; }
+}
+
+@media (min-width: 480px) and (max-width: 768px) {
+  .rtr-cards-grid { grid-template-columns: repeat(2, 1fr); }
+}
