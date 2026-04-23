@@ -70,7 +70,7 @@ export default function AboutPage() {
                   The group has a strong trail running side alongside the road runs, and members organise social runs on weekends fairly regularly — longer distances, off-road, and usually finishing somewhere scenic.
                 </p>
                 <p style={{ fontSize: 15, color: '#888', lineHeight: 1.8 }}>
-                  Beyond the running, there's a real community here. Members support each other at parkruns and races across the country — you'll find RTR vests at everything from local 5ks to mountain ultras.
+                  Beyond the running, there's a real community here. Members support each other at parkruns and races across the country — you'll find our runners at everything from local 5ks to mountain ultras.
                 </p>
               </div>
             </div>
