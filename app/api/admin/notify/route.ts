@@ -130,11 +130,14 @@ export async function POST(request: NextRequest) {
 
 // ── Crypto helpers ────────────────────────────────────────────────────────────
 
-function base64urlToBytes(b64url: string): Uint8Array {
+function base64urlToBytes(b64url: string): Uint8Array<ArrayBuffer> {
   const b64 = b64url.replace(/-/g, '+').replace(/_/g, '/').padEnd(
     b64url.length + (4 - b64url.length % 4) % 4, '='
   )
-  return Uint8Array.from(atob(b64), c => c.charCodeAt(0))
+  const binary = atob(b64)
+  const bytes = new Uint8Array(binary.length)
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i)
+  return bytes
 }
 
 function bytesToBase64url(bytes: Uint8Array): string {
@@ -215,8 +218,9 @@ async function encryptPayload(
 }
 
 async function hkdf(
-  ikm: Uint8Array, salt: Uint8Array, info: Uint8Array, length: number
-): Promise<Uint8Array> {
+  ikm: Uint8Array<ArrayBuffer>, salt: Uint8Array<ArrayBuffer>,
+  info: Uint8Array<ArrayBuffer>, length: number
+): Promise<Uint8Array<ArrayBuffer>> {
   const keyMaterial = await crypto.subtle.importKey('raw', ikm, 'HKDF', false, ['deriveBits'])
   const bits = await crypto.subtle.deriveBits(
     { name: 'HKDF', hash: 'SHA-256', salt, info }, keyMaterial, length * 8
@@ -224,7 +228,7 @@ async function hkdf(
   return new Uint8Array(bits)
 }
 
-function concat(...arrays: Uint8Array[]): Uint8Array {
+function concat(...arrays: Uint8Array[]): Uint8Array<ArrayBuffer> {
   const total = arrays.reduce((n, a) => n + a.length, 0)
   const result = new Uint8Array(total)
   let offset = 0
