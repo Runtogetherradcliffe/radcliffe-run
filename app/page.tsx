@@ -127,7 +127,7 @@ export default async function HomePage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
               <div style={{ width: 28, height: 2, background: '#f5a623' }} />
               <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#f5a623' }}>
-                Radcliffe &middot; Greater Manchester &middot; Est. 2018
+                Radcliffe &middot; Greater Manchester &middot; Est. 2022
               </span>
             </div>
 
