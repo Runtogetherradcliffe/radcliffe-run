@@ -67,6 +67,7 @@ export default async function AdminPage() {
             <NavLink href="/admin/members"  label="Members" />
             <NavLink href="/admin/runs"     label="Runs" />
             <NavLink href="/admin/roundups" label="Roundups" />
+            <NavLink href="/admin/notify"   label="Notifications" />
             <NavLink href="#settings"       label="Settings" />
           </nav>
           <div style={{ borderTop: '1px solid #1a1a1a', marginTop: 24, paddingTop: 24, padding: '24px 12px 0' }}>

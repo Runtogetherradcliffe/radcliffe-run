@@ -40,7 +40,7 @@ self.addEventListener('fetch', (event) => {
 
   // Supabase API — network only (always fresh data)
   if (url.hostname.includes('supabase.co')) {
-    return; // let it fall through to the browser
+    return;
   }
 
   // Navigation requests — network first, offline page fallback
@@ -85,6 +85,34 @@ self.addEventListener('fetch', (event) => {
   // Everything else — network first
   event.respondWith(
     fetch(request).catch(() => caches.match(request))
+  );
+});
+
+// ── Push notifications ────────────────────────────────────────────────────────
+self.addEventListener('push', (event) => {
+  const data = event.data?.json() ?? {};
+  const title = data.title ?? 'radcliffe.run';
+  const options = {
+    body: data.body ?? '',
+    icon: '/icon-192.png',
+    badge: '/icon-192.png',
+    tag: data.tag ?? 'rtr-notification',
+    renotify: false,
+    data: { url: data.url ?? '/' },
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = event.notification.data?.url ?? '/';
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
+      for (const client of windowClients) {
+        if (client.url === url && 'focus' in client) return client.focus();
+      }
+      if (clients.openWindow) return clients.openWindow(url);
+    })
   );
 });
 
