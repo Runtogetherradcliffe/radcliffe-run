@@ -18,12 +18,20 @@ export default function SignInPage() {
     const normalised = email.trim().toLowerCase()
 
     // Server-side membership check first
-    const check = await fetch('/api/check-member', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: normalised }),
-    })
-    const { found } = await check.json()
+    let found = false
+    try {
+      const check = await fetch('/api/check-member', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: normalised }),
+      })
+      const data = await check.json()
+      found = data.found ?? false
+    } catch {
+      setError('Something went wrong — please try again.')
+      setLoading(false)
+      return
+    }
 
     if (!found) {
       setError('No account found for that email — have you registered yet?')

@@ -13,9 +13,11 @@ export async function middleware(request: NextRequest) {
     const isPreviewLogin  = pathname === '/preview-login'
     const isLeaderRoute   = pathname.startsWith('/leader')
     const isAuthCallback  = pathname.startsWith('/auth/callback')
+    const isSigninRoute   = pathname === '/signin'
+    const isPublicApi     = pathname.startsWith('/api/check-member')
     const authed = request.cookies.get(PREVIEW_COOKIE)?.value === previewPassword
 
-    if (!isPreviewLogin && !isLeaderRoute && !isAuthCallback && !authed) {
+    if (!isPreviewLogin && !isLeaderRoute && !isAuthCallback && !isSigninRoute && !isPublicApi && !authed) {
       const url = request.nextUrl.clone()
       url.pathname = '/preview-login'
       url.searchParams.set('next', pathname)
