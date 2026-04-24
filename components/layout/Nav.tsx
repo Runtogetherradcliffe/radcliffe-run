@@ -2,11 +2,13 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
+import { createClient } from '@/utils/supabase/client'
 
 export default function Nav() {
   const path = usePathname()
   const [open, setOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  const [signedIn, setSignedIn] = useState(false)
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 768px)')
@@ -14,6 +16,17 @@ export default function Nav() {
     update()
     mq.addEventListener('change', update)
     return () => mq.removeEventListener('change', update)
+  }, [])
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getSession().then(({ data }) => {
+      setSignedIn(!!data.session)
+    })
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+      setSignedIn(!!session)
+    })
+    return () => subscription.unsubscribe()
   }, [])
 
   // Close menu on route change
@@ -46,11 +59,8 @@ export default function Nav() {
           </span>
         </Link>
 
-        {/* Desktop links — hidden on mobile via JS */}
-        <div style={{
-          display: isMobile ? 'none' : 'flex',
-          alignItems: 'center', gap: 28,
-        }}>
+        {/* Desktop links */}
+        <div style={{ display: isMobile ? 'none' : 'flex', alignItems: 'center', gap: 28 }}>
           <div style={{ display: 'flex', gap: 28 }}>
             {links.map(({ href, label }) => (
               <Link key={href} href={href} style={{
@@ -69,16 +79,26 @@ export default function Nav() {
           }}>
             Admin
           </Link>
-          <Link href="/join" style={{
-            fontSize: 13, fontWeight: 700, textDecoration: 'none',
-            color: '#0a0a0a', background: '#f5a623',
-            padding: '8px 18px', borderRadius: 8,
-          }}>
-            Join us
-          </Link>
+          {signedIn ? (
+            <Link href="/profile" style={{
+              fontSize: 13, fontWeight: 700, textDecoration: 'none',
+              color: '#0a0a0a', background: '#f5a623',
+              padding: '8px 18px', borderRadius: 8,
+            }}>
+              My profile
+            </Link>
+          ) : (
+            <Link href="/join" style={{
+              fontSize: 13, fontWeight: 700, textDecoration: 'none',
+              color: '#0a0a0a', background: '#f5a623',
+              padding: '8px 18px', borderRadius: 8,
+            }}>
+              Join us
+            </Link>
+          )}
         </div>
 
-        {/* Hamburger — visible on mobile via JS */}
+        {/* Hamburger */}
         <button
           style={{
             display: isMobile ? 'flex' : 'none',
@@ -104,7 +124,7 @@ export default function Nav() {
         </button>
       </nav>
 
-      {/* Mobile menu overlay — fully state-driven, no CSS dependency */}
+      {/* Mobile menu */}
       {isMobile && open && (
         <div style={{
           position: 'fixed', inset: '60px 0 0 0', zIndex: 999,
@@ -112,7 +132,7 @@ export default function Nav() {
           backdropFilter: 'blur(16px)',
           display: 'flex', flexDirection: 'column',
           alignItems: 'center', justifyContent: 'center',
-          gap: 32,
+          gap: 28,
           borderTop: '1px solid #1e1e1e',
         }}>
           {links.map(({ href, label }) => (
@@ -123,25 +143,69 @@ export default function Nav() {
                 fontSize: 22, fontWeight: 600,
                 color: active(href) ? '#fff' : '#888',
                 textDecoration: 'none', letterSpacing: '-0.02em',
-                transition: 'color 0.15s',
               }}
               onClick={() => setOpen(false)}
             >
               {label}
             </Link>
           ))}
-          <Link
-            href="/join"
-            style={{
-              background: '#f5a623', color: '#0a0a0a',
-              padding: '12px 32px', borderRadius: 8,
-              fontWeight: 700, textDecoration: 'none',
-              fontSize: 22,
-            }}
-            onClick={() => setOpen(false)}
-          >
-            Join us
-          </Link>
+
+          {/* Primary CTA */}
+          {signedIn ? (
+            <Link
+              href="/profile"
+              style={{
+                background: '#f5a623', color: '#0a0a0a',
+                padding: '12px 32px', borderRadius: 8,
+                fontWeight: 700, textDecoration: 'none', fontSize: 18,
+              }}
+              onClick={() => setOpen(false)}
+            >
+              My profile
+            </Link>
+          ) : (
+            <>
+              <Link
+                href="/join"
+                style={{
+                  background: '#f5a623', color: '#0a0a0a',
+                  padding: '12px 32px', borderRadius: 8,
+                  fontWeight: 700, textDecoration: 'none', fontSize: 18,
+                }}
+                onClick={() => setOpen(false)}
+              >
+                Join us
+              </Link>
+              <Link
+                href="/signin"
+                style={{
+                  fontSize: 15, fontWeight: 500, color: '#555',
+                  textDecoration: 'none',
+                }}
+                onClick={() => setOpen(false)}
+              >
+                Sign in
+              </Link>
+            </>
+          )}
+
+          {/* Secondary links */}
+          <div style={{ borderTop: '1px solid #1a1a1a', paddingTop: 20, display: 'flex', gap: 24 }}>
+            <Link
+              href="/leader/login"
+              style={{ fontSize: 13, color: '#444', textDecoration: 'none' }}
+              onClick={() => setOpen(false)}
+            >
+              Run leader
+            </Link>
+            <Link
+              href="/admin"
+              style={{ fontSize: 13, color: '#444', textDecoration: 'none' }}
+              onClick={() => setOpen(false)}
+            >
+              Admin
+            </Link>
+          </div>
         </div>
       )}
     </>
