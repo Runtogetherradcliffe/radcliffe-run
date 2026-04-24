@@ -83,10 +83,11 @@ export default async function HomePage() {
   // Site settings — use service role so it works for both anon and authenticated visitors
   const { data: siteSettings } = await supabaseAdmin()
     .from('site_settings')
-    .select('hero_image_url, sync_social_sheet')
+    .select('hero_image_url, sync_social_sheet, show_social_calendar')
     .single()
-  const heroImageUrl   = siteSettings?.hero_image_url ?? null
-  const showSocialRuns = siteSettings?.sync_social_sheet ?? true
+  const heroImageUrl        = siteSettings?.hero_image_url ?? null
+  const showSocialRuns      = siteSettings?.sync_social_sheet ?? true
+  const showSocialCalendar  = siteSettings?.show_social_calendar ?? false
 
   // Thursday runs (all types except social)
   const { data: thursdayRuns } = await supabase
@@ -268,12 +269,9 @@ export default async function HomePage() {
 
               {/* Calendar subscription */}
               <div style={{ marginBottom: 28, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, padding: '14px 18px', background: '#111', border: '1px solid #1e1e1e', borderRadius: 10 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <span style={{ fontSize: 20 }}>📅</span>
-                  <div>
-                    <p style={{ fontSize: 13, fontWeight: 600, color: '#ccc', marginBottom: 2 }}>Never miss a Thursday run</p>
-                    <p style={{ fontSize: 12, color: '#555' }}>Subscribe and every run appears automatically in your phone's calendar</p>
-                  </div>
+                <div>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: '#ccc', marginBottom: 2 }}>Never miss a run</p>
+                  <p style={{ fontSize: 12, color: '#555' }}>Subscribe and every run appears automatically in your phone&apos;s calendar</p>
                 </div>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   <a
@@ -282,12 +280,14 @@ export default async function HomePage() {
                   >
                     Thursday runs →
                   </a>
-                  <a
-                    href="webcal://calendar.google.com/calendar/ical/fba15c422774be22b6adc0b5565205dd878a70d4a6a738fe3ff2fae1d08ac215%40group.calendar.google.com/public/basic.ics"
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 7, background: 'transparent', color: '#888', fontSize: 12, fontWeight: 600, textDecoration: 'none', border: '1px solid #222', whiteSpace: 'nowrap' }}
-                  >
-                    Social runs →
-                  </a>
+                  {showSocialCalendar && (
+                    <a
+                      href="webcal://calendar.google.com/calendar/ical/fba15c422774be22b6adc0b5565205dd878a70d4a6a738fe3ff2fae1d08ac215%40group.calendar.google.com/public/basic.ics"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 7, background: 'transparent', color: '#888', fontSize: 12, fontWeight: 600, textDecoration: 'none', border: '1px solid #222', whiteSpace: 'nowrap' }}
+                    >
+                      Social runs →
+                    </a>
+                  )}
                 </div>
               </div>
 
