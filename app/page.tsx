@@ -266,6 +266,31 @@ export default async function HomePage() {
                 <Link href="/routes" style={{ fontSize: 13, fontWeight: 500, color: '#555', textDecoration: 'none' }}>View all routes →</Link>
               </div>
 
+              {/* Calendar subscription */}
+              <div style={{ marginBottom: 28, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, padding: '14px 18px', background: '#111', border: '1px solid #1e1e1e', borderRadius: 10 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <span style={{ fontSize: 20 }}>📅</span>
+                  <div>
+                    <p style={{ fontSize: 13, fontWeight: 600, color: '#ccc', marginBottom: 2 }}>Never miss a Thursday run</p>
+                    <p style={{ fontSize: 12, color: '#555' }}>Subscribe and every run appears automatically in your phone's calendar</p>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  <a
+                    href="webcal://calendar.google.com/calendar/ical/1e8d26a3b27472c802fdf9e914db1577e4eddae7cbf3b1f6a4f30984626bc7df%40group.calendar.google.com/public/basic.ics"
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 7, background: '#f5a623', color: '#0a0a0a', fontSize: 12, fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap' }}
+                  >
+                    Thursday runs →
+                  </a>
+                  <a
+                    href="webcal://calendar.google.com/calendar/ical/fba15c422774be22b6adc0b5565205dd878a70d4a6a738fe3ff2fae1d08ac215%40group.calendar.google.com/public/basic.ics"
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 7, background: 'transparent', color: '#888', fontSize: 12, fontWeight: 600, textDecoration: 'none', border: '1px solid #222', whiteSpace: 'nowrap' }}
+                  >
+                    Social runs →
+                  </a>
+                </div>
+              </div>
+
               <div className="rtr-cards-grid">
                 {cards.length === 0 ? (
                   <p style={{ color: '#555', fontSize: 14 }}>No upcoming runs scheduled yet.</p>
