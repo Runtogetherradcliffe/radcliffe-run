@@ -90,7 +90,7 @@ export function buildEmailHtml(data: EmailData): string {
   } = data
 
   const runBlocks = (showRouteBlock && runs.length > 0)
-    ? runs.map((r, i) => runBlock(r, siteUrl, runs.length > 1)).join('\n')
+    ? runs.map(r => runBlock(r, siteUrl, runs.length > 1)).join('\n')
     : ''
 
   const openingSection = showOpening && openingText ? `
