@@ -38,7 +38,6 @@ export default function Footer() {
               {[
                 { href: '/join',           label: 'Register' },
                 { href: '/signin',         label: 'Sign in' },
-                { href: '/leader',         label: 'Run leader' },
               ].map(({ href, label }) => (
                 <Link key={label} href={href} style={{ fontSize: 14, color: '#555', textDecoration: 'none', transition: 'color 0.2s' }}>
                   {label}
