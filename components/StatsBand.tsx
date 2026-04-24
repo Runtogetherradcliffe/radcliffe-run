@@ -25,7 +25,7 @@ export default function StatsBand() {
   const STATS = [
     { num: memberCount, desktop: 'Registered runners', mobile: 'registered' },
     { num: '30–40',     desktop: 'Out every Thursday', mobile: 'per week'   },
-    { num: '40+',       desktop: 'Mapped routes',      mobile: 'routes'     },
+    { num: '65',        desktop: 'Mapped routes',      mobile: 'routes'     },
     { num: 'Free',      desktop: 'Always, forever',    mobile: 'always'     },
   ]
 
