@@ -146,9 +146,12 @@ export default async function HomePage() {
               ))}
             </div>
 
-            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
               <Link href="/join" style={{ display: 'inline-flex', alignItems: 'center', background: '#f5a623', color: '#0a0a0a', fontSize: 14, fontWeight: 700, padding: '12px 24px', borderRadius: 8, textDecoration: 'none' }}>
                 Join the group
+              </Link>
+              <Link href="/signin" style={{ display: 'inline-flex', alignItems: 'center', fontSize: 14, fontWeight: 500, color: '#555', textDecoration: 'none', padding: '12px 4px' }}>
+                Sign in
               </Link>
             </div>
           </div>
