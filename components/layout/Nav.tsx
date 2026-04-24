@@ -10,6 +10,9 @@ export default function Nav() {
   const [isMobile, setIsMobile] = useState(false)
   const [signedIn, setSignedIn] = useState(false)
   const [isLeader, setIsLeader] = useState(false)
+  const [isAdmin,  setIsAdmin]  = useState(false)
+
+  const ADMIN_EMAILS = ['paul.j.cox@gmail.com', 'runtogetherradcliffe@gmail.com']
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 768px)')
@@ -26,6 +29,7 @@ export default function Nav() {
       const { data: { session } } = await supabase.auth.getSession()
       setSignedIn(!!session)
       if (session?.user?.email) {
+        setIsAdmin(ADMIN_EMAILS.includes(session.user.email))
         const { data } = await supabase
           .from('members')
           .select('is_run_leader')
@@ -38,7 +42,7 @@ export default function Nav() {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
       setSignedIn(!!session)
-      if (!session) setIsLeader(false)
+      if (!session) { setIsLeader(false); setIsAdmin(false) }
     })
     return () => subscription.unsubscribe()
   }, [])
@@ -86,13 +90,15 @@ export default function Nav() {
               </Link>
             ))}
           </div>
-          <Link href="/admin" style={{
-            fontSize: 13, fontWeight: 500, textDecoration: 'none',
-            color: '#555', padding: '6px 14px',
-            border: '1px solid #222', borderRadius: 8,
-          }}>
-            Admin
-          </Link>
+          {isAdmin && (
+            <Link href="/admin" style={{
+              fontSize: 13, fontWeight: 500, textDecoration: 'none',
+              color: '#555', padding: '6px 14px',
+              border: '1px solid #222', borderRadius: 8,
+            }}>
+              Admin
+            </Link>
+          )}
           {signedIn ? (
             <Link href="/profile" style={{
               fontSize: 13, fontWeight: 700, textDecoration: 'none',
@@ -217,16 +223,17 @@ export default function Nav() {
             </>
           )}
 
-          {/* Secondary links */}
-          <div style={{ borderTop: '1px solid #1a1a1a', paddingTop: 20 }}>
-            <Link
-              href="/admin"
-              style={{ fontSize: 13, color: '#444', textDecoration: 'none' }}
-              onClick={() => setOpen(false)}
-            >
-              Admin
-            </Link>
-          </div>
+          {isAdmin && (
+            <div style={{ borderTop: '1px solid #1a1a1a', paddingTop: 20 }}>
+              <Link
+                href="/admin"
+                style={{ fontSize: 13, color: '#444', textDecoration: 'none' }}
+                onClick={() => setOpen(false)}
+              >
+                Admin
+              </Link>
+            </div>
+          )}
         </div>
       )}
     </>

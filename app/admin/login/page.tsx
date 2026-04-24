@@ -35,9 +35,11 @@ export default function AdminLoginPage() {
       <div style={{ width: '100%', maxWidth: 400 }}>
 
         {/* Wordmark */}
-        <p style={{ textAlign: 'center', fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 40, fontFamily: 'Inter, sans-serif' }}>
-          <span style={{ color: '#fff' }}>radcliffe.</span><span style={{ color: '#f5a623' }}>run</span>
-        </p>
+        <a href="/" style={{ textDecoration: 'none', display: 'block', textAlign: 'center', marginBottom: 40 }}>
+          <p style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em', fontFamily: 'Inter, sans-serif' }}>
+            <span style={{ color: '#fff' }}>radcliffe.</span><span style={{ color: '#f5a623' }}>run</span>
+          </p>
+        </a>
 
         <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 16, padding: 36 }}>
 
