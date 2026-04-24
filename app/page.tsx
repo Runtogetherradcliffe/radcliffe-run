@@ -505,9 +505,12 @@ export default async function HomePage() {
               <p style={{ fontSize: 16, fontWeight: 300, color: '#aaa', marginBottom: 32, maxWidth: 480, margin: '0 auto 32px', position: 'relative', lineHeight: 1.7 }}>
                 Join hundreds of Radcliffe runners. We only keep what we need to keep you safe on runs.
               </p>
-              <div style={{ position: 'relative' }}>
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
                 <Link href="/join" style={{ display: 'inline-flex', alignItems: 'center', background: '#f5a623', color: '#0a0a0a', fontSize: 15, fontWeight: 700, padding: '14px 36px', borderRadius: 8, textDecoration: 'none' }}>
                   Register &mdash; it&apos;s free
+                </Link>
+                <Link href="/signin" style={{ display: 'inline-flex', alignItems: 'center', background: 'transparent', color: '#7cb87c', fontSize: 14, fontWeight: 500, padding: '14px 24px', borderRadius: 8, textDecoration: 'none', border: '1px solid rgba(124,184,124,0.3)' }}>
+                  Already registered? Sign in
                 </Link>
               </div>
             </div>
