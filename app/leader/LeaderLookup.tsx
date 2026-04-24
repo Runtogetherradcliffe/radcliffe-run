@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { createBrowserClient } from '@supabase/ssr'
+import { createClient } from '@/utils/supabase/client'
 import { useRouter } from 'next/navigation'
 
 type Member = {
@@ -27,10 +27,7 @@ export default function LeaderLookup({
   const [query, setQuery] = useState('')
   const router = useRouter()
 
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  )
+  const supabase = createClient()
 
   async function signOut() {
     await supabase.auth.signOut()
