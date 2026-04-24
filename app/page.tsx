@@ -126,8 +126,7 @@ export default async function HomePage() {
         <section className="rtr-hero">
 
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
-              <div style={{ width: 28, height: 2, background: '#f5a623' }} />
+            <div style={{ marginBottom: 24 }}>
               <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#f5a623' }}>
                 Radcliffe &middot; Greater Manchester &middot; Est. 2022
               </span>
@@ -150,9 +149,6 @@ export default async function HomePage() {
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               <Link href="/join" style={{ display: 'inline-flex', alignItems: 'center', background: '#f5a623', color: '#0a0a0a', fontSize: 14, fontWeight: 700, padding: '12px 24px', borderRadius: 8, textDecoration: 'none' }}>
                 Join the group
-              </Link>
-              <Link href="/routes" style={{ display: 'inline-flex', alignItems: 'center', background: 'transparent', color: '#fff', fontSize: 14, fontWeight: 500, padding: '12px 24px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.15)', textDecoration: 'none' }}>
-                Explore routes →
               </Link>
             </div>
           </div>
