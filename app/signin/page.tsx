@@ -15,17 +15,35 @@ export default function SignInPage() {
     setLoading(true)
     setError(null)
 
+    const normalised = email.trim().toLowerCase()
+
+    // Server-side membership check first
+    const check = await fetch('/api/check-member', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: normalised }),
+    })
+    const { found } = await check.json()
+
+    if (!found) {
+      setError('No account found for that email — have you registered yet?')
+      setLoading(false)
+      return
+    }
+
+    // Member confirmed — send magic link (shouldCreateUser: true so first-time
+    // sign-ins work for members who don't yet have a Supabase auth account)
     const supabase = createClient()
     const { error } = await supabase.auth.signInWithOtp({
-      email: email.trim().toLowerCase(),
+      email: normalised,
       options: {
         emailRedirectTo: `${window.location.origin}/auth/callback?next=/profile`,
-        shouldCreateUser: false,
+        shouldCreateUser: true,
       },
     })
 
     if (error) {
-      setError('No account found for that email — have you registered yet?')
+      setError('Something went wrong — please try again.')
     } else {
       setSent(true)
     }
