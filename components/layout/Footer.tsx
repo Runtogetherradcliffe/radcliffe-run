@@ -36,9 +36,8 @@ export default function Footer() {
             <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#555', marginBottom: 16 }}>Join</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {[
-                { href: '/join',    label: 'Register' },
-                { href: '/join',    label: 'Emergency contacts' },
-                { href: '/profile', label: 'My profile' },
+                { href: '/join',           label: 'Register' },
+                { href: '/leader/login',   label: 'Run leader login' },
               ].map(({ href, label }) => (
                 <Link key={label} href={href} style={{ fontSize: 14, color: '#555', textDecoration: 'none', transition: 'color 0.2s' }}>
                   {label}

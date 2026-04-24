@@ -509,9 +509,6 @@ export default async function HomePage() {
                 <Link href="/join" style={{ display: 'inline-flex', alignItems: 'center', background: '#f5a623', color: '#0a0a0a', fontSize: 15, fontWeight: 700, padding: '14px 36px', borderRadius: 8, textDecoration: 'none' }}>
                   Register &mdash; it&apos;s free
                 </Link>
-                <p style={{ marginTop: 16, fontSize: 13, color: '#333' }}>
-                  Already registered? <Link href="/profile" style={{ color: '#555', textDecoration: 'underline' }}>Sign in</Link>
-                </p>
               </div>
             </div>
           </div>
