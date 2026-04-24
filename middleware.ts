@@ -53,14 +53,17 @@ export async function middleware(request: NextRequest) {
   const isAdminRoute = pathname.startsWith('/admin')
   const isLoginPage  = pathname === '/admin/login'
 
-  if (isAdminRoute && !isLoginPage && !user) {
+  const ADMIN_EMAILS = ['paul.j.cox@gmail.com', 'runtogetherradcliffe@gmail.com']
+  const isAdmin = !!user && ADMIN_EMAILS.includes(user.email ?? '')
+
+  if (isAdminRoute && !isLoginPage && !isAdmin) {
     const url = request.nextUrl.clone()
     url.pathname = '/admin/login'
     return NextResponse.redirect(url)
   }
 
-  // Redirect logged-in users away from login page
-  if (isLoginPage && user) {
+  // Redirect logged-in admins away from login page
+  if (isLoginPage && isAdmin) {
     const url = request.nextUrl.clone()
     url.pathname = '/admin'
     return NextResponse.redirect(url)
