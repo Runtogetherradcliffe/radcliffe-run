@@ -51,7 +51,7 @@ export default function SignInPage() {
     })
 
     if (error) {
-      setError('Something went wrong — please try again.')
+      setError(error.message || 'Something went wrong — please try again.')
     } else {
       setSent(true)
     }
