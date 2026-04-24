@@ -192,7 +192,7 @@ export default function Nav() {
           {/* Secondary links */}
           <div style={{ borderTop: '1px solid #1a1a1a', paddingTop: 20, display: 'flex', gap: 24 }}>
             <Link
-              href="/leader/login"
+              href="/leader"
               style={{ fontSize: 13, color: '#444', textDecoration: 'none' }}
               onClick={() => setOpen(false)}
             >
