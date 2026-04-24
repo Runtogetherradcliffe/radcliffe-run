@@ -9,6 +9,7 @@ export default function Nav() {
   const [open, setOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const [signedIn, setSignedIn] = useState(false)
+  const [isLeader, setIsLeader] = useState(false)
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 768px)')
@@ -20,11 +21,24 @@ export default function Nav() {
 
   useEffect(() => {
     const supabase = createClient()
-    supabase.auth.getSession().then(({ data }) => {
-      setSignedIn(!!data.session)
-    })
+
+    async function loadSession() {
+      const { data: { session } } = await supabase.auth.getSession()
+      setSignedIn(!!session)
+      if (session?.user?.email) {
+        const { data } = await supabase
+          .from('members')
+          .select('is_run_leader')
+          .eq('email', session.user.email)
+          .single()
+        setIsLeader(!!data?.is_run_leader)
+      }
+    }
+    loadSession()
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
       setSignedIn(!!session)
+      if (!session) setIsLeader(false)
     })
     return () => subscription.unsubscribe()
   }, [])
@@ -150,6 +164,20 @@ export default function Nav() {
             </Link>
           ))}
 
+          {isLeader && (
+            <Link
+              href="/leader"
+              style={{
+                fontSize: 22, fontWeight: 600,
+                color: active('/leader') ? '#fff' : '#888',
+                textDecoration: 'none', letterSpacing: '-0.02em',
+              }}
+              onClick={() => setOpen(false)}
+            >
+              Emergency contacts
+            </Link>
+          )}
+
           {/* Primary CTA */}
           {signedIn ? (
             <Link
@@ -190,14 +218,7 @@ export default function Nav() {
           )}
 
           {/* Secondary links */}
-          <div style={{ borderTop: '1px solid #1a1a1a', paddingTop: 20, display: 'flex', gap: 24 }}>
-            <Link
-              href="/leader"
-              style={{ fontSize: 13, color: '#444', textDecoration: 'none' }}
-              onClick={() => setOpen(false)}
-            >
-              Run leader
-            </Link>
+          <div style={{ borderTop: '1px solid #1a1a1a', paddingTop: 20 }}>
             <Link
               href="/admin"
               style={{ fontSize: 13, color: '#444', textDecoration: 'none' }}

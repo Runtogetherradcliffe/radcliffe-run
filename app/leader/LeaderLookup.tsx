@@ -54,9 +54,11 @@ export default function LeaderLookup({
         position: 'sticky', top: 0, zIndex: 10,
       }}>
         <div>
-          <p style={{ fontSize: 15, fontWeight: 800, letterSpacing: '-0.02em' }}>
-            radcliffe<span style={{ color: '#f5a623' }}>.run</span>
-          </p>
+          <a href="/" style={{ textDecoration: 'none' }}>
+            <p style={{ fontSize: 15, fontWeight: 800, letterSpacing: '-0.02em' }}>
+              radcliffe<span style={{ color: '#f5a623' }}>.run</span>
+            </p>
+          </a>
           <p style={{ fontSize: 11, color: '#555', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
             Emergency contacts
           </p>
