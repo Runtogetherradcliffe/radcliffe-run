@@ -6,12 +6,14 @@ type Settings = {
   hero_image_url: string | null
   sync_thursday_sheet: boolean
   sync_social_sheet: boolean
+  show_social_calendar: boolean
 }
 
 export default function SettingsClient({ initial }: { initial: Settings }) {
-  const [heroUrl,       setHeroUrl]       = useState(initial.hero_image_url ?? '')
-  const [syncThursday,  setSyncThursday]  = useState(initial.sync_thursday_sheet)
-  const [syncSocial,    setSyncSocial]    = useState(initial.sync_social_sheet)
+  const [heroUrl,            setHeroUrl]            = useState(initial.hero_image_url ?? '')
+  const [syncThursday,       setSyncThursday]       = useState(initial.sync_thursday_sheet)
+  const [syncSocial,         setSyncSocial]         = useState(initial.sync_social_sheet)
+  const [showSocialCalendar, setShowSocialCalendar] = useState(initial.show_social_calendar)
   const [saving,        setSaving]        = useState(false)
   const [uploading,     setUploading]     = useState(false)
   const [saved,         setSaved]         = useState(false)
@@ -63,9 +65,10 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          hero_image_url:      heroUrl.trim() || null,
-          sync_thursday_sheet: syncThursday,
-          sync_social_sheet:   syncSocial,
+          hero_image_url:       heroUrl.trim() || null,
+          sync_thursday_sheet:  syncThursday,
+          sync_social_sheet:    syncSocial,
+          show_social_calendar: showSocialCalendar,
         }),
       })
       if (!res.ok) throw new Error((await res.json()).error)
@@ -150,6 +153,7 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
         </p>
         {toggleRow('Thursday runs sheet', 'Syncs weekly 8k/5k groups from Google Sheets', syncThursday, setSyncThursday)}
         {toggleRow('Social & bank holiday sheet', 'Syncs social runs — disable if not yet published on Clubspark', syncSocial, setSyncSocial)}
+        {toggleRow('Social runs calendar button', 'Shows the "Social runs →" calendar subscription button on the homepage', showSocialCalendar, setShowSocialCalendar)}
       </div>
 
       {/* Save */}
