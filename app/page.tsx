@@ -221,7 +221,7 @@ export default async function HomePage() {
         </section>
 
         {/* ── STATS BAR ── */}
-        <StatsBand />
+        <StatsBand routeCount={ROUTES.length} />
 
         {/* ── UPCOMING RUNS ── */}
         {(() => {

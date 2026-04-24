@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 
-export default function StatsBand() {
+export default function StatsBand({ routeCount }: { routeCount: number }) {
   const [isMobile, setIsMobile] = useState(false)
   const [memberCount, setMemberCount] = useState<string>('…')
 
@@ -25,7 +25,7 @@ export default function StatsBand() {
   const STATS = [
     { num: memberCount, desktop: 'Registered runners', mobile: 'registered' },
     { num: '30–40',     desktop: 'Out every Thursday', mobile: 'per week'   },
-    { num: '65',        desktop: 'Mapped routes',      mobile: 'routes'     },
+    { num: String(routeCount), desktop: 'Mapped routes', mobile: 'routes'  },
     { num: 'Free',      desktop: 'Always, forever',    mobile: 'always'     },
   ]
 
