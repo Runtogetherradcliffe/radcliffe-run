@@ -1,0 +1,27 @@
+{
+  "slug": "trail-8k--halloween-run",
+  "distance_km": 6.06,
+  "elev_gain_m": 39,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 1.5,
+      "change_m": -16,
+      "direction": "descent"
+    },
+    {
+      "start_km": 1.5,
+      "end_km": 1.8,
+      "change_m": 10,
+      "direction": "climb"
+    },
+    {
+      "start_km": 1.8,
+      "end_km": 4.5,
+      "change_m": 9,
+      "direction": "climb"
+    }
+  ],
+  "features_on_route": [],
+  "road_names": []
+}

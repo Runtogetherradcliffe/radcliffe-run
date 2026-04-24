@@ -1,0 +1,46 @@
+{
+  "slug": "road-8k--dumers-mcr-rd-bury-rd",
+  "distance_km": 8.5,
+  "elev_gain_m": 47,
+  "terrain": [
+    {
+      "start_km": 2.0,
+      "end_km": 4.0,
+      "change_m": 8,
+      "direction": "climb"
+    },
+    {
+      "start_km": 5.5,
+      "end_km": 8.0,
+      "change_m": 8,
+      "direction": "climb"
+    },
+    {
+      "start_km": 8.0,
+      "end_km": 8.5,
+      "change_m": -15,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Manchester Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 2.4,
+      "last_km": 7.2
+    },
+    {
+      "name": "Redvales Playing Fields",
+      "type": "park",
+      "first_km": 4.9,
+      "last_km": 5.4
+    },
+    {
+      "name": "Starkies Wood",
+      "type": "wood",
+      "first_km": 4.9,
+      "last_km": 5.0
+    }
+  ],
+  "road_names": []
+}

@@ -1,0 +1,101 @@
+{
+  "slug": "trail-5k--outwood-to-scout-camp-and-back",
+  "distance_km": 5.19,
+  "elev_gain_m": 40,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 2.2,
+      "change_m": 31,
+      "direction": "climb"
+    },
+    {
+      "start_km": 2.2,
+      "end_km": 3.0,
+      "change_m": -13,
+      "direction": "descent"
+    },
+    {
+      "start_km": 3.0,
+      "end_km": 5.2,
+      "change_m": -19,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Outwood Country Park",
+      "type": "park",
+      "first_km": 1.1,
+      "last_km": 4.3
+    },
+    {
+      "name": "Manchester Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 1.2,
+      "last_km": 4.2
+    },
+    {
+      "name": "Manchester, Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 1.2,
+      "last_km": 4.2
+    },
+    {
+      "name": "Outwood Trail",
+      "type": "path",
+      "first_km": 1.6,
+      "last_km": 3.8
+    },
+    {
+      "name": "Irwell Sculpture Trail",
+      "type": "path",
+      "first_km": 1.8,
+      "last_km": 1.9
+    },
+    {
+      "name": "Irwell Sculpture Trail",
+      "type": "path",
+      "first_km": 2.1,
+      "last_km": 3.5
+    },
+    {
+      "name": "Ringley Wood",
+      "type": "wood",
+      "first_km": 2.6,
+      "last_km": 2.7
+    }
+  ],
+  "road_names": [
+    {
+      "approx_km": 1.1,
+      "road": "Outwood Trail",
+      "suburb": "Outwood Gate"
+    },
+    {
+      "approx_km": 2.3,
+      "road": "Wood Street",
+      "suburb": "Outwood Gate"
+    },
+    {
+      "approx_km": 2.8,
+      "road": "Ashed Road",
+      "suburb": ""
+    },
+    {
+      "approx_km": 3.4,
+      "road": "Outwood Trail",
+      "suburb": "Outwood Gate"
+    },
+    {
+      "approx_km": 4.5,
+      "road": "Phoenix Way",
+      "suburb": "Outwood Gate"
+    },
+    {
+      "approx_km": 5.1,
+      "road": "Pilkington Way",
+      "suburb": "Outwood Gate"
+    }
+  ]
+}

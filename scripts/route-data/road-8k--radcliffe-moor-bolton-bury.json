@@ -1,0 +1,46 @@
+{
+  "slug": "road-8k--radcliffe-moor-bolton-bury",
+  "distance_km": 8.84,
+  "elev_gain_m": 73,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 0.5,
+      "change_m": 10,
+      "direction": "climb"
+    },
+    {
+      "start_km": 0.5,
+      "end_km": 2.5,
+      "change_m": 25,
+      "direction": "climb"
+    },
+    {
+      "start_km": 3.0,
+      "end_km": 5.0,
+      "change_m": 28,
+      "direction": "climb"
+    },
+    {
+      "start_km": 5.0,
+      "end_km": 8.0,
+      "change_m": -50,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Manchester, Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 1.0,
+      "last_km": 7.4
+    },
+    {
+      "name": "Manchester Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 1.1,
+      "last_km": 7.3
+    }
+  ],
+  "road_names": []
+}

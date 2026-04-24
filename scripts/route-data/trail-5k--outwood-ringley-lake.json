@@ -1,0 +1,113 @@
+{
+  "slug": "trail-5k--outwood-ringley-lake",
+  "distance_km": 5.08,
+  "elev_gain_m": 62,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 2.8,
+      "change_m": 39,
+      "direction": "climb"
+    },
+    {
+      "start_km": 2.8,
+      "end_km": 3.2,
+      "change_m": -9,
+      "direction": "descent"
+    },
+    {
+      "start_km": 3.2,
+      "end_km": 3.8,
+      "change_m": -19,
+      "direction": "descent"
+    },
+    {
+      "start_km": 3.8,
+      "end_km": 4.0,
+      "change_m": 9,
+      "direction": "climb"
+    },
+    {
+      "start_km": 4.0,
+      "end_km": 4.2,
+      "change_m": -9,
+      "direction": "descent"
+    },
+    {
+      "start_km": 4.2,
+      "end_km": 5.2,
+      "change_m": -13,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Outwood Country Park",
+      "type": "park",
+      "first_km": 0.3,
+      "last_km": 4.5
+    },
+    {
+      "name": "Manchester Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 1.0,
+      "last_km": 4.5
+    },
+    {
+      "name": "Manchester, Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 1.0,
+      "last_km": 4.5
+    },
+    {
+      "name": "Outwood Trail",
+      "type": "path",
+      "first_km": 1.2,
+      "last_km": 1.4
+    },
+    {
+      "name": "Irwell Sculpture Trail",
+      "type": "path",
+      "first_km": 1.5,
+      "last_km": 1.5
+    },
+    {
+      "name": "King George V Lodge",
+      "type": "reservoir",
+      "first_km": 3.1,
+      "last_km": 3.5
+    }
+  ],
+  "road_names": [
+    {
+      "approx_km": 0.6,
+      "road": "Phoenix Way",
+      "suburb": "Outwood Gate"
+    },
+    {
+      "approx_km": 1.2,
+      "road": "Outwood Trail",
+      "suburb": "Outwood Gate"
+    },
+    {
+      "approx_km": 2.4,
+      "road": "Ringley Road West",
+      "suburb": "Outwood Gate"
+    },
+    {
+      "approx_km": 2.9,
+      "road": "Sedgefield Road",
+      "suburb": "Outwood Gate"
+    },
+    {
+      "approx_km": 3.5,
+      "road": "Outwood Road",
+      "suburb": "Outwood Gate"
+    },
+    {
+      "approx_km": 4.1,
+      "road": "Trees of Time and Place",
+      "suburb": "Outwood Gate"
+    }
+  ]
+}

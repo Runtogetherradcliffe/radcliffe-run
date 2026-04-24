@@ -1,0 +1,100 @@
+{
+  "slug": "trail-8k--ainsworth-lowercroft-reservoirs",
+  "distance_km": 8.96,
+  "elev_gain_m": 167,
+  "terrain": [
+    {
+      "start_km": 0.2,
+      "end_km": 1.0,
+      "change_m": -18,
+      "direction": "descent"
+    },
+    {
+      "start_km": 1.0,
+      "end_km": 1.2,
+      "change_m": 14,
+      "direction": "climb"
+    },
+    {
+      "start_km": 1.2,
+      "end_km": 1.5,
+      "change_m": -14,
+      "direction": "descent"
+    },
+    {
+      "start_km": 1.5,
+      "end_km": 2.5,
+      "change_m": -20,
+      "direction": "descent"
+    },
+    {
+      "start_km": 2.5,
+      "end_km": 2.8,
+      "change_m": 11,
+      "direction": "climb"
+    },
+    {
+      "start_km": 2.8,
+      "end_km": 4.0,
+      "change_m": -31,
+      "direction": "descent"
+    },
+    {
+      "start_km": 4.8,
+      "end_km": 6.2,
+      "change_m": 45,
+      "direction": "climb"
+    },
+    {
+      "start_km": 6.2,
+      "end_km": 7.0,
+      "change_m": 14,
+      "direction": "climb"
+    },
+    {
+      "start_km": 7.0,
+      "end_km": 7.8,
+      "change_m": -15,
+      "direction": "descent"
+    },
+    {
+      "start_km": 7.8,
+      "end_km": 8.0,
+      "change_m": 14,
+      "direction": "climb"
+    },
+    {
+      "start_km": 8.0,
+      "end_km": 8.2,
+      "change_m": -14,
+      "direction": "descent"
+    },
+    {
+      "start_km": 8.2,
+      "end_km": 8.8,
+      "change_m": 17,
+      "direction": "climb"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Top Lowercroft Reservoir",
+      "type": "reservoir",
+      "first_km": 1.5,
+      "last_km": 7.9
+    },
+    {
+      "name": "Middle Lowercroft Reservoir",
+      "type": "reservoir",
+      "first_km": 2.4,
+      "last_km": 2.4
+    },
+    {
+      "name": "Elton Vale",
+      "type": "park",
+      "first_km": 3.3,
+      "last_km": 4.7
+    }
+  ],
+  "road_names": []
+}

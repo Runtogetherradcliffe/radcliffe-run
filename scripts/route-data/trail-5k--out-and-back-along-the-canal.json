@@ -1,0 +1,34 @@
+{
+  "slug": "trail-5k--out-and-back-along-the-canal",
+  "distance_km": 5.17,
+  "elev_gain_m": 22,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 0.5,
+      "change_m": 13,
+      "direction": "climb"
+    },
+    {
+      "start_km": 0.5,
+      "end_km": 5.2,
+      "change_m": -16,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Manchester Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 0.9,
+      "last_km": 4.3
+    }
+  ],
+  "road_names": [
+    {
+      "approx_km": 4.7,
+      "road": "Blackburn Street",
+      "suburb": "Black Lane"
+    }
+  ]
+}

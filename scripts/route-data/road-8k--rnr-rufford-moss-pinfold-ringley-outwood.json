@@ -1,0 +1,52 @@
+{
+  "slug": "road-8k--rnr-rufford-moss-pinfold-ringley-outwood",
+  "distance_km": 8.63,
+  "elev_gain_m": 101,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 1.8,
+      "change_m": 43,
+      "direction": "climb"
+    },
+    {
+      "start_km": 2.5,
+      "end_km": 3.5,
+      "change_m": -13,
+      "direction": "descent"
+    },
+    {
+      "start_km": 3.5,
+      "end_km": 6.0,
+      "change_m": 41,
+      "direction": "climb"
+    },
+    {
+      "start_km": 7.0,
+      "end_km": 8.5,
+      "change_m": -63,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Coronation Park",
+      "type": "park",
+      "first_km": 0.5,
+      "last_km": 0.6
+    },
+    {
+      "name": "Springwater Park",
+      "type": "park",
+      "first_km": 0.7,
+      "last_km": 0.8
+    },
+    {
+      "name": "Outwood Country Park",
+      "type": "park",
+      "first_km": 7.7,
+      "last_km": 7.9
+    }
+  ],
+  "road_names": []
+}

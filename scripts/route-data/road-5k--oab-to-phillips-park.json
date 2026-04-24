@@ -1,0 +1,58 @@
+{
+  "slug": "road-5k--oab-to-phillips-park",
+  "distance_km": 7.98,
+  "elev_gain_m": 77,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 2.2,
+      "change_m": 55,
+      "direction": "climb"
+    },
+    {
+      "start_km": 2.2,
+      "end_km": 4.0,
+      "change_m": -14,
+      "direction": "descent"
+    },
+    {
+      "start_km": 4.0,
+      "end_km": 5.8,
+      "change_m": 13,
+      "direction": "climb"
+    },
+    {
+      "start_km": 5.8,
+      "end_km": 8.0,
+      "change_m": -54,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Coronation Park",
+      "type": "park",
+      "first_km": 0.8,
+      "last_km": 7.1
+    },
+    {
+      "name": "Springwater Park",
+      "type": "park",
+      "first_km": 1.0,
+      "last_km": 6.8
+    },
+    {
+      "name": "Philips Park",
+      "type": "park",
+      "first_km": 3.8,
+      "last_km": 3.8
+    },
+    {
+      "name": "North Wood",
+      "type": "wood",
+      "first_km": 3.8,
+      "last_km": 3.8
+    }
+  ],
+  "road_names": []
+}

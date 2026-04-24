@@ -1,0 +1,95 @@
+{
+  "slug": "trail-5k--outwood-king-george-v-playing-fields",
+  "distance_km": 6.01,
+  "elev_gain_m": 86,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 2.0,
+      "change_m": 35,
+      "direction": "climb"
+    },
+    {
+      "start_km": 2.0,
+      "end_km": 3.0,
+      "change_m": 17,
+      "direction": "climb"
+    },
+    {
+      "start_km": 3.0,
+      "end_km": 3.2,
+      "change_m": -16,
+      "direction": "descent"
+    },
+    {
+      "start_km": 3.2,
+      "end_km": 3.8,
+      "change_m": 14,
+      "direction": "climb"
+    },
+    {
+      "start_km": 3.8,
+      "end_km": 6.0,
+      "change_m": -49,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [],
+  "road_names": [
+    {
+      "approx_km": 0.0,
+      "road": "Pilkington Way",
+      "suburb": "Outwood Gate"
+    },
+    {
+      "approx_km": 0.6,
+      "road": "Dale Street",
+      "suburb": "Outwood Gate"
+    },
+    {
+      "approx_km": 1.1,
+      "road": "Sion Street",
+      "suburb": "Outwood Gate"
+    },
+    {
+      "approx_km": 1.7,
+      "road": "Outwood Trail",
+      "suburb": "Outwood Gate"
+    },
+    {
+      "approx_km": 2.3,
+      "road": "Saint Aiden's Close",
+      "suburb": "Outwood Gate"
+    },
+    {
+      "approx_km": 2.8,
+      "road": "Trees of Time and Place",
+      "suburb": "Outwood Gate"
+    },
+    {
+      "approx_km": 3.4,
+      "road": "Albion Street",
+      "suburb": "Outwood Gate"
+    },
+    {
+      "approx_km": 4.0,
+      "road": "Ashurst Grove",
+      "suburb": "Outwood Gate"
+    },
+    {
+      "approx_km": 4.5,
+      "road": "West View Grove",
+      "suburb": "Chapel Field"
+    },
+    {
+      "approx_km": 5.1,
+      "road": "Radcliffe New Road",
+      "suburb": "Chapel Field"
+    },
+    {
+      "approx_km": 5.7,
+      "road": "Pilkington Way",
+      "suburb": "Outwood Gate"
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "slug": "trail-8k--outwood-ringley-canal-diversion",
+  "distance_km": 9.45,
+  "elev_gain_m": 93,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 2.0,
+      "change_m": 31,
+      "direction": "climb"
+    },
+    {
+      "start_km": 2.0,
+      "end_km": 3.5,
+      "change_m": -47,
+      "direction": "descent"
+    },
+    {
+      "start_km": 3.5,
+      "end_km": 4.0,
+      "change_m": 8,
+      "direction": "climb"
+    },
+    {
+      "start_km": 4.0,
+      "end_km": 5.8,
+      "change_m": 30,
+      "direction": "climb"
+    },
+    {
+      "start_km": 5.8,
+      "end_km": 7.2,
+      "change_m": -10,
+      "direction": "descent"
+    },
+    {
+      "start_km": 7.2,
+      "end_km": 8.0,
+      "change_m": -14,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Manchester Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 0.8,
+      "last_km": 8.8
+    },
+    {
+      "name": "Outwood Country Park",
+      "type": "park",
+      "first_km": 0.8,
+      "last_km": 8.5
+    },
+    {
+      "name": "Manchester, Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 0.8,
+      "last_km": 8.9
+    },
+    {
+      "name": "Outwood Trail",
+      "type": "path",
+      "first_km": 1.2,
+      "last_km": 1.5
+    },
+    {
+      "name": "Irwell Sculpture Trail",
+      "type": "path",
+      "first_km": 1.5,
+      "last_km": 1.6
+    },
+    {
+      "name": "Irwell Sculpture Trail",
+      "type": "path",
+      "first_km": 1.9,
+      "last_km": 2.0
+    },
+    {
+      "name": "Ringley Wood",
+      "type": "wood",
+      "first_km": 2.3,
+      "last_km": 3.2
+    },
+    {
+      "name": "Towpath",
+      "type": "path",
+      "first_km": 2.5,
+      "last_km": 3.2
+    },
+    {
+      "name": "Manchester, Bolton and Bury Canal",
+      "type": "canal",
+      "first_km": 3.6,
+      "last_km": 4.7
+    },
+    {
+      "name": "Manchester, Bolton and Bury Canal",
+      "type": "canal",
+      "first_km": 4.7,
+      "last_km": 5.2
+    },
+    {
+      "name": "Manchester, Bolton and Bury Canal",
+      "type": "canal",
+      "first_km": 4.7,
+      "last_km": 4.8
+    },
+    {
+      "name": "Nob End SSSI",
+      "type": "nature_reserve",
+      "first_km": 4.9,
+      "last_km": 5.3
+    },
+    {
+      "name": "Moses Gate Country Park",
+      "type": "park",
+      "first_km": 4.9,
+      "last_km": 5.3
+    },
+    {
+      "name": "Manchester, Bolton and Bury Canal",
+      "type": "canal",
+      "first_km": 5.5,
+      "last_km": 5.5
+    },
+    {
+      "name": "Manchester, Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 5.5,
+      "last_km": 5.5
+    },
+    {
+      "name": "Ladyshore",
+      "type": "park",
+      "first_km": 6.9,
+      "last_km": 7.2
+    },
+    {
+      "name": "Nickerhole Clough",
+      "type": "wood",
+      "first_km": 8.3,
+      "last_km": 8.4
+    }
+  ],
+  "road_names": []
+}

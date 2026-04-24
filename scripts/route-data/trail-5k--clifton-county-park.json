@@ -1,0 +1,94 @@
+{
+  "slug": "trail-5k--clifton-county-park",
+  "distance_km": 5.2,
+  "elev_gain_m": 43,
+  "terrain": [
+    {
+      "start_km": 2.5,
+      "end_km": 3.0,
+      "change_m": -10,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Towpath",
+      "type": "path",
+      "first_km": 0.0,
+      "last_km": 5.2
+    },
+    {
+      "name": "Clifton Country Park",
+      "type": "park",
+      "first_km": 0.5,
+      "last_km": 4.9
+    },
+    {
+      "name": "Giant's Seat Wood",
+      "type": "wood",
+      "first_km": 0.9,
+      "last_km": 4.3
+    },
+    {
+      "name": "The Kingfisher Trail",
+      "type": "path",
+      "first_km": 0.9,
+      "last_km": 4.3
+    },
+    {
+      "name": "Clifton Marina",
+      "type": "water",
+      "first_km": 1.1,
+      "last_km": 4.1
+    },
+    {
+      "name": "Clifton Marina",
+      "type": "reservoir",
+      "first_km": 1.1,
+      "last_km": 4.1
+    },
+    {
+      "name": "Towpath",
+      "type": "path",
+      "first_km": 1.7,
+      "last_km": 3.9
+    },
+    {
+      "name": "Fletcher's Canal",
+      "type": "canal",
+      "first_km": 1.9,
+      "last_km": 3.6
+    },
+    {
+      "name": "Fletcher's Canal",
+      "type": "canal",
+      "first_km": 2.1,
+      "last_km": 3.2
+    },
+    {
+      "name": "Towpath",
+      "type": "path",
+      "first_km": 2.2,
+      "last_km": 3.2
+    },
+    {
+      "name": "The Kingfisher Trail",
+      "type": "path",
+      "first_km": 3.7,
+      "last_km": 4.0
+    },
+    {
+      "name": "Fletcher's Canal (abandoned)",
+      "type": "canal",
+      "first_km": 3.9,
+      "last_km": 4.0
+    },
+    {
+      "name": "Fletcher's Canal (abandoned)",
+      "type": "canal",
+      "first_km": 4.1,
+      "last_km": 4.2
+    }
+  ],
+  "road_names": []
+}

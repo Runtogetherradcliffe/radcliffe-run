@@ -1,0 +1,78 @@
+{
+  "slug": "trail-5k--springwater-new-path",
+  "distance_km": 5.5,
+  "elev_gain_m": 97,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 1.8,
+      "change_m": 43,
+      "direction": "climb"
+    },
+    {
+      "start_km": 1.8,
+      "end_km": 3.5,
+      "change_m": -43,
+      "direction": "descent"
+    },
+    {
+      "start_km": 3.5,
+      "end_km": 4.5,
+      "change_m": 25,
+      "direction": "climb"
+    },
+    {
+      "start_km": 4.5,
+      "end_km": 5.5,
+      "change_m": -26,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Coronation Park",
+      "type": "park",
+      "first_km": 0.5,
+      "last_km": 4.9
+    },
+    {
+      "name": "Springwater Park",
+      "type": "park",
+      "first_km": 0.8,
+      "last_km": 4.7
+    },
+    {
+      "name": "Radcliffe Ees",
+      "type": "park",
+      "first_km": 3.7,
+      "last_km": 3.9
+    }
+  ],
+  "road_names": [
+    {
+      "approx_km": 0.0,
+      "road": "Pilkington Way",
+      "suburb": "Outwood Gate"
+    },
+    {
+      "approx_km": 0.6,
+      "road": "Radcliffe New Road",
+      "suburb": "Chapel Field"
+    },
+    {
+      "approx_km": 1.2,
+      "road": "Dales Avenue",
+      "suburb": "Chapel Field"
+    },
+    {
+      "approx_km": 1.7,
+      "road": "East Avenue",
+      "suburb": "Blackford Bridge"
+    },
+    {
+      "approx_km": 2.3,
+      "road": "Springwater Lane",
+      "suburb": "Blackford Bridge"
+    }
+  ]
+}

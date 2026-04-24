@@ -1,0 +1,112 @@
+{
+  "slug": "trail-5k--outwood-canal-banana-path",
+  "distance_km": 4.84,
+  "elev_gain_m": 42,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 1.5,
+      "change_m": 21,
+      "direction": "climb"
+    },
+    {
+      "start_km": 1.5,
+      "end_km": 2.0,
+      "change_m": -22,
+      "direction": "descent"
+    },
+    {
+      "start_km": 2.0,
+      "end_km": 2.5,
+      "change_m": 14,
+      "direction": "climb"
+    },
+    {
+      "start_km": 2.5,
+      "end_km": 5.0,
+      "change_m": -16,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Manchester Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 0.6,
+      "last_km": 3.1
+    },
+    {
+      "name": "Outwood Country Park",
+      "type": "park",
+      "first_km": 0.6,
+      "last_km": 2.5
+    },
+    {
+      "name": "Manchester, Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 0.6,
+      "last_km": 3.1
+    },
+    {
+      "name": "Outwood Trail",
+      "type": "path",
+      "first_km": 0.9,
+      "last_km": 1.2
+    },
+    {
+      "name": "Irwell Sculpture Trail",
+      "type": "path",
+      "first_km": 1.2,
+      "last_km": 2.0
+    },
+    {
+      "name": "Nickerhole Clough",
+      "type": "wood",
+      "first_km": 2.1,
+      "last_km": 2.2
+    },
+    {
+      "name": "Manchester Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 3.4,
+      "last_km": 3.8
+    }
+  ],
+  "road_names": [
+    {
+      "approx_km": 0.6,
+      "road": "Outwood Trail",
+      "suburb": "Outwood Gate"
+    },
+    {
+      "approx_km": 1.2,
+      "road": "Irwell Sculpture Trail",
+      "suburb": "Outwood Gate"
+    },
+    {
+      "approx_km": 2.3,
+      "road": "Cams Lane",
+      "suburb": "Outwood Gate"
+    },
+    {
+      "approx_km": 2.9,
+      "road": "Towpath",
+      "suburb": "Black Lane"
+    },
+    {
+      "approx_km": 3.5,
+      "road": "Hampson Street",
+      "suburb": "Black Lane"
+    },
+    {
+      "approx_km": 4.1,
+      "road": "Darbyshire Street",
+      "suburb": "Outwood Gate"
+    },
+    {
+      "approx_km": 4.7,
+      "road": "Dale Street",
+      "suburb": "Outwood Gate"
+    }
+  ]
+}

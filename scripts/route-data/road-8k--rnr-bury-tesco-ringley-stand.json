@@ -1,0 +1,52 @@
+{
+  "slug": "road-8k--rnr-bury-tesco-ringley-stand",
+  "distance_km": 8.42,
+  "elev_gain_m": 88,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 1.8,
+      "change_m": 43,
+      "direction": "climb"
+    },
+    {
+      "start_km": 1.8,
+      "end_km": 4.2,
+      "change_m": -8,
+      "direction": "descent"
+    },
+    {
+      "start_km": 4.2,
+      "end_km": 6.5,
+      "change_m": 30,
+      "direction": "climb"
+    },
+    {
+      "start_km": 6.5,
+      "end_km": 8.5,
+      "change_m": -65,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Coronation Park",
+      "type": "park",
+      "first_km": 0.8,
+      "last_km": 0.9
+    },
+    {
+      "name": "Springwater Park",
+      "type": "park",
+      "first_km": 1.1,
+      "last_km": 1.1
+    },
+    {
+      "name": "Prestwich Footbridge",
+      "type": "path",
+      "first_km": 3.7,
+      "last_km": 4.7
+    }
+  ],
+  "road_names": []
+}

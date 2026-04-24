@@ -1,0 +1,92 @@
+{
+  "slug": "road-5k--christmas-route",
+  "distance_km": 7.33,
+  "elev_gain_m": 94,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 2.8,
+      "change_m": 64,
+      "direction": "climb"
+    },
+    {
+      "start_km": 2.8,
+      "end_km": 4.0,
+      "change_m": -19,
+      "direction": "descent"
+    },
+    {
+      "start_km": 4.0,
+      "end_km": 5.5,
+      "change_m": 22,
+      "direction": "climb"
+    },
+    {
+      "start_km": 5.5,
+      "end_km": 7.2,
+      "change_m": -67,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Coronation Park",
+      "type": "park",
+      "first_km": 0.8,
+      "last_km": 0.9
+    },
+    {
+      "name": "Springwater Park",
+      "type": "park",
+      "first_km": 1.0,
+      "last_km": 1.1
+    }
+  ],
+  "road_names": [
+    {
+      "approx_km": 0.0,
+      "road": "Blackburn Street",
+      "suburb": "Outwood Gate"
+    },
+    {
+      "approx_km": 0.6,
+      "road": "Pilkington Way",
+      "suburb": "Outwood Gate"
+    },
+    {
+      "approx_km": 1.2,
+      "road": "Radcliffe New Road",
+      "suburb": "Chapel Field"
+    },
+    {
+      "approx_km": 1.8,
+      "road": "Dales Lane",
+      "suburb": "Park Lane"
+    },
+    {
+      "approx_km": 2.4,
+      "road": "Ringley Drive",
+      "suburb": ""
+    },
+    {
+      "approx_km": 3.5,
+      "road": "Hillingdon Road",
+      "suburb": ""
+    },
+    {
+      "approx_km": 4.7,
+      "road": "Old Hall Lane",
+      "suburb": "Chapel Field"
+    },
+    {
+      "approx_km": 5.3,
+      "road": "The Spinney",
+      "suburb": ""
+    },
+    {
+      "approx_km": 5.9,
+      "road": "Stand Lane",
+      "suburb": "Chapel Field"
+    }
+  ]
+}

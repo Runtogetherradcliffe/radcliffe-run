@@ -1,0 +1,70 @@
+{
+  "slug": "trail-8k--crompton-lodges-and-canal",
+  "distance_km": 8.16,
+  "elev_gain_m": 105,
+  "terrain": [
+    {
+      "start_km": 1.2,
+      "end_km": 1.8,
+      "change_m": -14,
+      "direction": "descent"
+    },
+    {
+      "start_km": 1.8,
+      "end_km": 2.5,
+      "change_m": 26,
+      "direction": "climb"
+    },
+    {
+      "start_km": 2.5,
+      "end_km": 2.8,
+      "change_m": -19,
+      "direction": "descent"
+    },
+    {
+      "start_km": 2.8,
+      "end_km": 3.8,
+      "change_m": 20,
+      "direction": "climb"
+    },
+    {
+      "start_km": 4.8,
+      "end_km": 5.5,
+      "change_m": -8,
+      "direction": "descent"
+    },
+    {
+      "start_km": 6.2,
+      "end_km": 8.0,
+      "change_m": -32,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Moses Gate Country Park",
+      "type": "park",
+      "first_km": 0.0,
+      "last_km": 8.1
+    },
+    {
+      "name": "Manchester, Bolton and Bury Canal",
+      "type": "canal",
+      "first_km": 1.6,
+      "last_km": 7.9
+    },
+    {
+      "name": "Manchester, Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 1.6,
+      "last_km": 7.9
+    },
+    {
+      "name": "Nob End SSSI",
+      "type": "nature_reserve",
+      "first_km": 3.3,
+      "last_km": 7.2
+    }
+  ],
+  "road_names": []
+}

@@ -1,0 +1,40 @@
+{
+  "slug": "road-5k--rnr-ringley-outwood",
+  "distance_km": 5.6,
+  "elev_gain_m": 73,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 2.8,
+      "change_m": 66,
+      "direction": "climb"
+    },
+    {
+      "start_km": 3.5,
+      "end_km": 5.8,
+      "change_m": -60,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Coronation Park",
+      "type": "park",
+      "first_km": 0.7,
+      "last_km": 0.7
+    },
+    {
+      "name": "Springwater Park",
+      "type": "park",
+      "first_km": 0.9,
+      "last_km": 1.0
+    },
+    {
+      "name": "Outwood Country Park",
+      "type": "park",
+      "first_km": 4.0,
+      "last_km": 4.3
+    }
+  ],
+  "road_names": []
+}

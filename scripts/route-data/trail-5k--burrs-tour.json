@@ -1,0 +1,34 @@
+{
+  "slug": "trail-5k--burrs-tour",
+  "distance_km": 5.56,
+  "elev_gain_m": 95,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 3.8,
+      "change_m": 61,
+      "direction": "climb"
+    },
+    {
+      "start_km": 3.8,
+      "end_km": 5.0,
+      "change_m": -63,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Burrs Country Park",
+      "type": "park",
+      "first_km": 0.0,
+      "last_km": 5.5
+    },
+    {
+      "name": "Seedfield Wood",
+      "type": "wood",
+      "first_km": 4.4,
+      "last_km": 4.8
+    }
+  ],
+  "road_names": []
+}

@@ -1,0 +1,58 @@
+{
+  "slug": "road-5k--rnr-dales-ringley-outwood-sion-oab",
+  "distance_km": 8.79,
+  "elev_gain_m": 90,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 3.0,
+      "change_m": 64,
+      "direction": "climb"
+    },
+    {
+      "start_km": 3.8,
+      "end_km": 5.5,
+      "change_m": -60,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Coronation Park",
+      "type": "park",
+      "first_km": 0.8,
+      "last_km": 0.9
+    },
+    {
+      "name": "Springwater Park",
+      "type": "park",
+      "first_km": 1.1,
+      "last_km": 1.1
+    },
+    {
+      "name": "Outwood Country Park",
+      "type": "park",
+      "first_km": 4.2,
+      "last_km": 7.6
+    },
+    {
+      "name": "Manchester, Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 6.0,
+      "last_km": 8.0
+    },
+    {
+      "name": "Manchester Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 6.1,
+      "last_km": 8.0
+    },
+    {
+      "name": "Nickerhole Clough",
+      "type": "wood",
+      "first_km": 6.6,
+      "last_km": 7.5
+    }
+  ],
+  "road_names": []
+}

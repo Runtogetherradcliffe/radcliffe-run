@@ -1,0 +1,106 @@
+{
+  "slug": "trail-5k--outwood-to-ringley",
+  "distance_km": 5.54,
+  "elev_gain_m": 61,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 2.0,
+      "change_m": 32,
+      "direction": "climb"
+    },
+    {
+      "start_km": 2.0,
+      "end_km": 3.2,
+      "change_m": -32,
+      "direction": "descent"
+    },
+    {
+      "start_km": 3.2,
+      "end_km": 4.2,
+      "change_m": 22,
+      "direction": "climb"
+    },
+    {
+      "start_km": 4.2,
+      "end_km": 5.8,
+      "change_m": -23,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Outwood Country Park",
+      "type": "park",
+      "first_km": 0.9,
+      "last_km": 3.0
+    },
+    {
+      "name": "Manchester Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 1.0,
+      "last_km": 4.7
+    },
+    {
+      "name": "Manchester, Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 1.0,
+      "last_km": 4.7
+    },
+    {
+      "name": "Outwood Trail",
+      "type": "path",
+      "first_km": 1.3,
+      "last_km": 1.5
+    },
+    {
+      "name": "Irwell Sculpture Trail",
+      "type": "path",
+      "first_km": 1.6,
+      "last_km": 3.3
+    },
+    {
+      "name": "Irwell Sculpture Trail",
+      "type": "path",
+      "first_km": 1.9,
+      "last_km": 2.3
+    }
+  ],
+  "road_names": [
+    {
+      "approx_km": 0.0,
+      "road": "Blackburn Street",
+      "suburb": "Outwood Gate"
+    },
+    {
+      "approx_km": 1.2,
+      "road": "Outwood Trail",
+      "suburb": "Outwood Gate"
+    },
+    {
+      "approx_km": 2.9,
+      "road": "Irwell Sculpture Trail",
+      "suburb": "Outwood Gate"
+    },
+    {
+      "approx_km": 3.5,
+      "road": "Mount Sion Road",
+      "suburb": "Outwood Gate"
+    },
+    {
+      "approx_km": 4.1,
+      "road": "Cams Lane",
+      "suburb": "Outwood Gate"
+    },
+    {
+      "approx_km": 4.7,
+      "road": "School Street",
+      "suburb": "Black Lane"
+    },
+    {
+      "approx_km": 5.3,
+      "road": "Dale Street",
+      "suburb": "Outwood Gate"
+    }
+  ]
+}

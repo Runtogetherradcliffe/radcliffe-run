@@ -1,0 +1,58 @@
+{
+  "slug": "trail-5k--crompton-lodges-and-canal",
+  "distance_km": 4.65,
+  "elev_gain_m": 67,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 1.5,
+      "change_m": 15,
+      "direction": "climb"
+    },
+    {
+      "start_km": 1.5,
+      "end_km": 1.8,
+      "change_m": -21,
+      "direction": "descent"
+    },
+    {
+      "start_km": 1.8,
+      "end_km": 2.5,
+      "change_m": 23,
+      "direction": "climb"
+    },
+    {
+      "start_km": 2.5,
+      "end_km": 3.0,
+      "change_m": -16,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Moses Gate Country Park",
+      "type": "park",
+      "first_km": 0.0,
+      "last_km": 4.6
+    },
+    {
+      "name": "Manchester, Bolton and Bury Canal",
+      "type": "canal",
+      "first_km": 1.6,
+      "last_km": 4.1
+    },
+    {
+      "name": "Manchester, Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 1.6,
+      "last_km": 4.1
+    },
+    {
+      "name": "Nob End SSSI",
+      "type": "nature_reserve",
+      "first_km": 3.1,
+      "last_km": 3.3
+    }
+  ],
+  "road_names": []
+}

@@ -1,0 +1,112 @@
+{
+  "slug": "trail-8k--stand-snape-outwood",
+  "distance_km": 8.27,
+  "elev_gain_m": 106,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 1.5,
+      "change_m": 57,
+      "direction": "climb"
+    },
+    {
+      "start_km": 1.8,
+      "end_km": 2.2,
+      "change_m": 10,
+      "direction": "climb"
+    },
+    {
+      "start_km": 2.2,
+      "end_km": 3.8,
+      "change_m": -62,
+      "direction": "descent"
+    },
+    {
+      "start_km": 3.8,
+      "end_km": 6.0,
+      "change_m": 23,
+      "direction": "climb"
+    },
+    {
+      "start_km": 6.0,
+      "end_km": 7.0,
+      "change_m": -21,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Snape Hill Wood",
+      "type": "wood",
+      "first_km": 3.1,
+      "last_km": 4.5
+    },
+    {
+      "name": "Fat Hurst Wood",
+      "type": "wood",
+      "first_km": 3.8,
+      "last_km": 4.7
+    },
+    {
+      "name": "Little Hurst Wood",
+      "type": "wood",
+      "first_km": 4.4,
+      "last_km": 5.0
+    },
+    {
+      "name": "Clifton Country Park",
+      "type": "park",
+      "first_km": 4.5,
+      "last_km": 4.8
+    },
+    {
+      "name": "Pale Walk",
+      "type": "path",
+      "first_km": 4.9,
+      "last_km": 5.0
+    },
+    {
+      "name": "Giant's Seat Wood",
+      "type": "wood",
+      "first_km": 5.0,
+      "last_km": 5.0
+    },
+    {
+      "name": "Irwell Sculpture Trail",
+      "type": "path",
+      "first_km": 5.5,
+      "last_km": 5.6
+    },
+    {
+      "name": "Outwood Country Park",
+      "type": "park",
+      "first_km": 5.5,
+      "last_km": 7.1
+    },
+    {
+      "name": "Irwell Sculpture Trail",
+      "type": "path",
+      "first_km": 5.8,
+      "last_km": 6.7
+    },
+    {
+      "name": "Nickerhole Clough",
+      "type": "wood",
+      "first_km": 6.9,
+      "last_km": 7.0
+    },
+    {
+      "name": "Manchester Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 7.0,
+      "last_km": 7.5
+    },
+    {
+      "name": "Manchester, Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 7.0,
+      "last_km": 7.5
+    }
+  ],
+  "road_names": []
+}

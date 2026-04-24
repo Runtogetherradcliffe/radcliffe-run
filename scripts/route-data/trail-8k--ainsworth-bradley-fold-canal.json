@@ -1,0 +1,70 @@
+{
+  "slug": "trail-8k--ainsworth-bradley-fold-canal",
+  "distance_km": 8.99,
+  "elev_gain_m": 58,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 0.5,
+      "change_m": 15,
+      "direction": "climb"
+    },
+    {
+      "start_km": 0.5,
+      "end_km": 2.8,
+      "change_m": 23,
+      "direction": "climb"
+    },
+    {
+      "start_km": 2.8,
+      "end_km": 4.8,
+      "change_m": -9,
+      "direction": "descent"
+    },
+    {
+      "start_km": 5.2,
+      "end_km": 6.8,
+      "change_m": -21,
+      "direction": "descent"
+    },
+    {
+      "start_km": 6.8,
+      "end_km": 7.8,
+      "change_m": -13,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Manchester, Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 1.2,
+      "last_km": 8.4
+    },
+    {
+      "name": "Manchester Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 5.1,
+      "last_km": 8.4
+    },
+    {
+      "name": "Ladyshore",
+      "type": "park",
+      "first_km": 6.2,
+      "last_km": 6.4
+    },
+    {
+      "name": "Nickerhole Clough",
+      "type": "wood",
+      "first_km": 7.8,
+      "last_km": 7.9
+    },
+    {
+      "name": "Outwood Country Park",
+      "type": "park",
+      "first_km": 7.8,
+      "last_km": 8.0
+    }
+  ],
+  "road_names": []
+}

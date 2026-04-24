@@ -1,0 +1,52 @@
+{
+  "slug": "trail-5k--withins-res-back-via-banana-path",
+  "distance_km": 6.11,
+  "elev_gain_m": 48,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 0.5,
+      "change_m": 14,
+      "direction": "climb"
+    },
+    {
+      "start_km": 0.5,
+      "end_km": 3.0,
+      "change_m": 18,
+      "direction": "climb"
+    },
+    {
+      "start_km": 3.0,
+      "end_km": 5.2,
+      "change_m": -19,
+      "direction": "descent"
+    },
+    {
+      "start_km": 5.2,
+      "end_km": 6.2,
+      "change_m": -16,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Manchester Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 1.0,
+      "last_km": 5.2
+    },
+    {
+      "name": "Lower Withins path",
+      "type": "path",
+      "first_km": 2.3,
+      "last_km": 2.4
+    },
+    {
+      "name": "Withins Reservoir SBI",
+      "type": "reservoir",
+      "first_km": 2.5,
+      "last_km": 2.6
+    }
+  ],
+  "road_names": []
+}

@@ -1,0 +1,58 @@
+{
+  "slug": "road-8k--rnr-bury-nr-dumers",
+  "distance_km": 8.72,
+  "elev_gain_m": 76,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 1.8,
+      "change_m": 43,
+      "direction": "climb"
+    },
+    {
+      "start_km": 1.8,
+      "end_km": 3.2,
+      "change_m": -18,
+      "direction": "descent"
+    },
+    {
+      "start_km": 3.2,
+      "end_km": 4.0,
+      "change_m": 12,
+      "direction": "climb"
+    },
+    {
+      "start_km": 4.0,
+      "end_km": 5.0,
+      "change_m": -30,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Coronation Park",
+      "type": "park",
+      "first_km": 0.5,
+      "last_km": 0.6
+    },
+    {
+      "name": "Springwater Park",
+      "type": "park",
+      "first_km": 0.8,
+      "last_km": 0.9
+    },
+    {
+      "name": "Whitefield Park",
+      "type": "park",
+      "first_km": 2.2,
+      "last_km": 2.3
+    },
+    {
+      "name": "Manchester Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 7.3,
+      "last_km": 7.5
+    }
+  ],
+  "road_names": []
+}

@@ -1,0 +1,94 @@
+{
+  "slug": "trail-8k--along-the-canal-and-around-elton",
+  "distance_km": 8.27,
+  "elev_gain_m": 53,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 0.5,
+      "change_m": 14,
+      "direction": "climb"
+    },
+    {
+      "start_km": 0.5,
+      "end_km": 3.5,
+      "change_m": 10,
+      "direction": "climb"
+    },
+    {
+      "start_km": 3.5,
+      "end_km": 6.0,
+      "change_m": -9,
+      "direction": "descent"
+    },
+    {
+      "start_km": 6.0,
+      "end_km": 8.5,
+      "change_m": -22,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Manchester Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 0.8,
+      "last_km": 7.4
+    },
+    {
+      "name": "Elton Reservoir",
+      "type": "reservoir",
+      "first_km": 2.7,
+      "last_km": 5.4
+    },
+    {
+      "name": "Elton Reservoir Northwest Shore Path",
+      "type": "path",
+      "first_km": 3.7,
+      "last_km": 4.3
+    },
+    {
+      "name": "Round Oak to Elton Reservoir Car Park",
+      "type": "path",
+      "first_km": 3.7,
+      "last_km": 3.8
+    },
+    {
+      "name": "Elton Reservoir Southwest Shore Path",
+      "type": "path",
+      "first_km": 4.2,
+      "last_km": 4.8
+    },
+    {
+      "name": "Elton Reservoir Northwest Shore Path",
+      "type": "path",
+      "first_km": 4.3,
+      "last_km": 4.4
+    },
+    {
+      "name": "Elton Reservoir Southwest Shore Path",
+      "type": "path",
+      "first_km": 4.8,
+      "last_km": 5.3
+    },
+    {
+      "name": "Withins Reservoir SBI",
+      "type": "reservoir",
+      "first_km": 5.7,
+      "last_km": 5.7
+    },
+    {
+      "name": "Lower Withins path",
+      "type": "path",
+      "first_km": 5.9,
+      "last_km": 5.9
+    },
+    {
+      "name": "Lower Withins Path",
+      "type": "path",
+      "first_km": 6.1,
+      "last_km": 6.2
+    }
+  ],
+  "road_names": []
+}

@@ -1,0 +1,70 @@
+{
+  "slug": "trail-8k--canal-out-road-back",
+  "distance_km": 8.28,
+  "elev_gain_m": 55,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 2.0,
+      "change_m": 13,
+      "direction": "climb"
+    },
+    {
+      "start_km": 2.0,
+      "end_km": 6.0,
+      "change_m": 27,
+      "direction": "climb"
+    },
+    {
+      "start_km": 6.0,
+      "end_km": 7.2,
+      "change_m": -26,
+      "direction": "descent"
+    },
+    {
+      "start_km": 7.2,
+      "end_km": 8.2,
+      "change_m": -14,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Manchester, Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 0.6,
+      "last_km": 7.1
+    },
+    {
+      "name": "Manchester Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 0.7,
+      "last_km": 7.1
+    },
+    {
+      "name": "Outwood Country Park",
+      "type": "park",
+      "first_km": 1.0,
+      "last_km": 1.2
+    },
+    {
+      "name": "Nickerhole Clough",
+      "type": "wood",
+      "first_km": 1.1,
+      "last_km": 1.2
+    },
+    {
+      "name": "Ladyshore",
+      "type": "park",
+      "first_km": 2.5,
+      "last_km": 2.8
+    },
+    {
+      "name": "Mytham Park",
+      "type": "park",
+      "first_km": 4.8,
+      "last_km": 5.0
+    }
+  ],
+  "road_names": []
+}

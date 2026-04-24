@@ -1,0 +1,88 @@
+{
+  "slug": "road-5k--banana-path-one-loop",
+  "distance_km": 5.11,
+  "elev_gain_m": 47,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 0.5,
+      "change_m": 13,
+      "direction": "climb"
+    },
+    {
+      "start_km": 0.5,
+      "end_km": 2.0,
+      "change_m": 21,
+      "direction": "climb"
+    },
+    {
+      "start_km": 2.0,
+      "end_km": 4.0,
+      "change_m": -19,
+      "direction": "descent"
+    },
+    {
+      "start_km": 4.0,
+      "end_km": 5.2,
+      "change_m": -15,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Manchester Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 0.7,
+      "last_km": 1.7
+    },
+    {
+      "name": "Manchester Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 3.8,
+      "last_km": 4.2
+    },
+    {
+      "name": "Manchester, Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 3.8,
+      "last_km": 4.2
+    }
+  ],
+  "road_names": [
+    {
+      "approx_km": 0.6,
+      "road": "Darbyshire Street",
+      "suburb": "Outwood Gate"
+    },
+    {
+      "approx_km": 1.1,
+      "road": "Banana Path",
+      "suburb": "Black Lane"
+    },
+    {
+      "approx_km": 1.7,
+      "road": "Belgrave Drive",
+      "suburb": "Black Lane"
+    },
+    {
+      "approx_km": 2.3,
+      "road": "Ainsworth Road",
+      "suburb": "Black Lane"
+    },
+    {
+      "approx_km": 2.8,
+      "road": "Coronation Road",
+      "suburb": "Black Lane"
+    },
+    {
+      "approx_km": 4.0,
+      "road": "Water Street",
+      "suburb": "Black Lane"
+    },
+    {
+      "approx_km": 4.5,
+      "road": "Hutchinson Way",
+      "suburb": "Black Lane"
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "slug": "trail-8k--canal-elton-woos-daisyfield",
+  "distance_km": 8.81,
+  "elev_gain_m": 41,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 0.8,
+      "change_m": 16,
+      "direction": "climb"
+    },
+    {
+      "start_km": 0.8,
+      "end_km": 4.0,
+      "change_m": 13,
+      "direction": "climb"
+    },
+    {
+      "start_km": 4.0,
+      "end_km": 5.0,
+      "change_m": -15,
+      "direction": "descent"
+    },
+    {
+      "start_km": 5.0,
+      "end_km": 9.0,
+      "change_m": -14,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Manchester Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 0.9,
+      "last_km": 7.8
+    },
+    {
+      "name": "Elton Reservoir",
+      "type": "reservoir",
+      "first_km": 3.6,
+      "last_km": 3.7
+    },
+    {
+      "name": "Daisyfield Site of Biological Importance",
+      "type": "wood",
+      "first_km": 5.1,
+      "last_km": 5.2
+    },
+    {
+      "name": "Manchester Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 5.4,
+      "last_km": 5.7
+    },
+    {
+      "name": "Farmer's Arms Wharf access",
+      "type": "path",
+      "first_km": 5.7,
+      "last_km": 5.8
+    }
+  ],
+  "road_names": []
+}

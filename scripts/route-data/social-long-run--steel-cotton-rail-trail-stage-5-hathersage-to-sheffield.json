@@ -1,0 +1,166 @@
+{
+  "slug": "social-long-run--steel-cotton-rail-trail-stage-5-hathersage-to-sheffield",
+  "distance_km": 22.09,
+  "elev_gain_m": 283,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 0.8,
+      "change_m": -16,
+      "direction": "descent"
+    },
+    {
+      "start_km": 0.8,
+      "end_km": 3.0,
+      "change_m": 42,
+      "direction": "climb"
+    },
+    {
+      "start_km": 3.5,
+      "end_km": 8.0,
+      "change_m": 203,
+      "direction": "climb"
+    },
+    {
+      "start_km": 8.0,
+      "end_km": 12.5,
+      "change_m": -237,
+      "direction": "descent"
+    },
+    {
+      "start_km": 12.5,
+      "end_km": 13.0,
+      "change_m": 19,
+      "direction": "climb"
+    },
+    {
+      "start_km": 13.0,
+      "end_km": 16.8,
+      "change_m": -62,
+      "direction": "descent"
+    },
+    {
+      "start_km": 16.8,
+      "end_km": 19.2,
+      "change_m": -25,
+      "direction": "descent"
+    },
+    {
+      "start_km": 19.2,
+      "end_km": 19.8,
+      "change_m": 9,
+      "direction": "climb"
+    },
+    {
+      "start_km": 19.8,
+      "end_km": 20.5,
+      "change_m": -15,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Fallcliff Wood",
+      "type": "wood",
+      "first_km": 1.6,
+      "last_km": 1.9
+    },
+    {
+      "name": "Gorsey Bank Wood",
+      "type": "wood",
+      "first_km": 1.8,
+      "last_km": 1.8
+    },
+    {
+      "name": "Coppice Wood",
+      "type": "wood",
+      "first_km": 1.8,
+      "last_km": 2.1
+    },
+    {
+      "name": "Rough Wood",
+      "type": "wood",
+      "first_km": 2.0,
+      "last_km": 2.1
+    },
+    {
+      "name": "Bolehill Wood",
+      "type": "wood",
+      "first_km": 2.7,
+      "last_km": 2.8
+    },
+    {
+      "name": "Padley Gorge",
+      "type": "wood",
+      "first_km": 3.2,
+      "last_km": 4.9
+    },
+    {
+      "name": "Yarncliff Wood",
+      "type": "wood",
+      "first_km": 3.8,
+      "last_km": 4.9
+    },
+    {
+      "name": "Akley Bank",
+      "type": "wood",
+      "first_km": 9.9,
+      "last_km": 10.1
+    },
+    {
+      "name": "Grove Walk",
+      "type": "path",
+      "first_km": 10.1,
+      "last_km": 10.1
+    },
+    {
+      "name": "Poynton Wood",
+      "type": "wood",
+      "first_km": 10.4,
+      "last_km": 11.4
+    },
+    {
+      "name": "Ecclesall Woods",
+      "type": "wood",
+      "first_km": 12.1,
+      "last_km": 13.6
+    },
+    {
+      "name": "Ladies Spring Wood",
+      "type": "wood",
+      "first_km": 12.3,
+      "last_km": 12.7
+    },
+    {
+      "name": "Millhouses Park",
+      "type": "park",
+      "first_km": 13.2,
+      "last_km": 15.0
+    },
+    {
+      "name": "Hutcliffe Wood",
+      "type": "wood",
+      "first_km": 13.2,
+      "last_km": 14.8
+    },
+    {
+      "name": "Marriott Wood",
+      "type": "wood",
+      "first_km": 14.7,
+      "last_km": 14.7
+    },
+    {
+      "name": "Heeley People's Park",
+      "type": "park",
+      "first_km": 18.8,
+      "last_km": 18.9
+    },
+    {
+      "name": "Sheaf",
+      "type": "river",
+      "first_km": 18.9,
+      "last_km": 19.0
+    }
+  ],
+  "road_names": []
+}

@@ -1,0 +1,76 @@
+{
+  "slug": "road-8k--3-peaks",
+  "distance_km": 9.9,
+  "elev_gain_m": 174,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 0.5,
+      "change_m": 14,
+      "direction": "climb"
+    },
+    {
+      "start_km": 0.5,
+      "end_km": 1.0,
+      "change_m": -14,
+      "direction": "descent"
+    },
+    {
+      "start_km": 1.0,
+      "end_km": 2.0,
+      "change_m": 53,
+      "direction": "climb"
+    },
+    {
+      "start_km": 2.0,
+      "end_km": 3.0,
+      "change_m": -53,
+      "direction": "descent"
+    },
+    {
+      "start_km": 3.0,
+      "end_km": 4.8,
+      "change_m": 65,
+      "direction": "climb"
+    },
+    {
+      "start_km": 4.8,
+      "end_km": 6.2,
+      "change_m": -57,
+      "direction": "descent"
+    },
+    {
+      "start_km": 6.2,
+      "end_km": 7.5,
+      "change_m": 35,
+      "direction": "climb"
+    },
+    {
+      "start_km": 7.5,
+      "end_km": 10.0,
+      "change_m": -45,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Outwood Country Park",
+      "type": "park",
+      "first_km": 2.6,
+      "last_km": 3.9
+    },
+    {
+      "name": "Coronation Park",
+      "type": "park",
+      "first_km": 6.9,
+      "last_km": 9.1
+    },
+    {
+      "name": "Springwater Park",
+      "type": "park",
+      "first_km": 7.2,
+      "last_km": 8.8
+    }
+  ],
+  "road_names": []
+}

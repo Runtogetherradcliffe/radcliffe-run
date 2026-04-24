@@ -1,0 +1,33 @@
+{
+  "slug": "trail-5k--springwater-park",
+  "distance_km": 5.52,
+  "elev_gain_m": 84,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 1.0,
+      "change_m": 25,
+      "direction": "climb"
+    },
+    {
+      "start_km": 1.0,
+      "end_km": 2.0,
+      "change_m": -25,
+      "direction": "descent"
+    },
+    {
+      "start_km": 2.0,
+      "end_km": 3.8,
+      "change_m": 43,
+      "direction": "climb"
+    },
+    {
+      "start_km": 3.8,
+      "end_km": 5.8,
+      "change_m": -43,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [],
+  "road_names": []
+}

@@ -1,0 +1,46 @@
+{
+  "slug": "road-5k--church-st-eton-hill-spring-lane-asda",
+  "distance_km": 5.39,
+  "elev_gain_m": 31,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 2.5,
+      "change_m": 9,
+      "direction": "climb"
+    },
+    {
+      "start_km": 3.8,
+      "end_km": 4.2,
+      "change_m": 10,
+      "direction": "climb"
+    },
+    {
+      "start_km": 4.2,
+      "end_km": 5.5,
+      "change_m": -15,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Manchester Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 1.9,
+      "last_km": 3.5
+    },
+    {
+      "name": "Manchester Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 4.3,
+      "last_km": 4.5
+    },
+    {
+      "name": "Manchester, Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 4.3,
+      "last_km": 4.5
+    }
+  ],
+  "road_names": []
+}

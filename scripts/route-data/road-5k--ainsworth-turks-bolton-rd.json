@@ -1,0 +1,93 @@
+{
+  "slug": "road-5k--ainsworth-turks-bolton-rd",
+  "distance_km": 5.51,
+  "elev_gain_m": 48,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 0.5,
+      "change_m": 15,
+      "direction": "climb"
+    },
+    {
+      "start_km": 0.5,
+      "end_km": 1.8,
+      "change_m": 16,
+      "direction": "climb"
+    },
+    {
+      "start_km": 1.8,
+      "end_km": 3.0,
+      "change_m": 10,
+      "direction": "climb"
+    },
+    {
+      "start_km": 3.0,
+      "end_km": 4.8,
+      "change_m": -27,
+      "direction": "descent"
+    },
+    {
+      "start_km": 4.8,
+      "end_km": 5.5,
+      "change_m": -14,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Manchester, Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 1.2,
+      "last_km": 4.2
+    },
+    {
+      "name": "Manchester Bolton & Bury Canal",
+      "type": "canal",
+      "first_km": 3.3,
+      "last_km": 4.2
+    }
+  ],
+  "road_names": [
+    {
+      "approx_km": 0.6,
+      "road": "Blackburn Street",
+      "suburb": "Black Lane"
+    },
+    {
+      "approx_km": 1.2,
+      "road": "Water Street",
+      "suburb": "Black Lane"
+    },
+    {
+      "approx_km": 1.8,
+      "road": "Ainsworth Road",
+      "suburb": "Black Lane"
+    },
+    {
+      "approx_km": 2.4,
+      "road": "Turks Road",
+      "suburb": "Black Lane"
+    },
+    {
+      "approx_km": 3.0,
+      "road": "Countess Lane",
+      "suburb": "Black Lane"
+    },
+    {
+      "approx_km": 3.6,
+      "road": "Bolton Road",
+      "suburb": "Black Lane"
+    },
+    {
+      "approx_km": 4.2,
+      "road": "Water Street",
+      "suburb": "Black Lane"
+    },
+    {
+      "approx_km": 4.8,
+      "road": "Blackburn Street",
+      "suburb": "Outwood Gate"
+    }
+  ]
+}

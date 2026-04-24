@@ -1,0 +1,124 @@
+{
+  "slug": "trail-8k--clifton-country-park",
+  "distance_km": 8.37,
+  "elev_gain_m": 65,
+  "terrain": [
+    {
+      "start_km": 2.8,
+      "end_km": 3.0,
+      "change_m": -13,
+      "direction": "descent"
+    },
+    {
+      "start_km": 3.0,
+      "end_km": 4.8,
+      "change_m": 19,
+      "direction": "climb"
+    },
+    {
+      "start_km": 4.8,
+      "end_km": 6.2,
+      "change_m": -19,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Towpath",
+      "type": "path",
+      "first_km": 0.0,
+      "last_km": 8.3
+    },
+    {
+      "name": "Clifton Country Park",
+      "type": "park",
+      "first_km": 0.6,
+      "last_km": 8.2
+    },
+    {
+      "name": "Giant's Seat Wood",
+      "type": "wood",
+      "first_km": 0.9,
+      "last_km": 7.9
+    },
+    {
+      "name": "The Kingfisher Trail",
+      "type": "path",
+      "first_km": 0.9,
+      "last_km": 1.0
+    },
+    {
+      "name": "Clifton Marina",
+      "type": "water",
+      "first_km": 1.1,
+      "last_km": 7.6
+    },
+    {
+      "name": "Clifton Marina",
+      "type": "reservoir",
+      "first_km": 1.1,
+      "last_km": 7.6
+    },
+    {
+      "name": "Towpath",
+      "type": "path",
+      "first_km": 1.8,
+      "last_km": 7.4
+    },
+    {
+      "name": "Fletcher's Canal",
+      "type": "canal",
+      "first_km": 2.0,
+      "last_km": 7.1
+    },
+    {
+      "name": "Fletcher's Canal",
+      "type": "canal",
+      "first_km": 2.3,
+      "last_km": 6.8
+    },
+    {
+      "name": "Towpath",
+      "type": "path",
+      "first_km": 2.4,
+      "last_km": 6.8
+    },
+    {
+      "name": "LIVIA",
+      "type": "park",
+      "first_km": 3.4,
+      "last_km": 3.9
+    },
+    {
+      "name": "Waterdale",
+      "type": "park",
+      "first_km": 3.9,
+      "last_km": 4.8
+    },
+    {
+      "name": "Fat Hurst Wood",
+      "type": "wood",
+      "first_km": 4.8,
+      "last_km": 6.9
+    },
+    {
+      "name": "Pale Walk",
+      "type": "path",
+      "first_km": 7.3,
+      "last_km": 7.6
+    },
+    {
+      "name": "The Kingfisher Trail",
+      "type": "path",
+      "first_km": 7.3,
+      "last_km": 7.4
+    },
+    {
+      "name": "Fletcher's Canal (abandoned)",
+      "type": "canal",
+      "first_km": 7.3,
+      "last_km": 7.4
+    }
+  ],
+  "road_names": []
+}

@@ -1,0 +1,64 @@
+{
+  "slug": "trail-8k--burrs-to-summerseat-loop",
+  "distance_km": 9.08,
+  "elev_gain_m": 115,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 1.0,
+      "change_m": 12,
+      "direction": "climb"
+    },
+    {
+      "start_km": 1.0,
+      "end_km": 2.8,
+      "change_m": 22,
+      "direction": "climb"
+    },
+    {
+      "start_km": 2.8,
+      "end_km": 3.5,
+      "change_m": -9,
+      "direction": "descent"
+    },
+    {
+      "start_km": 3.5,
+      "end_km": 3.8,
+      "change_m": 8,
+      "direction": "climb"
+    },
+    {
+      "start_km": 3.8,
+      "end_km": 4.2,
+      "change_m": 10,
+      "direction": "climb"
+    },
+    {
+      "start_km": 4.8,
+      "end_km": 6.2,
+      "change_m": -28,
+      "direction": "descent"
+    },
+    {
+      "start_km": 6.2,
+      "end_km": 7.0,
+      "change_m": 20,
+      "direction": "climb"
+    },
+    {
+      "start_km": 7.0,
+      "end_km": 8.0,
+      "change_m": -24,
+      "direction": "descent"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Burrs Country Park",
+      "type": "park",
+      "first_km": 0.0,
+      "last_km": 9.0
+    }
+  ],
+  "road_names": []
+}

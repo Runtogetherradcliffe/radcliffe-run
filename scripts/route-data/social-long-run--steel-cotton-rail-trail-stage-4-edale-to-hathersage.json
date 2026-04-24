@@ -1,0 +1,124 @@
+{
+  "slug": "social-long-run--steel-cotton-rail-trail-stage-4-edale-to-hathersage",
+  "distance_km": 19.86,
+  "elev_gain_m": 249,
+  "terrain": [
+    {
+      "start_km": 0.0,
+      "end_km": 1.2,
+      "change_m": 15,
+      "direction": "climb"
+    },
+    {
+      "start_km": 1.2,
+      "end_km": 2.5,
+      "change_m": -15,
+      "direction": "descent"
+    },
+    {
+      "start_km": 2.5,
+      "end_km": 3.2,
+      "change_m": 44,
+      "direction": "climb"
+    },
+    {
+      "start_km": 3.2,
+      "end_km": 4.0,
+      "change_m": -33,
+      "direction": "descent"
+    },
+    {
+      "start_km": 4.0,
+      "end_km": 4.8,
+      "change_m": 40,
+      "direction": "climb"
+    },
+    {
+      "start_km": 4.8,
+      "end_km": 6.8,
+      "change_m": -94,
+      "direction": "descent"
+    },
+    {
+      "start_km": 6.8,
+      "end_km": 7.2,
+      "change_m": 21,
+      "direction": "climb"
+    },
+    {
+      "start_km": 7.2,
+      "end_km": 9.8,
+      "change_m": -51,
+      "direction": "descent"
+    },
+    {
+      "start_km": 9.8,
+      "end_km": 11.0,
+      "change_m": 37,
+      "direction": "climb"
+    },
+    {
+      "start_km": 11.0,
+      "end_km": 12.5,
+      "change_m": -49,
+      "direction": "descent"
+    },
+    {
+      "start_km": 12.5,
+      "end_km": 13.5,
+      "change_m": 43,
+      "direction": "climb"
+    },
+    {
+      "start_km": 13.5,
+      "end_km": 15.0,
+      "change_m": -48,
+      "direction": "descent"
+    },
+    {
+      "start_km": 15.0,
+      "end_km": 16.2,
+      "change_m": -11,
+      "direction": "descent"
+    },
+    {
+      "start_km": 16.8,
+      "end_km": 18.0,
+      "change_m": -10,
+      "direction": "descent"
+    },
+    {
+      "start_km": 18.0,
+      "end_km": 18.5,
+      "change_m": 9,
+      "direction": "climb"
+    },
+    {
+      "start_km": 18.5,
+      "end_km": 19.0,
+      "change_m": -9,
+      "direction": "descent"
+    },
+    {
+      "start_km": 19.0,
+      "end_km": 19.8,
+      "change_m": 15,
+      "direction": "climb"
+    }
+  ],
+  "features_on_route": [
+    {
+      "name": "Backside Wood",
+      "type": "wood",
+      "first_km": 4.9,
+      "last_km": 6.1
+    },
+    {
+      "name": "Goose Nest Wood",
+      "type": "wood",
+      "first_km": 18.5,
+      "last_km": 18.5
+    }
+  ],
+  "road_names": []
+}
