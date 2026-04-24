@@ -117,7 +117,7 @@ export default function SignInPage() {
             <>
               <h1 style={{ fontSize: 20, fontWeight: 700, marginBottom: 6 }}>Sign in</h1>
               <p style={{ fontSize: 14, color: '#888', marginBottom: 28, lineHeight: 1.6 }}>
-                Enter your registered email and we&apos;ll send you a 6-digit code. No password needed.
+                Enter your registered email and we&apos;ll send you an 8-digit code. No password needed.
               </p>
 
               <form onSubmit={handleSendCode} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -151,7 +151,7 @@ export default function SignInPage() {
             <>
               <h1 style={{ fontSize: 20, fontWeight: 700, marginBottom: 6 }}>Enter your code</h1>
               <p style={{ fontSize: 14, color: '#888', marginBottom: 28, lineHeight: 1.6 }}>
-                We&apos;ve sent a 6-digit code to <strong style={{ color: '#ccc' }}>{email}</strong>.
+                We&apos;ve sent an 8-digit code to <strong style={{ color: '#ccc' }}>{email}</strong>.
                 Enter it below — check your spam if it doesn&apos;t arrive.
               </p>
 
@@ -165,18 +165,18 @@ export default function SignInPage() {
                     type="text"
                     inputMode="numeric"
                     pattern="[0-9]*"
-                    maxLength={6}
+                    maxLength={8}
                     required
                     value={code}
                     onChange={e => setCode(e.target.value.replace(/\D/g, ''))}
-                    placeholder="123456"
+                    placeholder="12345678"
                     style={{ ...INPUT_STYLE, fontSize: 24, letterSpacing: '0.2em', textAlign: 'center' }}
                   />
                 </div>
 
                 {error && <ErrorBox error={error} />}
 
-                <button type="submit" disabled={loading || code.length < 6} style={BTN_STYLE(loading || code.length < 6)}>
+                <button type="submit" disabled={loading || code.length < 8} style={BTN_STYLE(loading || code.length < 8)}>
                   {loading ? 'Verifying…' : 'Sign in'}
                 </button>
               </form>
