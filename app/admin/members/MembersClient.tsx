@@ -1,4 +1,5 @@
 'use client'
+
 import { useState } from 'react'
 
 type Member = {
@@ -15,6 +16,8 @@ type Member = {
   health_declaration: boolean
   status: 'active' | 'inactive'
   created_at: string
+  is_run_leader: boolean
+  uka_number: string | null
 }
 
 export default function MembersClient({ members: initial }: { members: Member[] }) {
@@ -31,13 +34,13 @@ export default function MembersClient({ members: initial }: { members: Member[] 
     return matchesQ && matchesF
   })
 
-  const activeCount   = members.filter(m => m.status === 'active').length
-  const inactiveCount = members.filter(m => m.status === 'inactive').length
+  const activeCount      = members.filter(m => m.status === 'active').length
+  const inactiveCount    = members.filter(m => m.status === 'inactive').length
+  const runLeaderCount   = members.filter(m => m.is_run_leader).length
 
   async function toggleStatus(id: string, current: 'active' | 'inactive') {
     const next = current === 'active' ? 'inactive' : 'active'
     setToggling(id)
-    // Optimistic update
     setMembers(prev => prev.map(m => m.id === id ? { ...m, status: next } : m))
     try {
       const res = await fetch(`/api/admin/members/${id}`, {
@@ -45,11 +48,7 @@ export default function MembersClient({ members: initial }: { members: Member[] 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: next }),
       })
-      if (!res.ok) {
-        // Revert on failure
-        setMembers(prev => prev.map(m => m.id === id ? { ...m, status: current } : m))
-        console.error('Failed to update status')
-      }
+      if (!res.ok) setMembers(prev => prev.map(m => m.id === id ? { ...m, status: current } : m))
     } catch {
       setMembers(prev => prev.map(m => m.id === id ? { ...m, status: current } : m))
     } finally {
@@ -57,14 +56,33 @@ export default function MembersClient({ members: initial }: { members: Member[] 
     }
   }
 
+  async function toggleLeader(id: string, current: boolean) {
+    setMembers(prev => prev.map(m => m.id === id ? { ...m, is_run_leader: !current } : m))
+    const res = await fetch(`/api/admin/members/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ is_run_leader: !current }),
+    })
+    if (!res.ok) setMembers(prev => prev.map(m => m.id === id ? { ...m, is_run_leader: current } : m))
+  }
+
+  async function saveUka(id: string, uka: string) {
+    await fetch(`/api/admin/members/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ uka_number: uka }),
+    })
+    setMembers(prev => prev.map(m => m.id === id ? { ...m, uka_number: uka || null } : m))
+  }
+
   return (
     <div>
       {/* Summary strip */}
-      <div style={{ display: 'flex', gap: 12, marginBottom: 24 }}>
+      <div style={{ display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}>
         {[
-          { label: 'Total',    value: members.length,  key: 'all'      },
-          { label: 'Active',   value: activeCount,     key: 'active'   },
-          { label: 'Inactive', value: inactiveCount,   key: 'inactive' },
+          { label: 'Total',        value: members.length, key: 'all'      },
+          { label: 'Active',       value: activeCount,    key: 'active'   },
+          { label: 'Inactive',     value: inactiveCount,  key: 'inactive' },
         ].map(({ label, value, key }) => (
           <button
             key={key}
@@ -80,6 +98,13 @@ export default function MembersClient({ members: initial }: { members: Member[] 
             <p style={{ fontSize: 12, color: '#666', marginTop: 2 }}>{label}</p>
           </button>
         ))}
+        <div style={{
+          background: '#111', border: '1px solid #1e1e1e',
+          borderRadius: 10, padding: '12px 20px', textAlign: 'left',
+        }}>
+          <p style={{ fontSize: 22, fontWeight: 800, color: '#f5a623', letterSpacing: '-0.02em' }}>{runLeaderCount}</p>
+          <p style={{ fontSize: 12, color: '#666', marginTop: 2 }}>Run leaders</p>
+        </div>
       </div>
 
       {/* Search */}
@@ -110,17 +135,12 @@ export default function MembersClient({ members: initial }: { members: Member[] 
             padding: '10px 20px', borderBottom: '1px solid #1a1a1a',
             fontSize: 11, fontWeight: 600, color: '#444', letterSpacing: '0.08em', textTransform: 'uppercase',
           }}>
-            <span>Name</span>
-            <span>Email</span>
-            <span>Mobile</span>
-            <span>Joined</span>
-            <span>Status</span>
-            <span></span>
+            <span>Name</span><span>Email</span><span>Mobile</span>
+            <span>Joined</span><span>Status</span><span></span>
           </div>
 
           {filtered.map((m, i) => (
             <div key={m.id}>
-              {/* Row */}
               <div
                 style={{
                   display: 'grid', gridTemplateColumns: '1fr 1fr 140px 110px 100px 80px',
@@ -131,9 +151,18 @@ export default function MembersClient({ members: initial }: { members: Member[] 
                 }}
                 onClick={() => setExpanded(expanded === m.id ? null : m.id)}
               >
-                <p style={{ fontSize: 14, fontWeight: 600, color: '#ddd' }}>
-                  {m.first_name} {m.last_name}
-                </p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <p style={{ fontSize: 14, fontWeight: 600, color: '#ddd' }}>
+                    {m.first_name} {m.last_name}
+                  </p>
+                  {m.is_run_leader && (
+                    <span style={{
+                      fontSize: 10, fontWeight: 700, letterSpacing: '0.06em',
+                      background: '#2a1a04', color: '#f5a623', border: '1px solid #4a2a04',
+                      borderRadius: 4, padding: '2px 6px', textTransform: 'uppercase',
+                    }}>Leader</span>
+                  )}
+                </div>
                 <p style={{ fontSize: 13, color: '#666' }}>{m.email}</p>
                 <p style={{ fontSize: 13, color: '#555' }}>{m.mobile ?? '—'}</p>
                 <p style={{ fontSize: 12, color: '#444' }}>
@@ -167,8 +196,8 @@ export default function MembersClient({ members: initial }: { members: Member[] 
 
               {/* Expanded detail */}
               {expanded === m.id && (
-                <div style={{ padding: '16px 20px 20px', background: '#0d0d0d', borderBottom: i < filtered.length - 1 ? '1px solid #1a1a1a' : 'none' }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
+                <div style={{ padding: '20px', background: '#0d0d0d', borderBottom: i < filtered.length - 1 ? '1px solid #1a1a1a' : 'none' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, marginBottom: 20 }}>
                     <div>
                       <p style={{ fontSize: 11, fontWeight: 600, color: '#444', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Emergency contact</p>
                       <p style={{ fontSize: 13, color: '#ccc', fontWeight: 600 }}>{m.emergency_name}</p>
@@ -191,6 +220,40 @@ export default function MembersClient({ members: initial }: { members: Member[] 
                       </p>
                     </div>
                   </div>
+
+                  {/* Run leader section */}
+                  <div style={{
+                    borderTop: '1px solid #1a1a1a', paddingTop: 16,
+                    display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap',
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <p style={{ fontSize: 12, fontWeight: 600, color: '#555' }}>Run leader</p>
+                      <button
+                        onClick={() => toggleLeader(m.id, m.is_run_leader)}
+                        style={{
+                          width: 44, height: 24, borderRadius: 12, border: 'none',
+                          cursor: 'pointer', background: m.is_run_leader ? '#f5a623' : '#222',
+                          position: 'relative', transition: 'background 0.2s', flexShrink: 0,
+                        }}
+                        aria-label="Toggle run leader"
+                      >
+                        <span style={{
+                          position: 'absolute', top: 3,
+                          left: m.is_run_leader ? 23 : 3,
+                          width: 18, height: 18, borderRadius: '50%',
+                          background: '#fff', transition: 'left 0.2s',
+                        }} />
+                      </button>
+                    </div>
+
+                    {m.is_run_leader && (
+                      <UkaInput
+                        memberId={m.id}
+                        initialValue={m.uka_number ?? ''}
+                        onSave={(uka) => saveUka(m.id, uka)}
+                      />
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -203,6 +266,53 @@ export default function MembersClient({ members: initial }: { members: Member[] 
         {query && ` matching "${query}"`}
         {filter !== 'all' && ` · ${filter} only`}
       </p>
+    </div>
+  )
+}
+
+function UkaInput({ memberId, initialValue, onSave }: { memberId: string; initialValue: string; onSave: (v: string) => void }) {
+  const [value, setValue] = useState(initialValue)
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+
+  async function handleSave() {
+    setSaving(true)
+    await onSave(value)
+    setSaving(false)
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2000)
+  }
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <div>
+        <p style={{ fontSize: 11, fontWeight: 600, color: '#555', marginBottom: 4 }}>UKA number</p>
+        <div style={{ display: 'flex', gap: 6 }}>
+          <input
+            type="text"
+            value={value}
+            onChange={e => setValue(e.target.value)}
+            placeholder="e.g. 5001234"
+            style={{
+              background: '#111', border: '1px solid #2a2a2a', borderRadius: 6,
+              padding: '6px 10px', fontSize: 13, color: '#ccc',
+              fontFamily: 'Inter, sans-serif', outline: 'none', width: 130,
+            }}
+          />
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            style={{
+              background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 6,
+              padding: '6px 12px', fontSize: 12, fontWeight: 600,
+              color: saved ? '#4caf76' : '#888', cursor: 'pointer',
+              fontFamily: 'Inter, sans-serif',
+            }}
+          >
+            {saving ? '…' : saved ? 'Saved ✓' : 'Save'}
+          </button>
+        </div>
+      </div>
     </div>
   )
 }
