@@ -1,6 +1,7 @@
 import Nav from '@/components/layout/Nav'
 import Footer from '@/components/layout/Footer'
 import FaqAccordion from './FaqAccordion'
+import { supabaseAdmin } from '@/lib/supabase'
 
 export const metadata = {
   title: 'About — radcliffe.run',
@@ -28,7 +29,10 @@ function InfoRow({ label, value }: { label: string; value: string }) {
   )
 }
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const { data: memberCountData } = await supabaseAdmin().rpc('get_member_count')
+  const memberCount = memberCountData !== null ? String(memberCountData) : '…'
+
   return (
     <>
       <Nav />
@@ -51,7 +55,7 @@ export default function AboutPage() {
             <StatCard value="£0" label="Cost to join" sub="Always free" />
             <StatCard value="Thu" label="Every week" sub="7pm sharp" />
             <StatCard value="65+" label="Routes" sub="Road & trail" />
-            <StatCard value="~50" label="Runners/week" sub="All abilities" />
+            <StatCard value={memberCount} label="Registered runners" sub="And counting" />
           </div>
         </section>
 

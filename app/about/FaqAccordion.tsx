@@ -21,15 +21,15 @@ const FAQS: FaqItem[] = [
   },
   {
     q: 'What time and where do you meet?',
-    a: 'We meet every Thursday at 7pm at Radcliffe Market, Church Street West, Radcliffe, M26 2TN. Look for the orange vests — you can\'t miss us.',
+    a: 'We meet every Thursday at 7pm at Radcliffe Market, Church Street West, Radcliffe, M26 2TN. Look for the runners outside the market — you can\'t miss us.',
   },
   {
     q: 'Do I need to book in advance?',
-    a: 'For Thursday sessions you can book through the Run Together Runner app (available on iOS and Android), but you\'re also very welcome to just turn up. We\'d always rather see you than have you miss a run because the app defeated you.',
+    a: 'For Thursday sessions you can book through the Run Together Runner app (available on iOS and Android), but you\'re also very welcome to just turn up — you don\'t need to book to come along. We\'d always rather see you than have you miss a run because the app defeated you. If you\'d like to register on this site, all we need is your contact details — we use these for runner safety and you\'ll receive occasional group emails.',
   },
   {
     q: 'What should I wear and bring?',
-    a: 'Whatever you\'d normally run in. On Thursday evenings a hi-vis or reflective layer is sensible in autumn and winter. Bring water if it\'s warm. We don\'t hang about at the end so no need to bring anything else.',
+    a: 'Whatever you\'d normally run in. On Thursday evenings a hi-vis or reflective layer is sensible in autumn and winter, and lights if you have them. Bring water if it\'s warm. We don\'t hang about at the end so no need to bring anything else.',
   },
   {
     q: 'What distances do you run?',
@@ -37,7 +37,7 @@ const FAQS: FaqItem[] = [
   },
   {
     q: 'Is it just road running?',
-    a: 'We do both road and trail. Thursday evenings are mostly road, but we have a big trail contingent in the group and run plenty of off-road routes — particularly in spring and summer. Take a look at the route library to get a feel for where we go.',
+    a: 'We do both road and trail. When we have lighter evenings we\'re on trails — in darker months we run on the road. Take a look at the route library to get a feel for where we go.',
   },
   {
     q: 'I\'m coming back from injury — is that okay?',

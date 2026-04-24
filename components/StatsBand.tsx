@@ -23,10 +23,9 @@ export default function StatsBand({ routeCount }: { routeCount: number }) {
   }, [])
 
   const STATS = [
-    { num: memberCount, desktop: 'Registered runners', mobile: 'registered' },
-    { num: '30–40',     desktop: 'Out every Thursday', mobile: 'per week'   },
-    { num: String(routeCount), desktop: 'Mapped routes', mobile: 'routes'  },
-    { num: 'Free',      desktop: 'Always, forever',    mobile: 'always'     },
+    { num: memberCount,        desktop: 'Registered runners', mobile: 'registered' },
+    { num: String(routeCount), desktop: 'Mapped routes',      mobile: 'routes'     },
+    { num: 'Free',             desktop: 'Always, forever',    mobile: 'always'     },
   ]
 
   if (isMobile) {
@@ -46,7 +45,7 @@ export default function StatsBand({ routeCount }: { routeCount: number }) {
 
   return (
     <div style={{ background: '#f5a623' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24, maxWidth: 1200, margin: '0 auto', padding: '40px 32px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24, maxWidth: 1200, margin: '0 auto', padding: '40px 32px' }}>
         {STATS.map(({ num, desktop }) => (
           <div key={desktop} style={{ textAlign: 'center' }}>
             <div style={{ fontSize: 48, fontWeight: 800, color: '#0a0a0a', letterSpacing: '-0.04em', lineHeight: 1 }}>{num}</div>

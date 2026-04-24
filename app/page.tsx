@@ -403,11 +403,6 @@ export default async function HomePage() {
                               2 GROUPS
                             </span>
                           )}
-                          {run.has_jeffing && (
-                            <span style={{ position: 'absolute', bottom: 8, left: 10, background: 'rgba(10,10,10,0.75)', border: '1px solid rgba(251,191,36,0.5)', borderRadius: 4, padding: '3px 8px', fontSize: 10, fontWeight: 700, color: '#fbbf24', letterSpacing: '0.06em' }}>
-                              JEFFING TONIGHT
-                            </span>
-                          )}
                         </div>
 
                         {/* ── Card body ── */}
@@ -429,18 +424,24 @@ export default async function HomePage() {
                             <div style={{ display: 'flex', gap: 8 }}>
                               {companionGroup && companion && (
                                 <Link href={`/runs/${companion.id}`} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '8px 10px', borderRadius: 6, textDecoration: 'none', fontSize: 11, fontWeight: 700, letterSpacing: '0.04em', ...(GROUP_BADGE[companionGroup] ?? {}) }}>
-                                  {companionGroup === '5K' ? `5K · ${companion.has_jeffing ? 'Run or Jeff' : 'Run'}` : '8K · Run'} →
+                                  {companionGroup === '5K'
+                                ? companion.has_jeffing ? 'Get Me Started / Keep Me Going →' : 'Keep Me Going →'
+                                : 'Challenge Me →'}
                                 </Link>
                               )}
                               {primaryGroup && (
                                 <Link href={`/runs/${run.id}`} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '8px 10px', borderRadius: 6, textDecoration: 'none', fontSize: 11, fontWeight: 700, letterSpacing: '0.04em', ...(GROUP_BADGE[primaryGroup] ?? {}) }}>
-                                  {primaryGroup === '5K' ? `5K · ${run.has_jeffing ? 'Run or Jeff' : 'Run'}` : '8K · Run'} →
+                                  {primaryGroup === '5K'
+                                    ? run.has_jeffing ? 'Get Me Started / Keep Me Going →' : 'Keep Me Going →'
+                                    : 'Challenge Me →'}
                                 </Link>
                               )}
                             </div>
                           ) : (
                             <Link href={`/runs/${run.id}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', borderRadius: 6, textDecoration: 'none', fontSize: 12, fontWeight: 700, letterSpacing: '0.04em', ...(primaryGroup ? GROUP_BADGE[primaryGroup] : { background: 'rgba(255,255,255,0.04)', border: '1px solid #222', color: '#888' }) }}>
-                              <span>{primaryGroup === '5K' ? `5K · ${run.has_jeffing ? 'Run or Jeff' : 'Run'}` : primaryGroup === '8K' ? '8K · Run' : 'View details'}</span>
+                              <span>{primaryGroup === '5K'
+                                ? run.has_jeffing ? 'Get Me Started / Keep Me Going' : 'Keep Me Going'
+                                : primaryGroup === '8K' ? 'Challenge Me' : 'View details'}</span>
                               <span>→</span>
                             </Link>
                           )}
