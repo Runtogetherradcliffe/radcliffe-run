@@ -150,7 +150,7 @@ export default async function HomePage() {
               <Link href="/join" style={{ display: 'inline-flex', alignItems: 'center', background: '#f5a623', color: '#0a0a0a', fontSize: 14, fontWeight: 700, padding: '12px 24px', borderRadius: 8, textDecoration: 'none' }}>
                 Join the group
               </Link>
-              <Link href="/signin" style={{ display: 'inline-flex', alignItems: 'center', fontSize: 14, fontWeight: 500, color: '#555', textDecoration: 'none', padding: '12px 4px' }}>
+              <Link href="/signin" style={{ display: 'inline-flex', alignItems: 'center', background: 'transparent', color: '#7cb87c', fontSize: 14, fontWeight: 500, padding: '12px 24px', borderRadius: 8, textDecoration: 'none', border: '1px solid rgba(124,184,124,0.3)' }}>
                 Sign in
               </Link>
             </div>
