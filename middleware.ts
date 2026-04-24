@@ -10,10 +10,12 @@ export async function middleware(request: NextRequest) {
   // Only active when PREVIEW_PASSWORD env var is set (remove var to disable)
   const previewPassword = process.env.PREVIEW_PASSWORD
   if (previewPassword) {
-    const isPreviewLogin = pathname === '/preview-login'
+    const isPreviewLogin  = pathname === '/preview-login'
+    const isLeaderRoute   = pathname.startsWith('/leader')
+    const isAuthCallback  = pathname.startsWith('/auth/callback')
     const authed = request.cookies.get(PREVIEW_COOKIE)?.value === previewPassword
 
-    if (!isPreviewLogin && !authed) {
+    if (!isPreviewLogin && !isLeaderRoute && !isAuthCallback && !authed) {
       const url = request.nextUrl.clone()
       url.pathname = '/preview-login'
       url.searchParams.set('next', pathname)
