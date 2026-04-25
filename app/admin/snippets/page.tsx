@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, CSSProperties } from 'react'
 import AdminShell from '@/components/AdminShell'
 
 interface Snippet {
@@ -10,13 +10,13 @@ interface Snippet {
   created_at: string
 }
 
-const INPUT: React.CSSProperties = {
+const INPUT: CSSProperties = {
   width: '100%', background: '#0a0a0a', border: '1px solid #222',
   borderRadius: 8, padding: '10px 14px', fontSize: 14, color: '#fff',
   fontFamily: 'Inter, sans-serif', outline: 'none', boxSizing: 'border-box',
 }
-const TEXTAREA: React.CSSProperties = { ...INPUT, resize: 'vertical', minHeight: 100, lineHeight: 1.7 }
-const LABEL: React.CSSProperties = { display: 'block', fontSize: 12, fontWeight: 600, color: '#888', marginBottom: 6, fontFamily: 'Inter, sans-serif' }
+const TEXTAREA: CSSProperties = { ...INPUT, resize: 'vertical', minHeight: 100, lineHeight: 1.7 }
+const LABEL: CSSProperties = { display: 'block', fontSize: 12, fontWeight: 600, color: '#888', marginBottom: 6, fontFamily: 'Inter, sans-serif' }
 
 export default function SnippetsPage() {
   const [snippets, setSnippets] = useState<Snippet[]>([])
