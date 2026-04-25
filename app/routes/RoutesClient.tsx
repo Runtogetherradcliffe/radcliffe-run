@@ -117,6 +117,12 @@ export default function RoutesClient() {
       import('leaflet/dist/leaflet.css' as any),
     ]).then(([L]) => {
       if (cancelled || mapObjRef.current) return
+
+      // Defensive: clear any stale Leaflet state that survived a previous unmount
+      if (mapRef.current && (mapRef.current as any)._leaflet_id) {
+        delete (mapRef.current as any)._leaflet_id
+      }
+
       leafletRef.current = L.default || L
 
       const map = leafletRef.current.map(mapRef.current!, {
