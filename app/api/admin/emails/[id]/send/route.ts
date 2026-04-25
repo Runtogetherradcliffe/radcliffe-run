@@ -68,7 +68,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (email.show_route_block && email.thursday_date) {
     const { data: runRows } = await db
       .from('runs')
-      .select('id, date, title, description, route_slug, distance_km, terrain, meeting_point, on_tour, cancelled')
+      .select('id, date, title, description, route_slug, distance_km, terrain, meeting_point, meeting_map_url, on_tour, has_jeffing, cancelled')
       .eq('date', email.thursday_date)
       .eq('cancelled', false)
       .neq('run_type', 'social')
