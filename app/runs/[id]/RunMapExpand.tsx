@@ -81,14 +81,14 @@ export default function RunMapExpand({ file, accentColor = '#f5a623' }: { file: 
   }, [])
 
   return (
-    <>
+    <div>
       <button
         onClick={() => setOpen(o => !o)}
         style={{
           display: 'inline-flex', alignItems: 'center', gap: 6,
           fontSize: 13, fontWeight: 600, color: accentColor,
           background: 'none', border: 'none', padding: 0, cursor: 'pointer',
-          fontFamily: 'Inter, sans-serif', marginTop: 14,
+          fontFamily: 'Inter, sans-serif',
         }}
       >
         {open ? 'Hide map ↑' : 'Show route map ↓'}
@@ -115,6 +115,6 @@ export default function RunMapExpand({ file, accentColor = '#f5a623' }: { file: 
           </div>
         )}
       </div>
-    </>
+    </div>
   )
 }
