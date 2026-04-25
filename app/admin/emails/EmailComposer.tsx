@@ -1,5 +1,5 @@
 'use client'
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useCallback, useEffect, useRef, ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 
 interface Snippet {
@@ -45,7 +45,7 @@ const INPUT = {
 const TEXTAREA = { ...INPUT, resize: 'vertical' as const, minHeight: 100, lineHeight: 1.7 }
 const LABEL = { display: 'block' as const, fontSize: 12, fontWeight: 600, color: '#888', marginBottom: 6, fontFamily: 'Inter, sans-serif' }
 
-function Section({ title, color = '#f5a623', children }: { title: string; color?: string; children: React.ReactNode }) {
+function Section({ title, color = '#f5a623', children }: { title: string; color?: string; children: ReactNode }) {
   return (
     <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 12, overflow: 'hidden', marginBottom: 16 }}>
       <div style={{ padding: '14px 20px', borderBottom: '1px solid #1a1a1a', display: 'flex', alignItems: 'center', gap: 8 }}>
