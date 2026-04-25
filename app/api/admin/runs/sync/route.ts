@@ -230,50 +230,6 @@ function parseSocialRows(rows: string[][]): RunRow[] {
   return out
 }
 
-/* ── Debug: inspect sheet columns without writing to DB ── */
-export async function GET() {
-  let thursdayRows: string[][]
-  try {
-    thursdayRows = await fetchCSV(THURSDAY_SHEET)
-  } catch (err) {
-    return NextResponse.json({ error: `Failed to fetch sheet: ${err}` }, { status: 502 })
-  }
-
-  const header = thursdayRows[0] ?? []
-
-  const today = new Date().toISOString().slice(0, 10) // YYYY-MM-DD
-
-  // Find upcoming rows (dates >= today) and show first 10
-  const upcomingRows = thursdayRows.slice(1).filter(row => {
-    const d = parseDate(row[0] ?? '')
-    return d && d >= today
-  }).slice(0, 10)
-
-  const sheetData = upcomingRows.map((row, i) => ({
-    rowIndex: i + 1,
-    date:        parseDate(row[0] ?? ''),
-    r1Name:      row[2]  ?? '',
-    r2Name:      row[12] ?? '',
-    r1_slug:     extractSlug(row[34] ?? ''),
-    r2_slug:     extractSlug(row[35] ?? ''),
-  }))
-
-  // Show ALL upcoming runs exactly as the homepage sees them (limit 10, same query)
-  const { data: homepageRows, error: homepageError } = await supabaseAdmin()
-    .from('runs')
-    .select('id, date, title, route_slug, run_type, cancelled, distance_km')
-    .gte('date', today)
-    .eq('cancelled', false)
-    .order('date', { ascending: true })
-    .limit(10)
-
-  return NextResponse.json({
-    today,
-    sheet: sheetData,
-    homepage_query: { rows: homepageRows ?? [], error: homepageError?.message ?? null },
-  })
-}
-
 /* ── Main handler ── */
 export async function POST() {
   const supabase = await createClient()
