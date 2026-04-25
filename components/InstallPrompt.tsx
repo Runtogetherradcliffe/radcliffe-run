@@ -20,10 +20,15 @@ export default function InstallPrompt() {
     // Already permanently dismissed
     if (localStorage.getItem(STORAGE_KEY)) return
 
-    // Increment visit counter
-    const visits = parseInt(localStorage.getItem(VISIT_KEY) ?? '0', 10) + 1
-    localStorage.setItem(VISIT_KEY, String(visits))
-    if (visits < VISITS_NEEDED) return
+    // Increment visit counter once per session (not per page navigation)
+    const alreadyCountedThisSession = sessionStorage.getItem(VISIT_KEY)
+    const visits = parseInt(localStorage.getItem(VISIT_KEY) ?? '0', 10)
+    const newVisits = alreadyCountedThisSession ? visits : visits + 1
+    if (!alreadyCountedThisSession) {
+      localStorage.setItem(VISIT_KEY, String(newVisits))
+      sessionStorage.setItem(VISIT_KEY, '1')
+    }
+    if (newVisits < VISITS_NEEDED) return
 
     // Detect platform
     const ua = navigator.userAgent
