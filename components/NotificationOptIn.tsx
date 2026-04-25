@@ -53,6 +53,9 @@ export default function NotificationOptIn() {
       setPermission(Notification.permission)
     } finally {
       setLoading(false)
+      // Always dismiss — the user has made a choice, don't leave the banner hanging
+      setDismissed(true)
+      sessionStorage.setItem('rtr-notif-dismissed', '1')
     }
   }
 
