@@ -109,8 +109,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   // Load recipients
   let recipientQuery = db
     .from('members')
-    .select('email, first_name')
+    .select('id, email, first_name')
     .eq('status', 'active')
+    .eq('email_opt_out', false)
 
   if (email.recipient_filter !== 'all') {
     recipientQuery = recipientQuery.eq('cohort', email.recipient_filter)
@@ -122,14 +123,17 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: 'No recipients found' }, { status: 400 })
   }
 
-  // Build batch payloads (one email per recipient for clean delivery)
-  const payloads: ResendEmailPayload[] = members.map(m => ({
-    from:    `${FROM_NAME} <${FROM_ADDRESS}>`,
-    to:      [m.email],
-    subject: email.subject,
-    html,
-    text,
-  }))
+  // Build batch payloads — personalise unsubscribe URL per member
+  const payloads: ResendEmailPayload[] = members.map(m => {
+    const unsubscribeUrl = `${SITE_URL}/unsubscribe?id=${m.id}`
+    return {
+      from:    `${FROM_NAME} <${FROM_ADDRESS}>`,
+      to:      [m.email],
+      subject: email.subject,
+      html:    html.replaceAll('{{UNSUBSCRIBE_URL}}', unsubscribeUrl),
+      text:    text.replaceAll('{{UNSUBSCRIBE_URL}}', unsubscribeUrl),
+    }
+  })
 
   // Send in batches of BATCH_SIZE
   let successCount = 0
