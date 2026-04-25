@@ -8,6 +8,7 @@ const SITE_URL     = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://radcliffe.run'
 const RESEND_KEY   = process.env.RESEND_API_KEY ?? ''
 const FROM_ADDRESS = process.env.EMAIL_FROM ?? 'noreply@radcliffe.run'
 const FROM_NAME    = process.env.EMAIL_FROM_NAME ?? 'Run Together Radcliffe'
+const CRON_SECRET  = process.env.CRON_SECRET ?? ''
 const BATCH_SIZE   = 50  // Resend batch limit per request
 
 interface ResendEmailPayload {
@@ -34,10 +35,14 @@ async function sendBatch(emails: ResendEmailPayload[]): Promise<{ ok: boolean; e
   return { ok: true, errors: [] }
 }
 
-export async function POST(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  // Allow cron internal calls (no user session) via shared secret header
+  const isCron = CRON_SECRET && req.headers.get('x-cron-internal') === CRON_SECRET
+  if (!isCron) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
 
   const { id } = await params
   const db = supabaseAdmin()
