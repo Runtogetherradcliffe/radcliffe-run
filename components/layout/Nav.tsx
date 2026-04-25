@@ -55,7 +55,7 @@ export default function Nav() {
   const links = [
     { href: '/',        label: 'Home'    },
     { href: '/routes',  label: 'Routes'  },
-    { href: '/roundup', label: 'Roundup' },
+    { href: '/news',    label: 'Roundup' },
     { href: '/about',   label: 'About'   },
   ]
 
