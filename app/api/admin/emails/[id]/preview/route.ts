@@ -37,7 +37,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (merged.show_route_block !== false && thursdayDate) {
     const { data: runRows } = await db
       .from('runs')
-      .select('id, date, title, description, route_slug, distance_km, terrain, meeting_point, on_tour, cancelled')
+      .select('id, date, title, description, route_slug, distance_km, terrain, meeting_point, meeting_map_url, on_tour, has_jeffing, cancelled')
       .eq('date', thursdayDate)
       .eq('cancelled', false)
       .order('distance_km', { ascending: true })
