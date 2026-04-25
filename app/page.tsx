@@ -203,7 +203,7 @@ export default async function HomePage() {
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
                           {run.distance_km && <span style={{ fontSize: 12, color: '#555' }}>{run.distance_km} km</span>}
-                          <span style={{ fontSize: 12, color: '#333' }}>→</span>
+                          <span style={{ fontSize: 12, color: '#666' }}>→</span>
                         </div>
                       </Link>
                     )
@@ -414,8 +414,15 @@ export default async function HomePage() {
                             {cleanTitle(run.title)}
                           </p>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                            <span style={{ fontSize: 12, color: '#555' }}>📍 {run.on_tour ? run.meeting_point : 'Radcliffe Market'}</span>
-                            {run.terrain && <TerrainBadge terrain={run.terrain} />}
+                            <span style={{ fontSize: 12, color: '#555' }}>📍 {run.on_tour ? run.meeting_point.split(',')[0] : 'Radcliffe Market'}</span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                              {isTwoGroups ? (
+                                <span style={{ fontSize: 12, color: '#666' }}>{run.distance_km}/{companion!.distance_km} km</span>
+                              ) : run.distance_km ? (
+                                <span style={{ fontSize: 12, color: '#666' }}>{run.distance_km} km</span>
+                              ) : null}
+                              {run.terrain && <TerrainBadge terrain={run.terrain} />}
+                            </div>
                           </div>
 
                           {/* Group links — pinned to bottom */}
@@ -481,8 +488,9 @@ export default async function HomePage() {
                       <p style={{ fontSize: 15, fontWeight: 700, marginBottom: 8, lineHeight: 1.3 }}>
                         {cleanTitle(run.title)}
                       </p>
+                      <p style={{ fontSize: 12, color: '#555', marginBottom: 8 }}>📍 {run.meeting_point.split(',')[0]}</p>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                        {run.distance_km && <span style={{ fontSize: 12, color: '#555' }}>{run.distance_km} km</span>}
+                        {run.distance_km && <span style={{ fontSize: 12, color: '#666' }}>{run.distance_km} km</span>}
                         {run.terrain && <TerrainBadge terrain={run.terrain} />}
                       </div>
                       <div style={{ marginTop: 'auto' }}>
