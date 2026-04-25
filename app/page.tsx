@@ -519,7 +519,7 @@ export default async function HomePage() {
           <div style={{ background: '#070707' }}>
             <div style={{ maxWidth: 1100, margin: '0 auto', padding: '64px 24px' }}>
               <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 32, flexWrap: 'wrap', gap: 12 }}>
-                <h2 style={{ fontSize: 'clamp(20px, 3vw, 28px)', fontWeight: 800, letterSpacing: '-0.02em' }}>Latest from RTR</h2>
+                <h2 style={{ fontSize: 'clamp(20px, 3vw, 28px)', fontWeight: 800, letterSpacing: '-0.02em' }}>From the group</h2>
                 <Link href="/news" style={{ fontSize: 13, fontWeight: 600, color: '#f5a623', textDecoration: 'none' }}>
                   All posts →
                 </Link>
