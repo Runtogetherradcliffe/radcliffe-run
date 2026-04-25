@@ -11,7 +11,9 @@ export interface RunInfo {
   description: string | null
   route_slug: string | null
   meeting_point: string
+  meeting_map_url: string | null
   on_tour: boolean
+  has_jeffing: boolean
   terrain: string | null
 }
 
@@ -60,6 +62,16 @@ function runBlock(run: RunInfo, siteUrl: string, showTerrain = false): string {
   const terrainMap: Record<string, string> = { trail: '🌿 Trail', road: '🏙️ Road', mixed: '🔀 Mixed' }
   const terrainLabel = (showTerrain && run.terrain) ? terrainMap[run.terrain] ?? '' : ''
 
+  const jeffingBadge = run.has_jeffing
+    ? `<span style="display:inline-block;margin-left:8px;padding:2px 8px;background:#fff3d6;border:1px solid #f5a623;border-radius:4px;font-size:10px;font-weight:700;color:#c47f00;letter-spacing:0.05em;text-transform:uppercase;vertical-align:middle;">Run or Jeff</span>`
+    : ''
+
+  const meetingLine = run.on_tour && run.meeting_map_url
+    ? `📍 ${location} <strong style="color:#f5a623;">(On Tour)</strong> &nbsp;·&nbsp; <a href="${run.meeting_map_url}" style="color:#f5a623;font-weight:600;text-decoration:none;">View on map &rarr;</a>`
+    : run.on_tour
+    ? `📍 ${location} <strong style="color:#f5a623;">(On Tour)</strong>`
+    : `📍 ${location}`
+
   return `
 <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
   <tr>
@@ -68,11 +80,11 @@ function runBlock(run: RunInfo, siteUrl: string, showTerrain = false): string {
         ${dateStr} &bull; 7pm${distance ? ` &bull; ${distance}` : ''}${terrainLabel ? ` &bull; ${terrainLabel}` : ''}
       </p>
       <p style="margin:0 0 10px;font-size:18px;font-weight:700;color:#0a0a0a;letter-spacing:-0.02em;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-        ${title}
+        ${title}${jeffingBadge}
       </p>
       ${run.description ? `<p style="margin:0 0 14px;font-size:14px;color:#555555;line-height:1.7;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">${run.description}</p>` : ''}
       <p style="margin:0 0 14px;font-size:13px;color:#777777;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-        📍 ${location}${run.on_tour ? ' <strong style="color:#f5a623;">(On Tour)</strong>' : ''}
+        ${meetingLine}
       </p>
       <a href="${routeUrl}"
          style="display:inline-block;padding:10px 20px;background:#f5a623;color:#0a0a0a;font-size:13px;font-weight:700;text-decoration:none;border-radius:6px;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
@@ -167,7 +179,7 @@ export function buildEmailHtml(data: EmailData): string {
                 &nbsp;&bull;&nbsp; Every Thursday, 7pm &nbsp;&bull;&nbsp; Radcliffe Market, M26 2TN
               </p>
               <p style="margin:0;font-size:12px;color:#bbbbbb;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-                You're receiving this because you're registered with Run Together Radcliffe.
+                You're receiving this because you're registered with radcliffe.run.
               </p>
             </td>
           </tr>
@@ -195,10 +207,12 @@ export function buildEmailText(data: EmailData): string {
     lines.push('─'.repeat(40))
     for (const run of runs) {
       const dateStr = fmtDate(run.date)
-      lines.push(`${dateStr} · 7pm · ${run.distance_km ?? '?'}km`)
+      lines.push(`${dateStr} · 7pm · ${run.distance_km ?? '?'}km${run.has_jeffing ? ' · Run or Jeff' : ''}`)
       lines.push(cleanTitle(run.title))
       if (run.description) lines.push('', run.description)
-      lines.push(`📍 ${run.meeting_point}${run.on_tour ? ' (On Tour)' : ''}`)
+      const tourNote = run.on_tour ? ' (On Tour)' : ''
+      lines.push(`📍 ${run.meeting_point}${tourNote}`)
+      if (run.on_tour && run.meeting_map_url) lines.push(`Map: ${run.meeting_map_url}`)
       if (run.route_slug) lines.push(`Route: ${siteUrl}/routes/${run.route_slug}`)
       lines.push('')
     }
