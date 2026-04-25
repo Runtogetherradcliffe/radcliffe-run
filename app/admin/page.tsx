@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
+import { supabaseAdmin } from '@/lib/supabase'
 import SettingsClient from './SettingsClient'
 import AdminShell from '@/components/AdminShell'
 
@@ -22,9 +23,10 @@ export default async function AdminPage() {
   if (!user) redirect('/admin/login')
 
   // Fetch stats + settings
-  const [{ count: memberCount }, { count: runCount }, { data: recentMembers }, { data: settings }] = await Promise.all([
+  const [{ count: memberCount }, { count: runCount }, { count: roundupCount }, { data: recentMembers }, { data: settings }] = await Promise.all([
     supabase.from('members').select('*', { count: 'exact', head: true }),
     supabase.from('runs').select('*', { count: 'exact', head: true }).gte('date', new Date().toISOString().split('T')[0]),
+    supabaseAdmin().from('posts').select('*', { count: 'exact', head: true }).eq('type', 'roundup').eq('status', 'published'),
     supabase.from('members').select('first_name, last_name, email, created_at').order('created_at', { ascending: false }).limit(5),
     supabase.from('site_settings').select('hero_image_url, sync_thursday_sheet, sync_social_sheet, show_social_calendar, email_default_subject, email_default_opening, email_default_closing').single(),
   ])
@@ -42,7 +44,7 @@ export default async function AdminPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 40 }}>
           <StatCard value={memberCount ?? 0} label="Registered members" sub="All time" />
           <StatCard value={runCount ?? 0}    label="Upcoming runs" sub="Scheduled ahead" />
-          <StatCard value="—"               label="Roundups published" sub="Coming soon" />
+          <StatCard value={roundupCount ?? 0} label="Roundups published" sub="On radcliffe.run" />
         </div>
 
         {/* Recent registrations */}
