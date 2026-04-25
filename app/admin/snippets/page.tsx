@@ -123,9 +123,9 @@ export default function SnippetsPage() {
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 32, gap: 16 }}>
           <div>
-            <a href="/admin/emails" style={{ fontSize: 12, color: '#555', textDecoration: 'none' }}>← Back to emails</a>
+            <a href="/admin/emails" style={{ fontSize: 12, color: '#777', textDecoration: 'none' }}>← Back to emails</a>
             <h1 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em', marginTop: 6 }}>Message snippets</h1>
-            <p style={{ fontSize: 13, color: '#555', marginTop: 4 }}>
+            <p style={{ fontSize: 13, color: '#999', marginTop: 4 }}>
               Pre-written messages you can insert into the custom message field when composing an email.
               Toggle active/inactive to control which appear in the composer — useful for seasonal messages like lights reminders.
             </p>
@@ -198,10 +198,10 @@ export default function SnippetsPage() {
 
         {/* Snippet list */}
         {loading ? (
-          <p style={{ color: '#555', fontSize: 14 }}>Loading…</p>
+          <p style={{ color: '#999', fontSize: 14 }}>Loading…</p>
         ) : snippets.length === 0 ? (
           <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 12, padding: '40px 24px', textAlign: 'center' }}>
-            <p style={{ color: '#555', fontSize: 14, marginBottom: 12 }}>No snippets yet.</p>
+            <p style={{ color: '#999', fontSize: 14, marginBottom: 12 }}>No snippets yet.</p>
             <button onClick={startCreate} style={{ background: 'none', border: 'none', color: '#f5a623', fontSize: 13, cursor: 'pointer' }}>
               Create your first snippet →
             </button>
@@ -226,7 +226,7 @@ export default function SnippetsPage() {
                         {s.active ? 'Active' : 'Inactive'}
                       </span>
                     </div>
-                    <p style={{ fontSize: 13, color: '#555', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{s.body}</p>
+                    <p style={{ fontSize: 13, color: '#999', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{s.body}</p>
                   </div>
                   <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
                     <button
