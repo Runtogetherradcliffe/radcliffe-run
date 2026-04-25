@@ -2,6 +2,13 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 
+interface Snippet {
+  id: string
+  title: string
+  body: string
+  active: boolean
+}
+
 interface RunOption {
   date: string      // ISO date
   label: string     // display label e.g. "Thu 1 May — 5K & 8K"
@@ -82,6 +89,22 @@ export default function EmailComposer({ draft: initial, runOptions, isNew }: Pro
   const [previewOpen, setPreviewOpen] = useState(false)
   const [previewHtml, setPreviewHtml] = useState('')
   const previewRef = useRef<HTMLIFrameElement>(null)
+  const [snippets, setSnippets]           = useState<Snippet[]>([])
+  const [snippetMenuOpen, setSnippetMenuOpen] = useState(false)
+
+  useEffect(() => {
+    fetch('/api/admin/snippets')
+      .then(r => r.json())
+      .then(d => setSnippets(Array.isArray(d) ? d.filter((s: Snippet) => s.active) : []))
+      .catch(() => {})
+  }, [])
+
+  const insertSnippet = (body: string) => {
+    const current = draft.custom_text ?? ''
+    const joined  = current.trim() ? `${current.trim()}\n\n${body}` : body
+    set('custom_text', joined)
+    setSnippetMenuOpen(false)
+  }
 
   const set = (field: keyof EmailDraft, value: unknown) =>
     setDraft(d => ({ ...d, [field]: value }))
@@ -319,7 +342,45 @@ export default function EmailComposer({ draft: initial, runOptions, isNew }: Pro
 
         {/* ── Custom text ── */}
         <Section title="Custom message" color="#c4a8e8">
-          <label style={LABEL}>Additional message (optional)</label>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+            <label style={{ ...LABEL, marginBottom: 0 }}>Additional message (optional)</label>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              {snippets.length > 0 && !isSent && (
+                <div style={{ position: 'relative' }}>
+                  <button
+                    onClick={() => setSnippetMenuOpen(o => !o)}
+                    style={{ padding: '5px 12px', borderRadius: 6, background: 'transparent', border: '1px solid #333', color: '#888', fontSize: 12, cursor: 'pointer' }}
+                  >
+                    Insert snippet ▾
+                  </button>
+                  {snippetMenuOpen && (
+                    <div style={{
+                      position: 'absolute', top: '100%', right: 0, zIndex: 100, marginTop: 4,
+                      background: '#111', border: '1px solid #222', borderRadius: 8, minWidth: 220,
+                      boxShadow: '0 4px 16px rgba(0,0,0,0.4)', overflow: 'hidden',
+                    }}>
+                      {snippets.map(s => (
+                        <button
+                          key={s.id}
+                          onClick={() => insertSnippet(s.body)}
+                          style={{
+                            display: 'block', width: '100%', textAlign: 'left', padding: '10px 14px',
+                            background: 'none', border: 'none', borderBottom: '1px solid #1a1a1a',
+                            color: '#ccc', fontSize: 13, cursor: 'pointer', fontFamily: 'Inter, sans-serif',
+                          }}
+                        >
+                          {s.title}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+              <a href="/admin/snippets" style={{ fontSize: 11, color: '#444', textDecoration: 'none' }}>
+                Manage snippets →
+              </a>
+            </div>
+          </div>
           <textarea
             value={draft.custom_text}
             onChange={e => set('custom_text', e.target.value)}
