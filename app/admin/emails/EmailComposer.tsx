@@ -281,14 +281,15 @@ export default function EmailComposer({ draft: initial, runOptions, isNew }: Pro
               </select>
             </div>
             <div>
-              <label style={LABEL}>Scheduled send (optional)</label>
+              <label style={LABEL}>Send on date (optional)</label>
               <input
-                type="datetime-local"
-                value={draft.scheduled_for ? draft.scheduled_for.slice(0, 16) : ''}
-                onChange={e => set('scheduled_for', e.target.value ? new Date(e.target.value).toISOString() : null)}
+                type="date"
+                value={draft.scheduled_for ? draft.scheduled_for.slice(0, 10) : ''}
+                onChange={e => set('scheduled_for', e.target.value ? new Date(e.target.value + 'T00:00:00').toISOString() : null)}
                 disabled={isSent}
                 style={INPUT}
               />
+              <p style={{ fontSize: 11, color: '#555', marginTop: 5 }}>Email sends at ~8am on this date</p>
             </div>
           </div>
           <div>
