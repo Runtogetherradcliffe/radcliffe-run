@@ -3,7 +3,7 @@ import Nav from '@/components/layout/Nav'
 import Footer from '@/components/layout/Footer'
 import { supabaseAdmin } from '@/lib/supabase'
 
-export const metadata = { title: 'Latest from RTR — radcliffe.run' }
+export const metadata = { title: 'News & Roundups — radcliffe.run' }
 export const dynamic = 'force-dynamic'
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
@@ -41,10 +41,10 @@ export default async function NewsPage() {
 
           <div style={{ marginBottom: 40 }}>
             <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#f5a623', marginBottom: 10 }}>
-              Run Together Radcliffe
+              radcliffe.run
             </p>
             <h1 style={{ fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1.1 }}>
-              Latest from RTR
+              News &amp; roundups
             </h1>
           </div>
 
