@@ -179,7 +179,9 @@ export function buildEmailHtml(data: EmailData): string {
                 &nbsp;&bull;&nbsp; Every Thursday, 7pm &nbsp;&bull;&nbsp; Radcliffe Market, M26 2TN
               </p>
               <p style="margin:0;font-size:12px;color:#bbbbbb;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-                You're receiving this because you're registered with radcliffe.run.
+                You&apos;re receiving this because you&apos;re registered with radcliffe.run.
+                &nbsp;&bull;&nbsp;
+                <a href="{{UNSUBSCRIBE_URL}}" style="color:#bbbbbb;text-decoration:underline;">Unsubscribe</a>
               </p>
             </td>
           </tr>
@@ -228,5 +230,6 @@ export function buildEmailText(data: EmailData): string {
   }
 
   lines.push('—', 'radcliffe.run · Every Thursday, 7pm · Radcliffe Market')
+  lines.push('Unsubscribe: {{UNSUBSCRIBE_URL}}')
   return lines.join('\n')
 }
