@@ -117,6 +117,14 @@ export default async function HomePage() {
   const runCards     = thursdayRuns ?? []
   const socialRuns   = socialRunsData ?? []
 
+  // Latest posts for homepage feed
+  const { data: latestPosts } = await supabaseAdmin()
+    .from('posts')
+    .select('id, type, title, summary, slug, published_at, photo_urls')
+    .eq('status', 'published')
+    .order('published_at', { ascending: false })
+    .limit(3)
+
   return (
     <>
       <Nav />
@@ -504,6 +512,51 @@ export default async function HomePage() {
                 ))}
               </div>
             </section>
+          </div>
+        )}
+
+        {/* ── LATEST FROM RTR ── */}
+        {(latestPosts ?? []).length > 0 && (
+          <div style={{ background: '#070707' }}>
+            <div style={{ maxWidth: 1100, margin: '0 auto', padding: '64px 24px' }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 32, flexWrap: 'wrap', gap: 12 }}>
+                <h2 style={{ fontSize: 'clamp(20px, 3vw, 28px)', fontWeight: 800, letterSpacing: '-0.02em' }}>Latest from RTR</h2>
+                <Link href="/news" style={{ fontSize: 13, fontWeight: 600, color: '#f5a623', textDecoration: 'none' }}>
+                  All posts →
+                </Link>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
+                {(latestPosts ?? []).map(post => {
+                  const postSlug = post.slug ?? post.id
+                  const typeColor = post.type === 'roundup' ? '#f5a623' : '#6b9fd4'
+                  const typeLabel = post.type === 'roundup' ? 'Weekly roundup' : 'News'
+                  const dateStr = post.published_at
+                    ? (() => { const d = new Date(post.published_at + 'T00:00:00Z'); return `${d.getUTCDate()} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getUTCMonth()]}` })()
+                    : null
+                  const coverPhoto = post.photo_urls?.[0] ?? null
+                  return (
+                    <Link key={post.id} href={`/news/${postSlug}`} style={{ display: 'block', textDecoration: 'none', background: '#111', border: '1px solid #1a1a1a', borderRadius: 12, overflow: 'hidden' }}>
+                      {coverPhoto && (
+                        <div style={{ height: 160, overflow: 'hidden' }}>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={coverPhoto} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                        </div>
+                      )}
+                      <div style={{ padding: '16px 18px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                          <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: typeColor }}>{typeLabel}</span>
+                          {dateStr && <span style={{ fontSize: 10, color: '#444' }}>{dateStr}</span>}
+                        </div>
+                        <p style={{ fontSize: 15, fontWeight: 700, color: '#ddd', lineHeight: 1.3, marginBottom: post.summary ? 8 : 0 }}>{post.title}</p>
+                        {post.summary && (
+                          <p style={{ fontSize: 13, color: '#666', lineHeight: 1.5, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{post.summary}</p>
+                        )}
+                      </div>
+                    </Link>
+                  )
+                })}
+              </div>
+            </div>
           </div>
         )}
 
