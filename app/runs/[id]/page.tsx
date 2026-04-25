@@ -131,15 +131,20 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
                 About this route
               </p>
               <p style={{ fontSize: 14, color: '#bbb', lineHeight: 1.75 }}>{route.description}</p>
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginTop: 14 }}>
-                <RunMapExpand file={route.file} accentColor={accentColor} />
-                <a
-                  href={`/gpx/${route.file}`}
-                  download
-                  style={{ fontSize: 12, fontWeight: 600, color: '#0a0a0a', background: accentColor, padding: '7px 14px', borderRadius: 6, textDecoration: 'none', whiteSpace: 'nowrap' }}
-                >
-                  Download GPX
-                </a>
+              <div style={{ marginTop: 14 }}>
+                <RunMapExpand
+                  file={route.file}
+                  accentColor={accentColor}
+                  rightButton={
+                    <a
+                      href={`/gpx/${route.file}`}
+                      download
+                      style={{ fontSize: 12, fontWeight: 600, color: '#0a0a0a', background: accentColor, padding: '7px 14px', borderRadius: 6, textDecoration: 'none', whiteSpace: 'nowrap' }}
+                    >
+                      Download GPX
+                    </a>
+                  }
+                />
               </div>
             </div>
           )}
