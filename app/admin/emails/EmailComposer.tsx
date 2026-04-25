@@ -236,7 +236,7 @@ export default function EmailComposer({ draft: initial, runOptions, isNew }: Pro
           <div style={{ background: '#111', border: '1px solid #222', borderRadius: 12, overflow: 'hidden', width: '100%', maxWidth: 680, maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 20px', borderBottom: '1px solid #1a1a1a' }}>
               <p style={{ fontSize: 13, fontWeight: 700, color: '#ccc' }}>Email preview</p>
-              <button onClick={() => setPreviewOpen(false)} style={{ background: 'none', border: 'none', color: '#555', fontSize: 20, cursor: 'pointer', lineHeight: 1 }}>×</button>
+              <button onClick={() => setPreviewOpen(false)} style={{ background: 'none', border: 'none', color: '#999', fontSize: 20, cursor: 'pointer', lineHeight: 1 }}>×</button>
             </div>
             <iframe ref={previewRef} style={{ flex: 1, border: 'none', background: '#fff', minHeight: 500 }} title="Email preview" />
           </div>
@@ -248,7 +248,7 @@ export default function EmailComposer({ draft: initial, runOptions, isNew }: Pro
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28, gap: 12 }}>
           <div>
-            <a href="/admin/emails" style={{ fontSize: 12, color: '#555', textDecoration: 'none' }}>← All emails</a>
+            <a href="/admin/emails" style={{ fontSize: 12, color: '#999', textDecoration: 'none' }}>← All emails</a>
             <h1 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.02em', marginTop: 6 }}>
               {isNew ? 'Compose email' : isSent ? 'Sent email' : 'Edit draft'}
             </h1>
@@ -333,7 +333,7 @@ export default function EmailComposer({ draft: initial, runOptions, isNew }: Pro
             label="Include this week's run details (auto-populated from the selected Thursday)"
           />
           {draft.show_route_block && !draft.thursday_date && (
-            <p style={{ fontSize: 13, color: '#555', marginTop: 8 }}>Select a Thursday date above to preview the run details.</p>
+            <p style={{ fontSize: 13, color: '#999', marginTop: 8 }}>Select a Thursday date above to preview the run details.</p>
           )}
           {draft.show_route_block && draft.thursday_date && (
             <p style={{ fontSize: 13, color: '#7cb87c', marginTop: 8 }}>✓ Will include all runs for {draft.thursday_date} with descriptions and route links.</p>
