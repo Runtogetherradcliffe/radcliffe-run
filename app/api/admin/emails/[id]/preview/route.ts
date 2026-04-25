@@ -45,14 +45,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     runs = (runRows ?? []).map(r => {
       const route = r.route_slug ? ROUTES.find(ro => ro.slug === r.route_slug) : null
       return {
-        date:          r.date,
-        title:         r.title,
-        distance_km:   r.distance_km,
-        description:   route?.description ?? r.description ?? null,
-        route_slug:    r.route_slug,
-        meeting_point: r.meeting_point,
-        on_tour:       r.on_tour ?? false,
-        terrain:       r.terrain,
+        date:            r.date,
+        title:           r.title,
+        distance_km:     r.distance_km,
+        description:     route?.description ?? r.description ?? null,
+        route_slug:      r.route_slug,
+        meeting_point:   r.meeting_point,
+        meeting_map_url: r.meeting_map_url ?? null,
+        on_tour:         r.on_tour ?? false,
+        has_jeffing:     r.has_jeffing ?? false,
+        terrain:         r.terrain,
       }
     })
   }
