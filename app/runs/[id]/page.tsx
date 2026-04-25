@@ -4,6 +4,7 @@ import Nav from '@/components/layout/Nav'
 import Footer from '@/components/layout/Footer'
 import { supabaseAdmin } from '@/lib/supabase'
 import { ROUTES } from '@/lib/routes'
+import RunMapExpand from './RunMapExpand'
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 const DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
@@ -135,12 +136,7 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
                 About this route
               </p>
               <p style={{ fontSize: 14, color: '#bbb', lineHeight: 1.75 }}>{route.description}</p>
-              <a
-                href={`/routes#${run.route_slug}`}
-                style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 14, fontSize: 13, fontWeight: 600, color: accentColor, textDecoration: 'none' }}
-              >
-                View interactive map →
-              </a>
+              <RunMapExpand file={route.file} accentColor={accentColor} />
             </div>
           )}
 
@@ -164,10 +160,10 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
             </Link>
             {run.route_slug && (
               <Link
-                href={`/routes#${run.route_slug}`}
-                style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 600, color: '#0a0a0a', background: accentColor, padding: '10px 18px', borderRadius: 8, textDecoration: 'none' }}
+                href="/routes"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 600, color: '#888', background: '#111', border: '1px solid #1e1e1e', padding: '10px 18px', borderRadius: 8, textDecoration: 'none' }}
               >
-                View route map →
+                Browse all routes →
               </Link>
             )}
           </div>
