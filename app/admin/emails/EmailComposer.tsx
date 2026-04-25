@@ -285,7 +285,7 @@ export default function EmailComposer({ draft: initial, runOptions, isNew }: Pro
               <input
                 type="date"
                 value={draft.scheduled_for ? draft.scheduled_for.slice(0, 10) : ''}
-                onChange={e => set('scheduled_for', e.target.value ? new Date(e.target.value + 'T00:00:00').toISOString() : null)}
+                onChange={e => set('scheduled_for', e.target.value ? e.target.value + 'T00:00:00.000Z' : null)}
                 disabled={isSent}
                 style={INPUT}
               />
