@@ -4,7 +4,6 @@ import Link from 'next/link'
 import Nav from '@/components/layout/Nav'
 import Footer from '@/components/layout/Footer'
 import StatsBand from '@/components/StatsBand'
-import NotificationOptIn from '@/components/NotificationOptIn'
 import { createClient } from '@/utils/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { ROUTES } from '@/lib/routes'
@@ -584,7 +583,6 @@ export default async function HomePage() {
 
       </main>
       <Footer />
-      <NotificationOptIn />
     </>
   )
 }
