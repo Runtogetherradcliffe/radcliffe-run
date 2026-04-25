@@ -92,6 +92,9 @@ export default function EmailComposer({ draft: initial, runOptions, isNew }: Pro
   const [snippets, setSnippets]           = useState<Snippet[]>([])
   const [snippetMenuOpen, setSnippetMenuOpen] = useState(false)
 
+  const set = (field: keyof EmailDraft, value: unknown) =>
+    setDraft(d => ({ ...d, [field]: value }))
+
   useEffect(() => {
     fetch('/api/admin/snippets')
       .then(r => r.json())
@@ -105,9 +108,6 @@ export default function EmailComposer({ draft: initial, runOptions, isNew }: Pro
     set('custom_text', joined)
     setSnippetMenuOpen(false)
   }
-
-  const set = (field: keyof EmailDraft, value: unknown) =>
-    setDraft(d => ({ ...d, [field]: value }))
 
   const showToast = (msg: string, type: 'ok' | 'err' = 'ok') => {
     setToast({ msg, type })
