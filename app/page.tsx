@@ -432,14 +432,14 @@ export default async function HomePage() {
                               {companionGroup && companion && (
                                 <Link href={`/runs/${companion.id}`} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '8px 10px', borderRadius: 6, textDecoration: 'none', fontSize: 11, fontWeight: 700, letterSpacing: '0.04em', ...(GROUP_BADGE[companionGroup] ?? {}) }}>
                                   {companionGroup === '5K'
-                                ? companion.has_jeffing ? `${companion.distance_km}km · Get Me Started →` : `${companion.distance_km}km · Keep Me Going →`
+                                ? companion.has_jeffing ? `${companion.distance_km}km · Get Me Started / Keep Me Going →` : `${companion.distance_km}km · Keep Me Going →`
                                 : `${companion.distance_km}km · Challenge Me →`}
                                 </Link>
                               )}
                               {primaryGroup && (
                                 <Link href={`/runs/${run.id}`} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '8px 10px', borderRadius: 6, textDecoration: 'none', fontSize: 11, fontWeight: 700, letterSpacing: '0.04em', ...(GROUP_BADGE[primaryGroup] ?? {}) }}>
                                   {primaryGroup === '5K'
-                                    ? run.has_jeffing ? `${run.distance_km}km · Get Me Started →` : `${run.distance_km}km · Keep Me Going →`
+                                    ? run.has_jeffing ? `${run.distance_km}km · Get Me Started / Keep Me Going →` : `${run.distance_km}km · Keep Me Going →`
                                     : `${run.distance_km}km · Challenge Me →`}
                                 </Link>
                               )}
@@ -447,7 +447,7 @@ export default async function HomePage() {
                           ) : (
                             <Link href={`/runs/${run.id}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', borderRadius: 6, textDecoration: 'none', fontSize: 12, fontWeight: 700, letterSpacing: '0.04em', ...(primaryGroup ? GROUP_BADGE[primaryGroup] : { background: 'rgba(255,255,255,0.04)', border: '1px solid #222', color: '#888' }) }}>
                               <span>{primaryGroup === '5K'
-                                ? run.has_jeffing ? `${run.distance_km}km · Get Me Started` : `${run.distance_km}km · Keep Me Going`
+                                ? run.has_jeffing ? `${run.distance_km}km · Get Me Started / Keep Me Going` : `${run.distance_km}km · Keep Me Going`
                                 : primaryGroup === '8K' ? `${run.distance_km}km · Challenge Me` : 'View details'}</span>
                               <span>→</span>
                             </Link>
