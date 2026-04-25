@@ -26,7 +26,7 @@ export default async function AdminPage() {
     supabase.from('members').select('*', { count: 'exact', head: true }),
     supabase.from('runs').select('*', { count: 'exact', head: true }).gte('date', new Date().toISOString().split('T')[0]),
     supabase.from('members').select('first_name, last_name, email, created_at').order('created_at', { ascending: false }).limit(5),
-    supabase.from('site_settings').select('hero_image_url, sync_thursday_sheet, sync_social_sheet, show_social_calendar').single(),
+    supabase.from('site_settings').select('hero_image_url, sync_thursday_sheet, sync_social_sheet, show_social_calendar, email_default_subject, email_default_opening, email_default_closing').single(),
   ])
 
   return (
@@ -82,10 +82,13 @@ export default async function AdminPage() {
             <p style={{ fontSize: 12, color: '#999', marginTop: 4 }}>Hero image and data sync sources.</p>
           </div>
           <SettingsClient initial={{
-            hero_image_url:       settings?.hero_image_url       ?? null,
-            sync_thursday_sheet:  settings?.sync_thursday_sheet  ?? true,
-            sync_social_sheet:    settings?.sync_social_sheet    ?? true,
-            show_social_calendar: settings?.show_social_calendar ?? false,
+            hero_image_url:        settings?.hero_image_url        ?? null,
+            sync_thursday_sheet:   settings?.sync_thursday_sheet   ?? true,
+            sync_social_sheet:     settings?.sync_social_sheet     ?? true,
+            show_social_calendar:  settings?.show_social_calendar  ?? false,
+            email_default_subject: settings?.email_default_subject ?? null,
+            email_default_opening: settings?.email_default_opening ?? null,
+            email_default_closing: settings?.email_default_closing ?? null,
           }} />
         </div>
 
