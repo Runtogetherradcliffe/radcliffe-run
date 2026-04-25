@@ -85,7 +85,7 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', borderBottom: '1px solid #1a1a1a' }}>
       <div>
         <p style={{ fontSize: 14, fontWeight: 600, color: '#ccc', marginBottom: 2 }}>{label}</p>
-        <p style={{ fontSize: 12, color: '#555' }}>{sub}</p>
+        <p style={{ fontSize: 12, color: '#999' }}>{sub}</p>
       </div>
       <button
         onClick={() => onChange(!checked)}
@@ -102,7 +102,7 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
 
       {/* Hero image upload */}
       <div style={{ marginBottom: 24 }}>
-        <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#555', marginBottom: 12 }}>
+        <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#999', marginBottom: 12 }}>
           Hero image
         </p>
 
@@ -137,7 +137,7 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
           {preview && (
             <button
               onClick={() => { setPreview(null); setHeroUrl('') }}
-              style={{ background: 'transparent', border: '1px solid #2a2a2a', color: '#555', borderRadius: 8, padding: '9px 16px', fontSize: 13, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}
+              style={{ background: 'transparent', border: '1px solid #2a2a2a', color: '#999', borderRadius: 8, padding: '9px 16px', fontSize: 13, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}
             >
               Remove
             </button>
@@ -148,7 +148,7 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
 
       {/* Sync toggles */}
       <div style={{ marginBottom: 24 }}>
-        <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#555', marginBottom: 4 }}>
+        <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#999', marginBottom: 4 }}>
           Sync sources
         </p>
         {toggleRow('Thursday runs sheet', 'Syncs weekly 8k/5k groups from Google Sheets', syncThursday, setSyncThursday)}
