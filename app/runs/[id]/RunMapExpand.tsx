@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, ReactNode } from 'react'
 
 const MAP_HEIGHT = 300
 
@@ -12,7 +12,7 @@ async function loadGPXCoords(file: string): Promise<[number, number][]> {
   return pts.map(p => [parseFloat(p.getAttribute('lat')!), parseFloat(p.getAttribute('lon')!)])
 }
 
-export default function RunMapExpand({ file, accentColor = '#f5a623' }: { file: string; accentColor?: string }) {
+export default function RunMapExpand({ file, accentColor = '#f5a623', rightButton }: { file: string; accentColor?: string; rightButton?: ReactNode }) {
   const [open, setOpen]     = useState(false)
   const [status, setStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle')
   const mapRef    = useRef<HTMLDivElement>(null)
@@ -82,17 +82,21 @@ export default function RunMapExpand({ file, accentColor = '#f5a623' }: { file: 
 
   return (
     <div>
-      <button
-        onClick={() => setOpen(o => !o)}
-        style={{
-          display: 'inline-flex', alignItems: 'center', gap: 6,
-          fontSize: 13, fontWeight: 600, color: accentColor,
-          background: 'none', border: 'none', padding: 0, cursor: 'pointer',
-          fontFamily: 'Inter, sans-serif',
-        }}
-      >
-        {open ? 'Hide map ↑' : 'Show route map ↓'}
-      </button>
+      {/* Toggle + optional right-slot (e.g. Download GPX) on one row */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+        <button
+          onClick={() => setOpen(o => !o)}
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+            fontSize: 13, fontWeight: 600, color: accentColor,
+            background: 'none', border: 'none', padding: 0, cursor: 'pointer',
+            fontFamily: 'Inter, sans-serif',
+          }}
+        >
+          {open ? 'Hide map ↑' : 'Show route map ↓'}
+        </button>
+        {rightButton}
+      </div>
 
       {/* Outer wrapper clips to 0 when closed; inner div always full height so Leaflet gets real dimensions */}
       <div style={{
