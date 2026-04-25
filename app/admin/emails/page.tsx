@@ -68,7 +68,7 @@ export default async function AdminEmailsPage() {
           <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 12, overflow: 'hidden' }}>
             {upcoming.length === 0 ? (
               <div style={{ padding: '32px 24px', textAlign: 'center' }}>
-                <p style={{ color: '#555', fontSize: 14 }}>No drafts yet.</p>
+                <p style={{ color: '#999', fontSize: 14 }}>No drafts yet.</p>
                 <Link href="/admin/emails/new" style={{ fontSize: 13, color: '#f5a623', textDecoration: 'none' }}>Compose your first email →</Link>
               </div>
             ) : upcoming.map((e, i) => {
@@ -83,7 +83,7 @@ export default async function AdminEmailsPage() {
                     <p style={{ fontSize: 14, fontWeight: 600, color: '#fff', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {e.subject || '(no subject)'}
                     </p>
-                    <p style={{ fontSize: 12, color: '#555' }}>
+                    <p style={{ fontSize: 12, color: '#999' }}>
                       {e.thursday_date ? `For Thursday ${fmtDate(e.thursday_date)}` : 'No run attached'}
                       {e.scheduled_for ? ` · Send ${fmtDatetime(e.scheduled_for)}` : ' · No send time set'}
                     </p>
