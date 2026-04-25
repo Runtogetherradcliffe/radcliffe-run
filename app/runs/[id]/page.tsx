@@ -86,11 +86,6 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
                   {group} group
                 </span>
               )}
-              {run.distance_km && (
-                <span style={{ fontSize: 12, color: '#888', background: '#111', border: '1px solid #1e1e1e', borderRadius: 5, padding: '3px 8px' }}>
-                  {run.distance_km} km
-                </span>
-              )}
               {run.terrain && (
                 <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '3px 8px', borderRadius: 5, ...(TERRAIN_BADGE[run.terrain] ?? {}) }}>
                   {run.terrain}
@@ -136,7 +131,16 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
                 About this route
               </p>
               <p style={{ fontSize: 14, color: '#bbb', lineHeight: 1.75 }}>{route.description}</p>
-              <RunMapExpand file={route.file} accentColor={accentColor} />
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginTop: 14 }}>
+                <RunMapExpand file={route.file} accentColor={accentColor} />
+                <a
+                  href={`/gpx/${route.file}`}
+                  download
+                  style={{ fontSize: 12, fontWeight: 600, color: '#0a0a0a', background: accentColor, padding: '7px 14px', borderRadius: 6, textDecoration: 'none', whiteSpace: 'nowrap' }}
+                >
+                  Download GPX
+                </a>
+              </div>
             </div>
           )}
 
