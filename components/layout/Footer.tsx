@@ -21,7 +21,7 @@ export default function Footer() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {[
                 { href: '/routes',  label: 'Routes' },
-                { href: '/roundup', label: 'Roundup' },
+                { href: '/news',    label: 'Roundup' },
                 { href: '/about',   label: 'About' },
               ].map(({ href, label }) => (
                 <Link key={href} href={href} style={{ fontSize: 14, color: '#555', textDecoration: 'none', transition: 'color 0.2s' }}>
