@@ -125,7 +125,7 @@ export default function MembersClient({ members: initial }: { members: Member[] 
       {/* Table */}
       {filtered.length === 0 ? (
         <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 12, padding: '48px 20px', textAlign: 'center' }}>
-          <p style={{ fontSize: 14, color: '#555' }}>No members found</p>
+          <p style={{ fontSize: 14, color: '#999' }}>No members found</p>
         </div>
       ) : (
         <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 12, overflow: 'hidden' }}>
@@ -164,7 +164,7 @@ export default function MembersClient({ members: initial }: { members: Member[] 
                   )}
                 </div>
                 <p style={{ fontSize: 13, color: '#666' }}>{m.email}</p>
-                <p style={{ fontSize: 13, color: '#555' }}>{m.mobile ?? '—'}</p>
+                <p style={{ fontSize: 13, color: '#999' }}>{m.mobile ?? '—'}</p>
                 <p style={{ fontSize: 12, color: '#444' }}>
                   {new Date(m.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' })}
                 </p>
@@ -185,7 +185,7 @@ export default function MembersClient({ members: initial }: { members: Member[] 
                     disabled={toggling === m.id}
                     style={{
                       fontSize: 11, padding: '5px 10px', borderRadius: 6, cursor: toggling === m.id ? 'wait' : 'pointer',
-                      background: 'transparent', border: '1px solid #2a2a2a', color: '#555',
+                      background: 'transparent', border: '1px solid #2a2a2a', color: '#999',
                       fontFamily: 'Inter, sans-serif', fontWeight: 500,
                     }}
                   >
@@ -227,7 +227,7 @@ export default function MembersClient({ members: initial }: { members: Member[] 
                     display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap',
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                      <p style={{ fontSize: 12, fontWeight: 600, color: '#555' }}>Run leader</p>
+                      <p style={{ fontSize: 12, fontWeight: 600, color: '#999' }}>Run leader</p>
                       <button
                         onClick={() => toggleLeader(m.id, m.is_run_leader)}
                         style={{
@@ -286,7 +286,7 @@ function UkaInput({ memberId, initialValue, onSave }: { memberId: string; initia
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
       <div>
-        <p style={{ fontSize: 11, fontWeight: 600, color: '#555', marginBottom: 4 }}>UKA number</p>
+        <p style={{ fontSize: 11, fontWeight: 600, color: '#999', marginBottom: 4 }}>UKA number</p>
         <div style={{ display: 'flex', gap: 6 }}>
           <input
             type="text"
