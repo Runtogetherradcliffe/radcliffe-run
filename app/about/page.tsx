@@ -45,7 +45,7 @@ export default async function AboutPage() {
             Running together<br />since 2022.
           </h1>
           <p style={{ fontSize: 17, color: '#888', lineHeight: 1.8, maxWidth: 620 }}>
-            Run Together Radcliffe is a free, friendly running group meeting every Thursday evening in Radcliffe, Greater Manchester. We're part of the England Athletics Run Together programme — open to everyone, no membership fees, no pressure, no minimum pace.
+            We're a free, friendly running group meeting every Thursday evening in Radcliffe, Greater Manchester. We're part of the England Athletics Run Together programme — open to everyone, no membership fees, no pressure, no minimum pace.
           </p>
         </section>
 
