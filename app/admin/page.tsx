@@ -11,7 +11,7 @@ function StatCard({ value, label, sub }: { value: string | number; label: string
     <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 12, padding: '20px 24px' }}>
       <p style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-0.02em', color: '#f5a623', marginBottom: 4 }}>{value}</p>
       <p style={{ fontSize: 13, fontWeight: 600, color: '#ccc' }}>{label}</p>
-      {sub && <p style={{ fontSize: 12, color: '#555', marginTop: 2 }}>{sub}</p>}
+      {sub && <p style={{ fontSize: 12, color: '#999', marginTop: 2 }}>{sub}</p>}
     </div>
   )
 }
@@ -60,7 +60,7 @@ export default async function AdminPage() {
                 }}>
                   <div>
                     <p style={{ fontSize: 14, fontWeight: 600, color: '#ccc' }}>{m.first_name} {m.last_name}</p>
-                    <p style={{ fontSize: 12, color: '#555' }}>{m.email}</p>
+                    <p style={{ fontSize: 12, color: '#999' }}>{m.email}</p>
                   </div>
                   <p style={{ fontSize: 12, color: '#333' }}>
                     {new Date(m.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
@@ -69,7 +69,7 @@ export default async function AdminPage() {
               ))
             ) : (
               <div style={{ padding: '32px 20px', textAlign: 'center' }}>
-                <p style={{ fontSize: 14, color: '#555' }}>No registrations yet</p>
+                <p style={{ fontSize: 14, color: '#999' }}>No registrations yet</p>
               </div>
             )}
           </div>
@@ -79,7 +79,7 @@ export default async function AdminPage() {
         <div id="settings" style={{ marginTop: 48 }}>
           <div style={{ marginBottom: 16 }}>
             <h2 style={{ fontSize: 16, fontWeight: 700 }}>Site settings</h2>
-            <p style={{ fontSize: 12, color: '#555', marginTop: 4 }}>Hero image and data sync sources.</p>
+            <p style={{ fontSize: 12, color: '#999', marginTop: 4 }}>Hero image and data sync sources.</p>
           </div>
           <SettingsClient initial={{
             hero_image_url:       settings?.hero_image_url       ?? null,
