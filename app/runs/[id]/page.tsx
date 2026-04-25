@@ -131,7 +131,7 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
                 About this route
               </p>
               <p style={{ fontSize: 14, color: '#bbb', lineHeight: 1.75 }}>{route.description}</p>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginTop: 14 }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginTop: 14 }}>
                 <RunMapExpand file={route.file} accentColor={accentColor} />
                 <a
                   href={`/gpx/${route.file}`}
