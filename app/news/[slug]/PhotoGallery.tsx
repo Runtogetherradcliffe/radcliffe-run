@@ -90,7 +90,7 @@ export default function PhotoGallery({ urls }: { urls: string[] }) {
           {urls.length > 1 && (
             <>
               <button
-                onClick={prev}
+                onClick={e => { e.stopPropagation(); prev() }}
                 style={{
                   position: 'fixed', left: 12, top: '50%', transform: 'translateY(-50%)',
                   background: 'rgba(0,0,0,0.5)', border: '1px solid #333', borderRadius: 8,
@@ -99,7 +99,7 @@ export default function PhotoGallery({ urls }: { urls: string[] }) {
                 }}
               >‹</button>
               <button
-                onClick={next}
+                onClick={e => { e.stopPropagation(); next() }}
                 style={{
                   position: 'fixed', right: 12, top: '50%', transform: 'translateY(-50%)',
                   background: 'rgba(0,0,0,0.5)', border: '1px solid #333', borderRadius: 8,
