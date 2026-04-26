@@ -110,6 +110,7 @@ export default async function HomePage() {
         .eq('cancelled', false)
         .eq('run_type', 'social')
         .order('date', { ascending: true })
+        .limit(4)
     : { data: [] }
 
   // All runs on the very next Thursday date (may be 1, 2 or more groups)
