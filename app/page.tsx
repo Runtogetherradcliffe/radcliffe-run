@@ -73,6 +73,8 @@ const TERRAIN_CARD_STYLE: Record<string, { bg: string; glow: string }> = {
 
 export default async function HomePage() {
   const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  const isRegistered = !!user
   const today = new Date().toISOString().split('T')[0]
 
   const fourWeeksOut = new Date()
@@ -468,6 +470,29 @@ export default async function HomePage() {
             </section>
           )
         })()}
+
+        {/* ── NO BOOKING NEEDED BANNER ── */}
+        {!isRegistered && (
+          <div style={{ background: '#0a0a0a', borderTop: '1px solid #1e1e1e', borderBottom: '1px solid #1e1e1e' }}>
+            <div style={{ maxWidth: 1100, margin: '0 auto', padding: '28px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
+                <span style={{ fontSize: 22, flexShrink: 0, marginTop: 2 }}>👋</span>
+                <div>
+                  <p style={{ fontSize: 15, fontWeight: 600, color: '#fff', marginBottom: 4 }}>No need to book — just turn up</p>
+                  <p style={{ fontSize: 14, color: '#666', lineHeight: 1.6, maxWidth: 520 }}>
+                    All our runs are free and open to everyone. We do ask that you join the group so we have your contact details in case of an emergency.
+                  </p>
+                </div>
+              </div>
+              <Link
+                href="/join"
+                style={{ display: 'inline-flex', alignItems: 'center', background: '#f5a623', color: '#0a0a0a', fontSize: 14, fontWeight: 700, padding: '11px 22px', borderRadius: 8, textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0 }}
+              >
+                Join the group →
+              </Link>
+            </div>
+          </div>
+        )}
 
         {/* ── SOCIAL RUNS ── */}
         {socialRuns.length > 0 && (
