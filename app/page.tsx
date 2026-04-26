@@ -489,7 +489,6 @@ export default async function HomePage() {
               </div>
               <div className="rtr-cards-grid">
                 {socialRuns.map(run => {
-                  const socialRoute = run.route_slug ? ROUTES.find(r => r.slug === run.route_slug) : null
                   return (
                   <div key={run.id} style={{ background: '#111', border: '1px solid rgba(196,168,232,0.15)', borderRadius: 12, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                     <div style={{ height: 80, position: 'relative', background: 'linear-gradient(160deg,#100a20,#1c1030,#120a1c)' }}>
@@ -510,11 +509,6 @@ export default async function HomePage() {
                         {run.distance_km && <span style={{ fontSize: 12, color: '#666' }}>{run.distance_km} km</span>}
                         {run.terrain && <TerrainBadge terrain={run.terrain} />}
                       </div>
-                      {socialRoute?.description && (
-                        <p style={{ fontSize: 13, color: '#666', lineHeight: 1.6, marginBottom: 12 }}>
-                          {socialRoute.description}
-                        </p>
-                      )}
                       <div style={{ marginTop: 'auto' }}>
                         <Link href={`/runs/${run.id}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', borderRadius: 6, textDecoration: 'none', fontSize: 12, fontWeight: 700, background: 'rgba(196,168,232,0.08)', border: '1px solid rgba(196,168,232,0.2)', color: '#c4a8e8' }}>
                           <span>View details</span>
