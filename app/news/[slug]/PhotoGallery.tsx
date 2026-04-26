@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function PhotoGallery({ urls }: { urls: string[] }) {
   const [lightbox, setLightbox] = useState<number | null>(null)
@@ -7,6 +7,17 @@ export default function PhotoGallery({ urls }: { urls: string[] }) {
   const close = () => setLightbox(null)
   const prev  = () => setLightbox(i => i !== null ? (i - 1 + urls.length) % urls.length : null)
   const next  = () => setLightbox(i => i !== null ? (i + 1) % urls.length : null)
+
+  useEffect(() => {
+    if (lightbox === null) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight') next()
+      else if (e.key === 'ArrowLeft') prev()
+      else if (e.key === 'Escape') close()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [lightbox]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (urls.length === 0) return null
 
