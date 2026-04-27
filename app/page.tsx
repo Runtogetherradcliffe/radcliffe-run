@@ -156,6 +156,7 @@ export default async function HomePage() {
               ))}
             </div>
 
+            {!isRegistered && (
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
               <Link href="/join" style={{ display: 'inline-flex', alignItems: 'center', background: '#f5a623', color: '#0a0a0a', fontSize: 14, fontWeight: 700, padding: '12px 24px', borderRadius: 8, textDecoration: 'none' }}>
                 Join the group
@@ -164,6 +165,7 @@ export default async function HomePage() {
                 Sign in
               </Link>
             </div>
+            )}
             {!isRegistered && (
               <p style={{ fontSize: 13, color: '#555', marginTop: 14, lineHeight: 1.6 }}>
                 No need to book — just turn up. We ask you to join so we have your contact details in case of an emergency.
@@ -570,7 +572,7 @@ export default async function HomePage() {
         )}
 
         {/* ── JOIN CTA (green) ── */}
-        <div style={{ background: '#0a120a' }}>
+        {!isRegistered && <div style={{ background: '#0a120a' }}>
           <div className="rtr-cta-section">
             <div style={{ background: 'linear-gradient(135deg, #061408, #0a1a0e)', border: '1px solid rgba(124,184,124,0.2)', borderRadius: 16, padding: '64px 48px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
               <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 60% 80% at 50% 0%, rgba(124,184,124,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
@@ -589,7 +591,7 @@ export default async function HomePage() {
               </div>
             </div>
           </div>
-        </div>
+        </div>}
 
       </main>
       <Footer />
