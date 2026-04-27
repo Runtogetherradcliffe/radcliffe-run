@@ -45,6 +45,7 @@ function InfoBadge({
   active: boolean
   onToggle: () => void
   style: React.CSSProperties
+  activeColor: string
 }) {
   return (
     <button
@@ -58,7 +59,7 @@ function InfoBadge({
         outline: 'none',
         transition: 'opacity 0.15s',
         opacity: active ? 1 : undefined,
-        boxShadow: active ? `0 0 0 2px ${GROUP_INFO[groupKey].color}60` : undefined,
+        boxShadow: active ? `0 0 0 2px ${activeColor}60` : undefined,
       }}
     >
       {label}
@@ -125,6 +126,7 @@ export default function RunBadges({ group, hasJeffing, groupColor, terrain, onTo
               groupKey="jeffing"
               active={active === 'jeffing'}
               onToggle={() => toggle('jeffing')}
+              activeColor={accentColor}
               style={{ fontSize: 11, fontWeight: 600, color: '#f5a623', background: active === 'jeffing' ? 'rgba(245,166,35,0.14)' : 'rgba(245,166,35,0.08)', border: '1px solid rgba(245,166,35,0.25)', borderRadius: 5, padding: '3px 9px' }}
             />
             <InfoBadge
@@ -132,6 +134,7 @@ export default function RunBadges({ group, hasJeffing, groupColor, terrain, onTo
               groupKey="jeffing"
               active={active === 'jeffing'}
               onToggle={() => toggle('jeffing')}
+              activeColor={accentColor}
               style={{ fontSize: 11, color: '#888', background: active === 'jeffing' ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.03)', border: '1px solid #1e1e1e', borderRadius: 5, padding: '3px 9px' }}
             />
             {group === '5K' && groupColor && (
@@ -141,6 +144,7 @@ export default function RunBadges({ group, hasJeffing, groupColor, terrain, onTo
                   groupKey="keepMeGoing"
                   active={active === 'keepMeGoing'}
                   onToggle={() => toggle('keepMeGoing')}
+                  activeColor={groupColor}
                   style={{ fontSize: 11, fontWeight: 600, color: groupColor, background: active === 'keepMeGoing' ? `${groupColor}14` : `${groupColor}08`, border: `1px solid ${groupColor}30`, borderRadius: 5, padding: '3px 9px' }}
                 />
                 <InfoBadge
@@ -148,6 +152,7 @@ export default function RunBadges({ group, hasJeffing, groupColor, terrain, onTo
                   groupKey="keepMeGoing"
                   active={active === 'keepMeGoing'}
                   onToggle={() => toggle('keepMeGoing')}
+                  activeColor={groupColor}
                   style={{ fontSize: 11, color: '#888', background: active === 'keepMeGoing' ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.03)', border: '1px solid #1e1e1e', borderRadius: 5, padding: '3px 9px' }}
                 />
               </>
@@ -160,13 +165,15 @@ export default function RunBadges({ group, hasJeffing, groupColor, terrain, onTo
               groupKey="keepMeGoing"
               active={active === 'keepMeGoing'}
               onToggle={() => toggle('keepMeGoing')}
-              style={{ fontSize: 11, fontWeight: 600, color: groupColor, background: active === 'keepMeGoing' ? `${groupColor}14` : `${groupColor}08`, border: `1px solid ${groupColor}30`, borderRadius: 5, padding: '3px 9px' }}
+              activeColor={groupColor!}
+              style={{ fontSize: 11, fontWeight: 600, color: groupColor!, background: active === 'keepMeGoing' ? `${groupColor}14` : `${groupColor}08`, border: `1px solid ${groupColor}30`, borderRadius: 5, padding: '3px 9px' }}
             />
             <InfoBadge
               label="10–12 min/mile"
               groupKey="keepMeGoing"
               active={active === 'keepMeGoing'}
               onToggle={() => toggle('keepMeGoing')}
+              activeColor={groupColor!}
               style={{ fontSize: 11, color: '#888', background: active === 'keepMeGoing' ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.03)', border: '1px solid #1e1e1e', borderRadius: 5, padding: '3px 9px' }}
             />
           </>
@@ -177,6 +184,7 @@ export default function RunBadges({ group, hasJeffing, groupColor, terrain, onTo
               groupKey="challengeMe"
               active={active === 'challengeMe'}
               onToggle={() => toggle('challengeMe')}
+              activeColor={groupColor}
               style={{ fontSize: 11, fontWeight: 600, color: groupColor, background: active === 'challengeMe' ? `${groupColor}14` : `${groupColor}08`, border: `1px solid ${groupColor}30`, borderRadius: 5, padding: '3px 9px' }}
             />
             <InfoBadge
@@ -184,6 +192,7 @@ export default function RunBadges({ group, hasJeffing, groupColor, terrain, onTo
               groupKey="challengeMe"
               active={active === 'challengeMe'}
               onToggle={() => toggle('challengeMe')}
+              activeColor={groupColor}
               style={{ fontSize: 11, color: '#888', background: active === 'challengeMe' ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.03)', border: '1px solid #1e1e1e', borderRadius: 5, padding: '3px 9px' }}
             />
           </>
