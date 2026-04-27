@@ -4,33 +4,18 @@ import { useState, useEffect, useRef } from 'react'
 
 type GroupKey = 'jeffing' | 'keepMeGoing' | 'challengeMe'
 
-const GROUP_INFO: Record<GroupKey, {
-  name: string
-  desc: string
-  color: string
-  bg: string
-  border: string
-}> = {
+const GROUP_TEXT: Record<GroupKey, { name: string; desc: string }> = {
   jeffing: {
     name: 'Get Me Started',
     desc: "Perfect if you're new to running or getting back into it after a break. We use jeffing — run/walk intervals — to build fitness at a sustainable pace without overdoing it.",
-    color: '#7cb87c',
-    bg: '#0d1a0d',
-    border: '#1a3a1a',
   },
   keepMeGoing: {
     name: 'Keep Me Going',
     desc: 'Continuous running with regular regroups. A comfortable, social pace with two leaders — one at the front, one at the back.',
-    color: '#6b9fd4',
-    bg: '#0d1221',
-    border: '#1a2a44',
   },
   challengeMe: {
     name: 'Challenge Me',
     desc: 'Longer distance for more experienced runners looking to push further. Road and trail routes, with leaders front and back.',
-    color: '#f5a623',
-    bg: '#1a1000',
-    border: '#3a2200',
   },
 }
 
@@ -99,7 +84,14 @@ export default function RunBadges({ group, hasJeffing, groupColor, terrain, onTo
     setActive(prev => (prev === key ? null : key))
   }
 
-  const info = active ? GROUP_INFO[active] : null
+  // Derive card colour from the same source as the badge that was clicked
+  const cardColor = active === 'jeffing' ? accentColor
+                  : active ? (groupColor ?? accentColor)
+                  : null
+
+  const info = active
+    ? { ...GROUP_TEXT[active], color: cardColor! }
+    : null
 
   return (
     <div ref={wrapRef}>
@@ -210,8 +202,8 @@ export default function RunBadges({ group, hasJeffing, groupColor, terrain, onTo
         <div
           style={{
             marginTop: 10,
-            background: info.bg,
-            border: `1px solid ${info.border}`,
+            background: `${info.color}0f`,
+            border: `1px solid ${info.color}35`,
             borderRadius: 10,
             padding: '14px 16px 14px 16px',
             position: 'relative',
