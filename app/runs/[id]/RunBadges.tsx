@@ -39,6 +39,7 @@ function InfoBadge({
   active,
   onToggle,
   style,
+  activeColor,
 }: {
   label: string
   groupKey: GroupKey
