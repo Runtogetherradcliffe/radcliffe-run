@@ -68,8 +68,36 @@ function InfoBadge({
   )
 }
 
+const PACE = {
+  keepMeGoing: { km: '6–8 min/km', miles: '10–12 min/mile' },
+  challengeMe:  { km: '5–7 min/km', miles: '9–11 min/mile' },
+}
+
+function PaceBadge({ paceKey, showMiles, onToggle }: {
+  paceKey: 'keepMeGoing' | 'challengeMe'
+  showMiles: boolean
+  onToggle: () => void
+}) {
+  const label = showMiles ? PACE[paceKey].miles : PACE[paceKey].km
+  return (
+    <button
+      onClick={onToggle}
+      title={showMiles ? 'Switch to km' : 'Switch to miles'}
+      style={{
+        fontSize: 11, color: '#888', background: 'rgba(255,255,255,0.03)',
+        border: '1px solid #1e1e1e', borderRadius: 5, padding: '3px 9px',
+        cursor: 'pointer', fontFamily: 'inherit', outline: 'none',
+        transition: 'background 0.15s',
+      }}
+    >
+      {label}
+    </button>
+  )
+}
+
 export default function RunBadges({ group, hasJeffing, groupColor, terrain, onTour, accentColor }: Props) {
   const [active, setActive] = useState<GroupKey | null>(null)
+  const [showMiles, setShowMiles] = useState(false)
   const wrapRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -130,14 +158,9 @@ export default function RunBadges({ group, hasJeffing, groupColor, terrain, onTo
               activeColor={accentColor}
               style={{ fontSize: 11, fontWeight: 600, color: '#f5a623', background: active === 'jeffing' ? 'rgba(245,166,35,0.14)' : 'rgba(245,166,35,0.08)', border: '1px solid rgba(245,166,35,0.25)', borderRadius: 5, padding: '3px 9px' }}
             />
-            <InfoBadge
-              label="No minimum pace"
-              groupKey="jeffing"
-              active={active === 'jeffing'}
-              onToggle={() => toggle('jeffing')}
-              activeColor={accentColor}
-              style={{ fontSize: 11, color: '#888', background: active === 'jeffing' ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.03)', border: '1px solid #1e1e1e', borderRadius: 5, padding: '3px 9px' }}
-            />
+            <span style={{ fontSize: 11, color: '#666', background: 'rgba(255,255,255,0.03)', border: '1px solid #1e1e1e', borderRadius: 5, padding: '3px 9px' }}>
+              No minimum pace
+            </span>
             {group === '5K' && groupColor && (
               <>
                 <InfoBadge
@@ -148,14 +171,7 @@ export default function RunBadges({ group, hasJeffing, groupColor, terrain, onTo
                   activeColor={groupColor}
                   style={{ fontSize: 11, fontWeight: 600, color: groupColor, background: active === 'keepMeGoing' ? `${groupColor}14` : `${groupColor}08`, border: `1px solid ${groupColor}30`, borderRadius: 5, padding: '3px 9px' }}
                 />
-                <InfoBadge
-                  label="10–12 min/mile"
-                  groupKey="keepMeGoing"
-                  active={active === 'keepMeGoing'}
-                  onToggle={() => toggle('keepMeGoing')}
-                  activeColor={groupColor}
-                  style={{ fontSize: 11, color: '#888', background: active === 'keepMeGoing' ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.03)', border: '1px solid #1e1e1e', borderRadius: 5, padding: '3px 9px' }}
-                />
+                <PaceBadge paceKey="keepMeGoing" showMiles={showMiles} onToggle={() => setShowMiles(m => !m)} />
               </>
             )}
           </>
@@ -169,14 +185,7 @@ export default function RunBadges({ group, hasJeffing, groupColor, terrain, onTo
               activeColor={groupColor!}
               style={{ fontSize: 11, fontWeight: 600, color: groupColor!, background: active === 'keepMeGoing' ? `${groupColor}14` : `${groupColor}08`, border: `1px solid ${groupColor}30`, borderRadius: 5, padding: '3px 9px' }}
             />
-            <InfoBadge
-              label="10–12 min/mile"
-              groupKey="keepMeGoing"
-              active={active === 'keepMeGoing'}
-              onToggle={() => toggle('keepMeGoing')}
-              activeColor={groupColor!}
-              style={{ fontSize: 11, color: '#888', background: active === 'keepMeGoing' ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.03)', border: '1px solid #1e1e1e', borderRadius: 5, padding: '3px 9px' }}
-            />
+            <PaceBadge paceKey="keepMeGoing" showMiles={showMiles} onToggle={() => setShowMiles(m => !m)} />
           </>
         ) : group === '8K' && groupColor ? (
           <>
@@ -188,14 +197,7 @@ export default function RunBadges({ group, hasJeffing, groupColor, terrain, onTo
               activeColor={groupColor}
               style={{ fontSize: 11, fontWeight: 600, color: groupColor, background: active === 'challengeMe' ? `${groupColor}14` : `${groupColor}08`, border: `1px solid ${groupColor}30`, borderRadius: 5, padding: '3px 9px' }}
             />
-            <InfoBadge
-              label="9–11 min/mile"
-              groupKey="challengeMe"
-              active={active === 'challengeMe'}
-              onToggle={() => toggle('challengeMe')}
-              activeColor={groupColor}
-              style={{ fontSize: 11, color: '#888', background: active === 'challengeMe' ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.03)', border: '1px solid #1e1e1e', borderRadius: 5, padding: '3px 9px' }}
-            />
+            <PaceBadge paceKey="challengeMe" showMiles={showMiles} onToggle={() => setShowMiles(m => !m)} />
           </>
         ) : null}
 
