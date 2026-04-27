@@ -49,7 +49,7 @@ function InfoBadge({
   return (
     <button
       onClick={onToggle}
-      title={`About ${GROUP_INFO[groupKey].name}`}
+      title={`About ${GROUP_TEXT[groupKey].name}`}
       style={{
         ...style,
         cursor: 'pointer',
