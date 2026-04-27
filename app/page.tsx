@@ -147,7 +147,7 @@ export default async function HomePage() {
             </h1>
 
             <p style={{ fontSize: 17, fontWeight: 300, color: '#aaa', lineHeight: 1.8, maxWidth: 420, marginBottom: 28 }}>
-              A running group open to everyone &mdash; no memberships, no minimum pace. Just good routes and good people, every week in Radcliffe.
+              Good routes. Good people. A run for every level. Every week in Radcliffe.
             </p>
 
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 36 }}>
