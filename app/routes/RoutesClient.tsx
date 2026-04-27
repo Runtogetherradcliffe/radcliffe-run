@@ -3,10 +3,9 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { ROUTES, TERRAIN_LABELS, type Route, type Terrain, type Category } from '@/lib/routes'
 
 /* ── Terrain colours ── */
-const TERRAIN_STYLE: Record<Terrain | 'mixed', { bg: string; color: string; border: string }> = {
+const TERRAIN_STYLE: Record<Terrain, { bg: string; color: string; border: string }> = {
   trail: { bg: '#0d1a0d', color: '#7cb87c', border: '#1a3a1a' },
   road:  { bg: '#0d1221', color: '#6b9fd4', border: '#1a2a44' },
-  mixed: { bg: '#1a1208', color: '#d4a84b', border: '#3a2a0a' },
 }
 
 function TerrainBadge({ terrain }: { terrain: Terrain }) {
