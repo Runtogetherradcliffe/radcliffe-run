@@ -491,10 +491,26 @@ export default async function HomePage() {
               </div>
               <div className="rtr-cards-grid">
                 {socialRuns.map(run => {
+                  const socialHasMap = !!run.route_slug && existsSync(
+                    join(process.cwd(), 'public', 'route-maps', `${run.route_slug}.png`)
+                  )
+                  const socialHeaderHeight = socialHasMap ? 160 : 80
                   return (
                   <div key={run.id} style={{ background: '#111', border: '1px solid rgba(196,168,232,0.15)', borderRadius: 12, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-                    <div style={{ height: 80, position: 'relative', background: 'linear-gradient(160deg,#100a20,#1c1030,#120a1c)' }}>
-                      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 100% 70% at 50% 100%, rgba(196,168,232,0.35) 0%, transparent 70%)' }} />
+                    <div style={{ height: socialHeaderHeight, position: 'relative', background: 'linear-gradient(160deg,#100a20,#1c1030,#120a1c)', overflow: 'hidden' }}>
+                      {socialHasMap ? (
+                        <>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={`/route-maps/${run.route_slug}.png`}
+                            alt=""
+                            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                          />
+                          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 48, background: 'linear-gradient(to bottom, transparent, #111)', pointerEvents: 'none' }} />
+                        </>
+                      ) : (
+                        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 100% 70% at 50% 100%, rgba(196,168,232,0.35) 0%, transparent 70%)' }} />
+                      )}
                       <span style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(10,10,10,0.75)', border: '1px solid rgba(196,168,232,0.5)', borderRadius: 4, padding: '3px 8px', fontSize: 10, fontWeight: 700, color: '#c4a8e8', letterSpacing: '0.06em' }}>
                         SOCIAL
                       </span>
