@@ -312,6 +312,7 @@ export default async function HomePage() {
                   <p style={{ color: '#555', fontSize: 14 }}>No upcoming runs scheduled yet.</p>
                 ) : cards.map(({ primary: run, companion }) => {
                   const linkedRoute = run.route_slug ? ROUTES.find(r => r.slug === run.route_slug) : null
+                  const companionRoute = companion?.route_slug ? ROUTES.find(r => r.slug === companion.route_slug) : null
 
                   // Derive group label from slug prefix
                   function groupLabel(slug: string | null) {
@@ -434,9 +435,9 @@ export default async function HomePage() {
                             <span style={{ fontSize: 12, color: '#555' }}>📍 {run.on_tour ? run.meeting_point.split(',')[0] : 'Radcliffe Market'}</span>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                               {isTwoGroups ? (
-                                <span style={{ fontSize: 12, color: '#666' }}>{run.distance_km}/{companion!.distance_km} km</span>
+                                <span style={{ fontSize: 12, color: '#666' }}>{linkedRoute?.distance_km ?? run.distance_km}/{companionRoute?.distance_km ?? companion!.distance_km} km</span>
                               ) : run.distance_km ? (
-                                <span style={{ fontSize: 12, color: '#666' }}>{run.distance_km} km</span>
+                                <span style={{ fontSize: 12, color: '#666' }}>{linkedRoute?.distance_km ?? run.distance_km} km</span>
                               ) : null}
                               {run.terrain && <TerrainBadge terrain={run.terrain} />}
                             </div>
@@ -448,37 +449,25 @@ export default async function HomePage() {
                             <>
                               {/* 5K group (primary / shorter) — always first */}
                               {primaryGroup && (
-                                <Link href={`/runs/${run.id}`} style={{ display: 'flex', flexDirection: 'column', gap: 5, padding: '8px 10px', borderRadius: 6, textDecoration: 'none', ...(GROUP_BADGE[primaryGroup] ?? {}) }}>
-                                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, alignItems: 'center' }}>
-                                    <span style={{ fontSize: 9, fontWeight: 700, background: 'rgba(76,175,118,0.2)', border: '1px solid rgba(76,175,118,0.4)', borderRadius: 3, padding: '1px 5px', color: '#4caf76' }}>5–6k</span>
-                                    {run.has_jeffing && (
-                                      <span style={{ fontSize: 9, fontWeight: 600, background: 'rgba(245,166,35,0.12)', border: '1px solid rgba(245,166,35,0.3)', borderRadius: 3, padding: '1px 5px', color: '#f5a623' }}>Jeffing (run/walk)</span>
-                                    )}
-                                    <span style={{ fontSize: 9, fontWeight: 600, background: 'rgba(76,175,118,0.1)', border: '1px solid rgba(76,175,118,0.25)', borderRadius: 3, padding: '1px 5px', color: '#4caf76' }}>Continuous running</span>
-                                  </div>
-                                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11, fontWeight: 700, letterSpacing: '0.04em' }}>
-                                    <span>{run.has_jeffing ? 'Get Me Started / Keep Me Going' : 'Keep Me Going'}</span>
-                                    <span>→</span>
-                                  </div>
+                                <Link href={`/runs/${run.id}`} style={{ display: 'flex', flexWrap: 'wrap', gap: 3, alignItems: 'center', padding: '8px 10px', borderRadius: 6, textDecoration: 'none', ...(GROUP_BADGE[primaryGroup] ?? {}) }}>
+                                  <span style={{ fontSize: 9, fontWeight: 700, background: 'rgba(76,175,118,0.2)', border: '1px solid rgba(76,175,118,0.4)', borderRadius: 3, padding: '1px 5px', color: '#4caf76' }}>5–6k</span>
+                                  {run.has_jeffing && (
+                                    <span style={{ fontSize: 9, fontWeight: 600, background: 'rgba(245,166,35,0.12)', border: '1px solid rgba(245,166,35,0.3)', borderRadius: 3, padding: '1px 5px', color: '#f5a623' }}>Jeffing (run/walk)</span>
+                                  )}
+                                  <span style={{ fontSize: 9, fontWeight: 600, background: 'rgba(76,175,118,0.1)', border: '1px solid rgba(76,175,118,0.25)', borderRadius: 3, padding: '1px 5px', color: '#4caf76' }}>Continuous running</span>
                                 </Link>
                               )}
                               {/* 8K group (companion / longer) — always second */}
                               {companionGroup && companion && (
-                                <Link href={`/runs/${companion.id}`} style={{ display: 'flex', flexDirection: 'column', gap: 5, padding: '8px 10px', borderRadius: 6, textDecoration: 'none', ...(GROUP_BADGE[companionGroup] ?? {}) }}>
-                                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, alignItems: 'center' }}>
-                                    <span style={{ fontSize: 9, fontWeight: 700, background: 'rgba(91,155,213,0.2)', border: '1px solid rgba(91,155,213,0.4)', borderRadius: 3, padding: '1px 5px', color: '#5b9bd5' }}>8–10k</span>
-                                    <span style={{ fontSize: 9, fontWeight: 600, background: 'rgba(91,155,213,0.1)', border: '1px solid rgba(91,155,213,0.25)', borderRadius: 3, padding: '1px 5px', color: '#5b9bd5' }}>Continuous running</span>
-                                  </div>
-                                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11, fontWeight: 700, letterSpacing: '0.04em' }}>
-                                    <span>Challenge Me</span>
-                                    <span>→</span>
-                                  </div>
+                                <Link href={`/runs/${companion.id}`} style={{ display: 'flex', flexWrap: 'wrap', gap: 3, alignItems: 'center', padding: '8px 10px', borderRadius: 6, textDecoration: 'none', ...(GROUP_BADGE[companionGroup] ?? {}) }}>
+                                  <span style={{ fontSize: 9, fontWeight: 700, background: 'rgba(91,155,213,0.2)', border: '1px solid rgba(91,155,213,0.4)', borderRadius: 3, padding: '1px 5px', color: '#5b9bd5' }}>8–10k</span>
+                                  <span style={{ fontSize: 9, fontWeight: 600, background: 'rgba(91,155,213,0.1)', border: '1px solid rgba(91,155,213,0.25)', borderRadius: 3, padding: '1px 5px', color: '#5b9bd5' }}>Continuous running</span>
                                 </Link>
                               )}
                             </>
                           ) : (
                             <Link href={`/runs/${run.id}`} style={{ display: 'flex', flexDirection: 'column', gap: 5, padding: '8px 10px', borderRadius: 6, textDecoration: 'none', ...(primaryGroup ? GROUP_BADGE[primaryGroup] : { background: 'rgba(255,255,255,0.04)', border: '1px solid #222', color: '#888' }) }}>
-                              {primaryGroup && (
+                              {primaryGroup ? (
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, alignItems: 'center' }}>
                                   {primaryGroup === '5K' && (
                                     <>
@@ -496,13 +485,12 @@ export default async function HomePage() {
                                     </>
                                   )}
                                 </div>
+                              ) : (
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11, fontWeight: 700, letterSpacing: '0.04em' }}>
+                                  <span>View details</span>
+                                  <span>→</span>
+                                </div>
                               )}
-                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11, fontWeight: 700, letterSpacing: '0.04em' }}>
-                                <span>{primaryGroup === '5K'
-                                  ? run.has_jeffing ? 'Get Me Started / Keep Me Going' : 'Keep Me Going'
-                                  : primaryGroup === '8K' ? 'Challenge Me' : 'View details'}</span>
-                                <span>→</span>
-                              </div>
                             </Link>
                           )}
                           </div>
