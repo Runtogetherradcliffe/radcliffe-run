@@ -21,7 +21,6 @@ function cleanTitle(title: string) {
 const TERRAIN_BADGE: Record<string, React.CSSProperties> = {
   trail: { background: '#0d1a0d', color: '#7cb87c', border: '1px solid #1a3a1a' },
   road:  { background: '#0d1221', color: '#6b9fd4', border: '1px solid #1a2a44' },
-  mixed: { background: '#1a1208', color: '#d4a84b', border: '1px solid #3a2a0a' },
 }
 
 /** Trim the long default address to just the venue name */
@@ -80,26 +79,46 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
               {title}
             </h1>
 
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
-              {group && groupColor && (
-                <span style={{ fontSize: 12, fontWeight: 700, color: groupColor, border: `1px solid ${groupColor}40`, borderRadius: 5, padding: '3px 8px' }}>
-                  {group} group
-                </span>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
+              {/* Distance range */}
+              {group === '5K' && groupColor && (
+                <span style={{ fontSize: 11, fontWeight: 700, color: groupColor, background: `${groupColor}18`, border: `1px solid ${groupColor}40`, borderRadius: 5, padding: '3px 9px' }}>5–6k</span>
               )}
+              {group === '8K' && groupColor && (
+                <span style={{ fontSize: 11, fontWeight: 700, color: groupColor, background: `${groupColor}18`, border: `1px solid ${groupColor}40`, borderRadius: 5, padding: '3px 9px' }}>8–10k</span>
+              )}
+              {/* Terrain */}
               {run.terrain && (
                 <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '3px 8px', borderRadius: 5, ...(TERRAIN_BADGE[run.terrain] ?? {}) }}>
                   {run.terrain}
                 </span>
               )}
-              {run.has_jeffing && (
-                <span style={{ fontSize: 11, color: '#f5a623', background: 'rgba(245,166,35,0.08)', border: '1px solid rgba(245,166,35,0.25)', borderRadius: 5, padding: '3px 8px' }}>
-                  Jeffing tonight
-                </span>
-              )}
+              {/* Style + pace */}
+              {run.has_jeffing ? (
+                <>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: '#f5a623', background: 'rgba(245,166,35,0.08)', border: '1px solid rgba(245,166,35,0.25)', borderRadius: 5, padding: '3px 9px' }}>Jeffing (run/walk)</span>
+                  <span style={{ fontSize: 11, color: '#666', background: 'rgba(255,255,255,0.03)', border: '1px solid #1e1e1e', borderRadius: 5, padding: '3px 9px' }}>No minimum pace</span>
+                  {group === '5K' && groupColor && (
+                    <>
+                      <span style={{ fontSize: 11, fontWeight: 600, color: groupColor, background: `${groupColor}08`, border: `1px solid ${groupColor}30`, borderRadius: 5, padding: '3px 9px' }}>Continuous running</span>
+                      <span style={{ fontSize: 11, color: '#666', background: 'rgba(255,255,255,0.03)', border: '1px solid #1e1e1e', borderRadius: 5, padding: '3px 9px' }}>10–12 min/mile</span>
+                    </>
+                  )}
+                </>
+              ) : group === '5K' && groupColor ? (
+                <>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: groupColor, background: `${groupColor}08`, border: `1px solid ${groupColor}30`, borderRadius: 5, padding: '3px 9px' }}>Continuous running</span>
+                  <span style={{ fontSize: 11, color: '#666', background: 'rgba(255,255,255,0.03)', border: '1px solid #1e1e1e', borderRadius: 5, padding: '3px 9px' }}>10–12 min/mile</span>
+                </>
+              ) : group === '8K' && groupColor ? (
+                <>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: groupColor, background: `${groupColor}08`, border: `1px solid ${groupColor}30`, borderRadius: 5, padding: '3px 9px' }}>Continuous running</span>
+                  <span style={{ fontSize: 11, color: '#666', background: 'rgba(255,255,255,0.03)', border: '1px solid #1e1e1e', borderRadius: 5, padding: '3px 9px' }}>9–11 min/mile</span>
+                </>
+              ) : null}
+              {/* On tour */}
               {run.on_tour && (
-                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#f5a623', background: 'rgba(245,166,35,0.08)', border: '1px solid rgba(245,166,35,0.3)', borderRadius: 5, padding: '3px 8px' }}>
-                  On tour
-                </span>
+                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#f5a623', background: 'rgba(245,166,35,0.08)', border: '1px solid rgba(245,166,35,0.3)', borderRadius: 5, padding: '3px 8px' }}>On tour</span>
               )}
             </div>
           </div>
