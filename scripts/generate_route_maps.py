@@ -24,6 +24,7 @@ Requirements:
 """
 
 import sys
+import math
 import argparse
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -48,7 +49,6 @@ WIDTH  = 800
 HEIGHT = 450
 
 # ── Map style ─────────────────────────────────────────────────────────────────
-ZOOM       = 14
 TILE_URL   = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"  # OSM standard
 
 # Post-processing
@@ -69,6 +69,32 @@ LINE_W_LIGHT  = 2
 ORANGE = (245, 166, 35)
 WHITE  = (255, 255, 255)
 DARK   = (10, 10, 10)
+
+# ── Auto zoom ─────────────────────────────────────────────────────────────────
+
+def best_zoom(coords: list[tuple[float, float]], width: int = WIDTH, height: int = HEIGHT) -> int:
+    """Return the highest zoom level that fits the full route with ~30% padding."""
+    lats = [c[1] for c in coords]
+    lons = [c[0] for c in coords]
+    lat_span = max(lats) - min(lats)
+    lon_span = max(lons) - min(lons)
+    if lat_span == 0 and lon_span == 0:
+        return 14
+
+    mean_lat  = sum(lats) / len(lats)
+    padding   = 1.30  # 30% breathing room
+    cos_lat   = math.cos(math.radians(mean_lat))
+    lat_m     = lat_span * 111_320 * padding
+    lon_m     = lon_span * 111_320 * cos_lat * padding
+
+    for z in range(14, 9, -1):
+        # metres per pixel at this zoom and latitude
+        mpp = 156_543 * cos_lat / (2 ** z)
+        if (lon_m / mpp if lon_m > 0 else 0) <= width and \
+           (lat_m / mpp if lat_m > 0 else 0) <= height:
+            return z
+    return 10
+
 
 # ── GPX parsing ───────────────────────────────────────────────────────────────
 
@@ -111,7 +137,7 @@ def parse_gpx(path: Path) -> list[tuple[float, float]]:
 
 # ── Map rendering ─────────────────────────────────────────────────────────────
 
-def render_map(coords: list[tuple[float, float]]) -> Image.Image:
+def render_map(coords: list[tuple[float, float]], zoom: int = 14) -> Image.Image:
     """Render tile-based map with route overlay, return as PIL Image."""
     m = StaticMap(WIDTH, HEIGHT, url_template=TILE_URL)
 
@@ -120,7 +146,7 @@ def render_map(coords: list[tuple[float, float]]) -> Image.Image:
     m.add_line(Line(coords, LINE_ORANGE, LINE_W_ORANGE))
     m.add_line(Line(coords, LINE_LIGHT,  LINE_W_LIGHT))
 
-    img = m.render(zoom=ZOOM)
+    img = m.render(zoom=zoom)
     return img
 
 
@@ -187,7 +213,8 @@ def generate_map(gpx_path: Path, out_path: Path) -> bool:
             print(f"  ⚠  {slug}: too few coordinates ({len(coords)}), skipped")
             return False
 
-        img = render_map(coords)
+        zoom = best_zoom(coords)
+        img = render_map(coords, zoom=zoom)
         img = postprocess(img)
 
         out_path.parent.mkdir(parents=True, exist_ok=True)
