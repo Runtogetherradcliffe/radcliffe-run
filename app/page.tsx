@@ -443,30 +443,86 @@ export default async function HomePage() {
                           </div>
 
                           {/* Group links — pinned to bottom */}
-                          <div style={{ marginTop: 'auto' }}>
+                          <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 6 }}>
                           {isTwoGroups ? (
-                            <div style={{ display: 'flex', gap: 8 }}>
-                              {companionGroup && companion && (
-                                <Link href={`/runs/${companion.id}`} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '8px 10px', borderRadius: 6, textDecoration: 'none', fontSize: 11, fontWeight: 700, letterSpacing: '0.04em', ...(GROUP_BADGE[companionGroup] ?? {}) }}>
-                                  {companionGroup === '5K'
-                                ? companion.has_jeffing ? `${companion.distance_km}km · Get Me Started / Keep Me Going →` : `${companion.distance_km}km · Keep Me Going →`
-                                : `${companion.distance_km}km · Challenge Me →`}
-                                </Link>
-                              )}
+                            <>
+                              {/* 5K group (primary / shorter) */}
                               {primaryGroup && (
-                                <Link href={`/runs/${run.id}`} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '8px 10px', borderRadius: 6, textDecoration: 'none', fontSize: 11, fontWeight: 700, letterSpacing: '0.04em', ...(GROUP_BADGE[primaryGroup] ?? {}) }}>
-                                  {primaryGroup === '5K'
-                                    ? run.has_jeffing ? `${run.distance_km}km · Get Me Started / Keep Me Going →` : `${run.distance_km}km · Keep Me Going →`
-                                    : `${run.distance_km}km · Challenge Me →`}
+                                <Link href={`/runs/${run.id}`} style={{ display: 'flex', flexDirection: 'column', gap: 5, padding: '8px 10px', borderRadius: 6, textDecoration: 'none', ...(GROUP_BADGE[primaryGroup] ?? {}) }}>
+                                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, alignItems: 'center' }}>
+                                    <span style={{ fontSize: 9, fontWeight: 700, background: 'rgba(76,175,118,0.2)', border: '1px solid rgba(76,175,118,0.4)', borderRadius: 3, padding: '1px 5px', color: '#4caf76' }}>5–6k</span>
+                                    {run.has_jeffing ? (
+                                      <>
+                                        <span style={{ fontSize: 9, fontWeight: 600, background: 'rgba(245,166,35,0.12)', border: '1px solid rgba(245,166,35,0.3)', borderRadius: 3, padding: '1px 5px', color: '#f5a623' }}>Jeffing (run/walk)</span>
+                                        <span style={{ fontSize: 9, fontWeight: 600, background: 'rgba(255,255,255,0.04)', border: '1px solid #252525', borderRadius: 3, padding: '1px 5px', color: '#555' }}>No minimum pace</span>
+                                        <span style={{ fontSize: 9, fontWeight: 600, background: 'rgba(76,175,118,0.1)', border: '1px solid rgba(76,175,118,0.25)', borderRadius: 3, padding: '1px 5px', color: '#4caf76' }}>Continuous running</span>
+                                        <span style={{ fontSize: 9, fontWeight: 600, background: 'rgba(255,255,255,0.04)', border: '1px solid #252525', borderRadius: 3, padding: '1px 5px', color: '#555' }}>10–12 min/mile</span>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <span style={{ fontSize: 9, fontWeight: 600, background: 'rgba(76,175,118,0.1)', border: '1px solid rgba(76,175,118,0.25)', borderRadius: 3, padding: '1px 5px', color: '#4caf76' }}>Continuous running</span>
+                                        <span style={{ fontSize: 9, fontWeight: 600, background: 'rgba(255,255,255,0.04)', border: '1px solid #252525', borderRadius: 3, padding: '1px 5px', color: '#555' }}>10–12 min/mile</span>
+                                      </>
+                                    )}
+                                  </div>
+                                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11, fontWeight: 700, letterSpacing: '0.04em' }}>
+                                    <span>{run.has_jeffing ? 'Get Me Started / Keep Me Going' : 'Keep Me Going'}</span>
+                                    <span>→</span>
+                                  </div>
                                 </Link>
                               )}
-                            </div>
+                              {/* 8K group (companion / longer) */}
+                              {companionGroup && companion && (
+                                <Link href={`/runs/${companion.id}`} style={{ display: 'flex', flexDirection: 'column', gap: 5, padding: '8px 10px', borderRadius: 6, textDecoration: 'none', ...(GROUP_BADGE[companionGroup] ?? {}) }}>
+                                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, alignItems: 'center' }}>
+                                    <span style={{ fontSize: 9, fontWeight: 700, background: 'rgba(91,155,213,0.2)', border: '1px solid rgba(91,155,213,0.4)', borderRadius: 3, padding: '1px 5px', color: '#5b9bd5' }}>8–10k</span>
+                                    <span style={{ fontSize: 9, fontWeight: 600, background: 'rgba(91,155,213,0.1)', border: '1px solid rgba(91,155,213,0.25)', borderRadius: 3, padding: '1px 5px', color: '#5b9bd5' }}>Continuous running</span>
+                                    <span style={{ fontSize: 9, fontWeight: 600, background: 'rgba(255,255,255,0.04)', border: '1px solid #252525', borderRadius: 3, padding: '1px 5px', color: '#555' }}>9–11 min/mile</span>
+                                  </div>
+                                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11, fontWeight: 700, letterSpacing: '0.04em' }}>
+                                    <span>Challenge Me</span>
+                                    <span>→</span>
+                                  </div>
+                                </Link>
+                              )}
+                            </>
                           ) : (
-                            <Link href={`/runs/${run.id}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', borderRadius: 6, textDecoration: 'none', fontSize: 12, fontWeight: 700, letterSpacing: '0.04em', ...(primaryGroup ? GROUP_BADGE[primaryGroup] : { background: 'rgba(255,255,255,0.04)', border: '1px solid #222', color: '#888' }) }}>
-                              <span>{primaryGroup === '5K'
-                                ? run.has_jeffing ? `${run.distance_km}km · Get Me Started / Keep Me Going` : `${run.distance_km}km · Keep Me Going`
-                                : primaryGroup === '8K' ? `${run.distance_km}km · Challenge Me` : 'View details'}</span>
-                              <span>→</span>
+                            <Link href={`/runs/${run.id}`} style={{ display: 'flex', flexDirection: 'column', gap: 5, padding: '8px 10px', borderRadius: 6, textDecoration: 'none', ...(primaryGroup ? GROUP_BADGE[primaryGroup] : { background: 'rgba(255,255,255,0.04)', border: '1px solid #222', color: '#888' }) }}>
+                              {primaryGroup && (
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, alignItems: 'center' }}>
+                                  {primaryGroup === '5K' && (
+                                    <>
+                                      <span style={{ fontSize: 9, fontWeight: 700, background: 'rgba(76,175,118,0.2)', border: '1px solid rgba(76,175,118,0.4)', borderRadius: 3, padding: '1px 5px', color: '#4caf76' }}>5–6k</span>
+                                      {run.has_jeffing ? (
+                                        <>
+                                          <span style={{ fontSize: 9, fontWeight: 600, background: 'rgba(245,166,35,0.12)', border: '1px solid rgba(245,166,35,0.3)', borderRadius: 3, padding: '1px 5px', color: '#f5a623' }}>Jeffing (run/walk)</span>
+                                          <span style={{ fontSize: 9, fontWeight: 600, background: 'rgba(255,255,255,0.04)', border: '1px solid #252525', borderRadius: 3, padding: '1px 5px', color: '#555' }}>No minimum pace</span>
+                                          <span style={{ fontSize: 9, fontWeight: 600, background: 'rgba(76,175,118,0.1)', border: '1px solid rgba(76,175,118,0.25)', borderRadius: 3, padding: '1px 5px', color: '#4caf76' }}>Continuous running</span>
+                                          <span style={{ fontSize: 9, fontWeight: 600, background: 'rgba(255,255,255,0.04)', border: '1px solid #252525', borderRadius: 3, padding: '1px 5px', color: '#555' }}>10–12 min/mile</span>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <span style={{ fontSize: 9, fontWeight: 600, background: 'rgba(76,175,118,0.1)', border: '1px solid rgba(76,175,118,0.25)', borderRadius: 3, padding: '1px 5px', color: '#4caf76' }}>Continuous running</span>
+                                          <span style={{ fontSize: 9, fontWeight: 600, background: 'rgba(255,255,255,0.04)', border: '1px solid #252525', borderRadius: 3, padding: '1px 5px', color: '#555' }}>10–12 min/mile</span>
+                                        </>
+                                      )}
+                                    </>
+                                  )}
+                                  {primaryGroup === '8K' && (
+                                    <>
+                                      <span style={{ fontSize: 9, fontWeight: 700, background: 'rgba(91,155,213,0.2)', border: '1px solid rgba(91,155,213,0.4)', borderRadius: 3, padding: '1px 5px', color: '#5b9bd5' }}>8–10k</span>
+                                      <span style={{ fontSize: 9, fontWeight: 600, background: 'rgba(91,155,213,0.1)', border: '1px solid rgba(91,155,213,0.25)', borderRadius: 3, padding: '1px 5px', color: '#5b9bd5' }}>Continuous running</span>
+                                      <span style={{ fontSize: 9, fontWeight: 600, background: 'rgba(255,255,255,0.04)', border: '1px solid #252525', borderRadius: 3, padding: '1px 5px', color: '#555' }}>9–11 min/mile</span>
+                                    </>
+                                  )}
+                                </div>
+                              )}
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11, fontWeight: 700, letterSpacing: '0.04em' }}>
+                                <span>{primaryGroup === '5K'
+                                  ? run.has_jeffing ? 'Get Me Started / Keep Me Going' : 'Keep Me Going'
+                                  : primaryGroup === '8K' ? 'Challenge Me' : 'View details'}</span>
+                                <span>→</span>
+                              </div>
                             </Link>
                           )}
                           </div>
