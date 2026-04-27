@@ -1,7 +1,7 @@
 // radcliffe.run service worker
 // Vanilla JS — no build tools required, Turbopack compatible
 
-const CACHE_VERSION = 'rtr-v1';
+const CACHE_VERSION = 'rtr-v2';
 const OFFLINE_URL = '/offline';
 
 // Assets to pre-cache on install (app shell)
