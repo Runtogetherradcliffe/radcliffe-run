@@ -96,7 +96,7 @@ export default async function AboutPage() {
         </section>
 
         {/* ── Pace groups ── */}
-        <section style={{ maxWidth: 780, margin: '0 auto', padding: '0 24px 48px', borderBottom: '1px solid #1e1e1e' }}>
+        <section id="groups" style={{ maxWidth: 780, margin: '0 auto', padding: '0 24px 48px', borderBottom: '1px solid #1e1e1e' }}>
           <div style={{ marginBottom: 28 }}>
             <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#f5a623', marginBottom: 10 }}>Groups</p>
             <h2 style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em' }}>Find your group</h2>
