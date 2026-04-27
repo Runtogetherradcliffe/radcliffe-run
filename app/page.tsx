@@ -99,7 +99,7 @@ export default async function HomePage() {
     .eq('cancelled', false)
     .neq('run_type', 'social')
     .order('date', { ascending: true })
-    .order('distance_km', { ascending: false })
+    .order('distance_km', { ascending: true })
 
   // Social runs (separate query, only if toggle is on)
   const { data: socialRunsData } = showSocialRuns
