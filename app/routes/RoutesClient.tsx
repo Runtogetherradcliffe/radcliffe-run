@@ -360,13 +360,24 @@ export default function RoutesClient() {
                 <TerrainBadge terrain={selected.terrain} />
                 <span style={{ fontSize: 12, color: '#f5a623', fontWeight: 600 }}>{selected.distance_km} km</span>
                 <span style={{ fontSize: 12, color: '#555' }}>↑ {selected.elevation_m}m</span>
-                <a href={`/gpx/${selected.file}`} download style={{
-                  marginLeft: 'auto', fontSize: 11, fontWeight: 600,
-                  padding: '6px 12px', borderRadius: 6, textDecoration: 'none',
-                  background: '#f5a623', color: '#0a0a0a',
-                }}>
-                  GPX
-                </a>
+                <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
+                  {selected.strava && (
+                    <a href={selected.strava} target="_blank" rel="noopener noreferrer" style={{
+                      fontSize: 11, fontWeight: 600,
+                      padding: '6px 10px', borderRadius: 6, textDecoration: 'none',
+                      background: '#fc4c02', color: '#fff',
+                    }}>
+                      Strava
+                    </a>
+                  )}
+                  <a href={`/gpx/${selected.file}`} download style={{
+                    fontSize: 11, fontWeight: 600,
+                    padding: '6px 12px', borderRadius: 6, textDecoration: 'none',
+                    background: '#f5a623', color: '#0a0a0a',
+                  }}>
+                    GPX
+                  </a>
+                </div>
               </div>
             ) : (
               /* Full desktop info */
@@ -392,6 +403,15 @@ export default function RoutesClient() {
                   }}>
                     Download GPX
                   </a>
+                  {selected.strava && (
+                    <a href={selected.strava} target="_blank" rel="noopener noreferrer" style={{
+                      flex: 1, textAlign: 'center', fontSize: 12, fontWeight: 600,
+                      padding: '9px 12px', borderRadius: 7, textDecoration: 'none',
+                      background: '#fc4c02', color: '#fff', transition: 'opacity 0.15s',
+                    }}>
+                      View on Strava
+                    </a>
+                  )}
                 </div>
               </>
             )}
