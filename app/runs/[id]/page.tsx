@@ -117,13 +117,25 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
                   file={route.file}
                   accentColor={accentColor}
                   rightButton={
-                    <a
-                      href={`/gpx/${route.file}`}
-                      download
-                      style={{ fontSize: 12, fontWeight: 600, color: '#0a0a0a', background: accentColor, padding: '7px 14px', borderRadius: 6, textDecoration: 'none', whiteSpace: 'nowrap' }}
-                    >
-                      Download GPX
-                    </a>
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                      {route.strava && (
+                        <a
+                          href={route.strava}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ fontSize: 12, fontWeight: 600, color: '#fff', background: '#fc4c02', padding: '7px 14px', borderRadius: 6, textDecoration: 'none', whiteSpace: 'nowrap' }}
+                        >
+                          View on Strava
+                        </a>
+                      )}
+                      <a
+                        href={`/gpx/${route.file}`}
+                        download
+                        style={{ fontSize: 12, fontWeight: 600, color: '#0a0a0a', background: accentColor, padding: '7px 14px', borderRadius: 6, textDecoration: 'none', whiteSpace: 'nowrap' }}
+                      >
+                        Download GPX
+                      </a>
+                    </div>
                   }
                 />
               </div>
