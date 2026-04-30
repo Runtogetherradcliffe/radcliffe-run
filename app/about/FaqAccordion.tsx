@@ -21,7 +21,7 @@ const FAQS: FaqItem[] = [
   },
   {
     q: 'What time and where do you meet?',
-    a: 'We meet every Thursday at 7pm at Radcliffe Market, Church Street West, Radcliffe, M26 2TN. Look for the runners outside the market — you can\'t miss us.',
+    a: 'We meet every Thursday at 7pm at Radcliffe Market, 11 Blackburn Street, Radcliffe, M26 1PN. Look for the runners outside the market — you can\'t miss us.',
   },
   {
     q: 'Do I need to book in advance?',
