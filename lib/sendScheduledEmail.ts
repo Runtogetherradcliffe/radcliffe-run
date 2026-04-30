@@ -4,15 +4,24 @@
  * make an internal HTTP call to itself, avoiding double-timeout issues.
  */
 
+import { createHmac } from 'crypto'
 import { supabaseAdmin } from '@/lib/supabase'
 import { buildEmailHtml, buildEmailText, RunInfo } from '@/lib/buildEmail'
 import { ROUTES } from '@/lib/routes'
 
-const SITE_URL     = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://radcliffe.run'
-const RESEND_KEY   = process.env.RESEND_API_KEY ?? ''
-const FROM_ADDRESS = process.env.EMAIL_FROM ?? 'noreply@radcliffe.run'
-const FROM_NAME    = process.env.EMAIL_FROM_NAME ?? 'Run Together Radcliffe'
-const BATCH_SIZE   = 50
+const SITE_URL           = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://radcliffe.run'
+const RESEND_KEY         = process.env.RESEND_API_KEY ?? ''
+const FROM_ADDRESS       = process.env.EMAIL_FROM ?? 'noreply@radcliffe.run'
+const FROM_NAME          = process.env.EMAIL_FROM_NAME ?? 'Run Together Radcliffe'
+const UNSUBSCRIBE_SECRET = process.env.UNSUBSCRIBE_SECRET ?? ''
+const BATCH_SIZE         = 50
+
+/** Generate an HMAC-SHA256 token for the given member ID so unsubscribe
+ *  links cannot be forged or used to opt out arbitrary members. */
+function makeUnsubscribeToken(memberId: string): string {
+  if (!UNSUBSCRIBE_SECRET) throw new Error('UNSUBSCRIBE_SECRET env var is not set')
+  return createHmac('sha256', UNSUBSCRIBE_SECRET).update(memberId).digest('hex')
+}
 
 interface ResendEmailPayload {
   from: string
@@ -128,7 +137,8 @@ export async function sendScheduledEmail(emailId: string): Promise<SendResult> {
 
   // Build personalised payloads
   const payloads: ResendEmailPayload[] = members.map(m => {
-    const unsubscribeUrl = `${SITE_URL}/unsubscribe?id=${m.id}`
+    const token = makeUnsubscribeToken(m.id)
+    const unsubscribeUrl = `${SITE_URL}/unsubscribe?id=${m.id}&token=${token}`
     return {
       from:    `${FROM_NAME} <${FROM_ADDRESS}>`,
       to:      [m.email],
