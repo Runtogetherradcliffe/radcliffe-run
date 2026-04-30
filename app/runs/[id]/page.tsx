@@ -91,7 +91,9 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
               Meeting point
             </p>
             <p style={{ fontSize: 14, color: '#ccc', lineHeight: 1.5, marginBottom: run.meeting_map_url ? 14 : 0 }}>
-              📍 {meetingPoint}
+              📍 {(!run.on_tour && !isSocial)
+                ? <a href="https://maps.app.goo.gl/d1FUYuqmNVpsWUs99" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>Radcliffe Market</a>
+                : meetingPoint}
             </p>
             {run.meeting_map_url && (
               <a
