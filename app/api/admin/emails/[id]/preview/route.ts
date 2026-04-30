@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/utils/supabase/server'
+import { requireAdmin } from '@/lib/admin'
 import { supabaseAdmin } from '@/lib/supabase'
 import { buildEmailHtml, RunInfo } from '@/lib/buildEmail'
 import { ROUTES } from '@/lib/routes'
@@ -8,9 +8,8 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://radcliffe.run'
 
 /** POST body can override any field for live preview as the user edits */
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const user = await requireAdmin()
+  if (!user) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
 
   const overrides = await req.json().catch(() => ({}))
   const { id } = await params
