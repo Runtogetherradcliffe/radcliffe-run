@@ -1,15 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/utils/supabase/server'
+import { requireAdmin } from '@/lib/admin'
 import { sendScheduledEmail } from '@/lib/sendScheduledEmail'
 
-const CRON_SECRET = process.env.CRON_SECRET ?? ''
+const CRON_SECRET = process.env.CRON_SECRET
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   // Allow cron internal calls (no user session) via shared secret header
-  const isCron = CRON_SECRET && req.headers.get('x-cron-internal') === CRON_SECRET
+  const cronHeader = req.headers.get('x-cron-internal')
+  const isCron = CRON_SECRET && cronHeader === CRON_SECRET
+
   if (!isCron) {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const user = await requireAdmin()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
