@@ -151,9 +151,10 @@ export default async function HomePage() {
             </p>
 
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 36 }}>
-              {['7pm start', 'Radcliffe Market', 'All abilities'].map(tag => (
+              {['7pm start', 'All abilities'].map(tag => (
                 <span key={tag} style={{ fontSize: 12, color: '#888', border: '1px solid #1a1a1a', borderRadius: 20, padding: '4px 12px' }}>{tag}</span>
               ))}
+              <a href="https://maps.app.goo.gl/d1FUYuqmNVpsWUs99" target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: '#888', border: '1px solid #1a1a1a', borderRadius: 20, padding: '4px 12px', textDecoration: 'none' }}>Radcliffe Market</a>
             </div>
 
             {!isRegistered && (
@@ -230,7 +231,7 @@ export default async function HomePage() {
                 <div style={{ marginTop: 12, paddingTop: 10, borderTop: '1px solid #1a1a1a', display: 'flex', alignItems: 'center', gap: 6 }}>
                   <span style={{ fontSize: 12, color: '#555' }}>📍</span>
                   <span style={{ fontSize: 12, color: '#555' }}>
-                    {nextWeekRuns[0].on_tour ? nextWeekRuns[0].meeting_point : 'Radcliffe Market'}
+                    {nextWeekRuns[0].on_tour ? nextWeekRuns[0].meeting_point : <a href="https://maps.app.goo.gl/d1FUYuqmNVpsWUs99" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>Radcliffe Market</a>}
                     {nextWeekRuns.length > 1 && nextWeekRuns[1].on_tour && nextWeekRuns[0].meeting_point !== nextWeekRuns[1].meeting_point
                       ? ` · ${nextWeekRuns[1].meeting_point}` : ''}
                   </span>
@@ -432,7 +433,7 @@ export default async function HomePage() {
                             {cleanTitle(run.title)}
                           </p>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                            <span style={{ fontSize: 12, color: '#555' }}>📍 {run.on_tour ? run.meeting_point.split(',')[0] : 'Radcliffe Market'}</span>
+                            <span style={{ fontSize: 12, color: '#555' }}>📍 {run.on_tour ? run.meeting_point.split(',')[0] : <a href="https://maps.app.goo.gl/d1FUYuqmNVpsWUs99" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>Radcliffe Market</a>}</span>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                               {isTwoGroups ? (
                                 <span style={{ fontSize: 12, color: '#666' }}>{linkedRoute?.distance_km ?? run.distance_km}/{companionRoute?.distance_km ?? companion!.distance_km} km</span>
