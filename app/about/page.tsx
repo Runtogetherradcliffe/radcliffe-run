@@ -3,6 +3,7 @@ import Footer from '@/components/layout/Footer'
 import FaqAccordion from './FaqAccordion'
 import PaceGroups from './PaceGroups'
 import { supabaseAdmin } from '@/lib/supabase'
+import { ROUTES } from '@/lib/routes'
 
 export const metadata = {
   title: 'About — radcliffe.run',
@@ -59,7 +60,7 @@ export default async function AboutPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'var(--about-stats-cols)', gap: 12 }}>
             <StatCard value="£0" label="Cost to join" sub="Always free" />
             <StatCard value="Thu" label="Every week" sub="7pm sharp" />
-            <StatCard value="65+" label="Routes" sub="Road & trail" />
+            <StatCard value={`${ROUTES.length}+`} label="Routes" sub="Road & trail" />
             <StatCard value={memberCount} label="Registered runners" sub="And counting" />
           </div>
         </section>
