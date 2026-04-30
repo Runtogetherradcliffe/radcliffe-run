@@ -33,7 +33,7 @@ export const RUN_GROUPS: RunGroup[] = [
     name: 'Keep Me Going',
     distance: '5–6k',
     style: 'Continuous running',
-    paceKm: '6:10–7:30 /km',
+    paceKm: '6:15–7:30 /km',
     paceMi: '10:00–12:00 /mi',
     desc: 'Continuous running with regular regroups. A comfortable, social pace with two leaders — one at the front, one at the back.',
     color: '#6b9fd4',
