@@ -144,7 +144,7 @@ export default function RoutesClient() {
       })
       markerRef.current = leafletRef.current.marker(MEETING, { icon: meetIcon })
         .addTo(map)
-        .bindPopup('<b style="font-family:Inter,sans-serif;font-size:13px">Radcliffe Market</b><br><span style="font-size:12px;color:#888">Meeting point</span>')
+        .bindPopup('<b style="font-family:Inter,sans-serif;font-size:13px"><a href="https://maps.app.goo.gl/d1FUYuqmNVpsWUs99" target="_blank" style="color:inherit;text-decoration:none">Radcliffe Market ↗</a></b><br><span style="font-size:12px;color:#888">Meeting point · 11 Blackburn Street</span>')
 
       setMapReady(true)
     })
@@ -394,7 +394,7 @@ export default function RoutesClient() {
                     </div>
                   ))}
                 </div>
-                <p style={{ fontSize: 12, color: '#555', marginBottom: 14 }}>📍 Starts at Radcliffe Market</p>
+                <p style={{ fontSize: 12, color: '#555', marginBottom: 14 }}>📍 Starts at <a href="https://maps.app.goo.gl/d1FUYuqmNVpsWUs99" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'underline' }}>Radcliffe Market</a></p>
                 <div style={{ display: 'flex', gap: 8 }}>
                   <a href={`/gpx/${selected.file}`} download style={{
                     flex: 1, textAlign: 'center', fontSize: 12, fontWeight: 600,
