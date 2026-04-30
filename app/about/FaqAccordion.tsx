@@ -9,7 +9,7 @@ interface FaqItem {
 const FAQS: FaqItem[] = [
   {
     q: 'Do I need to be a fast runner to join?',
-    a: 'Not at all. RTR welcomes runners of all abilities — from complete beginners to those training for marathons and ultras. We run in small groups so nobody gets left behind, and routes are offered at different distances each week so you can pick what suits you.',
+    a: 'Not at all. We welcome runners of all abilities — from complete beginners to those training for marathons and ultras. Nobody gets left behind, and routes are offered at different distances each week so you can pick what suits you.',
   },
   {
     q: 'What is jeffing?',
@@ -17,7 +17,7 @@ const FAQS: FaqItem[] = [
   },
   {
     q: 'How much does it cost?',
-    a: 'Nothing. RTR is completely free to attend. We\'re part of the England Athletics Run Together programme, which is built on the principle that running should be accessible to everyone.',
+    a: 'Nothing. It is completely free to attend. We\'re part of the England Athletics Run Together programme, which is built on the principle that running should be accessible to everyone.',
   },
   {
     q: 'What time and where do you meet?',
@@ -25,11 +25,11 @@ const FAQS: FaqItem[] = [
   },
   {
     q: 'Do I need to book in advance?',
-    a: 'For Thursday sessions you can book through the Run Together Runner app (available on iOS and Android), but you\'re also very welcome to just turn up — you don\'t need to book to come along. We\'d always rather see you than have you miss a run because the app defeated you. If you\'d like to register on this site, all we need is your contact details — we use these for runner safety and you\'ll receive occasional group emails.',
+    a: 'No you do not need to book. For your own safety we\'d really appreciate it if you could register your contact details and the details of anyone to contact in an emergency. You can also opt to receive emails and alerts about the group if you wish.',
   },
   {
     q: 'What should I wear and bring?',
-    a: 'Whatever you\'d normally run in. On Thursday evenings a hi-vis or reflective layer is sensible in autumn and winter, and lights if you have them. Bring water if it\'s warm. We don\'t hang about at the end so no need to bring anything else.',
+    a: 'Whatever you\'d normally run in. On Thursday evenings a hi-vis or reflective layer and lights are needed in autumn and winter. Hydrate before the run and bring water if it\'s particularly warm.',
   },
   {
     q: 'What distances do you run?',
@@ -44,7 +44,7 @@ const FAQS: FaqItem[] = [
     a: 'Absolutely. Just let one of the run leaders know when you arrive and we\'ll make sure you\'re with a group that suits where you\'re at. There\'s no pressure to push harder than you should.',
   },
   {
-    q: 'Can I add RTR to my parkrun profile?',
+    q: 'Can I add the group to my parkrun profile?',
     a: 'Yes — we\'d love that. Search for "Run Together Radcliffe" in the club section of your parkrun profile. It means your results show up in our weekly roundup and you\'re counted in the group\'s stats.',
   },
   {
