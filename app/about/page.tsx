@@ -60,7 +60,7 @@ export default async function AboutPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'var(--about-stats-cols)', gap: 12 }}>
             <StatCard value="£0" label="Cost to join" sub="Always free" />
             <StatCard value="Thu" label="Every week" sub="7pm sharp" />
-            <StatCard value={`${ROUTES.length}+`} label="Routes" sub="Road & trail" />
+            <StatCard value={String(ROUTES.length)} label="Routes" sub="Road & trail" />
             <StatCard value={memberCount} label="Registered runners" sub="And counting" />
           </div>
         </section>
