@@ -36,3 +36,35 @@ export async function PATCH(req: NextRequest) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json(data)
 }
+
+// DELETE /api/profile — permanently delete the authenticated member's account
+export async function DELETE() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user?.email || !user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const admin = supabaseAdmin()
+
+  // Delete the member row (removes all personal data, emergency contact, medical info)
+  const { error: memberError } = await admin
+    .from('members')
+    .delete()
+    .eq('email', user.email)
+
+  if (memberError) {
+    console.error('Delete member error:', memberError)
+    return NextResponse.json({ error: 'Failed to delete account' }, { status: 500 })
+  }
+
+  // Remove any push subscriptions for this user
+  await admin.from('push_subscriptions').delete().eq('user_id', user.id)
+
+  // Delete the Supabase auth user entirely
+  const { error: authError } = await admin.auth.admin.deleteUser(user.id)
+  if (authError) {
+    // Non-fatal: member data already gone, log and continue
+    console.error('Delete auth user error:', authError)
+  }
+
+  return NextResponse.json({ success: true })
+}
