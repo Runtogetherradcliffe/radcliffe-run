@@ -1,13 +1,12 @@
-import { createClient } from '@/utils/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAdmin } from '@/lib/admin'
 import { supabaseAdmin } from '@/lib/supabase'
 
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await requireAdmin()
   if (!user) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
 
   const { id } = await params
@@ -28,8 +27,7 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await requireAdmin()
   if (!user) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
 
   const { id } = await params
