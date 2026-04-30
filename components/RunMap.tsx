@@ -72,7 +72,7 @@ export default function RunMap({ gpxFile, center, onTour = false, meetingLabel =
       // For non-tour runs, place the Radcliffe Market marker immediately
       if (!onTour) {
         Lx.marker(MARKET_COORDS, { icon: meetIcon }).addTo(map)
-          .bindPopup(`<b style="font-family:Inter,sans-serif;font-size:13px">Radcliffe Market</b><br><span style="font-size:12px;color:#888">Meeting point · 7pm</span>`)
+          .bindPopup(`<b style="font-family:Inter,sans-serif;font-size:13px"><a href="https://maps.app.goo.gl/d1FUYuqmNVpsWUs99" target="_blank" style="color:inherit;text-decoration:none">Radcliffe Market ↗</a></b><br><span style="font-size:12px;color:#888">Meeting point · 7pm · 11 Blackburn St</span>`)
       }
 
       // Load GPX
