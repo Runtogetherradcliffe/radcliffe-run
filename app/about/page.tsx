@@ -20,11 +20,15 @@ function StatCard({ value, label, sub }: { value: string; label: string; sub?: s
 }
 
 /* ── Info row ── */
-function InfoRow({ label, value }: { label: string; value: string }) {
+function InfoRow({ label, value, href }: { label: string; value: string; href?: string }) {
   return (
     <div style={{ padding: '14px 0', borderBottom: '1px solid #1a1a1a' }}>
       <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#555', marginBottom: 3 }}>{label}</p>
-      <p style={{ fontSize: 15, color: '#ccc', lineHeight: 1.5 }}>{value}</p>
+      {href ? (
+        <a href={href} target="_blank" rel="noopener noreferrer" style={{ fontSize: 15, color: '#ccc', lineHeight: 1.5, textDecoration: 'none' }}>{value}</a>
+      ) : (
+        <p style={{ fontSize: 15, color: '#ccc', lineHeight: 1.5 }}>{value}</p>
+      )}
     </div>
   )
 }
@@ -84,7 +88,7 @@ export default async function AboutPage() {
               <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#555', marginBottom: 4 }}>The essentials</p>
               <div>
                 <InfoRow label="When" value="Every Thursday, 7:00pm" />
-                <InfoRow label="Where" value="Radcliffe Market, Blackburn Street, M26 1PN" />
+                <InfoRow label="Where" value="Radcliffe Market, 11 Blackburn Street, M26 1PN" href="https://maps.app.goo.gl/d1FUYuqmNVpsWUs99" />
                 <InfoRow label="Cost" value="Free — always" />
                 <InfoRow label="Distances" value="5–6k and 8–10k offered most weeks" />
                 <InfoRow label="Ability" value="All levels welcome — run/walk to experienced" />
