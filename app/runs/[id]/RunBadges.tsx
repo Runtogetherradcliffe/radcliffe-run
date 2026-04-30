@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { RUN_GROUPS } from '@/lib/groups'
 
 type GroupKey = 'jeffing' | 'keepMeGoing' | 'challengeMe'
 
@@ -68,9 +69,12 @@ function InfoBadge({
   )
 }
 
+// Pace values sourced from lib/groups.ts — edit there, not here
+const keepMeGoingGroup = RUN_GROUPS.find(g => g.name === 'Keep Me Going')!
+const challengeMeGroup  = RUN_GROUPS.find(g => g.name === 'Challenge Me')!
 const PACE = {
-  keepMeGoing: { km: '6–8 min/km', miles: '10–12 min/mile' },
-  challengeMe:  { km: '5–7 min/km', miles: '9–11 min/mile' },
+  keepMeGoing: { km: keepMeGoingGroup.paceKm!, miles: keepMeGoingGroup.paceMi! },
+  challengeMe:  { km: challengeMeGroup.paceKm!,  miles: challengeMeGroup.paceMi! },
 }
 
 function PaceBadge({ paceKey, showMiles, onToggle }: {
