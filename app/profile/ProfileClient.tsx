@@ -104,6 +104,8 @@ export default function ProfileClient({ member: initial }: { member: Member }) {
   const [emailToggling, setEmailToggling] = useState(false)
   const [pushState, setPushState] = useState<PushState>('loading')
   const [pushLoading, setPushLoading] = useState(false)
+  const [deleteConfirm, setDeleteConfirm] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   // ── Check push subscription state on mount ──────────────────────
   useEffect(() => {
@@ -224,6 +226,21 @@ export default function ProfileClient({ member: initial }: { member: Member }) {
       showToast('Failed to update notification preference', 'err')
     } finally {
       setPushLoading(false)
+    }
+  }
+
+  // ── Delete account ─────────────────────────────────────────────
+  const deleteAccount = async () => {
+    setDeleting(true)
+    try {
+      const res = await fetch('/api/profile', { method: 'DELETE' })
+      if (!res.ok) throw new Error((await res.json()).error)
+      // Redirect to home — session is gone, auth user deleted
+      window.location.href = '/'
+    } catch (e: unknown) {
+      showToast(e instanceof Error ? e.message : 'Failed to delete account', 'err')
+      setDeleting(false)
+      setDeleteConfirm(false)
     }
   }
 
@@ -369,6 +386,64 @@ export default function ProfileClient({ member: initial }: { member: Member }) {
 
       <div style={{ marginTop: 8 }}>
         <SignOutButton />
+      </div>
+
+      {/* ── Danger zone ── */}
+      <div style={{ marginTop: 40, borderTop: '1px solid #1a1a1a', paddingTop: 32 }}>
+        <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#555', marginBottom: 16 }}>
+          Danger zone
+        </p>
+
+        {!deleteConfirm ? (
+          <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 12, padding: '20px' }}>
+            <p style={{ fontSize: 14, fontWeight: 600, color: '#ccc', marginBottom: 6 }}>Delete my account</p>
+            <p style={{ fontSize: 13, color: '#666', lineHeight: 1.6, marginBottom: 16 }}>
+              This permanently removes all your personal data, emergency contact details, and medical information from radcliffe.run. This cannot be undone.
+            </p>
+            <button
+              onClick={() => setDeleteConfirm(true)}
+              style={{
+                padding: '9px 18px', borderRadius: 8, background: 'transparent',
+                border: '1px solid #5a1a1a', color: '#e05252', fontSize: 13,
+                fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif',
+              }}
+            >
+              Delete my account
+            </button>
+          </div>
+        ) : (
+          <div style={{ background: '#120808', border: '1px solid #5a1a1a', borderRadius: 12, padding: '20px' }}>
+            <p style={{ fontSize: 14, fontWeight: 700, color: '#e05252', marginBottom: 8 }}>Are you sure?</p>
+            <p style={{ fontSize: 13, color: '#999', lineHeight: 1.6, marginBottom: 20 }}>
+              Your account, emergency contact, and any medical information will be permanently deleted. You will be signed out immediately and cannot undo this.
+            </p>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                onClick={deleteAccount}
+                disabled={deleting}
+                style={{
+                  padding: '9px 18px', borderRadius: 8, background: '#c0392b',
+                  border: 'none', color: '#fff', fontSize: 13, fontWeight: 700,
+                  cursor: deleting ? 'default' : 'pointer', opacity: deleting ? 0.7 : 1,
+                  fontFamily: 'Inter, sans-serif',
+                }}
+              >
+                {deleting ? 'Deleting…' : 'Yes, delete my account'}
+              </button>
+              <button
+                onClick={() => setDeleteConfirm(false)}
+                disabled={deleting}
+                style={{
+                  padding: '9px 16px', borderRadius: 8, background: 'transparent',
+                  border: '1px solid #2a2a2a', color: '#888', fontSize: 13,
+                  cursor: 'pointer', fontFamily: 'Inter, sans-serif',
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
