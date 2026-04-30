@@ -1,6 +1,7 @@
 import Nav from '@/components/layout/Nav'
 import Footer from '@/components/layout/Footer'
 import FaqAccordion from './FaqAccordion'
+import PaceGroups from './PaceGroups'
 import { supabaseAdmin } from '@/lib/supabase'
 
 export const metadata = {
@@ -105,50 +106,7 @@ export default async function AboutPage() {
             <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#f5a623', marginBottom: 10 }}>Groups</p>
             <h2 style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em' }}>Find your group</h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'var(--about-pace-cols)', gap: 12 }}>
-            {[
-              {
-                name: 'Get Me Started',
-                distance: '5–6k',
-                style: 'Jeffing (run/walk)',
-                pace: 'No minimum pace',
-                desc: 'Perfect if you\'re new to running or getting back into it after a break. We use jeffing — run/walk intervals — to build fitness at a sustainable pace without overdoing it.',
-                color: '#7cb87c',
-                bg: '#0d1a0d',
-                border: '#1a3a1a',
-              },
-              {
-                name: 'Keep Me Going',
-                distance: '5–6k',
-                style: 'Continuous running',
-                pace: '6:10–7:30 /km',
-                desc: 'Continuous running with regular regroups. A comfortable, social pace with two leaders — one at the front, one at the back.',
-                color: '#6b9fd4',
-                bg: '#0d1221',
-                border: '#1a2a44',
-              },
-              {
-                name: 'Challenge Me',
-                distance: '8–10k',
-                style: 'Continuous running',
-                pace: '5:35–6:50 /km',
-                desc: 'Longer distance for more experienced runners looking to push further. Road and trail routes, with leaders front and back.',
-                color: '#f5a623',
-                bg: '#1a1000',
-                border: '#3a2200',
-              },
-            ].map(g => (
-              <div key={g.name} style={{ background: g.bg, border: `1px solid ${g.border}`, borderRadius: 12, padding: '20px 18px' }}>
-                <p style={{ fontSize: 13, fontWeight: 700, color: g.color, marginBottom: 6 }}>{g.name}</p>
-                <div style={{ display: 'flex', gap: 6, marginBottom: 12, flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: 11, fontWeight: 600, color: g.color, background: 'rgba(255,255,255,0.05)', border: `1px solid ${g.border}`, padding: '2px 7px', borderRadius: 4 }}>{g.distance}</span>
-                  <span style={{ fontSize: 11, fontWeight: 600, color: g.color, background: 'rgba(255,255,255,0.05)', border: `1px solid ${g.border}`, padding: '2px 7px', borderRadius: 4 }}>{g.style}</span>
-                  <span style={{ fontSize: 11, fontWeight: 600, color: '#555', background: 'rgba(255,255,255,0.03)', border: '1px solid #1a1a1a', padding: '2px 7px', borderRadius: 4 }}>{g.pace}</span>
-                </div>
-                <p style={{ fontSize: 13, color: '#777', lineHeight: 1.7 }}>{g.desc}</p>
-              </div>
-            ))}
-          </div>
+          <PaceGroups />
         </section>
 
         {/* ── FAQ ── */}
