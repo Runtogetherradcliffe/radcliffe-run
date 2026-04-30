@@ -127,7 +127,7 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
                           rel="noopener noreferrer"
                           style={{ fontSize: 12, fontWeight: 600, color: '#fff', background: '#fc4c02', padding: '7px 14px', borderRadius: 6, textDecoration: 'none', whiteSpace: 'nowrap' }}
                         >
-                          View on Strava
+                          Strava
                         </a>
                       )}
                       <a
@@ -135,7 +135,7 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
                         download
                         style={{ fontSize: 12, fontWeight: 600, color: '#0a0a0a', background: accentColor, padding: '7px 14px', borderRadius: 6, textDecoration: 'none', whiteSpace: 'nowrap' }}
                       >
-                        Download GPX
+                        GPX
                       </a>
                     </div>
                   }
