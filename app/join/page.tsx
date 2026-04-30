@@ -23,7 +23,7 @@ const EMPTY_FORM: FormData = {
   firstName: '', lastName: '', email: '', mobile: '',
   emergencyName: '', emergencyPhone: '', emergencyRelationship: '',
   healthDeclaration: false, healthNotes: '',
-  consentData: false, consentEmail: true, consentPhoto: true,
+  consentData: false, consentEmail: false, consentPhoto: false,
 }
 
 const RELATIONSHIPS = ['Partner', 'Parent', 'Sibling', 'Friend', 'Spouse', 'Child', 'Other']
