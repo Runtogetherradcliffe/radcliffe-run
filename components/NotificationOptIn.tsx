@@ -23,7 +23,7 @@ export default function NotificationOptIn() {
     setPermission(Notification.permission)
 
     // Don't re-show if they previously dismissed without choosing
-    if (sessionStorage.getItem('rtr-notif-dismissed')) setDismissed(true)
+    if (localStorage.getItem('rtr-notif-dismissed')) setDismissed(true)
   }, [])
 
   // Don't render on server, or if not supported, or if already decided
@@ -55,12 +55,12 @@ export default function NotificationOptIn() {
       setLoading(false)
       // Always dismiss — the user has made a choice, don't leave the banner hanging
       setDismissed(true)
-      sessionStorage.setItem('rtr-notif-dismissed', '1')
+      localStorage.setItem('rtr-notif-dismissed', '1')
     }
   }
 
   function dismiss() {
-    sessionStorage.setItem('rtr-notif-dismissed', '1')
+    localStorage.setItem('rtr-notif-dismissed', '1')
     setDismissed(true)
   }
 
