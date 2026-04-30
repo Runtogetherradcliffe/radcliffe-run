@@ -32,6 +32,28 @@ export interface EmailData {
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December']
 const DAYS   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
 
+/** Escape untrusted strings before interpolating into HTML */
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+/** Validate a URL is http(s) before putting it in an href; fall back to safe default */
+function safeUrl(url: string | null | undefined, fallback: string): string {
+  if (!url) return fallback
+  try {
+    const u = new URL(url)
+    if (u.protocol !== 'https:' && u.protocol !== 'http:') return fallback
+    return url
+  } catch {
+    return fallback
+  }
+}
+
 function fmtDate(iso: string) {
   const d = new Date(iso + 'T00:00:00')
   return `${DAYS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]}`
@@ -45,19 +67,20 @@ function nl2p(text: string): string {
   return text
     .split(/\n\n+/)
     .map(para => `<p style="margin:0 0 12px;font-size:15px;color:#333333;line-height:1.8;">${
-      para.replace(/\n/g, '<br>')
+      escapeHtml(para).replace(/\n/g, '<br>')
     }</p>`)
     .join('\n')
 }
 
 function runBlock(run: RunInfo, siteUrl: string, showTerrain = false): string {
   const dateStr   = fmtDate(run.date)
-  const title     = cleanTitle(run.title)
+  const title     = escapeHtml(cleanTitle(run.title))
   const distance  = run.distance_km ? `${run.distance_km}km` : ''
-  const location  = run.meeting_point || 'Radcliffe Market'
-  const routeUrl  = run.route_slug
-    ? `${siteUrl}/routes/${run.route_slug}`
-    : `${siteUrl}/routes`
+  const location  = escapeHtml(run.meeting_point || 'Radcliffe Market')
+  const routeUrl  = safeUrl(
+    run.route_slug ? `${siteUrl}/routes/${encodeURIComponent(run.route_slug)}` : `${siteUrl}/routes`,
+    `${siteUrl}/routes`,
+  )
 
   const terrainMap: Record<string, string> = { trail: '🌿 Trail', road: '🏙️ Road', mixed: '🔀 Mixed' }
   const terrainLabel = (showTerrain && run.terrain) ? terrainMap[run.terrain] ?? '' : ''
@@ -66,8 +89,9 @@ function runBlock(run: RunInfo, siteUrl: string, showTerrain = false): string {
     ? `<span style="display:inline-block;margin-left:8px;padding:2px 8px;background:#fff3d6;border:1px solid #f5a623;border-radius:4px;font-size:10px;font-weight:700;color:#c47f00;letter-spacing:0.05em;text-transform:uppercase;vertical-align:middle;">Run or Jeff</span>`
     : ''
 
-  const meetingLine = run.on_tour && run.meeting_map_url
-    ? `📍 ${location} <strong style="color:#f5a623;">(On Tour)</strong> &nbsp;·&nbsp; <a href="${run.meeting_map_url}" style="color:#f5a623;font-weight:600;text-decoration:none;">View on map &rarr;</a>`
+  const safeMapUrl = run.on_tour && run.meeting_map_url ? safeUrl(run.meeting_map_url, '') : ''
+  const meetingLine = run.on_tour && safeMapUrl
+    ? `📍 ${location} <strong style="color:#f5a623;">(On Tour)</strong> &nbsp;·&nbsp; <a href="${safeMapUrl}" style="color:#f5a623;font-weight:600;text-decoration:none;">View on map &rarr;</a>`
     : run.on_tour
     ? `📍 ${location} <strong style="color:#f5a623;">(On Tour)</strong>`
     : `📍 ${location}`
@@ -82,7 +106,7 @@ function runBlock(run: RunInfo, siteUrl: string, showTerrain = false): string {
       <p style="margin:0 0 10px;font-size:18px;font-weight:700;color:#0a0a0a;letter-spacing:-0.02em;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
         ${title}${jeffingBadge}
       </p>
-      ${run.description ? `<p style="margin:0 0 14px;font-size:14px;color:#555555;line-height:1.7;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">${run.description}</p>` : ''}
+      ${run.description ? `<p style="margin:0 0 14px;font-size:14px;color:#555555;line-height:1.7;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">${escapeHtml(run.description)}</p>` : ''}
       <p style="margin:0 0 14px;font-size:13px;color:#777777;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
         ${meetingLine}
       </p>
@@ -144,7 +168,7 @@ export function buildEmailHtml(data: EmailData): string {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="color-scheme" content="light">
-  <title>${data.subject}</title>
+  <title>${escapeHtml(data.subject)}</title>
 </head>
 <body style="margin:0;padding:0;background-color:#f0f0f0;-webkit-text-size-adjust:100%;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
 
