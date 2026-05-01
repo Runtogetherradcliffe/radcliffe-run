@@ -207,26 +207,27 @@ export default async function HomePage() {
                     const group = slug?.startsWith('trail-5k--') || slug?.startsWith('road-5k--') ? '5K'
                                : slug?.startsWith('trail-8k--') || slug?.startsWith('road-8k--') ? '8K'
                                : null
-                    const groupColor = group === '5K' ? '#4caf76' : group === '8K' ? '#5b9bd5' : '#888'
                     return (
-                      <Link key={run.id} href={`/runs/${run.id}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', textDecoration: 'none', gap: 12 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-                          {group && (
-                            <span style={{ fontSize: 10, fontWeight: 700, color: groupColor, border: `1px solid ${groupColor}`, borderRadius: 4, padding: '2px 6px', flexShrink: 0 }}>
-                              {group}
-                            </span>
-                          )}
-                          <span style={{ fontSize: 14, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {cleanTitle(run.title)}
-                          </span>
-                          <span style={{ fontSize: 10, color: '#555', flexShrink: 0, whiteSpace: 'nowrap' }}>
-                            {run.has_jeffing ? 'run/walk' : 'continuous'}
-                          </span>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
-                          {run.distance_km && <span style={{ fontSize: 12, color: '#555' }}>{run.distance_km} km</span>}
-                          <span style={{ fontSize: 12, color: '#666' }}>→</span>
-                        </div>
+                      <Link key={run.id} href={`/runs/${run.id}`} style={{ display: 'flex', flexWrap: 'wrap', gap: 3, alignItems: 'center', padding: '8px 10px', borderRadius: 6, textDecoration: 'none', ...(group === '5K' ? { background: 'rgba(76,175,118,0.06)', border: '1px solid rgba(76,175,118,0.2)', color: '#4caf76' } : group === '8K' ? { background: 'rgba(91,155,213,0.06)', border: '1px solid rgba(91,155,213,0.2)', color: '#5b9bd5' } : { background: 'rgba(255,255,255,0.04)', border: '1px solid #222', color: '#888' }) }}>
+                        {group === '5K' && (
+                          <>
+                            <span style={{ fontSize: 9, fontWeight: 700, background: 'rgba(76,175,118,0.2)', border: '1px solid rgba(76,175,118,0.4)', borderRadius: 3, padding: '1px 5px', color: '#4caf76' }}>5–6k</span>
+                            {run.has_jeffing && (
+                              <span style={{ fontSize: 9, fontWeight: 600, background: 'rgba(245,166,35,0.12)', border: '1px solid rgba(245,166,35,0.3)', borderRadius: 3, padding: '1px 5px', color: '#f5a623' }}>Jeffing (run/walk)</span>
+                            )}
+                            <span style={{ fontSize: 9, fontWeight: 600, background: 'rgba(76,175,118,0.1)', border: '1px solid rgba(76,175,118,0.25)', borderRadius: 3, padding: '1px 5px', color: '#4caf76' }}>Continuous running</span>
+                          </>
+                        )}
+                        {group === '8K' && (
+                          <>
+                            <span style={{ fontSize: 9, fontWeight: 700, background: 'rgba(91,155,213,0.2)', border: '1px solid rgba(91,155,213,0.4)', borderRadius: 3, padding: '1px 5px', color: '#5b9bd5' }}>8–10k</span>
+                            <span style={{ fontSize: 9, fontWeight: 600, background: 'rgba(91,155,213,0.1)', border: '1px solid rgba(91,155,213,0.25)', borderRadius: 3, padding: '1px 5px', color: '#5b9bd5' }}>Continuous running</span>
+                          </>
+                        )}
+                        {!group && (
+                          <span style={{ fontSize: 13, fontWeight: 600, color: '#ccc' }}>{cleanTitle(run.title)}</span>
+                        )}
+                        <span style={{ marginLeft: 'auto', fontSize: 11, fontWeight: 700 }}>→</span>
                       </Link>
                     )
                   })}
