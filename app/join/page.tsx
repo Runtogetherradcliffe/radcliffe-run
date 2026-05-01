@@ -13,7 +13,9 @@ interface FormData {
   emergencyPhone: string
   emergencyRelationship: string
   healthDeclaration: boolean
+  consentMedical: boolean
   healthNotes: string
+  ageConfirmed: boolean
   consentData: boolean
   consentEmail: boolean
   consentPhoto: boolean
@@ -22,8 +24,8 @@ interface FormData {
 const EMPTY_FORM: FormData = {
   firstName: '', lastName: '', email: '', mobile: '',
   emergencyName: '', emergencyPhone: '', emergencyRelationship: '',
-  healthDeclaration: false, healthNotes: '',
-  consentData: false, consentEmail: false, consentPhoto: false,
+  healthDeclaration: false, consentMedical: false, healthNotes: '',
+  ageConfirmed: false, consentData: false, consentEmail: false, consentPhoto: false,
 }
 
 const RELATIONSHIPS = ['Partner', 'Parent', 'Sibling', 'Friend', 'Spouse', 'Child', 'Other']
@@ -260,17 +262,36 @@ function StepLastBits({ data, onChange, onToggle }: {
           I confirm I am in good health and aware of the physical demands of running. I take responsibility for my own safety during runs.
         </ConsentItem>
         {data.healthDeclaration && (
-          <div style={{ marginTop: 10 }}>
-            <label style={labelStyle}>Anything we should know? (optional)</label>
-            <textarea
-              placeholder="E.g. asthma, recent injury, or anything that might be relevant..."
-              value={data.healthNotes}
-              onChange={e => onChange('healthNotes', e.target.value)}
-              rows={3}
-              style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.6 }}
-            />
+          <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <ConsentItem checked={data.consentMedical} onChange={v => onToggle('consentMedical', v)}>
+              I consent to radcliffe.run storing any health information I share below. This is used only for runner safety and is only accessible to run leaders.{' '}
+              <span style={{ color: '#555', fontSize: 13 }}>(Optional — only tick if you want to share health details.)</span>
+            </ConsentItem>
+            {data.consentMedical && (
+              <div>
+                <label style={labelStyle}>Anything we should know?</label>
+                <textarea
+                  placeholder="E.g. asthma, recent injury, or anything that might be relevant..."
+                  value={data.healthNotes}
+                  onChange={e => onChange('healthNotes', e.target.value)}
+                  rows={3}
+                  style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.6 }}
+                />
+              </div>
+            )}
           </div>
         )}
+      </div>
+
+      {/* Age */}
+      <div>
+        <p style={{ fontSize: 13, fontWeight: 600, color: '#888', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 10 }}>Age</p>
+        <div style={{ fontSize: 13, color: '#666', lineHeight: 1.6, marginBottom: 10, padding: '10px 14px', background: '#0d0d0d', borderRadius: 8, border: '1px solid #1a1a1a' }}>
+          Radcliffe.run is open to runners aged 18 and over. Young people aged 12–17 are welcome to join with a parent or guardian, who should complete this form on their behalf. Under 12s are unable to attend.
+        </div>
+        <ConsentItem required checked={data.ageConfirmed} onChange={v => onToggle('ageConfirmed', v)}>
+          I confirm I am 18 or over, or I am a parent or guardian registering on behalf of a young person aged 12–17 who will attend with me.
+        </ConsentItem>
       </div>
 
       {/* GDPR */}
@@ -279,10 +300,10 @@ function StepLastBits({ data, onChange, onToggle }: {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           <ConsentItem required checked={data.consentData} onChange={v => onToggle('consentData', v)}>
             I agree to radcliffe.run storing my name, contact details, and emergency contact for the purpose of running group safety and communications.{' '}
-            <Link href="/privacy" style={{ color: '#f5a623', textDecoration: 'none' }}>Privacy policy</Link>
+            <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: '#f5a623', textDecoration: 'none' }}>Privacy policy</a>
           </ConsentItem>
           <ConsentItem checked={data.consentEmail} onChange={v => onToggle('consentEmail', v)}>
-            Send me weekly run reminders and the weekend roundup by email. (You can unsubscribe anytime.)
+            Send me club emails including weekly run reminders, the weekend roundup, and other club updates. (You can unsubscribe anytime.)
           </ConsentItem>
           <ConsentItem checked={data.consentPhoto} onChange={v => onToggle('consentPhoto', v)}>
             I&apos;m happy to appear in group photos shared on the radcliffe.run website and social media.
@@ -349,7 +370,7 @@ function isStepValid(step: number, data: FormData): boolean {
     data.emergencyPhone && isValidUKPhone(data.emergencyPhone) &&
     data.emergencyRelationship
   )
-  if (step === 2) return !!(data.consentData && data.healthDeclaration)
+  if (step === 2) return !!(data.consentData && data.healthDeclaration && data.ageConfirmed)
   return true
 }
 
