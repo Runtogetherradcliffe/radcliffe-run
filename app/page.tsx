@@ -73,35 +73,46 @@ const TERRAIN_CARD_STYLE: Record<string, { bg: string; glow: string }> = {
 
 export default async function HomePage() {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  const isRegistered = !!user
   const today = new Date().toISOString().split('T')[0]
-
   const fourWeeksOut = new Date()
   fourWeeksOut.setDate(fourWeeksOut.getDate() + 28)
   const fourWeeksOutStr = fourWeeksOut.toISOString().split('T')[0]
 
-  // Site settings — use service role so it works for both anon and authenticated visitors
-  const { data: siteSettings } = await supabaseAdmin()
-    .from('site_settings')
-    .select('hero_image_url, sync_social_sheet, show_social_calendar')
-    .single()
+  // Parallelise independent queries — auth, settings, runs, and posts fire at the same time
+  const [
+    { data: { user } },
+    { data: siteSettings },
+    { data: thursdayRuns },
+    { data: latestPosts },
+  ] = await Promise.all([
+    supabase.auth.getUser(),
+    supabaseAdmin()
+      .from('site_settings')
+      .select('hero_image_url, sync_social_sheet, show_social_calendar')
+      .single(),
+    supabase
+      .from('runs')
+      .select('id, date, title, distance_km, terrain, meeting_point, route_slug, on_tour, has_jeffing, run_type, cancelled')
+      .gte('date', today)
+      .lte('date', fourWeeksOutStr)
+      .eq('cancelled', false)
+      .neq('run_type', 'social')
+      .order('date', { ascending: true })
+      .order('distance_km', { ascending: true }),
+    supabaseAdmin()
+      .from('posts')
+      .select('id, type, title, summary, slug, published_at, photo_urls')
+      .eq('status', 'published')
+      .order('published_at', { ascending: false })
+      .limit(3),
+  ])
+
+  const isRegistered        = !!user
   const heroImageUrl        = siteSettings?.hero_image_url ?? null
   const showSocialRuns      = siteSettings?.sync_social_sheet ?? true
   const showSocialCalendar  = siteSettings?.show_social_calendar ?? false
 
-  // Thursday runs (all types except social)
-  const { data: thursdayRuns } = await supabase
-    .from('runs')
-    .select('id, date, title, distance_km, terrain, meeting_point, route_slug, on_tour, has_jeffing, run_type, cancelled')
-    .gte('date', today)
-    .lte('date', fourWeeksOutStr)
-    .eq('cancelled', false)
-    .neq('run_type', 'social')
-    .order('date', { ascending: true })
-    .order('distance_km', { ascending: true })
-
-  // Social runs (separate query, only if toggle is on)
+  // Social runs depend on the settings toggle so fetched after
   const { data: socialRunsData } = showSocialRuns
     ? await supabase
         .from('runs')
@@ -119,13 +130,14 @@ export default async function HomePage() {
   const runCards     = thursdayRuns ?? []
   const socialRuns   = socialRunsData ?? []
 
-  // Latest posts for homepage feed
-  const { data: latestPosts } = await supabaseAdmin()
-    .from('posts')
-    .select('id, type, title, summary, slug, published_at, photo_urls')
-    .eq('status', 'published')
-    .order('published_at', { ascending: false })
-    .limit(3)
+  // Pre-compute which route slugs have map images once — avoids existsSync inside render loop
+  const allSlugs = [
+    ...runCards.map(r => r.route_slug),
+    ...socialRuns.map(r => r.route_slug),
+  ].filter((s): s is string => !!s)
+  const slugsWithMap = new Set(
+    allSlugs.filter(slug => existsSync(join(process.cwd(), 'public', 'route-maps', `${slug}.png`)))
+  )
 
   return (
     <>
@@ -316,7 +328,7 @@ export default async function HomePage() {
               <div className="rtr-cards-grid">
                 {cards.length === 0 ? (
                   <p style={{ color: '#555', fontSize: 14 }}>No upcoming runs scheduled yet.</p>
-                ) : cards.map(({ primary: run, companion }) => {
+                ) : cards.map(({ primary: run, companion }, cardIndex) => {
                   const linkedRoute = run.route_slug ? ROUTES.find(r => r.slug === run.route_slug) : null
                   const companionRoute = companion?.route_slug ? ROUTES.find(r => r.slug === companion.route_slug) : null
 
@@ -345,9 +357,7 @@ export default async function HomePage() {
                   const mapSlug = isTwoGroups
                     ? (companion!.route_slug ?? run.route_slug)
                     : run.route_slug
-                  const hasMap = !!mapSlug && existsSync(
-                    join(process.cwd(), 'public', 'route-maps', `${mapSlug}.png`)
-                  )
+                  const hasMap = !!mapSlug && slugsWithMap.has(mapSlug)
                   const headerHeight = hasMap ? 160 : 100
 
                   // Card border colour keyed on group
@@ -372,6 +382,7 @@ export default async function HomePage() {
                               <img
                                 src={`/route-maps/${mapSlug}.png`}
                                 alt=""
+                                loading={cardIndex === 0 ? 'eager' : 'lazy'}
                                 style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                               />
                               {/* Bottom fade to blend into card body */}
@@ -524,9 +535,7 @@ export default async function HomePage() {
               </div>
               <div className="rtr-cards-grid">
                 {socialRuns.map(run => {
-                  const socialHasMap = !!run.route_slug && existsSync(
-                    join(process.cwd(), 'public', 'route-maps', `${run.route_slug}.png`)
-                  )
+                  const socialHasMap = !!run.route_slug && slugsWithMap.has(run.route_slug)
                   const socialHeaderHeight = socialHasMap ? 160 : 80
                   return (
                   <div key={run.id} style={{ background: '#111', border: '1px solid rgba(196,168,232,0.15)', borderRadius: 12, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
@@ -537,6 +546,7 @@ export default async function HomePage() {
                           <img
                             src={`/route-maps/${run.route_slug}.png`}
                             alt=""
+                            loading="lazy"
                             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                           />
                           <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 48, background: 'linear-gradient(to bottom, transparent, #111)', pointerEvents: 'none' }} />
@@ -599,7 +609,7 @@ export default async function HomePage() {
                       {coverPhoto && (
                         <div style={{ height: 160, overflow: 'hidden' }}>
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={coverPhoto} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                          <img src={coverPhoto} alt="" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                         </div>
                       )}
                       <div style={{ padding: '16px 18px' }}>
