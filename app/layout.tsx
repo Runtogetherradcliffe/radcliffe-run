@@ -6,6 +6,20 @@ import InstallPrompt from '@/components/InstallPrompt'
 export const metadata: Metadata = {
   title: "radcliffe.run — Radcliffe's Running Group",
   description: 'A free, friendly running group open to everyone. No memberships, no minimum pace — just good routes and good people, every Thursday in Radcliffe, Greater Manchester.',
+  metadataBase: new URL('https://radcliffe.run'),
+  openGraph: {
+    title: "radcliffe.run — Radcliffe's Running Group",
+    description: 'A free, friendly running group open to everyone. No memberships, no minimum pace — just good routes and good people, every Thursday in Radcliffe, Greater Manchester.',
+    url: 'https://radcliffe.run',
+    siteName: 'radcliffe.run',
+    locale: 'en_GB',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: "radcliffe.run — Radcliffe's Running Group",
+    description: 'A free, friendly running group open to everyone. No memberships, no minimum pace — just good routes and good people, every Thursday in Radcliffe, Greater Manchester.',
+  },
   manifest: '/manifest.json',
   icons: {
     icon: [
