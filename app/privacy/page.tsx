@@ -1,5 +1,6 @@
 import Nav from '@/components/layout/Nav'
 import Footer from '@/components/layout/Footer'
+import BackLink from './BackLink'
 
 export const metadata = {
   title: 'Privacy Policy — radcliffe.run',
@@ -37,6 +38,8 @@ export default function PrivacyPage() {
       <Nav />
       <main style={{ minHeight: 'calc(100vh - 60px)', background: '#0a0a0a', padding: '60px 24px 80px' }}>
         <div style={{ maxWidth: 720, margin: '0 auto' }}>
+
+          <BackLink />
 
           {/* Header */}
           <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#f5a623', marginBottom: 12 }}>
