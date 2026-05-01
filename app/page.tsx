@@ -151,7 +151,7 @@ export default async function HomePage() {
             </p>
 
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 36 }}>
-              {['7pm start', 'All abilities', 'Continuous & jeffing'].map(tag => (
+              {['7pm start', 'All abilities'].map(tag => (
                 <span key={tag} style={{ fontSize: 12, color: '#888', border: '1px solid #1a1a1a', borderRadius: 20, padding: '4px 12px' }}>{tag}</span>
               ))}
               <a href="https://maps.app.goo.gl/d1FUYuqmNVpsWUs99" target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: '#888', border: '1px solid #1a1a1a', borderRadius: 20, padding: '4px 12px', textDecoration: 'none' }}>Radcliffe Market</a>
@@ -218,6 +218,9 @@ export default async function HomePage() {
                           )}
                           <span style={{ fontSize: 14, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {cleanTitle(run.title)}
+                          </span>
+                          <span style={{ fontSize: 10, color: '#555', flexShrink: 0, whiteSpace: 'nowrap' }}>
+                            {run.has_jeffing ? 'run/walk' : 'continuous'}
                           </span>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
