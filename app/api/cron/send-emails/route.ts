@@ -8,12 +8,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { sendScheduledEmail } from '@/lib/sendScheduledEmail'
 
-const CRON_SECRET = process.env.CRON_SECRET ?? ''
+const CRON_SECRET = process.env.CRON_SECRET
 
 export async function GET(req: NextRequest) {
-  // Verify Vercel cron secret (set CRON_SECRET in Vercel env vars)
+  // Fail closed: if CRON_SECRET is not configured, deny all requests
+  if (!CRON_SECRET) {
+    return NextResponse.json({ error: 'Cron not configured' }, { status: 503 })
+  }
   const auth = req.headers.get('authorization')
-  if (CRON_SECRET && auth !== `Bearer ${CRON_SECRET}`) {
+  if (auth !== `Bearer ${CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
