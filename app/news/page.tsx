@@ -3,7 +3,10 @@ import Nav from '@/components/layout/Nav'
 import Footer from '@/components/layout/Footer'
 import { supabaseAdmin } from '@/lib/supabase'
 
-export const metadata = { title: 'News & Roundups — radcliffe.run' }
+export const metadata = {
+  title: 'News & Roundups — radcliffe.run',
+  description: 'Weekly run roundups, race results, and news from radcliffe.run — Radcliffe\'s free community running group.',
+}
 export const dynamic = 'force-dynamic'
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
