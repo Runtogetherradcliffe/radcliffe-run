@@ -24,6 +24,30 @@ function shortMeetingPoint(mp: string) {
   return mp.split(',')[0].trim()
 }
 
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const { data: run } = await supabaseAdmin()
+    .from('runs')
+    .select('title, date, distance_km, terrain')
+    .eq('id', id)
+    .single()
+
+  if (!run) return {}
+
+  const cleanedTitle = run.title.replace(/^RTR\s+[58]k\s*/i, '').trim()
+  const d = new Date(run.date + 'T00:00:00')
+  const dateStr = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+  const title = `${cleanedTitle} — ${dateStr} — radcliffe.run`
+  const description = `${run.distance_km ? `${run.distance_km}km ` : ''}${run.terrain ?? ''} run with radcliffe.run on ${dateStr}.`.trim()
+
+  return {
+    title,
+    description,
+    openGraph: { title, description, type: 'website' },
+    twitter: { card: 'summary', title, description },
+  }
+}
+
 export default async function RunPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
 
@@ -133,6 +157,8 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
                       <a
                         href={`/gpx/${route.file}`}
                         download
+                        target="_blank"
+                        rel="noopener noreferrer"
                         style={{ fontSize: 12, fontWeight: 600, color: '#0a0a0a', background: accentColor, padding: '7px 14px', borderRadius: 6, textDecoration: 'none', whiteSpace: 'nowrap' }}
                       >
                         GPX
