@@ -151,7 +151,7 @@ export default async function HomePage() {
             </p>
 
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 36 }}>
-              {['7pm start', 'All abilities'].map(tag => (
+              {['7pm start', 'All abilities', 'Continuous & jeffing'].map(tag => (
                 <span key={tag} style={{ fontSize: 12, color: '#888', border: '1px solid #1a1a1a', borderRadius: 20, padding: '4px 12px' }}>{tag}</span>
               ))}
               <a href="https://maps.app.goo.gl/d1FUYuqmNVpsWUs99" target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: '#888', border: '1px solid #1a1a1a', borderRadius: 20, padding: '4px 12px', textDecoration: 'none' }}>Radcliffe Market</a>
@@ -169,7 +169,8 @@ export default async function HomePage() {
             )}
             {!isRegistered && (
               <p style={{ fontSize: 13, color: '#555', marginTop: 14, lineHeight: 1.6 }}>
-                No need to book — just turn up. We ask you to join so we have your contact details in case of an emergency.
+                No need to book — just turn up. We ask you to join so we have your contact details in case of an emergency.{' '}
+                <Link href="/about" style={{ color: '#888', textDecoration: 'underline' }}>Find out more about us.</Link>
               </p>
             )}
           </div>
