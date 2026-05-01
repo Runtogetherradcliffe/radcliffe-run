@@ -32,6 +32,28 @@ function PlainBody({ content }: { content: string }) {
   )
 }
 
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const { data: post } = await supabaseAdmin()
+    .from('posts')
+    .select('title, summary, published_at')
+    .eq('slug', slug)
+    .eq('status', 'published')
+    .maybeSingle()
+
+  if (!post) return {}
+
+  const title = `${post.title} — radcliffe.run`
+  const description = post.summary ?? undefined
+
+  return {
+    title,
+    description,
+    openGraph: { title, description, type: 'article', publishedTime: post.published_at ?? undefined },
+    twitter: { card: 'summary', title, description },
+  }
+}
+
 export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
 
