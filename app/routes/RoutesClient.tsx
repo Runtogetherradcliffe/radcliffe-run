@@ -370,7 +370,7 @@ export default function RoutesClient() {
                       Strava
                     </a>
                   )}
-                  <a href={`/gpx/${selected.file}`} download style={{
+                  <a href={`/gpx/${selected.file}`} download target="_blank" rel="noopener noreferrer" style={{
                     fontSize: 11, fontWeight: 600,
                     padding: '6px 12px', borderRadius: 6, textDecoration: 'none',
                     background: '#f5a623', color: '#0a0a0a',
@@ -396,7 +396,7 @@ export default function RoutesClient() {
                 </div>
                 <p style={{ fontSize: 12, color: '#555', marginBottom: 14 }}>📍 Starts at <a href="https://maps.app.goo.gl/d1FUYuqmNVpsWUs99" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'underline' }}>Radcliffe Market</a></p>
                 <div style={{ display: 'flex', gap: 8 }}>
-                  <a href={`/gpx/${selected.file}`} download style={{
+                  <a href={`/gpx/${selected.file}`} download target="_blank" rel="noopener noreferrer" style={{
                     flex: 1, textAlign: 'center', fontSize: 12, fontWeight: 600,
                     padding: '9px 12px', borderRadius: 7, textDecoration: 'none',
                     background: '#f5a623', color: '#0a0a0a', transition: 'background 0.15s',
