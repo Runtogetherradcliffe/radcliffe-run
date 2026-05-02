@@ -287,7 +287,7 @@ function PrivacyModal({ onClose }: { onClose: () => void }) {
         </div>
         {/* iframe body */}
         <iframe
-          src="/privacy"
+          src="/privacy?modal=1"
           style={{ flex: 1, border: 'none', width: '100%' }}
           title="Privacy Policy"
         />
