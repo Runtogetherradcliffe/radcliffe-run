@@ -80,51 +80,25 @@ const FILTERS: { key: Filter; label: string }[] = [
 ]
 
 /* ── GPX download (PWA-safe) ──
- * iOS PWA strategy (in order):
- *   1. Web Share with file — try GPX, XML, and octet-stream MIME types
- *      (share sheet appears as overlay, GPS apps shown as recipients)
- *   2. Web Share with URL only — share sheet still opens as overlay,
- *      user can open in Safari → WorkOutDoors from there
- *   3. If navigator.share is unavailable (desktop), blob anchor click
- * Never calls window.open — that navigates the PWA away.
- * Caller passes setGpxLink so we can show an in-app copy panel as last resort.
+ * In Safari (browser): blob anchor click — user confirmed this works fine.
+ * In PWA standalone mode: any navigation or file-share attempt can open the
+ * iOS Quick Look viewer with no back button. Instead we detect standalone and
+ * immediately show an in-app panel — copy the link or tap Share to get the
+ * native iOS share sheet as a proper overlay.
  */
 async function handleGpx(file: string, setGpxLink: (url: string | null) => void) {
   const absoluteUrl = `${window.location.origin}/gpx/${file}`
 
-  if (typeof navigator.share === 'function') {
-    // 1. Try file share (makes GPS apps appear directly in sheet)
-    try {
-      const res = await fetch(`/gpx/${file}`)
-      const blob = await res.blob()
-      const mimeTypes = ['application/gpx+xml', 'text/xml', 'application/octet-stream']
-      for (const type of mimeTypes) {
-        const f = new File([blob], file, { type })
-        if (navigator.canShare && navigator.canShare({ files: [f] })) {
-          await navigator.share({ files: [f], title: file })
-          return
-        }
-      }
-    } catch (err: unknown) {
-      if (err instanceof Error && err.name === 'AbortError') return
-      // fetch or share failed — fall through to URL share
-    }
+  // Detect PWA standalone mode (home screen install on iOS/Android)
+  const isPwa = window.matchMedia('(display-mode: standalone)').matches
 
-    // 2. URL share — sheet still opens as overlay, PWA stays alive
-    try {
-      await navigator.share({ title: file, url: absoluteUrl })
-      return
-    } catch (err: unknown) {
-      if (err instanceof Error && err.name === 'AbortError') return
-      // share not supported or failed — show copy panel
-    }
-
-    // 3. In-app copy panel (last resort on iOS where blob click is ignored)
+  if (isPwa) {
+    // Show in-app panel — never navigate away from the PWA
     setGpxLink(absoluteUrl)
     return
   }
 
-  // Desktop: blob anchor click
+  // Browser mode: standard blob download (works in Safari as user confirmed)
   try {
     const res = await fetch(`/gpx/${file}`)
     const blob = await res.blob()
@@ -290,57 +264,67 @@ export default function RoutesClient() {
   return (
     <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', height: 'calc(100vh - 60px)', overflow: 'hidden' }}>
 
-      {/* ── GPX copy panel (last-resort fallback when Web Share unavailable) ── */}
+      {/* ── GPX panel (PWA mode — never navigates away) ── */}
       {gpxLink && (
         <div
           onClick={() => setGpxLink(null)}
           style={{
             position: 'fixed', inset: 0, zIndex: 9999,
-            background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)',
+            background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)',
             display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
-            padding: '0 0 32px',
           }}
         >
           <div
             onClick={e => e.stopPropagation()}
             style={{
-              width: '100%', maxWidth: 480, margin: '0 16px',
-              background: '#161616', border: '1px solid #2a2a2a', borderRadius: 16,
-              padding: '20px 20px 24px',
+              width: '100%', maxWidth: 480, margin: '0 0 0',
+              background: '#161616', borderTop: '1px solid #2a2a2a',
+              borderRadius: '16px 16px 0 0', padding: '20px 20px 40px',
             }}
           >
-            <p style={{ fontSize: 13, fontWeight: 700, color: '#fff', marginBottom: 6 }}>Get this GPX file</p>
-            <p style={{ fontSize: 13, color: '#666', lineHeight: 1.6, marginBottom: 16 }}>
-              Copy the link below and open it in Safari — your GPS app will offer to import it.
+            <div style={{ width: 36, height: 4, background: '#333', borderRadius: 2, margin: '0 auto 20px' }} />
+            <p style={{ fontSize: 15, fontWeight: 700, color: '#fff', marginBottom: 6 }}>Import GPX route</p>
+            <p style={{ fontSize: 13, color: '#666', lineHeight: 1.6, marginBottom: 20 }}>
+              Open this link in Safari — your GPS app will offer to import it.
             </p>
-            <div style={{
-              display: 'flex', gap: 8, background: '#0a0a0a',
-              border: '1px solid #222', borderRadius: 8, padding: '8px 12px',
-              marginBottom: 14, alignItems: 'center',
-            }}>
-              <span style={{ flex: 1, fontSize: 12, color: '#888', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {gpxLink}
-              </span>
+
+            {/* Share button (native iOS share sheet as overlay) */}
+            {typeof navigator.share === 'function' && (
               <button
-                onClick={() => { navigator.clipboard?.writeText(gpxLink); setGpxLink(null) }}
+                onClick={async () => {
+                  try { await navigator.share({ title: gpxLink.split('/').pop() ?? 'route.gpx', url: gpxLink }) } catch { /* cancelled */ }
+                }}
                 style={{
-                  background: '#f5a623', color: '#0a0a0a', border: 'none',
-                  borderRadius: 6, fontSize: 12, fontWeight: 700, padding: '6px 12px',
-                  cursor: 'pointer', fontFamily: 'inherit', flexShrink: 0,
+                  width: '100%', background: '#f5a623', color: '#0a0a0a', border: 'none',
+                  borderRadius: 10, fontSize: 14, fontWeight: 700, padding: '13px',
+                  cursor: 'pointer', fontFamily: 'inherit', marginBottom: 10,
                 }}
               >
-                Copy
+                Share / Open in Safari ↗
               </button>
-            </div>
+            )}
+
+            {/* Copy link */}
+            <button
+              onClick={() => { navigator.clipboard?.writeText(gpxLink); setGpxLink(null) }}
+              style={{
+                width: '100%', background: '#1e1e1e', color: '#ccc', border: '1px solid #2a2a2a',
+                borderRadius: 10, fontSize: 14, fontWeight: 500, padding: '13px',
+                cursor: 'pointer', fontFamily: 'inherit', marginBottom: 10,
+              }}
+            >
+              Copy link
+            </button>
+
             <button
               onClick={() => setGpxLink(null)}
               style={{
-                width: '100%', background: 'transparent', border: '1px solid #2a2a2a',
-                color: '#555', borderRadius: 8, fontSize: 13, fontWeight: 500,
-                padding: '10px', cursor: 'pointer', fontFamily: 'inherit',
+                width: '100%', background: 'transparent', border: 'none',
+                color: '#444', fontSize: 13, padding: '8px',
+                cursor: 'pointer', fontFamily: 'inherit',
               }}
             >
-              Close
+              Cancel
             </button>
           </div>
         </div>
