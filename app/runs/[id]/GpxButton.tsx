@@ -87,35 +87,26 @@ export default function GpxButton({ file, accentColor = '#f5a623' }: { file: str
             <div style={{ width: 36, height: 4, background: '#333', borderRadius: 2, margin: '0 auto 20px' }} />
             <p style={{ fontSize: 15, fontWeight: 700, color: '#fff', marginBottom: 6 }}>Import GPX route</p>
             <p style={{ fontSize: 13, color: '#666', lineHeight: 1.6, marginBottom: 20 }}>
-              Open this link in Safari — your GPS app will offer to import it.
+              Tap below to open the file — then choose your GPS app. Tap Done to return here.
             </p>
 
-            {/* Native share sheet — shares the GPX file so iOS shows compatible apps */}
-            {typeof navigator !== 'undefined' && typeof navigator.share === 'function' && (
-              <button
-                onClick={async () => {
-                  try {
-                    // Fetch as file so iOS shows GPX-compatible apps (WorkOutDoors etc.)
-                    const res = await fetch(`/gpx/${file}`)
-                    const blob = await res.blob()
-                    const gpxFile = new File([blob], file, { type: 'application/gpx+xml' })
-                    await navigator.share({ files: [gpxFile], title: file })
-                  } catch {
-                    // File sharing not supported — fall back to URL share
-                    try {
-                      await navigator.share({ title: file, url: `${window.location.origin}/gpx/${file}` })
-                    } catch { /* cancelled */ }
-                  }
-                }}
-                style={{
-                  width: '100%', background: accentColor, color: '#0a0a0a', border: 'none',
-                  borderRadius: 10, fontSize: 14, fontWeight: 700, padding: '13px',
-                  cursor: 'pointer', fontFamily: 'inherit', marginBottom: 10,
-                }}
-              >
-                Open in GPS app ↗
-              </button>
-            )}
+            {/* Same-window navigation — iOS shows Quick Look as an overlay with
+                 GPS app handlers (WorkOutDoors etc.) listed under "Open In".
+                 Done dismisses the overlay and returns to this page.
+                 navigator.share only shows share-extension apps, not document handlers,
+                 so it will never show GPS apps — direct navigation is the right mechanism. */}
+            <button
+              onClick={() => {
+                window.location.href = `${window.location.origin}/gpx/${file}`
+              }}
+              style={{
+                width: '100%', background: accentColor, color: '#0a0a0a', border: 'none',
+                borderRadius: 10, fontSize: 14, fontWeight: 700, padding: '13px',
+                cursor: 'pointer', fontFamily: 'inherit', marginBottom: 10,
+              }}
+            >
+              Open in GPS app ↗
+            </button>
 
             {/* Copy link */}
             <button
