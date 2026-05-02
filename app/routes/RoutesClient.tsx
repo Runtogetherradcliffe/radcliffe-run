@@ -79,11 +79,26 @@ const FILTERS: { key: Filter; label: string }[] = [
   { key: 'social-long-run', label: 'Social Long Runs' },
 ]
 
-/* ── GPX download (PWA-safe: fetch→blob, never navigates away) ── */
+/* ── GPX download (PWA-safe) ──
+ * iOS PWA: blob a.click() is silently ignored. Use Web Share API so the
+ * native share sheet appears as an overlay — PWA stays open underneath.
+ * Desktop: standard fetch→blob anchor click.
+ */
 async function downloadGpx(file: string) {
   try {
     const res = await fetch(`/gpx/${file}`)
     const blob = await res.blob()
+
+    // iOS PWA path: Web Share API with file
+    if (typeof navigator.share === 'function') {
+      const gpxFile = new File([blob], file, { type: 'application/gpx+xml' })
+      if (navigator.canShare && navigator.canShare({ files: [gpxFile] })) {
+        await navigator.share({ files: [gpxFile], title: file })
+        return
+      }
+    }
+
+    // Desktop path: programmatic anchor click
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
@@ -92,8 +107,10 @@ async function downloadGpx(file: string) {
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
-  } catch {
-    // Fallback: open directly (non-PWA browsers handle this fine)
+  } catch (err: unknown) {
+    // User cancelled share sheet — not an error worth surfacing
+    if (err instanceof Error && err.name === 'AbortError') return
+    // Final fallback
     window.open(`/gpx/${file}`, '_blank')
   }
 }
