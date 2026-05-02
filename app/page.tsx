@@ -180,9 +180,9 @@ export default async function HomePage() {
             </div>
             )}
             {!isRegistered && (
-              <p style={{ fontSize: 13, color: '#555', marginTop: 14, lineHeight: 1.7 }}>
+              <p style={{ fontSize: 13, color: '#aaa', marginTop: 14, lineHeight: 1.7 }}>
                 New here?{' '}
-                <Link href="/about" style={{ color: '#888', textDecoration: 'underline' }}>Find out more about us</Link>
+                <Link href="/about" style={{ color: '#ccc', textDecoration: 'underline' }}>Find out more about us</Link>
                 {' '}— we&apos;re a friendly group that welcomes runners of all abilities.
                 No need to book, just turn up. We do ask you to register so we have your contact details in case of an emergency on a run.
               </p>
