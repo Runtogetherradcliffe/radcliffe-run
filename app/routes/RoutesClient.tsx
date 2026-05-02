@@ -86,11 +86,18 @@ const FILTERS: { key: Filter; label: string }[] = [
  * immediately show an in-app panel — copy the link or tap Share to get the
  * native iOS share sheet as a proper overlay.
  */
+// iOS exposes navigator.standalone = true when running from the home screen.
+// This is more reliable than the CSS display-mode media query on iOS.
+interface IOSNavigator extends Navigator { standalone?: boolean }
+
 async function handleGpx(file: string, setGpxLink: (url: string | null) => void) {
   const absoluteUrl = `${window.location.origin}/gpx/${file}`
 
-  // Detect PWA standalone mode (home screen install on iOS/Android)
-  const isPwa = window.matchMedia('(display-mode: standalone)').matches
+  // navigator.standalone: iOS home screen PWA (most reliable iOS detection)
+  // display-mode: standalone: Android PWA / fallback
+  const isPwa =
+    (navigator as IOSNavigator).standalone === true ||
+    window.matchMedia('(display-mode: standalone)').matches
 
   if (isPwa) {
     // Show in-app panel — never navigate away from the PWA
