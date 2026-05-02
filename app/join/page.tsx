@@ -247,13 +247,65 @@ function StepEmergency({ data, onChange }: { data: FormData; onChange: (k: keyof
   )
 }
 
+/* ── Privacy policy modal ── */
+function PrivacyModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 9999,
+        background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(4px)',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        padding: '16px',
+      }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          width: '100%', maxWidth: 640, height: '80vh',
+          background: '#111', border: '1px solid #2a2a2a', borderRadius: 16,
+          display: 'flex', flexDirection: 'column', overflow: 'hidden',
+        }}
+      >
+        {/* Modal header */}
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '14px 20px', borderBottom: '1px solid #1e1e1e', flexShrink: 0,
+        }}>
+          <p style={{ fontSize: 14, fontWeight: 600, color: '#ccc' }}>Privacy Policy</p>
+          <button
+            onClick={onClose}
+            style={{
+              background: '#1a1a1a', border: '1px solid #2a2a2a', color: '#888',
+              width: 30, height: 30, borderRadius: '50%', cursor: 'pointer',
+              fontSize: 16, lineHeight: 1, fontFamily: 'inherit',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}
+          >
+            ×
+          </button>
+        </div>
+        {/* iframe body */}
+        <iframe
+          src="/privacy"
+          style={{ flex: 1, border: 'none', width: '100%' }}
+          title="Privacy Policy"
+        />
+      </div>
+    </div>
+  )
+}
+
 /* ── Step 3: Last bits (health + GDPR) ── */
 function StepLastBits({ data, onChange, onToggle }: {
   data: FormData
   onChange: (k: keyof FormData, v: string) => void
   onToggle: (k: keyof FormData, v: boolean) => void
 }) {
+  const [showPrivacy, setShowPrivacy] = useState(false)
   return (
+    <>
+      {showPrivacy && <PrivacyModal onClose={() => setShowPrivacy(false)} />}
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       {/* Health declaration */}
       <div>
@@ -300,7 +352,7 @@ function StepLastBits({ data, onChange, onToggle }: {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           <ConsentItem required checked={data.consentData} onChange={v => onToggle('consentData', v)}>
             I agree to radcliffe.run storing my name, contact details, and emergency contact for the purpose of running group safety and communications.{' '}
-            <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: '#f5a623', textDecoration: 'none' }}>Privacy policy</a>
+            <button onClick={e => { e.stopPropagation(); setShowPrivacy(true) }} style={{ background: 'none', border: 'none', color: '#f5a623', textDecoration: 'none', cursor: 'pointer', padding: 0, fontSize: 'inherit', fontFamily: 'inherit' }}>Privacy policy</button>
           </ConsentItem>
           <ConsentItem checked={data.consentEmail} onChange={v => onToggle('consentEmail', v)}>
             Send me club emails including weekly run reminders, the weekend roundup, and other club updates. (You can unsubscribe anytime.)
@@ -311,6 +363,7 @@ function StepLastBits({ data, onChange, onToggle }: {
         </div>
       </div>
     </div>
+    </>
   )
 }
 
