@@ -79,6 +79,25 @@ const FILTERS: { key: Filter; label: string }[] = [
   { key: 'social-long-run', label: 'Social Long Runs' },
 ]
 
+/* ── GPX download (PWA-safe: fetch→blob, never navigates away) ── */
+async function downloadGpx(file: string) {
+  try {
+    const res = await fetch(`/gpx/${file}`)
+    const blob = await res.blob()
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = file
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  } catch {
+    // Fallback: open directly (non-PWA browsers handle this fine)
+    window.open(`/gpx/${file}`, '_blank')
+  }
+}
+
 export default function RoutesClient() {
   const [filter,   setFilter]   = useState<Filter>('all')
   const [selected, setSelected] = useState<Route | null>(null)
@@ -370,13 +389,14 @@ export default function RoutesClient() {
                       Strava
                     </a>
                   )}
-                  <a href={`/gpx/${selected.file}`} download target="_blank" rel="noopener noreferrer" style={{
+                  <button onClick={() => downloadGpx(selected.file)} style={{
                     fontSize: 11, fontWeight: 600,
-                    padding: '6px 12px', borderRadius: 6, textDecoration: 'none',
+                    padding: '6px 12px', borderRadius: 6, cursor: 'pointer',
                     background: '#f5a623', color: '#0a0a0a',
+                    border: 'none', fontFamily: 'inherit',
                   }}>
                     GPX
-                  </a>
+                  </button>
                 </div>
               </div>
             ) : (
@@ -396,13 +416,14 @@ export default function RoutesClient() {
                 </div>
                 <p style={{ fontSize: 12, color: '#555', marginBottom: 14 }}>📍 Starts at <a href="https://maps.app.goo.gl/d1FUYuqmNVpsWUs99" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'underline' }}>Radcliffe Market</a></p>
                 <div style={{ display: 'flex', gap: 8 }}>
-                  <a href={`/gpx/${selected.file}`} download target="_blank" rel="noopener noreferrer" style={{
+                  <button onClick={() => downloadGpx(selected.file)} style={{
                     flex: 1, textAlign: 'center', fontSize: 12, fontWeight: 600,
-                    padding: '9px 12px', borderRadius: 7, textDecoration: 'none',
+                    padding: '9px 12px', borderRadius: 7, cursor: 'pointer',
                     background: '#f5a623', color: '#0a0a0a', transition: 'background 0.15s',
+                    border: 'none', fontFamily: 'inherit',
                   }}>
                     Download GPX
-                  </a>
+                  </button>
                   {selected.strava && (
                     <a href={selected.strava} target="_blank" rel="noopener noreferrer" style={{
                       flex: 1, textAlign: 'center', fontSize: 12, fontWeight: 600,
