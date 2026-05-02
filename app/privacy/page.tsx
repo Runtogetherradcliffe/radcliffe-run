@@ -7,6 +7,8 @@ export const metadata = {
   description: 'How Run Together Radcliffe collects, uses, and protects your personal data.',
 }
 
+type Props = { searchParams: Promise<{ modal?: string }> }
+
 const sectionHeadStyle: React.CSSProperties = {
   fontSize: 13, fontWeight: 600, color: '#f5a623',
   letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12, marginTop: 40,
@@ -32,14 +34,16 @@ const tdLabelStyle: React.CSSProperties = {
   ...tdStyle, color: '#666', width: '30%', fontWeight: 500,
 }
 
-export default function PrivacyPage() {
+export default async function PrivacyPage({ searchParams }: Props) {
+  const { modal } = await searchParams
+  const isModal = modal === '1'
   return (
     <>
-      <Nav />
-      <main style={{ minHeight: 'calc(100vh - 60px)', background: '#0a0a0a', padding: '60px 24px 80px' }}>
+      {!isModal && <Nav />}
+      <main style={{ minHeight: isModal ? 'auto' : 'calc(100vh - 60px)', background: '#0a0a0a', padding: isModal ? '32px 24px 48px' : '60px 24px 80px' }}>
         <div style={{ maxWidth: 720, margin: '0 auto' }}>
 
-          <BackLink />
+          {!isModal && <BackLink />}
 
           {/* Header */}
           <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#f5a623', marginBottom: 12 }}>
@@ -225,7 +229,7 @@ export default function PrivacyPage() {
 
         </div>
       </main>
-      <Footer />
+      {!isModal && <Footer />}
     </>
   )
 }
