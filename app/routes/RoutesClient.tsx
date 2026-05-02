@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { ROUTES, TERRAIN_LABELS, type Route, type Terrain, type Category } from '@/lib/routes'
+import GpxButton from '@/app/runs/[id]/GpxButton'
 
 /* ── Terrain colours ── */
 const TERRAIN_STYLE: Record<Terrain, { bg: string; color: string; border: string }> = {
@@ -79,48 +80,6 @@ const FILTERS: { key: Filter; label: string }[] = [
   { key: 'social-long-run', label: 'Social Long Runs' },
 ]
 
-/* ── GPX download (PWA-safe) ──
- * In Safari (browser): blob anchor click — user confirmed this works fine.
- * In PWA standalone mode: any navigation or file-share attempt can open the
- * iOS Quick Look viewer with no back button. Instead we detect standalone and
- * immediately show an in-app panel — copy the link or tap Share to get the
- * native iOS share sheet as a proper overlay.
- */
-// iOS exposes navigator.standalone = true when running from the home screen.
-// This is more reliable than the CSS display-mode media query on iOS.
-interface IOSNavigator extends Navigator { standalone?: boolean }
-
-async function handleGpx(file: string, setGpxLink: (url: string | null) => void) {
-  const absoluteUrl = `${window.location.origin}/gpx/${file}`
-
-  // navigator.standalone: iOS home screen PWA (most reliable iOS detection)
-  // display-mode: standalone: Android PWA / fallback
-  const isPwa =
-    (navigator as IOSNavigator).standalone === true ||
-    window.matchMedia('(display-mode: standalone)').matches
-
-  if (isPwa) {
-    // Show in-app panel — never navigate away from the PWA
-    setGpxLink(absoluteUrl)
-    return
-  }
-
-  // Browser mode: standard blob download (works in Safari as user confirmed)
-  try {
-    const res = await fetch(`/gpx/${file}`)
-    const blob = await res.blob()
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = file
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
-  } catch {
-    setGpxLink(absoluteUrl)
-  }
-}
 
 export default function RoutesClient() {
   const [filter,   setFilter]   = useState<Filter>('all')
@@ -128,7 +87,6 @@ export default function RoutesClient() {
   const [loading,  setLoading]  = useState(false)
   const [mapReady, setMapReady] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
-  const [gpxLink,  setGpxLink]  = useState<string | null>(null)   // in-app copy panel
   const mapRef     = useRef<HTMLDivElement>(null)
   const leafletRef = useRef<any>(null)
   const mapObjRef  = useRef<any>(null)
@@ -270,72 +228,6 @@ export default function RoutesClient() {
 
   return (
     <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', height: 'calc(100vh - 60px)', overflow: 'hidden' }}>
-
-      {/* ── GPX panel (PWA mode — never navigates away) ── */}
-      {gpxLink && (
-        <div
-          onClick={() => setGpxLink(null)}
-          style={{
-            position: 'fixed', inset: 0, zIndex: 9999,
-            background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)',
-            display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
-          }}
-        >
-          <div
-            onClick={e => e.stopPropagation()}
-            style={{
-              width: '100%', maxWidth: 480, margin: '0 0 0',
-              background: '#161616', borderTop: '1px solid #2a2a2a',
-              borderRadius: '16px 16px 0 0', padding: '20px 20px 40px',
-            }}
-          >
-            <div style={{ width: 36, height: 4, background: '#333', borderRadius: 2, margin: '0 auto 20px' }} />
-            <p style={{ fontSize: 15, fontWeight: 700, color: '#fff', marginBottom: 6 }}>Import GPX route</p>
-            <p style={{ fontSize: 13, color: '#666', lineHeight: 1.6, marginBottom: 20 }}>
-              Open this link in Safari — your GPS app will offer to import it.
-            </p>
-
-            {/* Share button (native iOS share sheet as overlay) */}
-            {typeof navigator.share === 'function' && (
-              <button
-                onClick={async () => {
-                  try { await navigator.share({ title: gpxLink.split('/').pop() ?? 'route.gpx', url: gpxLink }) } catch { /* cancelled */ }
-                }}
-                style={{
-                  width: '100%', background: '#f5a623', color: '#0a0a0a', border: 'none',
-                  borderRadius: 10, fontSize: 14, fontWeight: 700, padding: '13px',
-                  cursor: 'pointer', fontFamily: 'inherit', marginBottom: 10,
-                }}
-              >
-                Share / Open in Safari ↗
-              </button>
-            )}
-
-            {/* Copy link */}
-            <button
-              onClick={() => { navigator.clipboard?.writeText(gpxLink); setGpxLink(null) }}
-              style={{
-                width: '100%', background: '#1e1e1e', color: '#ccc', border: '1px solid #2a2a2a',
-                borderRadius: 10, fontSize: 14, fontWeight: 500, padding: '13px',
-                cursor: 'pointer', fontFamily: 'inherit', marginBottom: 10,
-              }}
-            >
-              Copy link
-            </button>
-
-            <button
-              onClick={() => setGpxLink(null)}
-              style={{
-                width: '100%', background: 'transparent', border: 'none',
-                color: '#444', fontSize: 13, padding: '8px',
-                cursor: 'pointer', fontFamily: 'inherit',
-              }}
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* ── SIDEBAR ── */}
       <aside style={{
@@ -480,14 +372,7 @@ export default function RoutesClient() {
                       Strava
                     </a>
                   )}
-                  <button onClick={() => handleGpx(selected.file, setGpxLink)} style={{
-                    fontSize: 11, fontWeight: 600,
-                    padding: '6px 12px', borderRadius: 6, cursor: 'pointer',
-                    background: '#f5a623', color: '#0a0a0a',
-                    border: 'none', fontFamily: 'inherit',
-                  }}>
-                    GPX
-                  </button>
+                  <GpxButton file={selected.file} />
                 </div>
               </div>
             ) : (
@@ -507,14 +392,7 @@ export default function RoutesClient() {
                 </div>
                 <p style={{ fontSize: 12, color: '#555', marginBottom: 14 }}>📍 Starts at <a href="https://maps.app.goo.gl/d1FUYuqmNVpsWUs99" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'underline' }}>Radcliffe Market</a></p>
                 <div style={{ display: 'flex', gap: 8 }}>
-                  <button onClick={() => handleGpx(selected.file, setGpxLink)} style={{
-                    flex: 1, textAlign: 'center', fontSize: 12, fontWeight: 600,
-                    padding: '9px 12px', borderRadius: 7, cursor: 'pointer',
-                    background: '#f5a623', color: '#0a0a0a', transition: 'background 0.15s',
-                    border: 'none', fontFamily: 'inherit',
-                  }}>
-                    Download GPX
-                  </button>
+                  <GpxButton file={selected.file} />
                   {selected.strava && (
                     <a href={selected.strava} target="_blank" rel="noopener noreferrer" style={{
                       flex: 1, textAlign: 'center', fontSize: 12, fontWeight: 600,
