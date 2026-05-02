@@ -6,6 +6,7 @@ import { supabaseAdmin } from '@/lib/supabase'
 import { ROUTES } from '@/lib/routes'
 import RunMapExpand from './RunMapExpand'
 import RunBadges from './RunBadges'
+import GpxButton from './GpxButton'
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 const DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
@@ -154,15 +155,7 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
                           Strava
                         </a>
                       )}
-                      <a
-                        href={`/gpx/${route.file}`}
-                        download
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ fontSize: 12, fontWeight: 600, color: '#0a0a0a', background: accentColor, padding: '7px 14px', borderRadius: 6, textDecoration: 'none', whiteSpace: 'nowrap' }}
-                      >
-                        GPX
-                      </a>
+                      <GpxButton file={route.file} accentColor={accentColor} />
                     </div>
                   }
                 />
