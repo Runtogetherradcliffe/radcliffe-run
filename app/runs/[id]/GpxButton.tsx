@@ -90,16 +90,22 @@ export default function GpxButton({ file, accentColor = '#f5a623' }: { file: str
               Open this link in Safari — your GPS app will offer to import it.
             </p>
 
-            {/* Native share sheet (iOS share button as overlay) */}
+            {/* Native share sheet — shares the GPX file so iOS shows compatible apps */}
             {typeof navigator !== 'undefined' && typeof navigator.share === 'function' && (
               <button
                 onClick={async () => {
                   try {
-                    await navigator.share({
-                      title: file,
-                      url: `${window.location.origin}/gpx/${file}`,
-                    })
-                  } catch { /* cancelled */ }
+                    // Fetch as file so iOS shows GPX-compatible apps (WorkOutDoors etc.)
+                    const res = await fetch(`/gpx/${file}`)
+                    const blob = await res.blob()
+                    const gpxFile = new File([blob], file, { type: 'application/gpx+xml' })
+                    await navigator.share({ files: [gpxFile], title: file })
+                  } catch {
+                    // File sharing not supported — fall back to URL share
+                    try {
+                      await navigator.share({ title: file, url: `${window.location.origin}/gpx/${file}` })
+                    } catch { /* cancelled */ }
+                  }
                 }}
                 style={{
                   width: '100%', background: accentColor, color: '#0a0a0a', border: 'none',
@@ -107,7 +113,7 @@ export default function GpxButton({ file, accentColor = '#f5a623' }: { file: str
                   cursor: 'pointer', fontFamily: 'inherit', marginBottom: 10,
                 }}
               >
-                Share / Open in Safari ↗
+                Open in GPS app ↗
               </button>
             )}
 
