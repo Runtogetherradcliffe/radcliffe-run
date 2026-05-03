@@ -101,7 +101,7 @@ export default function GpxButton({ file, accentColor = '#f5a623' }: { file: str
                     const res = await fetch(`/gpx/${file}`)
                     const blob = await res.blob()
                     const gpxFile = new File([blob], file, { type: 'application/gpx+xml' })
-                    await navigator.share({ files: [gpxFile], title: file })
+                    await navigator.share({ files: [gpxFile] })
                   } catch { /* cancelled or unsupported */ }
                 }}
                 style={{
