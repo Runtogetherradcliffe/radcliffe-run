@@ -16,11 +16,13 @@ const TC = {
   notes: 22, meetingMapUrl: 33,
   r1RtrPage: 34, // AI — "8k RTR page" — maps to r1Name
   r2RtrPage: 35, // AJ — "5k RTR page" — maps to r2Name
+  eventId: 28,   // AC — Google Calendar Event ID (stable across title/route changes)
 }
 
 /* ── Social sheet columns ── */
 const SC = {
   date: 0, title: 1, location: 4, routeUrl: 5, distance: 6, notes: 7, cancelled: 8,
+  eventId: 9,    // Google Calendar Event ID
 }
 
 /* ── Helpers ── */
@@ -122,6 +124,7 @@ type RunRow = {
   on_tour: boolean
   has_jeffing: boolean
   run_type: string
+  google_event_id: string | null
 }
 
 async function fetchCSV(url: string): Promise<string[][]> {
@@ -147,6 +150,7 @@ function parseThursdayRows(rows: string[][]): RunRow[] {
     const r1Page    = (row[TC.r1RtrPage]  ?? '').trim()
     const r2Page    = (row[TC.r2RtrPage]  ?? '').trim()
     const mapUrl    = (row[TC.meetingMapUrl] ?? '').trim()
+    const eventId   = (row[TC.eventId]    ?? '').trim()
     const onTour    = /RTR on tour/i.test(notes)
 
     if (!r1Name && !r2Name) continue
@@ -169,10 +173,11 @@ function parseThursdayRows(rows: string[][]): RunRow[] {
       out.push({
         ...sharedBase,
         date,
-        title:       r1Name,
-        terrain:     normalise(r1Terrain),
-        distance_km: parseDistance(r1Dist),
-        route_slug:  extractSlug(r1Page),
+        title:            r1Name,
+        terrain:          normalise(r1Terrain),
+        distance_km:      parseDistance(r1Dist),
+        route_slug:       extractSlug(r1Page),
+        google_event_id:  eventId ? `${eventId}_1` : null,
       })
     }
 
@@ -181,10 +186,11 @@ function parseThursdayRows(rows: string[][]): RunRow[] {
       out.push({
         ...sharedBase,
         date,
-        title:       r2Name,
-        terrain:     normalise(r2Terrain),
-        distance_km: parseDistance(r2Dist),
-        route_slug:  extractSlug(r2Page),
+        title:            r2Name,
+        terrain:          normalise(r2Terrain),
+        distance_km:      parseDistance(r2Dist),
+        route_slug:       extractSlug(r2Page),
+        google_event_id:  eventId ? `${eventId}_2` : null,
       })
     }
   }
@@ -204,6 +210,7 @@ function parseSocialRows(rows: string[][]): RunRow[] {
     const distance  = (row[SC.distance]  ?? '').trim()
     const notes     = (row[SC.notes]     ?? '').trim()
     const cancelled = /^(yes|true|1)/i.test((row[SC.cancelled] ?? '').trim())
+    const eventId   = (row[SC.eventId]   ?? '').trim()
 
     if (!title) continue
 
@@ -215,16 +222,17 @@ function parseSocialRows(rows: string[][]): RunRow[] {
       date,
       title,
       description,
-      terrain:         null,
-      distance_km:     parseDistance(distance),
-      route_slug:      null,
-      meeting_point:   location || 'Radcliffe Market, Blackburn Street, M26 1PN',
-      meeting_map_url: null,
-      leader_name:     null,
+      terrain:          null,
+      distance_km:      parseDistance(distance),
+      route_slug:       null,
+      meeting_point:    location || 'Radcliffe Market, Blackburn Street, M26 1PN',
+      meeting_map_url:  null,
+      leader_name:      null,
       cancelled,
-      on_tour:         false,
-      has_jeffing:     false,
-      run_type:        'social',
+      on_tour:          false,
+      has_jeffing:      false,
+      run_type:         'social',
+      google_event_id:  eventId || null,
     })
   }
   return out
@@ -261,52 +269,50 @@ export async function POST() {
     return NextResponse.json({ inserted: 0, updated: 0, errors: 0, message: 'No upcoming runs found' })
   }
 
-  // Fetch existing runs in range — include run_type so we can match social runs by date only
+  // Fetch existing runs in range — include google_event_id for stable matching
   const dates = [...new Set(allRuns.map(r => r.date))]
   const { data: existing } = await supabaseAdmin()
     .from('runs')
-    .select('id, date, title, cancelled, has_jeffing, run_type')
+    .select('id, date, title, cancelled, has_jeffing, google_event_id')
     .in('date', dates)
 
-  type ExRow = { id: string; date: string; title: string; cancelled: boolean; has_jeffing: boolean }
+  type ExRow = { id: string; date: string; title: string; cancelled: boolean; has_jeffing: boolean; google_event_id: string | null }
 
-  // Regular runs: keyed on "date::title" — same title can appear twice on a date (both groups
-  // run the same route), so store an array and pop one entry per matching run.
-  const existingArrayMap = new Map<string, ExRow[]>()
-  // Social runs: keyed on "date" only — one social run per date, title may change in the sheet.
-  const existingSocialMap = new Map<string, ExRow[]>()
+  // Primary match: google_event_id (stable across title/route changes)
+  const existingByEventId = new Map<string, ExRow>()
+  // Fallback match: "date::title" (for rows that predate event ID tracking)
+  const existingByDateTitle = new Map<string, ExRow[]>()
 
   for (const r of existing ?? []) {
-    if (r.run_type === 'social') {
-      if (!existingSocialMap.has(r.date)) existingSocialMap.set(r.date, [])
-      existingSocialMap.get(r.date)!.push(r)
+    if (r.google_event_id) {
+      existingByEventId.set(r.google_event_id, r)
     } else {
       const key = `${r.date}::${r.title}`
-      if (!existingArrayMap.has(key)) existingArrayMap.set(key, [])
-      existingArrayMap.get(key)!.push(r)
+      if (!existingByDateTitle.has(key)) existingByDateTitle.set(key, [])
+      existingByDateTitle.get(key)!.push(r)
     }
   }
 
   let inserted = 0, updated = 0, errors = 0
 
   for (const run of allRuns) {
-    // Social runs match by date only (title may have changed); regular runs match by date+title
-    const candidates = run.run_type === 'social'
-      ? (existingSocialMap.get(run.date) ?? [])
-      : (existingArrayMap.get(`${run.date}::${run.title}`) ?? [])
-    const ex = candidates.shift() // consume one match; leaves sibling for same-key duplicates
+    // Match by event ID first (stable); fall back to date+title for legacy rows
+    const ex = run.google_event_id
+      ? existingByEventId.get(run.google_event_id)
+      : existingByDateTitle.get(`${run.date}::${run.title}`)?.shift()
     if (ex) {
       const { error } = await supabaseAdmin()
         .from('runs')
         .update({
-          title:           run.title,
-          description:     run.description,
-          terrain:         run.terrain,
-          distance_km:     run.distance_km,
-          meeting_point:   run.meeting_point,
-          meeting_map_url: run.meeting_map_url,
-          on_tour:         run.on_tour,
-          run_type:        run.run_type,
+          title:            run.title,
+          description:      run.description,
+          terrain:          run.terrain,
+          distance_km:      run.distance_km,
+          meeting_point:    run.meeting_point,
+          meeting_map_url:  run.meeting_map_url,
+          on_tour:          run.on_tour,
+          run_type:         run.run_type,
+          google_event_id:  run.google_event_id,
           // Only overwrite route_slug if the sheet actually provides one —
           // manual overrides set in admin survive syncs when the sheet is empty
           ...(run.route_slug ? { route_slug: run.route_slug } : {}),
