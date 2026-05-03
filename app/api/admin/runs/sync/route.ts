@@ -1,4 +1,4 @@
-import { createClient } from '@/utils/supabase/server'
+import { requireAdmin } from '@/lib/admin'
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 
@@ -232,8 +232,7 @@ function parseSocialRows(rows: string[][]): RunRow[] {
 
 /* ── Main handler ── */
 export async function POST() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await requireAdmin()
   if (!user) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
 
   // Fetch both sheets in parallel
@@ -262,28 +261,40 @@ export async function POST() {
     return NextResponse.json({ inserted: 0, updated: 0, errors: 0, message: 'No upcoming runs found' })
   }
 
-  // Fetch existing runs in range — keyed on (date, title) so multiple runs per date work
+  // Fetch existing runs in range — include run_type so we can match social runs by date only
   const dates = [...new Set(allRuns.map(r => r.date))]
   const { data: existing } = await supabaseAdmin()
     .from('runs')
-    .select('id, date, title, cancelled, has_jeffing')
+    .select('id, date, title, cancelled, has_jeffing, run_type')
     .in('date', dates)
 
-  // Key: "date::title" — but same title can appear twice on a date (e.g. both groups run
-  // the same route). Store an array per key so we can pop one row per matching run.
-  const existingArrayMap = new Map<string, { id: string; date: string; title: string; cancelled: boolean; has_jeffing: boolean }[]>()
+  type ExRow = { id: string; date: string; title: string; cancelled: boolean; has_jeffing: boolean }
+
+  // Regular runs: keyed on "date::title" — same title can appear twice on a date (both groups
+  // run the same route), so store an array and pop one entry per matching run.
+  const existingArrayMap = new Map<string, ExRow[]>()
+  // Social runs: keyed on "date" only — one social run per date, title may change in the sheet.
+  const existingSocialMap = new Map<string, ExRow[]>()
+
   for (const r of existing ?? []) {
-    const key = `${r.date}::${r.title}`
-    if (!existingArrayMap.has(key)) existingArrayMap.set(key, [])
-    existingArrayMap.get(key)!.push(r)
+    if (r.run_type === 'social') {
+      if (!existingSocialMap.has(r.date)) existingSocialMap.set(r.date, [])
+      existingSocialMap.get(r.date)!.push(r)
+    } else {
+      const key = `${r.date}::${r.title}`
+      if (!existingArrayMap.has(key)) existingArrayMap.set(key, [])
+      existingArrayMap.get(key)!.push(r)
+    }
   }
 
   let inserted = 0, updated = 0, errors = 0
 
   for (const run of allRuns) {
-    const key = `${run.date}::${run.title}`
-    const candidates = existingArrayMap.get(key) ?? []
-    const ex = candidates.shift() // consume one match; leaves the other for same-title sibling
+    // Social runs match by date only (title may have changed); regular runs match by date+title
+    const candidates = run.run_type === 'social'
+      ? (existingSocialMap.get(run.date) ?? [])
+      : (existingArrayMap.get(`${run.date}::${run.title}`) ?? [])
+    const ex = candidates.shift() // consume one match; leaves sibling for same-key duplicates
     if (ex) {
       const { error } = await supabaseAdmin()
         .from('runs')
