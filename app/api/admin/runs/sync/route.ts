@@ -299,6 +299,7 @@ export async function POST() {
       const { error } = await supabaseAdmin()
         .from('runs')
         .update({
+          title:           run.title,
           description:     run.description,
           terrain:         run.terrain,
           distance_km:     run.distance_km,
