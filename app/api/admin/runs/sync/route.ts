@@ -296,10 +296,11 @@ export async function POST() {
   let inserted = 0, updated = 0, errors = 0
 
   for (const run of allRuns) {
-    // Match by event ID first (stable); fall back to date+title for legacy rows
-    const ex = run.google_event_id
-      ? existingByEventId.get(run.google_event_id)
-      : existingByDateTitle.get(`${run.date}::${run.title}`)?.shift()
+    // Match by event ID first (stable); always fall back to date+title so existing rows
+    // without an event ID (e.g. first sync after migration) are found and updated rather
+    // than duplicated
+    const ex = (run.google_event_id ? existingByEventId.get(run.google_event_id) : undefined)
+      ?? existingByDateTitle.get(`${run.date}::${run.title}`)?.shift()
     if (ex) {
       const { error } = await supabaseAdmin()
         .from('runs')
