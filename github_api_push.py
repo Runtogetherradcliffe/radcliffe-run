@@ -22,27 +22,39 @@ import base64
 import json
 import os
 import re
+import ssl
 import sys
 import urllib.request
 import urllib.error
+
+try:
+    import certifi
+    _SSL_CONTEXT = ssl.create_default_context(cafile=certifi.where())
+except ImportError:
+    _SSL_CONTEXT = None
 
 REPO     = "Runtogetherradcliffe/radcliffe-run"
 BRANCH   = "main"
 SITE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Token is stored in the RTR site repo's git config — read it from there
-RTR_SITE_CONFIG = os.path.join(SITE_DIR, "..", "..", "RTR site", ".git", "config")
+# Token is stored in the RTR site repo's git config — check both Cowork mount path
+# and the local Mac path (Downloads/code for claude/RTR site)
+_CONFIG_CANDIDATES = [
+    os.path.join(SITE_DIR, "..", "..", "RTR site", ".git", "config"),
+    os.path.expanduser("~/Downloads/code for claude/RTR site/.git/config"),
+]
 
 
 def _load_token() -> str:
     """Read the GitHub token from the RTR site's .git/config remote URL."""
-    config_path = os.path.normpath(RTR_SITE_CONFIG)
-    if os.path.exists(config_path):
-        with open(config_path) as f:
-            text = f.read()
-        m = re.search(r"https://([^@]+)@github\.com", text)
-        if m:
-            return m.group(1)
+    for candidate in _CONFIG_CANDIDATES:
+        config_path = os.path.normpath(candidate)
+        if os.path.exists(config_path):
+            with open(config_path) as f:
+                text = f.read()
+            m = re.search(r"https://([^@]+)@github\.com", text)
+            if m:
+                return m.group(1)
     raise RuntimeError(
         "Could not find GitHub token. "
         "Check the RTR site .git/config has a token in the remote origin URL."
@@ -57,7 +69,7 @@ def _get_sha(repo_path: str) -> "str | None":
     url = f"https://api.github.com/repos/{REPO}/contents/{repo_path}?ref={BRANCH}"
     req = urllib.request.Request(url, headers={"Authorization": f"token {TOKEN}"})
     try:
-        with urllib.request.urlopen(req) as r:
+        with urllib.request.urlopen(req, context=_SSL_CONTEXT) as r:
             return json.load(r)["sha"]
     except urllib.error.HTTPError as e:
         if e.code == 404:
@@ -82,7 +94,7 @@ def push_file(local_path: str, repo_path: str, message: str) -> str:
         headers={"Authorization": f"token {TOKEN}", "Content-Type": "application/json"},
         method="PUT",
     )
-    with urllib.request.urlopen(req) as r:
+    with urllib.request.urlopen(req, context=_SSL_CONTEXT) as r:
         return json.load(r)["commit"]["sha"]
 
 
