@@ -371,8 +371,26 @@ function StepLastBits({ data, onChange, onToggle }: {
 type NextRun = { title: string; date: string; meeting_point: string } | null
 
 /* ── Step 4: Welcome ── */
-function StepWelcome({ name, nextRun, onReset }: { name: string; nextRun: NextRun; onReset: () => void }) {
+function StepWelcome({ name, email, nextRun, onReset }: { name: string; email: string; nextRun: NextRun; onReset: () => void }) {
+  const [code,    setCode]    = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error,   setError]   = useState<string | null>(null)
   const formatted = nextRun ? new Date(nextRun.date + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }) : null
+
+  async function handleVerify(e: React.FormEvent) {
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+    const supabase = createClient()
+    const { error: otpError } = await supabase.auth.verifyOtp({ email, token: code.trim(), type: 'email' })
+    if (otpError) {
+      setError('Invalid or expired code — check your email and try again.')
+      setLoading(false)
+    } else {
+      window.location.href = '/profile'
+    }
+  }
+
   return (
     <div style={{ textAlign: 'center', padding: '16px 0' }}>
       <div style={{ fontSize: 56, marginBottom: 20 }}>💜</div>
@@ -399,9 +417,34 @@ function StepWelcome({ name, nextRun, onReset }: { name: string; nextRun: NextRu
         </div>
       )}
 
-      <Link href="/signin" style={{ display: 'inline-flex', alignItems: 'center', background: '#f5a623', color: '#0a0a0a', fontSize: 14, fontWeight: 700, padding: '12px 28px', borderRadius: 8, textDecoration: 'none', marginBottom: 16 }}>
-        Sign in to your profile
-      </Link>
+      {/* Sign-in code entry */}
+      <div style={{ background: '#0a0a0a', border: '1px solid #1e1e1e', borderRadius: 12, padding: '20px 24px', marginBottom: 20, textAlign: 'left' }}>
+        <p style={{ fontSize: 13, color: '#aaa', marginBottom: 16, lineHeight: 1.6 }}>
+          We&apos;ve sent a sign-in code to <strong style={{ color: '#ccc' }}>{email}</strong>. Enter it below to go straight to your profile.
+        </p>
+        <form onSubmit={handleVerify} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <input
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            maxLength={8}
+            required
+            value={code}
+            onChange={e => setCode(e.target.value.replace(/\D/g, ''))}
+            placeholder="12345678"
+            style={{ width: '100%', background: '#111', border: '1px solid #222', borderRadius: 8, padding: '10px 14px', fontSize: 24, color: '#fff', fontFamily: 'Inter, sans-serif', outline: 'none', letterSpacing: '0.2em', textAlign: 'center', boxSizing: 'border-box' }}
+          />
+          {error && <p style={{ fontSize: 13, color: '#e05252' }}>⚠️ {error}</p>}
+          <button
+            type="submit"
+            disabled={loading || code.length < 6}
+            style={{ background: loading || code.length < 6 ? '#1a1a1a' : '#f5a623', color: loading || code.length < 6 ? '#333' : '#0a0a0a', fontSize: 14, fontWeight: 700, padding: '12px 24px', borderRadius: 8, border: 'none', cursor: loading || code.length < 6 ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif' }}
+          >
+            {loading ? 'Verifying…' : 'Go to my profile →'}
+          </button>
+        </form>
+      </div>
+
       <p style={{ fontSize: 13, color: '#555', marginBottom: 8 }}>
         <Link href="/routes" style={{ color: '#555' }}>Explore the routes</Link>
       </p>
@@ -464,18 +507,24 @@ export default function JoinPage() {
       })
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || 'Something went wrong')
-      // Fetch next upcoming run to show on the welcome screen
+      // Fetch next upcoming run + auto-send sign-in code in parallel
       const supabase = createClient()
       const today = new Date().toISOString().split('T')[0]
-      const { data: run } = await supabase
-        .from('runs')
-        .select('title, date, meeting_point')
-        .eq('run_type', 'regular')
-        .eq('cancelled', false)
-        .gte('date', today)
-        .order('date', { ascending: true })
-        .limit(1)
-        .single()
+      const [{ data: run }] = await Promise.all([
+        supabase
+          .from('runs')
+          .select('title, date, meeting_point')
+          .eq('run_type', 'regular')
+          .eq('cancelled', false)
+          .gte('date', today)
+          .order('date', { ascending: true })
+          .limit(1)
+          .single(),
+        supabase.auth.signInWithOtp({
+          email: data.email.trim().toLowerCase(),
+          options: { shouldCreateUser: true },
+        }),
+      ])
       setNextRun(run ?? null)
       setDone(true)
     } catch (err: any) {
@@ -514,7 +563,7 @@ export default function JoinPage() {
           {/* Form card */}
           <div style={{ background: '#111', border: '1px solid #1a1a1a', borderRadius: 16, padding: 'var(--join-card-pad)', boxShadow: '0 24px 48px rgba(0,0,0,0.4)' }}>
             {done ? (
-              <StepWelcome name={data.firstName} nextRun={nextRun} onReset={handleReset} />
+              <StepWelcome name={data.firstName} email={data.email.trim().toLowerCase()} nextRun={nextRun} onReset={handleReset} />
             ) : (
               <>
                 {step === 0 && <StepAboutYou   data={data} onChange={update} />}
