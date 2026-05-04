@@ -12,7 +12,7 @@ export default function Nav() {
   const [isLeader, setIsLeader] = useState(false)
   const [isAdmin,  setIsAdmin]  = useState(false)
 
-  const ADMIN_EMAILS = ['paul.j.cox@gmail.com', 'runtogetherradcliffe@gmail.com']
+  const ADMIN_EMAILS = ['paul.j.cox@gmail.com', 'pjcox@fastmail.fm', 'runtogetherradcliffe@gmail.com']
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 768px)')
