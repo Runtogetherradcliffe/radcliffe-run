@@ -21,18 +21,6 @@ BEGIN
 END;
 $$;
 
--- Public member count (anon-callable, no PII exposed)
-CREATE OR REPLACE FUNCTION public.get_member_count()
-RETURNS integer
-LANGUAGE sql
-SECURITY DEFINER
-SET search_path = public
-AS $$
-  SELECT count(*)::integer FROM public.members;
-$$;
-
-GRANT EXECUTE ON FUNCTION public.get_member_count() TO anon;
-
 -- Auto-generate slug for posts from title + date
 CREATE OR REPLACE FUNCTION public.posts_set_slug()
 RETURNS TRIGGER LANGUAGE plpgsql AS $$
@@ -92,6 +80,19 @@ CREATE POLICY "Anon can register"
 CREATE POLICY "Authenticated full access to members"
   ON public.members FOR ALL TO authenticated
   USING (true) WITH CHECK (true);
+
+-- Public member count (anon-callable, no PII exposed)
+-- Defined after members table so the relation exists
+CREATE OR REPLACE FUNCTION public.get_member_count()
+RETURNS integer
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT count(*)::integer FROM public.members;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.get_member_count() TO anon;
 
 
 -- Run schedule
