@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS public.members (
   emergency_phone          text        NOT NULL DEFAULT '',
   emergency_relationship   text        NOT NULL DEFAULT '',
   medical_info             text,
-  medical_consent          boolean     NOT NULL DEFAULT false,
+  consent_medical          boolean     NOT NULL DEFAULT false,
   consent_data             boolean     NOT NULL DEFAULT false,
   health_declaration       boolean     NOT NULL DEFAULT false,
   email_opt_out            boolean     NOT NULL DEFAULT false,

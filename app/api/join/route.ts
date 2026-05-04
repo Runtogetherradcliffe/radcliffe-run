@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
       firstName, lastName, email, mobile,
       emergencyName, emergencyPhone, emergencyRelationship,
       healthDeclaration, healthNotes, consentData,
-      consentEmail, consentPhoto,
+      consentEmail, consentPhoto, consentMedical,
     } = body
 
     // Basic server-side validation
@@ -35,6 +35,7 @@ export async function POST(req: NextRequest) {
       // Honour email preference: opt_out is the inverse of opting in
       email_opt_out:            !consentEmail,
       photo_consent:            !!consentPhoto,
+      consent_medical:          !!consentMedical,
     })
 
     if (error) {
