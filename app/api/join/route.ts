@@ -125,6 +125,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Failed to save registration' }, { status: 500 })
     }
 
+    // Create a confirmed auth user so subsequent signInWithOtp sends a code (not a confirmation email)
+    const normalEmail = email.trim().toLowerCase()
+    await supabaseAdmin().auth.admin.createUser({
+      email: normalEmail,
+      email_confirm: true,
+    }).catch(err => console.error('Auth user creation failed (may already exist):', err))
+
     // Send welcome email (fire and forget — don't block the response)
     sendWelcomeEmail(firstName, email.trim().toLowerCase()).catch(err =>
       console.error('Welcome email failed:', err)
