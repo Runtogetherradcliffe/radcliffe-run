@@ -4,7 +4,7 @@ RTR Route Map Generator
 =======================
 Renders each GPX route as a branded map image for use on the radcliffe.run website.
 
-Output: public/route-maps/{slug}.png  (800×450px, RTR branded)
+Output: public/route-maps/{slug}.webp  (800×450px, RTR branded)
 
 Usage:
     # Generate ALL routes (skips existing by default)
@@ -218,7 +218,7 @@ def generate_map(gpx_path: Path, out_path: Path) -> bool:
         img = postprocess(img)
 
         out_path.parent.mkdir(parents=True, exist_ok=True)
-        img.save(str(out_path), "PNG", optimize=True)
+        img.save(str(out_path), "WEBP", quality=85)
         print(f"  ✓  {slug} → {out_path.name}")
         return True
 
@@ -262,7 +262,7 @@ def main():
 
     ok = skipped = failed = 0
     for gpx_path in gpx_files:
-        out_path = OUT_DIR / f"{gpx_path.stem}.png"
+        out_path = OUT_DIR / f"{gpx_path.stem}.webp"
         if out_path.exists() and not args.force:
             print(f"  –  {gpx_path.stem} (already exists, use --force to regenerate)")
             skipped += 1
