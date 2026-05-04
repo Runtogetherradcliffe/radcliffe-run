@@ -294,11 +294,9 @@ export async function POST() {
   }
 
   let inserted = 0, updated = 0, errors = 0
+  const errorDetails: string[] = []
 
   for (const run of allRuns) {
-    // Match by event ID first (stable); always fall back to date+title so existing rows
-    // without an event ID (e.g. first sync after migration) are found and updated rather
-    // than duplicated
     const ex = (run.google_event_id ? existingByEventId.get(run.google_event_id) : undefined)
       ?? existingByDateTitle.get(`${run.date}::${run.title}`)?.shift()
     if (ex) {
@@ -314,18 +312,17 @@ export async function POST() {
           on_tour:          run.on_tour,
           run_type:         run.run_type,
           google_event_id:  run.google_event_id,
-          // Only overwrite route_slug if the sheet actually provides one —
-          // manual overrides set in admin survive syncs when the sheet is empty
           ...(run.route_slug ? { route_slug: run.route_slug } : {}),
-          // Never overwrite: cancelled, has_jeffing — manual overrides in admin always win
         })
         .eq('id', ex.id)
-      error ? errors++ : updated++
+      if (error) { errors++; errorDetails.push(`UPDATE ${run.date} "${run.title}": ${error.message}`) }
+      else updated++
     } else {
       const { error } = await supabaseAdmin().from('runs').insert(run)
-      error ? errors++ : inserted++
+      if (error) { errors++; errorDetails.push(`INSERT ${run.date} "${run.title}": ${error.message}`) }
+      else inserted++
     }
   }
 
-  return NextResponse.json({ inserted, updated, errors, total: allRuns.length })
+  return NextResponse.json({ inserted, updated, errors, total: allRuns.length, errorDetails })
 }
