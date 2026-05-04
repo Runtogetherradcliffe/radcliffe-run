@@ -28,7 +28,7 @@ export default async function AdminPage() {
     supabase.from('runs').select('*', { count: 'exact', head: true }).gte('date', new Date().toISOString().split('T')[0]),
     supabaseAdmin().from('posts').select('*', { count: 'exact', head: true }).eq('type', 'roundup').eq('status', 'published'),
     supabase.from('members').select('first_name, last_name, email, created_at').order('created_at', { ascending: false }).limit(5),
-    supabase.from('site_settings').select('hero_image_url, sync_thursday_sheet, sync_social_sheet, show_social_calendar, email_default_subject, email_default_opening, email_default_closing').single(),
+    supabaseAdmin().from('site_settings').select('hero_image_url, sync_thursday_sheet, sync_social_sheet, show_social_calendar, email_default_subject, email_default_opening, email_default_closing').single(),
   ])
 
   return (
