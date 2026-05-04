@@ -215,7 +215,7 @@ function StepAboutYou({ data, onChange }: { data: FormData; onChange: (k: keyof 
         error={mobileBlurred && data.mobile ? phoneError(data.mobile) : null}
       />
       <p style={{ fontSize: 13, color: '#555', lineHeight: 1.6, paddingTop: 4 }}>
-        We&apos;ll send you a magic link to verify your email &mdash; no password needed.
+        If you&apos;d like to manage your profile or emergency contacts later, you can sign in with a one-time code sent to this email.
       </p>
     </div>
   )
@@ -376,7 +376,7 @@ function StepWelcome({ name, onReset }: { name: string; onReset: () => void }) {
         Welcome, {name}!
       </h2>
       <p style={{ fontSize: 16, fontWeight: 300, color: '#aaa', lineHeight: 1.7, marginBottom: 32, maxWidth: 360, margin: '0 auto 32px' }}>
-        You&apos;re all registered. Check your email for a confirmation, and we&apos;ll see you on Thursday.
+        You&apos;re all registered &mdash; we&apos;ll see you on Thursday!
       </p>
 
       {/* Next run card */}
