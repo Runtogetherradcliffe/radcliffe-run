@@ -75,9 +75,9 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
           sync_thursday_sheet:   syncThursday,
           sync_social_sheet:     syncSocial,
           show_social_calendar:  showSocialCalendar,
-          email_default_subject: emailSubject.trim() || null,
-          email_default_opening: emailOpening.trim() || null,
-          email_default_closing: emailClosing.trim() || null,
+          email_default_subject: emailSubject.trim(),
+          email_default_opening: emailOpening.trim(),
+          email_default_closing: emailClosing.trim(),
         }),
       })
       if (!res.ok) throw new Error((await res.json()).error)
