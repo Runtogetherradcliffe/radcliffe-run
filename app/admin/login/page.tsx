@@ -67,7 +67,7 @@ export default function AdminLoginPage() {
     if (error) {
       setError('Invalid or expired code — check your email and try again.')
     } else {
-      router.push('/admin')
+      window.location.href = '/admin'
     }
     setLoading(false)
   }
