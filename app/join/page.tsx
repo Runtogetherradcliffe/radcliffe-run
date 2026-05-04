@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Nav from '@/components/layout/Nav'
+import { createClient } from '@/utils/supabase/client'
 
 /* ── Types ── */
 interface FormData {
@@ -367,8 +368,11 @@ function StepLastBits({ data, onChange, onToggle }: {
   )
 }
 
+type NextRun = { title: string; date: string; meeting_point: string } | null
+
 /* ── Step 4: Welcome ── */
-function StepWelcome({ name, onReset }: { name: string; onReset: () => void }) {
+function StepWelcome({ name, nextRun, onReset }: { name: string; nextRun: NextRun; onReset: () => void }) {
+  const formatted = nextRun ? new Date(nextRun.date + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }) : null
   return (
     <div style={{ textAlign: 'center', padding: '16px 0' }}>
       <div style={{ fontSize: 56, marginBottom: 20 }}>💜</div>
@@ -380,18 +384,20 @@ function StepWelcome({ name, onReset }: { name: string; onReset: () => void }) {
       </p>
 
       {/* Next run card */}
-      <div style={{ background: '#0a0a0a', border: '1px solid #1e1e1e', borderRadius: 12, padding: '20px 24px', marginBottom: 28, textAlign: 'left' }}>
-        <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#f5a623', marginBottom: 8 }}>Next run</p>
-        <p style={{ fontSize: 17, fontWeight: 700, marginBottom: 12 }}>Outwood Trail Loop</p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'var(--run-stats-cols)', gap: 16 }}>
-          {[{ label: 'Date', value: 'Thu 24 Apr' }, { label: 'Time', value: '6:30pm' }, { label: 'Meet', value: 'Radcliffe Market' }].map(({ label, value }) => (
-            <div key={label}>
-              <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#555', marginBottom: 3 }}>{label}</p>
-              <p style={{ fontSize: 13, fontWeight: 500 }}>{value}</p>
-            </div>
-          ))}
+      {nextRun && (
+        <div style={{ background: '#0a0a0a', border: '1px solid #1e1e1e', borderRadius: 12, padding: '20px 24px', marginBottom: 28, textAlign: 'left' }}>
+          <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#f5a623', marginBottom: 8 }}>Next run</p>
+          <p style={{ fontSize: 17, fontWeight: 700, marginBottom: 12 }}>{nextRun.title}</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'var(--run-stats-cols)', gap: 16 }}>
+            {[{ label: 'Date', value: formatted }, { label: 'Time', value: '7:00pm' }, { label: 'Meet', value: nextRun.meeting_point }].map(({ label, value }) => (
+              <div key={label}>
+                <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#555', marginBottom: 3 }}>{label}</p>
+                <p style={{ fontSize: 13, fontWeight: 500 }}>{value}</p>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       <Link href="/routes" style={{ display: 'inline-flex', alignItems: 'center', background: '#f5a623', color: '#0a0a0a', fontSize: 14, fontWeight: 700, padding: '12px 28px', borderRadius: 8, textDecoration: 'none', marginBottom: 16 }}>
         Explore the routes
@@ -434,6 +440,7 @@ export default function JoinPage() {
   const [data,       setData]       = useState<FormData>(EMPTY_FORM)
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [nextRun,    setNextRun]    = useState<NextRun>(null)
 
   const update = (k: keyof FormData, v: string) => setData(d => ({ ...d, [k]: v }))
   const toggle = (k: keyof FormData, v: boolean) => setData(d => ({ ...d, [k]: v }))
@@ -454,6 +461,19 @@ export default function JoinPage() {
       })
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || 'Something went wrong')
+      // Fetch next upcoming run to show on the welcome screen
+      const supabase = createClient()
+      const today = new Date().toISOString().split('T')[0]
+      const { data: run } = await supabase
+        .from('runs')
+        .select('title, date, meeting_point')
+        .eq('run_type', 'regular')
+        .eq('cancelled', false)
+        .gte('date', today)
+        .order('date', { ascending: true })
+        .limit(1)
+        .single()
+      setNextRun(run ?? null)
       setDone(true)
     } catch (err: any) {
       setSubmitError(err.message || 'Something went wrong. Please try again.')
@@ -491,7 +511,7 @@ export default function JoinPage() {
           {/* Form card */}
           <div style={{ background: '#111', border: '1px solid #1a1a1a', borderRadius: 16, padding: 'var(--join-card-pad)', boxShadow: '0 24px 48px rgba(0,0,0,0.4)' }}>
             {done ? (
-              <StepWelcome name={data.firstName} onReset={handleReset} />
+              <StepWelcome name={data.firstName} nextRun={nextRun} onReset={handleReset} />
             ) : (
               <>
                 {step === 0 && <StepAboutYou   data={data} onChange={update} />}
