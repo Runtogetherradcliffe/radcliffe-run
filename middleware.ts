@@ -53,8 +53,8 @@ export async function middleware(request: NextRequest) {
   const isAdminRoute = pathname.startsWith('/admin')
   const isLoginPage  = pathname === '/admin/login'
 
-  const adminEmails = (process.env.ADMIN_EMAILS ?? '')
-    .split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
+  const envEmails = (process.env.ADMIN_EMAILS ?? '').split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
+  const adminEmails = envEmails.length > 0 ? envEmails : ['paul.j.cox@gmail.com', 'pjcox@fastmail.fm', 'runtogetherradcliffe@gmail.com']
   const isAdmin = !!user && adminEmails.includes((user.email ?? '').toLowerCase())
 
   if (isAdminRoute && !isLoginPage && !isAdmin) {
