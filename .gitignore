@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# generated route analysis data (intermediate files, not needed on server)
+/scripts/route-data/
+
+# python cache
+__pycache__/
