@@ -136,7 +136,7 @@ export default async function HomePage() {
     ...socialRuns.map(r => r.route_slug),
   ].filter((s): s is string => !!s)
   const slugsWithMap = new Set(
-    allSlugs.filter(slug => existsSync(join(process.cwd(), 'public', 'route-maps', `${slug}.png`)))
+    allSlugs.filter(slug => existsSync(join(process.cwd(), 'public', 'route-maps', `${slug}.webp`)))
   )
 
   return (
@@ -382,7 +382,7 @@ export default async function HomePage() {
                             <>
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
-                                src={`/route-maps/${mapSlug}.png`}
+                                src={`/route-maps/${mapSlug}.webp`}
                                 alt=""
                                 loading={cardIndex === 0 ? 'eager' : 'lazy'}
                                 style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
@@ -546,7 +546,7 @@ export default async function HomePage() {
                         <>
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
-                            src={`/route-maps/${run.route_slug}.png`}
+                            src={`/route-maps/${run.route_slug}.webp`}
                             alt=""
                             loading="lazy"
                             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
