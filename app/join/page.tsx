@@ -399,9 +399,12 @@ function StepWelcome({ name, nextRun, onReset }: { name: string; nextRun: NextRu
         </div>
       )}
 
-      <Link href="/routes" style={{ display: 'inline-flex', alignItems: 'center', background: '#f5a623', color: '#0a0a0a', fontSize: 14, fontWeight: 700, padding: '12px 28px', borderRadius: 8, textDecoration: 'none', marginBottom: 16 }}>
-        Explore the routes
+      <Link href="/signin" style={{ display: 'inline-flex', alignItems: 'center', background: '#f5a623', color: '#0a0a0a', fontSize: 14, fontWeight: 700, padding: '12px 28px', borderRadius: 8, textDecoration: 'none', marginBottom: 16 }}>
+        Sign in to your profile
       </Link>
+      <p style={{ fontSize: 13, color: '#555', marginBottom: 8 }}>
+        <Link href="/routes" style={{ color: '#555' }}>Explore the routes</Link>
+      </p>
       <p style={{ fontSize: 13, color: '#555' }}>
         <button onClick={onReset} style={{ background: 'none', border: 'none', color: '#555', cursor: 'pointer', textDecoration: 'underline', fontSize: 13, fontFamily: 'inherit' }}>
           Register another runner
