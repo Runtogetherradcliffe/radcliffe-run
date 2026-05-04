@@ -1,6 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 
-const ADMIN_EMAILS = ['paul.j.cox@gmail.com', 'runtogetherradcliffe@gmail.com']
+const ADMIN_EMAILS = ['paul.j.cox@gmail.com', 'runtogetherradcliffe@gmail.com', 'pjcox@fastmail.fm']
 
 export async function requireAdmin() {
   const supabase = await createClient()
