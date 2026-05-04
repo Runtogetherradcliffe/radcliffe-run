@@ -224,7 +224,7 @@ function parseSocialRows(rows: string[][]): RunRow[] {
       description,
       terrain:          null,
       distance_km:      parseDistance(distance),
-      route_slug:       null,
+      route_slug:       extractSlug(routeUrl),
       meeting_point:    location || 'Radcliffe Market, Blackburn Street, M26 1PN',
       meeting_map_url:  null,
       leader_name:      null,
