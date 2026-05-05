@@ -36,8 +36,8 @@ function InfoRow({ label, value, href }: { label: string; value: string; href?: 
 }
 
 export default async function AboutPage() {
-  const { data: memberCountData } = await supabaseAdmin().rpc('get_member_count')
-  const memberCount = memberCountData !== null ? String(memberCountData) : '…'
+  const { count } = await supabaseAdmin().from('members').select('*', { count: 'exact', head: true })
+  const memberCount = count !== null ? String(count) : '…'
 
   return (
     <>
