@@ -53,10 +53,11 @@ export default function Nav() {
   const active = (href: string) => href === '/' ? path === '/' : path.startsWith(href)
 
   const links = [
-    { href: '/',        label: 'Home'    },
-    { href: '/about',   label: 'About'   },
-    { href: '/routes',  label: 'Routes'  },
-    { href: '/news',    label: 'Roundup' },
+    { href: '/',         label: 'Home'    },
+    { href: '/about',    label: 'About'   },
+    { href: '/routes',   label: 'Routes'  },
+    { href: '/news',     label: 'Roundup' },
+    { href: '/contact',  label: 'Contact' },
   ]
 
   return (
