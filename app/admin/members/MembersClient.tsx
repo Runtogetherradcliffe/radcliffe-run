@@ -25,19 +25,22 @@ type Member = {
 export default function MembersClient({ members: initial }: { members: Member[] }) {
   const [members, setMembers]   = useState<Member[]>(initial)
   const [query, setQuery]       = useState('')
-  const [filter, setFilter]     = useState<'all' | 'active' | 'inactive'>('all')
+  const [filter, setFilter]     = useState<'all' | 'active' | 'inactive' | 'no_photo'>('all')
   const [expanded, setExpanded] = useState<string | null>(null)
   const [toggling, setToggling] = useState<string | null>(null)
 
   const filtered = members.filter(m => {
     const name = `${m.first_name} ${m.last_name}`.toLowerCase()
     const matchesQ = name.includes(query.toLowerCase()) || m.email.toLowerCase().includes(query.toLowerCase())
-    const matchesF = filter === 'all' || m.status === filter
+    const matchesF = filter === 'all'
+      || (filter === 'no_photo' && !m.photo_consent && m.status === 'active')
+      || m.status === filter
     return matchesQ && matchesF
   })
 
   const activeCount      = members.filter(m => m.status === 'active').length
   const inactiveCount    = members.filter(m => m.status === 'inactive').length
+  const noPhotoCount     = members.filter(m => !m.photo_consent && m.status === 'active').length
   const runLeaderCount   = members.filter(m => m.is_run_leader).length
 
   async function toggleStatus(id: string, current: 'active' | 'inactive') {
@@ -85,21 +88,22 @@ export default function MembersClient({ members: initial }: { members: Member[] 
       {/* Summary strip */}
       <div style={{ display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}>
         {[
-          { label: 'Total',        value: members.length, key: 'all'      },
-          { label: 'Active',       value: activeCount,    key: 'active'   },
-          { label: 'Inactive',     value: inactiveCount,  key: 'inactive' },
+          { label: 'Total',            value: members.length, key: 'all'      },
+          { label: 'Active',           value: activeCount,    key: 'active'   },
+          { label: 'Inactive',         value: inactiveCount,  key: 'inactive' },
+          { label: 'No photo consent', value: noPhotoCount,   key: 'no_photo' },
         ].map(({ label, value, key }) => (
           <button
             key={key}
-            onClick={() => setFilter(key as 'all' | 'active' | 'inactive')}
+            onClick={() => setFilter(key as typeof filter)}
             style={{
               background: filter === key ? '#1a1a1a' : '#111',
-              border: `1px solid ${filter === key ? '#f5a623' : '#1e1e1e'}`,
+              border: `1px solid ${filter === key ? (key === 'no_photo' ? '#e05252' : '#f5a623') : '#1e1e1e'}`,
               borderRadius: 10, padding: '12px 20px', cursor: 'pointer',
               textAlign: 'left', color: 'inherit',
             }}
           >
-            <p style={{ fontSize: 22, fontWeight: 800, color: filter === key ? '#f5a623' : '#fff', letterSpacing: '-0.02em' }}>{value}</p>
+            <p style={{ fontSize: 22, fontWeight: 800, color: filter === key ? (key === 'no_photo' ? '#e05252' : '#f5a623') : '#fff', letterSpacing: '-0.02em' }}>{value}</p>
             <p style={{ fontSize: 12, color: '#666', marginTop: 2 }}>{label}</p>
           </button>
         ))}
