@@ -12,7 +12,7 @@ export default async function MembersPage() {
 
   const { data: members, error } = await supabase
     .from('members')
-    .select('id, first_name, last_name, email, mobile, emergency_name, emergency_phone, emergency_relationship, medical_info, consent_data, health_declaration, status, created_at, is_run_leader, uka_number')
+    .select('id, first_name, last_name, email, mobile, emergency_name, emergency_phone, emergency_relationship, medical_info, consent_data, health_declaration, photo_consent, email_opt_out, status, created_at, is_run_leader, uka_number')
     .order('created_at', { ascending: false })
 
   return (

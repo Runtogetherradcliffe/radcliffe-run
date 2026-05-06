@@ -68,7 +68,8 @@ CREATE TABLE IF NOT EXISTS public.members (
                            CHECK (status IN ('active', 'inactive')),
   cohort                   text,
   is_run_leader            boolean     NOT NULL DEFAULT false,
-  uka_number               text
+  uka_number               text,
+  deactivated_at           timestamptz
 );
 
 ALTER TABLE public.members ENABLE ROW LEVEL SECURITY;
@@ -287,3 +288,140 @@ CREATE POLICY "Anyone can unsubscribe by endpoint"
 CREATE POLICY "Authenticated can manage subscriptions"
   ON public.push_subscriptions FOR ALL TO authenticated
   USING (true);
+
+
+-- ── ROUNDUP TABLES ───────────────────────────────────────────────
+
+-- Roundup posts (weekly weekend summaries)
+CREATE TABLE IF NOT EXISTS public.roundup_posts (
+  id            uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at    timestamptz NOT NULL DEFAULT now(),
+  weekend_of    date        NOT NULL UNIQUE,
+  intro         text,
+  published     boolean     NOT NULL DEFAULT false,
+  published_at  timestamptz
+);
+
+ALTER TABLE public.roundup_posts ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anon can read published roundups"
+  ON public.roundup_posts FOR SELECT TO anon
+  USING (published = true);
+
+CREATE POLICY "Authenticated full access to roundups"
+  ON public.roundup_posts FOR ALL TO authenticated
+  USING (true) WITH CHECK (true);
+
+
+-- Parkrun results (linked to a roundup)
+CREATE TABLE IF NOT EXISTS public.parkrun_results (
+  id          uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
+  roundup_id  uuid        NOT NULL REFERENCES public.roundup_posts(id) ON DELETE CASCADE,
+  venue       text        NOT NULL,
+  location    text,
+  narrative   text        NOT NULL,
+  milestone   integer,
+  pb          boolean     NOT NULL DEFAULT false,
+  podium      text,
+  sort_order  integer     NOT NULL DEFAULT 0
+);
+
+ALTER TABLE public.parkrun_results ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anon can read published parkrun results"
+  ON public.parkrun_results FOR SELECT TO anon
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.roundup_posts
+      WHERE id = parkrun_results.roundup_id AND published = true
+    )
+  );
+
+CREATE POLICY "Authenticated full access to parkrun results"
+  ON public.parkrun_results FOR ALL TO authenticated
+  USING (true) WITH CHECK (true);
+
+
+-- Race results (linked to a roundup)
+CREATE TABLE IF NOT EXISTS public.race_results (
+  id          uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
+  roundup_id  uuid        NOT NULL REFERENCES public.roundup_posts(id) ON DELETE CASCADE,
+  name        text        NOT NULL,
+  distance    text        NOT NULL,
+  terrain     text        NOT NULL CHECK (terrain IN ('road', 'trail', 'mixed')),
+  date        date        NOT NULL,
+  location    text        NOT NULL,
+  narrative   text        NOT NULL,
+  podium      text,
+  sort_order  integer     NOT NULL DEFAULT 0
+);
+
+ALTER TABLE public.race_results ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anon can read published race results"
+  ON public.race_results FOR SELECT TO anon
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.roundup_posts
+      WHERE id = race_results.roundup_id AND published = true
+    )
+  );
+
+CREATE POLICY "Authenticated full access to race results"
+  ON public.race_results FOR ALL TO authenticated
+  USING (true) WITH CHECK (true);
+
+
+-- Social run results (linked to a roundup)
+CREATE TABLE IF NOT EXISTS public.social_run_results (
+  id          uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
+  roundup_id  uuid        NOT NULL REFERENCES public.roundup_posts(id) ON DELETE CASCADE,
+  name        text        NOT NULL,
+  date        date        NOT NULL,
+  location    text        NOT NULL,
+  narrative   text        NOT NULL,
+  sort_order  integer     NOT NULL DEFAULT 0
+);
+
+ALTER TABLE public.social_run_results ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anon can read published social run results"
+  ON public.social_run_results FOR SELECT TO anon
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.roundup_posts
+      WHERE id = social_run_results.roundup_id AND published = true
+    )
+  );
+
+CREATE POLICY "Authenticated full access to social run results"
+  ON public.social_run_results FOR ALL TO authenticated
+  USING (true) WITH CHECK (true);
+
+
+-- Roundup photos (linked to a roundup)
+CREATE TABLE IF NOT EXISTS public.roundup_photos (
+  id          uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
+  roundup_id  uuid        NOT NULL REFERENCES public.roundup_posts(id) ON DELETE CASCADE,
+  url         text        NOT NULL,
+  alt         text        NOT NULL,
+  caption     text,
+  credit      text,
+  tall        boolean     NOT NULL DEFAULT false,
+  sort_order  integer     NOT NULL DEFAULT 0
+);
+
+ALTER TABLE public.roundup_photos ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anon can read published roundup photos"
+  ON public.roundup_photos FOR SELECT TO anon
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.roundup_posts
+      WHERE id = roundup_photos.roundup_id AND published = true
+    )
+  );
+
+CREATE POLICY "Authenticated full access to roundup photos"
+  ON public.roundup_photos FOR ALL TO authenticated
+  USING (true) WITH CHECK (true);

@@ -14,7 +14,7 @@ export default async function ProfilePage() {
 
   const { data: member } = await supabaseAdmin()
     .from('members')
-    .select('first_name, last_name, email, mobile, emergency_name, emergency_phone, emergency_relationship, medical_info, status, created_at, email_opt_out')
+    .select('first_name, last_name, email, mobile, emergency_name, emergency_phone, emergency_relationship, medical_info, status, created_at, email_opt_out, photo_consent')
     .eq('email', user.email!)
     .single()
 
@@ -59,6 +59,7 @@ export default async function ProfilePage() {
           emergency_relationship:  member.emergency_relationship,
           medical_info:            member.medical_info,
           email_opt_out:           member.email_opt_out ?? false,
+          photo_consent:           member.photo_consent ?? false,
         }} />
 
       </main>

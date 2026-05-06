@@ -13,6 +13,7 @@ type Member = {
   emergency_phone: string
   emergency_relationship: string
   medical_info: string | null
+  photo_consent: boolean
 }
 
 export default function LeaderLookup({
@@ -154,15 +155,26 @@ function MemberCard({ m }: { m: Member }) {
             </a>
           )}
         </div>
-        {hasMedical && (
-          <span style={{
-            fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase',
-            background: '#3a1a0a', color: '#f5a623', border: '1px solid #5a2a0a',
-            borderRadius: 6, padding: '4px 8px', flexShrink: 0, marginLeft: 12,
-          }}>
-            Medical info
-          </span>
-        )}
+        <div style={{ display: 'flex', gap: 6, flexShrink: 0, marginLeft: 12 }}>
+          {!m.photo_consent && (
+            <span style={{
+              fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase',
+              background: '#1a0a0a', color: '#e05252', border: '1px solid #3a1a1a',
+              borderRadius: 6, padding: '4px 8px',
+            }}>
+              No photos
+            </span>
+          )}
+          {hasMedical && (
+            <span style={{
+              fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase',
+              background: '#3a1a0a', color: '#f5a623', border: '1px solid #5a2a0a',
+              borderRadius: 6, padding: '4px 8px',
+            }}>
+              Medical info
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Emergency contact */}

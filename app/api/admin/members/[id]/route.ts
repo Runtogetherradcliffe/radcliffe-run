@@ -22,6 +22,17 @@ export async function PATCH(
       return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
     }
     update.status = body.status
+
+    if (body.status === 'inactive') {
+      update.deactivated_at = new Date().toISOString()
+      // GDPR: immediately clear sensitive data on deactivation
+      update.emergency_name = ''
+      update.emergency_phone = ''
+      update.emergency_relationship = ''
+      update.medical_info = null
+    } else {
+      update.deactivated_at = null
+    }
   }
 
   if ('is_run_leader' in body) {

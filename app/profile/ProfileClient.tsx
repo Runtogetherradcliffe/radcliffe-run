@@ -13,6 +13,7 @@ type Member = {
   emergency_relationship: string
   medical_info: string | null
   email_opt_out: boolean
+  photo_consent: boolean
 }
 
 type PushState = 'loading' | 'unsupported' | 'denied' | 'subscribed' | 'unsubscribed'
@@ -102,6 +103,7 @@ export default function ProfileClient({ member: initial }: { member: Member }) {
   const [saving, setSaving] = useState(false)
   const [toast, setToast] = useState<{ msg: string; type: 'ok' | 'err' } | null>(null)
   const [emailToggling, setEmailToggling] = useState(false)
+  const [photoToggling, setPhotoToggling] = useState(false)
   const [pushState, setPushState] = useState<PushState>('loading')
   const [pushLoading, setPushLoading] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState(false)
@@ -175,6 +177,25 @@ export default function ProfileClient({ member: initial }: { member: Member }) {
       showToast('Failed to update email preference', 'err')
     } finally {
       setEmailToggling(false)
+    }
+  }
+
+  // ── Photo consent toggle ────────────────────────────────────────
+  const togglePhoto = async () => {
+    setPhotoToggling(true)
+    const next = !member.photo_consent
+    try {
+      const res = await fetch('/api/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ photo_consent: next }),
+      })
+      if (!res.ok) throw new Error()
+      setMember(m => ({ ...m, photo_consent: next }))
+    } catch {
+      showToast('Failed to update photo preference', 'err')
+    } finally {
+      setPhotoToggling(false)
     }
   }
 
@@ -344,8 +365,8 @@ export default function ProfileClient({ member: initial }: { member: Member }) {
         )}
       </Section>
 
-      {/* ── Notifications ── */}
-      <Section title="Notifications">
+      {/* ── Preferences ── */}
+      <Section title="Preferences">
         {/* Email */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid #161616' }}>
           <div>
@@ -353,6 +374,15 @@ export default function ProfileClient({ member: initial }: { member: Member }) {
             <p style={{ fontSize: 12, color: '#666' }}>Weekly run info and group announcements</p>
           </div>
           <Toggle enabled={!member.email_opt_out} onChange={toggleEmail} loading={emailToggling} />
+        </div>
+
+        {/* Photo consent */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid #161616' }}>
+          <div>
+            <p style={{ fontSize: 14, fontWeight: 600, color: '#ddd', marginBottom: 3 }}>Photo consent</p>
+            <p style={{ fontSize: 12, color: '#666' }}>Allow group photos including you to be shared online</p>
+          </div>
+          <Toggle enabled={member.photo_consent} onChange={togglePhoto} loading={photoToggling} />
         </div>
 
         {/* Push */}

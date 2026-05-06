@@ -5,7 +5,7 @@ import { supabaseAdmin } from '@/lib/supabase'
 const ALLOWED_FIELDS = [
   'first_name', 'last_name', 'mobile',
   'emergency_name', 'emergency_phone', 'emergency_relationship',
-  'medical_info', 'email_opt_out',
+  'medical_info', 'email_opt_out', 'photo_consent',
 ]
 
 // PATCH /api/profile — update the authenticated member's own record

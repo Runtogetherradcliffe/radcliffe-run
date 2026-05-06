@@ -14,6 +14,8 @@ type Member = {
   medical_info: string | null
   consent_data: boolean
   health_declaration: boolean
+  photo_consent: boolean
+  email_opt_out: boolean
   status: 'active' | 'inactive'
   created_at: string
   is_run_leader: boolean
@@ -41,7 +43,10 @@ export default function MembersClient({ members: initial }: { members: Member[] 
   async function toggleStatus(id: string, current: 'active' | 'inactive') {
     const next = current === 'active' ? 'inactive' : 'active'
     setToggling(id)
-    setMembers(prev => prev.map(m => m.id === id ? { ...m, status: next } : m))
+    const cleared = next === 'inactive'
+      ? { emergency_name: '', emergency_phone: '', emergency_relationship: '', medical_info: null }
+      : {}
+    setMembers(prev => prev.map(m => m.id === id ? { ...m, status: next, ...cleared } : m))
     try {
       const res = await fetch(`/api/admin/members/${id}`, {
         method: 'PATCH',
@@ -217,6 +222,12 @@ export default function MembersClient({ members: initial }: { members: Member[] 
                       </p>
                       <p style={{ fontSize: 13, color: m.health_declaration ? '#4caf76' : '#e05252' }}>
                         {m.health_declaration ? '✓' : '✗'} Health declaration
+                      </p>
+                      <p style={{ fontSize: 13, color: m.photo_consent ? '#4caf76' : '#e05252' }}>
+                        {m.photo_consent ? '✓' : '✗'} Photo consent
+                      </p>
+                      <p style={{ fontSize: 13, color: !m.email_opt_out ? '#4caf76' : '#e05252' }}>
+                        {!m.email_opt_out ? '✓' : '✗'} Club emails
                       </p>
                     </div>
                   </div>

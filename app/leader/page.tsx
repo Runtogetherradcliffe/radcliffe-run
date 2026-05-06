@@ -23,7 +23,7 @@ export default async function LeaderPage() {
   // Fetch all active members with emergency contact info
   const { data: members } = await supabaseAdmin()
     .from('members')
-    .select('id, first_name, last_name, mobile, emergency_name, emergency_phone, emergency_relationship, medical_info')
+    .select('id, first_name, last_name, mobile, emergency_name, emergency_phone, emergency_relationship, medical_info, photo_consent')
     .eq('status', 'active')
     .order('last_name', { ascending: true })
 
