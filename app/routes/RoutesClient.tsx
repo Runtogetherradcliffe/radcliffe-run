@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { ROUTES, TERRAIN_LABELS, type Route, type Terrain, type Category } from '@/lib/routes'
+import type { RouteOverrides } from '@/lib/routeDescriptions'
 import GpxButton from '@/app/runs/[id]/GpxButton'
 
 /* ── Terrain colours ── */
@@ -81,7 +82,7 @@ const FILTERS: { key: Filter; label: string }[] = [
 ]
 
 
-export default function RoutesClient() {
+export default function RoutesClient({ nameOverrides = {} }: { nameOverrides?: RouteOverrides }) {
   const [filter,   setFilter]   = useState<Filter>('all')
   const [selected, setSelected] = useState<Route | null>(null)
   const [loading,  setLoading]  = useState(false)
@@ -105,6 +106,8 @@ export default function RoutesClient() {
     mq.addEventListener('change', update)
     return () => mq.removeEventListener('change', update)
   }, [])
+
+  const displayName = (r: Route) => nameOverrides[r.slug]?.name ?? r.name
 
   const filtered = filter === 'all' ? ROUTES : ROUTES.filter(r => r.category === filter)
 
@@ -290,7 +293,7 @@ export default function RoutesClient() {
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
                   <span style={{ fontSize: isMobile ? 13 : 14, fontWeight: 600, color: isSelected ? '#fff' : '#ccc', lineHeight: 1.3, flex: 1 }}>
-                    {route.name}
+                    {displayName(route)}
                   </span>
                   {!isMobile && <TerrainBadge terrain={route.terrain} />}
                   {isMobile && (
@@ -344,7 +347,7 @@ export default function RoutesClient() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: isMobile ? 6 : 10 }}>
               <div style={{ flex: 1 }}>
                 {!isMobile && <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#f5a623', marginBottom: 4 }}>Selected route</p>}
-                <p style={{ fontSize: isMobile ? 14 : 15, fontWeight: 700, lineHeight: 1.3 }}>{selected.name}</p>
+                <p style={{ fontSize: isMobile ? 14 : 15, fontWeight: 700, lineHeight: 1.3 }}>{displayName(selected)}</p>
               </div>
               <button onClick={() => {
                 setSelected(null)

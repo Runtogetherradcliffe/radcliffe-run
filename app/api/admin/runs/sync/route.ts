@@ -324,5 +324,22 @@ export async function POST() {
     }
   }
 
+  // Sync route names: extract the clean route name from run titles and upsert into route_descriptions
+  const routeNames = new Map<string, string>()
+  for (const run of allRuns) {
+    if (!run.route_slug) continue
+    const clean = run.title.replace(/^RTR\s+[58]k\s*/i, '').trim()
+    if (clean && !routeNames.has(run.route_slug)) {
+      routeNames.set(run.route_slug, clean)
+    }
+  }
+
+  if (routeNames.size > 0) {
+    const upsertRows = Array.from(routeNames.entries()).map(([slug, name]) => ({ slug, name }))
+    await supabaseAdmin()
+      .from('route_descriptions')
+      .upsert(upsertRows, { onConflict: 'slug', ignoreDuplicates: false })
+  }
+
   return NextResponse.json({ inserted, updated, errors, total: allRuns.length, errorDetails })
 }

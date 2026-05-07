@@ -4,6 +4,7 @@ import Nav from '@/components/layout/Nav'
 import Footer from '@/components/layout/Footer'
 import { supabaseAdmin } from '@/lib/supabase'
 import { ROUTES } from '@/lib/routes'
+import { getRouteOverrides } from '@/lib/routeDescriptions'
 import RunMapExpand from './RunMapExpand'
 import RunBadges from './RunBadges'
 import GpxButton from './GpxButton'
@@ -62,6 +63,8 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
 
   const title  = cleanTitle(run.title)
   const route  = run.route_slug ? ROUTES.find(r => r.slug === run.route_slug) : null
+  const overrides = route ? await getRouteOverrides() : {}
+  const routeDescription = route ? (overrides[route.slug]?.description ?? route.description ?? null) : null
   const slug   = run.route_slug
   const group  = slug?.startsWith('trail-5k--') || slug?.startsWith('road-5k--') ? '5K'
                : slug?.startsWith('trail-8k--') || slug?.startsWith('road-8k--') ? '8K' : null
@@ -132,13 +135,13 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
             )}
           </div>
 
-          {/* Route description (from lib/routes.ts) */}
-          {route?.description && (
+          {/* Route description (DB override or static fallback) */}
+          {routeDescription && route && (
             <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 12, padding: '18px 20px', marginBottom: 20 }}>
               <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#444', marginBottom: 10 }}>
                 About this route
               </p>
-              <p style={{ fontSize: 14, color: '#bbb', lineHeight: 1.75 }}>{route.description}</p>
+              <p style={{ fontSize: 14, color: '#bbb', lineHeight: 1.75 }}>{routeDescription}</p>
               <div style={{ marginTop: 14 }}>
                 <RunMapExpand
                   file={route.file}

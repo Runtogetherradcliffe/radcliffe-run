@@ -7,6 +7,7 @@ const NAV_ITEMS = [
   { href: '/admin',          label: 'Dashboard' },
   { href: '/admin/members',  label: 'Members' },
   { href: '/admin/runs',     label: 'Runs' },
+  { href: '/admin/routes',   label: 'Routes' },
   { href: '/admin/emails',   label: 'Emails' },
   { href: '/admin/posts',    label: 'Posts' },
   { href: '/admin/notify',   label: 'Notifications' },

@@ -8,6 +8,7 @@ import { createHmac } from 'crypto'
 import { supabaseAdmin } from '@/lib/supabase'
 import { buildEmailHtml, buildEmailText, RunInfo } from '@/lib/buildEmail'
 import { ROUTES } from '@/lib/routes'
+import { getRouteOverrides } from '@/lib/routeDescriptions'
 
 const SITE_URL           = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://radcliffe.run'
 const RESEND_KEY         = process.env.RESEND_API_KEY ?? ''
@@ -86,13 +87,15 @@ export async function sendScheduledEmail(emailId: string): Promise<SendResult> {
       .neq('run_type', 'social')
       .order('distance_km', { ascending: true })
 
+    const overrides = await getRouteOverrides()
+
     runs = (runRows ?? []).map(r => {
       const route = r.route_slug ? ROUTES.find(ro => ro.slug === r.route_slug) : null
       return {
         date:            r.date,
         title:           r.title,
         distance_km:     r.distance_km,
-        description:     route?.description ?? r.description ?? null,
+        description:     (r.route_slug && overrides[r.route_slug]?.description) ? overrides[r.route_slug].description! : (route?.description ?? r.description ?? null),
         route_slug:      r.route_slug,
         meeting_point:   r.meeting_point,
         meeting_map_url: r.meeting_map_url ?? null,
