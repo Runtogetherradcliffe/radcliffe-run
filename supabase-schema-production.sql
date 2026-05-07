@@ -231,6 +231,45 @@ CREATE POLICY "Authenticated full access to snippets"
   USING (true) WITH CHECK (true);
 
 
+-- Route description/name overrides (DB layer over static lib/routes.ts)
+CREATE TABLE IF NOT EXISTS public.route_descriptions (
+  slug        text        PRIMARY KEY,
+  name        text,
+  description text,
+  updated_at  timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE OR REPLACE FUNCTION public.update_route_descriptions_updated_at()
+RETURNS trigger AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER route_descriptions_updated_at
+  BEFORE UPDATE ON public.route_descriptions
+  FOR EACH ROW EXECUTE FUNCTION public.update_route_descriptions_updated_at();
+
+ALTER TABLE public.route_descriptions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anyone can read route descriptions"
+  ON public.route_descriptions FOR SELECT
+  USING (true);
+
+CREATE POLICY "Authenticated users can insert route descriptions"
+  ON public.route_descriptions FOR INSERT TO authenticated
+  WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can update route descriptions"
+  ON public.route_descriptions FOR UPDATE TO authenticated
+  USING (true);
+
+CREATE POLICY "Authenticated users can delete route descriptions"
+  ON public.route_descriptions FOR DELETE TO authenticated
+  USING (true);
+
+
 -- Posts (roundups + news)
 CREATE TABLE IF NOT EXISTS public.posts (
   id            uuid  PRIMARY KEY DEFAULT gen_random_uuid(),
