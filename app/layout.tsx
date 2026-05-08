@@ -14,9 +14,10 @@ export const metadata: Metadata = {
     siteName: 'radcliffe.run',
     locale: 'en_GB',
     type: 'website',
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: "radcliffe.run — Radcliffe's Running Group" }],
   },
   twitter: {
-    card: 'summary',
+    card: 'summary_large_image',
     title: "radcliffe.run — Radcliffe's Running Group",
     description: 'A free, friendly running group open to everyone. No memberships, no minimum pace — just good routes and good people, every Thursday in Radcliffe, Greater Manchester.',
   },
