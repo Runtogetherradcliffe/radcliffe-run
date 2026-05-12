@@ -118,10 +118,22 @@ export default function EmailComposer({ draft: initial, runOptions, isNew }: Pro
   const save = useCallback(async (andSend = false, andSchedule = false) => {
     setSaving(true)
     try {
+      // Status rules:
+      // - Schedule send → 'scheduled' (only fires if scheduled_for is set)
+      // - Sent emails stay 'sent'
+      // - Save draft preserves an existing 'scheduled' status when scheduled_for is still set,
+      //   so editing a scheduled email doesn't silently demote it back to a draft
+      const isAlreadyScheduled = draft.status === 'scheduled' && !!draft.scheduled_for
+      const nextStatus =
+        andSchedule && draft.scheduled_for ? 'scheduled' :
+        isSent                              ? 'sent' :
+        isAlreadyScheduled                  ? 'scheduled' :
+        'draft'
+
       const payload = {
         thursday_date:    draft.thursday_date,
-        scheduled_for:    (andSchedule && draft.scheduled_for) ? draft.scheduled_for : draft.scheduled_for,
-        status:           andSchedule && draft.scheduled_for ? 'scheduled' : (isSent ? 'sent' : 'draft'),
+        scheduled_for:    draft.scheduled_for,
+        status:           nextStatus,
         subject:          draft.subject,
         show_opening:     draft.show_opening,
         opening_text:     draft.opening_text,
@@ -289,7 +301,7 @@ export default function EmailComposer({ draft: initial, runOptions, isNew }: Pro
                 disabled={isSent}
                 style={INPUT}
               />
-              <p style={{ fontSize: 11, color: '#555', marginTop: 5 }}>Email sends at ~8am on this date</p>
+              <p style={{ fontSize: 11, color: '#555', marginTop: 5 }}>Sends ~08:00 UTC on this date</p>
             </div>
           </div>
           <div>

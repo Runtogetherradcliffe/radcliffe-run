@@ -85,7 +85,7 @@ export default async function AdminEmailsPage() {
                     </p>
                     <p style={{ fontSize: 12, color: '#999' }}>
                       {e.thursday_date ? `For Thursday ${fmtDate(e.thursday_date)}` : 'No run attached'}
-                      {e.scheduled_for ? ` · Send ${fmtDatetime(e.scheduled_for)}` : ' · No send time set'}
+                      {e.scheduled_for ? ` · Sends ${fmtDate(e.scheduled_for)} (~08:00 UTC)` : ' · No send time set'}
                     </p>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
