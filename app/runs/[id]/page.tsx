@@ -55,7 +55,7 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
 
   const { data: run } = await supabaseAdmin()
     .from('runs')
-    .select('id, date, title, description, distance_km, terrain, meeting_point, meeting_map_url, route_slug, on_tour, has_jeffing, run_type, cancelled, leader_name')
+    .select('id, date, title, description, distance_km, terrain, meeting_point, meeting_map_url, route_slug, strava_url, on_tour, has_jeffing, run_type, cancelled, leader_name')
     .eq('id', id)
     .single()
 
@@ -148,9 +148,9 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
                   accentColor={accentColor}
                   rightButton={
                     <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                      {route.strava && (
+                      {(run.strava_url || route.strava) && (
                         <a
-                          href={route.strava}
+                          href={(run.strava_url || route.strava)!}
                           target="_blank"
                           rel="noopener noreferrer"
                           style={{ fontSize: 12, fontWeight: 600, color: '#fff', background: '#fc4c02', padding: '7px 14px', borderRadius: 6, textDecoration: 'none', whiteSpace: 'nowrap' }}

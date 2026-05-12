@@ -12,7 +12,9 @@ const SOCIAL_SHEET =
 /* ── Thursday sheet columns ── */
 const TC = {
   date: 0, r1Name: 2, r1Terrain: 4, r1Distance: 5,
+  r1StravaUrl: 7,  // "Route 1 - Route Link (Source URL)"
   r2Name: 12, r2Terrain: 14, r2Distance: 15,
+  r2StravaUrl: 17, // "Route 2 - Route Link (Source URL)"
   notes: 22, meetingMapUrl: 33,
   r1RtrPage: 34, // AI — "8k RTR page" — maps to r1Name
   r2RtrPage: 35, // AJ — "5k RTR page" — maps to r2Name
@@ -117,6 +119,7 @@ type RunRow = {
   terrain: 'road' | 'trail' | 'mixed' | null
   distance_km: number | null
   route_slug: string | null
+  strava_url: string | null
   meeting_point: string
   meeting_map_url: string | null
   leader_name: null
@@ -147,9 +150,11 @@ function parseThursdayRows(rows: string[][]): RunRow[] {
     const r2Terrain = (row[TC.r2Terrain]  ?? '').trim()
     const r2Dist    = (row[TC.r2Distance] ?? '').trim()
     const notes     = (row[TC.notes]      ?? '').trim()
-    const r1Page    = (row[TC.r1RtrPage]  ?? '').trim()
-    const r2Page    = (row[TC.r2RtrPage]  ?? '').trim()
-    const mapUrl    = (row[TC.meetingMapUrl] ?? '').trim()
+    const r1Page      = (row[TC.r1RtrPage]   ?? '').trim()
+    const r2Page      = (row[TC.r2RtrPage]   ?? '').trim()
+    const r1StravaUrl = (row[TC.r1StravaUrl] ?? '').trim() || null
+    const r2StravaUrl = (row[TC.r2StravaUrl] ?? '').trim() || null
+    const mapUrl      = (row[TC.meetingMapUrl] ?? '').trim()
     const eventId   = (row[TC.eventId]    ?? '').trim()
     const onTour    = /RTR on tour/i.test(notes)
 
@@ -177,6 +182,7 @@ function parseThursdayRows(rows: string[][]): RunRow[] {
         terrain:          normalise(r1Terrain),
         distance_km:      parseDistance(r1Dist),
         route_slug:       extractSlug(r1Page),
+        strava_url:       r1StravaUrl,
         google_event_id:  eventId ? `${eventId}_1` : null,
       })
     }
@@ -190,6 +196,7 @@ function parseThursdayRows(rows: string[][]): RunRow[] {
         terrain:          normalise(r2Terrain),
         distance_km:      parseDistance(r2Dist),
         route_slug:       extractSlug(r2Page),
+        strava_url:       r2StravaUrl,
         google_event_id:  eventId ? `${eventId}_2` : null,
       })
     }
@@ -225,6 +232,7 @@ function parseSocialRows(rows: string[][]): RunRow[] {
       terrain:          null,
       distance_km:      parseDistance(distance),
       route_slug:       extractSlug(routeUrl),
+      strava_url:       routeUrl || null,
       meeting_point:    location || 'Radcliffe Market, Blackburn Street, M26 1PN',
       meeting_map_url:  null,
       leader_name:      null,
@@ -313,6 +321,7 @@ export async function POST() {
           run_type:         run.run_type,
           google_event_id:  run.google_event_id,
           ...(run.route_slug ? { route_slug: run.route_slug } : {}),
+          ...(run.strava_url ? { strava_url: run.strava_url } : {}),
         })
         .eq('id', ex.id)
       if (error) { errors++; errorDetails.push(`UPDATE ${run.date} "${run.title}": ${error.message}`) }
