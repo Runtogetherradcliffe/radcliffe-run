@@ -232,7 +232,7 @@ function parseSocialRows(rows: string[][]): RunRow[] {
       terrain:          null,
       distance_km:      parseDistance(distance),
       route_slug:       extractSlug(routeUrl),
-      strava_url:       routeUrl || null,
+      strava_url:       null, // social run route links are not Strava URLs
       meeting_point:    location || 'Radcliffe Market, Blackburn Street, M26 1PN',
       meeting_map_url:  null,
       leader_name:      null,

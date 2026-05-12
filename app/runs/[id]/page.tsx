@@ -148,7 +148,7 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
                   accentColor={accentColor}
                   rightButton={
                     <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                      {(run.strava_url || route.strava) && (
+                      {!isSocial && (run.strava_url || route.strava) && (
                         <a
                           href={(run.strava_url || route.strava)!}
                           target="_blank"
