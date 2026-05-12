@@ -3,6 +3,34 @@ import { useState, useEffect, useRef, ReactNode } from 'react'
 
 const MAP_HEIGHT = 300
 
+/* ── Bearing (degrees, 0 = north) ── */
+function bearing(a: [number, number], b: [number, number]): number {
+  const lat1 = a[0] * Math.PI / 180, lat2 = b[0] * Math.PI / 180
+  const dLon = (b[1] - a[1]) * Math.PI / 180
+  const y = Math.sin(dLon) * Math.cos(lat2)
+  const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon)
+  return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360
+}
+
+/* ── Haversine distance (metres) ── */
+function haversine(a: [number, number], b: [number, number]): number {
+  const R = 6371000
+  const φ1 = a[0] * Math.PI / 180, φ2 = b[0] * Math.PI / 180
+  const dφ = (b[0] - a[0]) * Math.PI / 180, dλ = (b[1] - a[1]) * Math.PI / 180
+  const s = Math.sin(dφ / 2) ** 2 + Math.cos(φ1) * Math.cos(φ2) * Math.sin(dλ / 2) ** 2
+  return R * 2 * Math.atan2(Math.sqrt(s), Math.sqrt(1 - s))
+}
+
+/* ── Arrow marker ── */
+function arrowIcon(L: any, deg: number, color: string) {
+  return L.divIcon({
+    className: '',
+    html: `<div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:10px solid ${color};transform:rotate(${deg}deg);transform-origin:center center;filter:drop-shadow(0 0 2px rgba(0,0,0,0.8))"></div>`,
+    iconSize: [10, 10],
+    iconAnchor: [5, 5],
+  })
+}
+
 async function loadGPXCoords(file: string): Promise<[number, number][]> {
   const res = await fetch(`/gpx/${file}`)
   const text = await res.text()
@@ -61,6 +89,23 @@ export default function RunMapExpand({ file, accentColor = '#f5a623', rightButto
         if (coords.length) {
           Lm.polyline(coords, { color: '#7a4800', weight: 5, opacity: 0.9 }).addTo(map)
           Lm.polyline(coords, { color: accentColor, weight: 3, opacity: 1 }).addTo(map)
+
+          // Direction arrows every ~800 m
+          const arrowMarkers: any[] = []
+          let distAcc = 0, nextArrow = 400
+          for (let i = 1; i < coords.length; i++) {
+            distAcc += haversine(coords[i - 1], coords[i])
+            if (distAcc >= nextArrow) {
+              const mid: [number, number] = [
+                (coords[i - 1][0] + coords[i][0]) / 2,
+                (coords[i - 1][1] + coords[i][1]) / 2,
+              ]
+              arrowMarkers.push(Lm.marker(mid, { icon: arrowIcon(Lm, bearing(coords[i - 1], coords[i]), accentColor), interactive: false }))
+              nextArrow = distAcc + 800
+            }
+          }
+          Lm.layerGroup(arrowMarkers).addTo(map)
+
           map.fitBounds(Lm.latLngBounds(coords), { padding: [24, 24] })
         }
         map.invalidateSize()
