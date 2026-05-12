@@ -25,7 +25,12 @@ async function loadGPXCoords(file: string): Promise<[number, number][]> {
   const text = await res.text()
   const parser = new DOMParser()
   const doc = parser.parseFromString(text, 'text/xml')
-  const pts = Array.from(doc.querySelectorAll('trkpt, rtept, wpt'))
+  // Prefer track points, then route points — only fall back to waypoints if neither exists.
+  // Mixing selectors in one querySelectorAll returns elements in document order, which
+  // causes waypoints (POIs) to be prepended to track points, creating a broken path.
+  const trkpts = Array.from(doc.querySelectorAll('trkpt'))
+  const rtepts = Array.from(doc.querySelectorAll('rtept'))
+  const pts = trkpts.length > 0 ? trkpts : rtepts.length > 0 ? rtepts : Array.from(doc.querySelectorAll('wpt'))
   return pts.map(p => [parseFloat(p.getAttribute('lat')!), parseFloat(p.getAttribute('lon')!)])
 }
 
