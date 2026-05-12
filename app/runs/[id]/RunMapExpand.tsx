@@ -8,7 +8,9 @@ async function loadGPXCoords(file: string): Promise<[number, number][]> {
   const text = await res.text()
   const parser = new DOMParser()
   const doc = parser.parseFromString(text, 'text/xml')
-  const pts = Array.from(doc.querySelectorAll('trkpt, rtept, wpt'))
+  const trkpts = Array.from(doc.querySelectorAll('trkpt'))
+  const rtepts = Array.from(doc.querySelectorAll('rtept'))
+  const pts = trkpts.length > 0 ? trkpts : rtepts.length > 0 ? rtepts : Array.from(doc.querySelectorAll('wpt'))
   return pts.map(p => [parseFloat(p.getAttribute('lat')!), parseFloat(p.getAttribute('lon')!)])
 }
 
