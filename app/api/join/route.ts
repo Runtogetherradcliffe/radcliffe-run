@@ -105,20 +105,19 @@ export async function POST(req: NextRequest) {
 
     const normalEmail = email.trim().toLowerCase()
 
-    // Check for existing registration before inserting
+    // Check for existing registration before inserting — match on email + name
+    // (email alone is not unique: family members may share an email address)
     const db = supabaseAdmin()
     const { data: existing } = await db
       .from('members')
       .select('id')
       .eq('email', normalEmail)
+      .eq('first_name', firstName.trim())
+      .eq('last_name', lastName.trim())
       .maybeSingle()
 
     if (existing) {
       // Already registered — fire an OTP so they can sign in, then tell the frontend
-      await supabaseAdmin().auth.admin.generateLink({
-        type: 'magiclink',
-        email: normalEmail,
-      }).catch(() => {/* best-effort */})
       await supabaseAdmin().auth.signInWithOtp({ email: normalEmail })
         .catch(() => {/* best-effort */})
       return NextResponse.json({ alreadyRegistered: true })

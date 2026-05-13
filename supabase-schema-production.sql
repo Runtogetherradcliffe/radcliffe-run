@@ -72,6 +72,12 @@ CREATE TABLE IF NOT EXISTS public.members (
   deactivated_at           timestamptz
 );
 
+-- Prevent the same person registering twice (email alone is not unique:
+-- family members sharing an email address are allowed)
+ALTER TABLE public.members
+  ADD CONSTRAINT members_email_first_last_unique
+  UNIQUE (email, first_name, last_name);
+
 ALTER TABLE public.members ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Anon can register"
