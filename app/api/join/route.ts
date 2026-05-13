@@ -103,11 +103,31 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Consent and health declaration required' }, { status: 400 })
     }
 
+    const normalEmail = email.trim().toLowerCase()
+
+    // Check for existing registration before inserting
     const db = supabaseAdmin()
+    const { data: existing } = await db
+      .from('members')
+      .select('id')
+      .eq('email', normalEmail)
+      .maybeSingle()
+
+    if (existing) {
+      // Already registered — fire an OTP so they can sign in, then tell the frontend
+      await supabaseAdmin().auth.admin.generateLink({
+        type: 'magiclink',
+        email: normalEmail,
+      }).catch(() => {/* best-effort */})
+      await supabaseAdmin().auth.signInWithOtp({ email: normalEmail })
+        .catch(() => {/* best-effort */})
+      return NextResponse.json({ alreadyRegistered: true })
+    }
+
     const { error } = await db.from('members').insert({
       first_name:               firstName,
       last_name:                lastName,
-      email:                    email.trim().toLowerCase(),
+      email:                    normalEmail,
       mobile:                   mobile || null,
       emergency_name:           emergencyName,
       emergency_phone:          emergencyPhone,
@@ -126,14 +146,13 @@ export async function POST(req: NextRequest) {
     }
 
     // Create a confirmed auth user so subsequent signInWithOtp sends a code (not a confirmation email)
-    const normalEmail = email.trim().toLowerCase()
     await supabaseAdmin().auth.admin.createUser({
       email: normalEmail,
       email_confirm: true,
     }).catch(err => console.error('Auth user creation failed (may already exist):', err))
 
     // Send welcome email (fire and forget — don't block the response)
-    sendWelcomeEmail(firstName, email.trim().toLowerCase()).catch(err =>
+    sendWelcomeEmail(firstName, normalEmail).catch(err =>
       console.error('Welcome email failed:', err)
     )
 

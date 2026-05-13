@@ -370,6 +370,63 @@ function StepLastBits({ data, onChange, onToggle }: {
 
 type NextRun = { title: string; date: string; meeting_point: string } | null
 
+/* ── Already registered screen ── */
+function StepAlreadyRegistered({ email }: { email: string }) {
+  const [code,    setCode]    = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error,   setError]   = useState<string | null>(null)
+
+  async function handleVerify(e: React.FormEvent) {
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+    const supabase = createClient()
+    const { error: otpError } = await supabase.auth.verifyOtp({ email, token: code.trim(), type: 'email' })
+    if (otpError) {
+      setError('Invalid or expired code — check your email and try again.')
+      setLoading(false)
+    } else {
+      window.location.href = '/profile'
+    }
+  }
+
+  return (
+    <div style={{ textAlign: 'center', padding: '16px 0' }}>
+      <div style={{ fontSize: 48, marginBottom: 20 }}>👋</div>
+      <h2 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 12 }}>
+        Looks like you&apos;re already with us!
+      </h2>
+      <p style={{ fontSize: 15, fontWeight: 300, color: '#aaa', lineHeight: 1.7, marginBottom: 28, maxWidth: 360, margin: '0 auto 28px' }}>
+        There&apos;s already an account registered to <strong style={{ color: '#ccc' }}>{email}</strong>.
+        We&apos;ve sent a sign-in code to that address &mdash; enter it below to go straight to your profile.
+      </p>
+      <div style={{ background: '#0a0a0a', border: '1px solid #1e1e1e', borderRadius: 12, padding: '20px 24px', textAlign: 'left' }}>
+        <form onSubmit={handleVerify} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <input
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            maxLength={8}
+            required
+            value={code}
+            onChange={e => setCode(e.target.value.replace(/\D/g, ''))}
+            placeholder="12345678"
+            style={{ width: '100%', background: '#111', border: '1px solid #222', borderRadius: 8, padding: '10px 14px', fontSize: 24, color: '#fff', fontFamily: 'Inter, sans-serif', outline: 'none', letterSpacing: '0.2em', textAlign: 'center', boxSizing: 'border-box' }}
+          />
+          {error && <p style={{ fontSize: 13, color: '#e05252' }}>⚠️ {error}</p>}
+          <button
+            type="submit"
+            disabled={loading || code.length < 6}
+            style={{ background: loading || code.length < 6 ? '#1a1a1a' : '#f5a623', color: loading || code.length < 6 ? '#333' : '#0a0a0a', fontSize: 14, fontWeight: 700, padding: '12px 24px', borderRadius: 8, border: 'none', cursor: loading || code.length < 6 ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif' }}
+          >
+            {loading ? 'Verifying…' : 'Go to my profile →'}
+          </button>
+        </form>
+      </div>
+    </div>
+  )
+}
+
 /* ── Step 4: Welcome ── */
 function StepWelcome({ name, email, nextRun, onReset }: { name: string; email: string; nextRun: NextRun; onReset: () => void }) {
   const [code,    setCode]    = useState('')
@@ -481,12 +538,13 @@ function isStepValid(step: number, data: FormData): boolean {
 
 /* ── PAGE ── */
 export default function JoinPage() {
-  const [step,       setStep]       = useState(0)
-  const [done,       setDone]       = useState(false)
-  const [data,       setData]       = useState<FormData>(EMPTY_FORM)
-  const [submitting, setSubmitting] = useState(false)
-  const [submitError, setSubmitError] = useState<string | null>(null)
-  const [nextRun,    setNextRun]    = useState<NextRun>(null)
+  const [step,              setStep]              = useState(0)
+  const [done,              setDone]              = useState(false)
+  const [alreadyRegistered, setAlreadyRegistered] = useState(false)
+  const [data,              setData]              = useState<FormData>(EMPTY_FORM)
+  const [submitting,        setSubmitting]        = useState(false)
+  const [submitError,       setSubmitError]       = useState<string | null>(null)
+  const [nextRun,           setNextRun]           = useState<NextRun>(null)
 
   const update = (k: keyof FormData, v: string) => setData(d => ({ ...d, [k]: v }))
   const toggle = (k: keyof FormData, v: boolean) => setData(d => ({ ...d, [k]: v }))
@@ -506,6 +564,10 @@ export default function JoinPage() {
         body: JSON.stringify(data),
       })
       const json = await res.json()
+      if (json.alreadyRegistered) {
+        setAlreadyRegistered(true)
+        return
+      }
       if (!res.ok) throw new Error(json.error || 'Something went wrong')
       // Fetch next upcoming run + auto-send sign-in code in parallel
       const supabase = createClient()
@@ -534,7 +596,7 @@ export default function JoinPage() {
     }
   }
 
-  const handleReset = () => { setData(EMPTY_FORM); setStep(0); setDone(false); setSubmitError(null) }
+  const handleReset = () => { setData(EMPTY_FORM); setStep(0); setDone(false); setAlreadyRegistered(false); setSubmitError(null) }
 
   const valid = isStepValid(step, data)
 
@@ -562,7 +624,9 @@ export default function JoinPage() {
 
           {/* Form card */}
           <div style={{ background: '#111', border: '1px solid #1a1a1a', borderRadius: 16, padding: 'var(--join-card-pad)', boxShadow: '0 24px 48px rgba(0,0,0,0.4)' }}>
-            {done ? (
+            {alreadyRegistered ? (
+              <StepAlreadyRegistered email={data.email.trim().toLowerCase()} />
+            ) : done ? (
               <StepWelcome name={data.firstName} email={data.email.trim().toLowerCase()} nextRun={nextRun} onReset={handleReset} />
             ) : (
               <>
