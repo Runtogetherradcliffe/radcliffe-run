@@ -464,3 +464,65 @@ CREATE POLICY "Anon can read published roundup photos"
 CREATE POLICY "Authenticated full access to roundup photos"
   ON public.roundup_photos FOR ALL TO authenticated
   USING (true) WITH CHECK (true);
+
+
+-- ── DATA API GRANTS ───────────────────────────────────────────────
+-- From May 30 2026, new Supabase projects no longer auto-grant public schema
+-- tables to the Data API roles. From October 30 2026, this applies to ALL
+-- projects (new tables only — existing tables keep their current grants).
+-- These explicit GRANTs are required for supabase-js / PostgREST / GraphQL.
+-- RLS policies above control what each role can actually read/write.
+-- service_role bypasses RLS but still needs table-level GRANT to use REST API.
+
+GRANT INSERT                        ON public.members              TO anon;
+GRANT ALL                           ON public.members              TO authenticated;
+GRANT ALL                           ON public.members              TO service_role;
+
+GRANT SELECT                        ON public.runs                 TO anon;
+GRANT ALL                           ON public.runs                 TO authenticated;
+GRANT ALL                           ON public.runs                 TO service_role;
+
+GRANT SELECT                        ON public.site_settings        TO anon;
+GRANT ALL                           ON public.site_settings        TO authenticated;
+GRANT ALL                           ON public.site_settings        TO service_role;
+
+GRANT ALL                           ON public.scheduled_emails     TO authenticated;
+GRANT ALL                           ON public.scheduled_emails     TO service_role;
+
+GRANT ALL                           ON public.email_send_log       TO authenticated;
+GRANT ALL                           ON public.email_send_log       TO service_role;
+
+GRANT ALL                           ON public.email_snippets       TO authenticated;
+GRANT ALL                           ON public.email_snippets       TO service_role;
+
+GRANT SELECT                        ON public.route_descriptions   TO anon;
+GRANT ALL                           ON public.route_descriptions   TO authenticated;
+GRANT ALL                           ON public.route_descriptions   TO service_role;
+
+GRANT SELECT                        ON public.posts                TO anon;
+GRANT ALL                           ON public.posts                TO authenticated;
+GRANT ALL                           ON public.posts                TO service_role;
+
+GRANT INSERT, DELETE                ON public.push_subscriptions   TO anon;
+GRANT ALL                           ON public.push_subscriptions   TO authenticated;
+GRANT ALL                           ON public.push_subscriptions   TO service_role;
+
+GRANT SELECT                        ON public.roundup_posts        TO anon;
+GRANT ALL                           ON public.roundup_posts        TO authenticated;
+GRANT ALL                           ON public.roundup_posts        TO service_role;
+
+GRANT SELECT                        ON public.parkrun_results      TO anon;
+GRANT ALL                           ON public.parkrun_results      TO authenticated;
+GRANT ALL                           ON public.parkrun_results      TO service_role;
+
+GRANT SELECT                        ON public.race_results         TO anon;
+GRANT ALL                           ON public.race_results         TO authenticated;
+GRANT ALL                           ON public.race_results         TO service_role;
+
+GRANT SELECT                        ON public.social_run_results   TO anon;
+GRANT ALL                           ON public.social_run_results   TO authenticated;
+GRANT ALL                           ON public.social_run_results   TO service_role;
+
+GRANT SELECT                        ON public.roundup_photos       TO anon;
+GRANT ALL                           ON public.roundup_photos       TO authenticated;
+GRANT ALL                           ON public.roundup_photos       TO service_role;
