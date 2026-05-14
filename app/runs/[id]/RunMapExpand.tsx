@@ -3,7 +3,17 @@ import { useState, useEffect, useRef, ReactNode } from 'react'
 
 const MAP_HEIGHT = 300
 
-/* ── Fullscreen expand icon ── */
+/* -- Inject pulse keyframe once into the document */
+function ensurePulseStyle() {
+  if (typeof document === 'undefined') return
+  if (document.getElementById('rtr-pulse-kf')) return
+  const s = document.createElement('style')
+  s.id = 'rtr-pulse-kf'
+  s.textContent = '@keyframes rtr-pulse { 0%{transform:scale(1);opacity:.5} 100%{transform:scale(2.8);opacity:0} }'
+  document.head.appendChild(s)
+}
+
+/* -- Fullscreen expand icon */
 function ExpandIcon({ fullscreen }: { fullscreen: boolean }) {
   return fullscreen ? (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
@@ -16,7 +26,26 @@ function ExpandIcon({ fullscreen }: { fullscreen: boolean }) {
   )
 }
 
-/* ── Bearing (degrees, 0 = north) ── */
+/* -- GPS locate icon */
+function LocateIcon({ active }: { active: boolean }) {
+  return active ? (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+      <circle cx="8" cy="8" r="3"/>
+      <path fillRule="evenodd" d="M8 0a.5.5 0 0 1 .5.5V2a6 6 0 0 1 5.5 5.5h1.5a.5.5 0 0 1 0 1H14A6 6 0 0 1 8.5 14v1.5a.5.5 0 0 1-1 0V14A6 6 0 0 1 2 8.5H.5a.5.5 0 0 1 0-1H2A6 6 0 0 1 7.5 2V.5A.5.5 0 0 1 8 0zm0 3a5 5 0 1 0 0 10A5 5 0 0 0 8 3z"/>
+    </svg>
+  ) : (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.2">
+      <circle cx="8" cy="8" r="2.5"/>
+      <circle cx="8" cy="8" r="5"/>
+      <line x1="8" y1="0.5" x2="8" y2="2.5"/>
+      <line x1="8" y1="13.5" x2="8" y2="15.5"/>
+      <line x1="0.5" y1="8" x2="2.5" y2="8"/>
+      <line x1="13.5" y1="8" x2="15.5" y2="8"/>
+    </svg>
+  )
+}
+
+/* -- Bearing (degrees, 0 = north) */
 function bearing(a: [number, number], b: [number, number]): number {
   const lat1 = a[0] * Math.PI / 180, lat2 = b[0] * Math.PI / 180
   const dLon = (b[1] - a[1]) * Math.PI / 180
@@ -25,22 +54,35 @@ function bearing(a: [number, number], b: [number, number]): number {
   return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360
 }
 
-/* ── Haversine distance (metres) ── */
+/* -- Haversine distance (metres) */
 function haversine(a: [number, number], b: [number, number]): number {
   const R = 6371000
-  const φ1 = a[0] * Math.PI / 180, φ2 = b[0] * Math.PI / 180
-  const dφ = (b[0] - a[0]) * Math.PI / 180, dλ = (b[1] - a[1]) * Math.PI / 180
-  const s = Math.sin(dφ / 2) ** 2 + Math.cos(φ1) * Math.cos(φ2) * Math.sin(dλ / 2) ** 2
+  const ph1 = a[0] * Math.PI / 180, ph2 = b[0] * Math.PI / 180
+  const dph = (b[0] - a[0]) * Math.PI / 180, dl = (b[1] - a[1]) * Math.PI / 180
+  const s = Math.sin(dph / 2) ** 2 + Math.cos(ph1) * Math.cos(ph2) * Math.sin(dl / 2) ** 2
   return R * 2 * Math.atan2(Math.sqrt(s), Math.sqrt(1 - s))
 }
 
-/* ── Arrow marker ── */
+/* -- Arrow marker */
 function arrowIcon(L: any, deg: number, color: string) {
   return L.divIcon({
     className: '',
     html: `<div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:10px solid ${color};transform:rotate(${deg}deg);transform-origin:center center;filter:drop-shadow(0 0 2px rgba(0,0,0,0.8))"></div>`,
     iconSize: [10, 10],
     iconAnchor: [5, 5],
+  })
+}
+
+/* -- Pulsing location dot marker */
+function locationDotIcon(L: any) {
+  return L.divIcon({
+    className: '',
+    html: `<div style="position:relative;width:20px;height:20px">
+      <div style="position:absolute;inset:0;background:rgba(74,158,255,0.45);border-radius:50%;animation:rtr-pulse 1.6s ease-out infinite"></div>
+      <div style="position:absolute;inset:4px;background:#4a9eff;border-radius:50%;border:2px solid #fff;box-shadow:0 0 6px rgba(0,0,0,0.6)"></div>
+    </div>`,
+    iconSize: [20, 20],
+    iconAnchor: [10, 10],
   })
 }
 
@@ -56,17 +98,26 @@ async function loadGPXCoords(file: string): Promise<[number, number][]> {
 }
 
 export default function RunMapExpand({ file, accentColor = '#f5a623', rightButton }: { file: string; accentColor?: string; rightButton?: ReactNode }) {
-  const [open, setOpen]           = useState(false)
+  const [open, setOpen]             = useState(false)
   const [fullscreen, setFullscreen] = useState(false)
-  const [status, setStatus]       = useState<'idle' | 'loading' | 'ready' | 'error'>('idle')
-  const mapRef    = useRef<HTMLDivElement>(null)
-  const mapObjRef = useRef<any>(null)
+  const [status, setStatus]         = useState<'idle' | 'loading' | 'ready' | 'error'>('idle')
+  const [locating, setLocating]     = useState(false)
+
+  const mapRef           = useRef<HTMLDivElement>(null)
+  const mapObjRef        = useRef<any>(null)
+  const leafletRef       = useRef<any>(null)      // Leaflet instance after load
+  const watchIdRef       = useRef<number | null>(null)
+  const locationLayerRef = useRef<any>(null)      // pulsing dot + accuracy circle
+  const firstFixRef      = useRef(true)           // pan on first GPS fix always
+  const fullscreenRef    = useRef(fullscreen)     // stable ref for watchPosition callback
+
+  // Keep fullscreenRef in sync
+  useEffect(() => { fullscreenRef.current = fullscreen }, [fullscreen])
 
   // Init (or invalidate) when toggled open
   useEffect(() => {
     if (!open) return
     if (mapObjRef.current) {
-      // Already initialised — fix size after reveal animation
       setTimeout(() => mapObjRef.current?.invalidateSize(), 60)
       return
     }
@@ -74,22 +125,23 @@ export default function RunMapExpand({ file, accentColor = '#f5a623', rightButto
     let cancelled = false
     setStatus('loading')
 
-    // Small delay so the container has rendered at full height before Leaflet measures it
     const timer = setTimeout(async () => {
       if (cancelled || !mapRef.current) return
       try {
+        ensurePulseStyle()
         const [L] = await Promise.all([
           import('leaflet'),
           import('leaflet/dist/leaflet.css' as any),
         ])
         if (cancelled || !mapRef.current || mapObjRef.current) return
 
-        // Clear any stale Leaflet state (e.g. from a previous page visit)
         if ((mapRef.current as any)._leaflet_id) {
           delete (mapRef.current as any)._leaflet_id
         }
 
         const Lm = L.default || L
+        leafletRef.current = Lm
+
         const map = Lm.map(mapRef.current, { center: [53.5609, -2.3265] as [number, number], zoom: 13 })
         mapObjRef.current = map
 
@@ -132,7 +184,7 @@ export default function RunMapExpand({ file, accentColor = '#f5a623', rightButto
     return () => { cancelled = true; clearTimeout(timer) }
   }, [open, file, accentColor])
 
-  // Invalidate map size when fullscreen toggles (after CSS transition)
+  // Invalidate map size when fullscreen toggles
   useEffect(() => {
     const t = setTimeout(() => mapObjRef.current?.invalidateSize(), 80)
     return () => clearTimeout(t)
@@ -145,18 +197,79 @@ export default function RunMapExpand({ file, accentColor = '#f5a623', rightButto
     return () => window.removeEventListener('keydown', onKey)
   }, [])
 
-  // Destroy map on component unmount
+  // Destroy map + stop tracking on unmount
   useEffect(() => {
     return () => {
+      stopLocate()
       mapObjRef.current?.remove()
       mapObjRef.current = null
       if (mapRef.current) delete (mapRef.current as any)._leaflet_id
     }
   }, [])
 
+  /* -- Geolocation */
+  function startLocate() {
+    if (!navigator.geolocation || !leafletRef.current || !mapObjRef.current) return
+    const Lm = leafletRef.current
+    firstFixRef.current = true
+
+    watchIdRef.current = navigator.geolocation.watchPosition(
+      (pos) => {
+        const { latitude, longitude, accuracy } = pos.coords
+        const latlng: [number, number] = [latitude, longitude]
+
+        if (locationLayerRef.current) locationLayerRef.current.remove()
+
+        const dot = Lm.marker(latlng, {
+          icon: locationDotIcon(Lm),
+          interactive: false,
+          zIndexOffset: 1000,
+        })
+        const circle = Lm.circle(latlng, {
+          radius: accuracy,
+          color: '#4a9eff',
+          fillColor: '#4a9eff',
+          fillOpacity: 0.08,
+          weight: 1,
+          opacity: 0.25,
+        })
+        locationLayerRef.current = Lm.layerGroup([circle, dot]).addTo(mapObjRef.current)
+
+        // Pan on first fix always; subsequent fixes follow only in fullscreen
+        if (firstFixRef.current || fullscreenRef.current) {
+          mapObjRef.current?.panTo(latlng)
+          firstFixRef.current = false
+        }
+      },
+      () => {
+        // Permission denied or unavailable - stop silently
+        stopLocate()
+      },
+      { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
+    )
+    setLocating(true)
+  }
+
+  function stopLocate() {
+    if (watchIdRef.current !== null) {
+      navigator.geolocation.clearWatch(watchIdRef.current)
+      watchIdRef.current = null
+    }
+    if (locationLayerRef.current) {
+      locationLayerRef.current.remove()
+      locationLayerRef.current = null
+    }
+    setLocating(false)
+  }
+
+  function toggleLocate() {
+    if (locating) stopLocate()
+    else startLocate()
+  }
+
   return (
     <div>
-      {/* Toggle + optional right-slot (e.g. Download GPX) on one row */}
+      {/* Toggle + optional right-slot on one row */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
         <button
           onClick={() => setOpen(o => !o)}
@@ -172,7 +285,7 @@ export default function RunMapExpand({ file, accentColor = '#f5a623', rightButto
         {rightButton}
       </div>
 
-      {/* Map wrapper — inline when open, fixed fullscreen overlay when expanded */}
+      {/* Map wrapper */}
       <div style={fullscreen ? {
         position: 'fixed', inset: 0, zIndex: 9999,
         background: '#0a0a0a',
@@ -184,7 +297,7 @@ export default function RunMapExpand({ file, accentColor = '#f5a623', rightButto
         transition: 'height 0.25s ease, margin-top 0.25s ease',
         position: 'relative',
       }}>
-        {/* Single map div — ref never changes so Leaflet stays attached */}
+        {/* Single map div - ref never changes so Leaflet stays attached */}
         <div
           ref={mapRef}
           style={{
@@ -196,7 +309,7 @@ export default function RunMapExpand({ file, accentColor = '#f5a623', rightButto
 
         {status === 'loading' && (
           <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#111', borderRadius: fullscreen ? 0 : 10 }}>
-            <p style={{ fontSize: 13, color: '#555' }}>Loading map…</p>
+            <p style={{ fontSize: 13, color: '#555' }}>Loading map...</p>
           </div>
         )}
         {status === 'error' && (
@@ -205,29 +318,54 @@ export default function RunMapExpand({ file, accentColor = '#f5a623', rightButto
           </div>
         )}
 
-        {/* Expand / collapse button — shown when map is visible */}
         {status === 'ready' && (
-          <button
-            onClick={() => setFullscreen(f => !f)}
-            aria-label={fullscreen ? 'Exit fullscreen' : 'Expand map'}
-            style={{
-              position: 'absolute',
-              bottom: fullscreen ? 24 : 10,
-              right: fullscreen ? 16 : 10,
-              zIndex: 1000,
-              background: 'rgba(17,17,17,0.88)',
-              border: '1px solid #333',
-              borderRadius: 8,
-              padding: fullscreen ? '10px 14px' : '7px 8px',
-              cursor: 'pointer',
-              color: fullscreen ? '#fff' : '#aaa',
-              display: 'flex', alignItems: 'center', gap: fullscreen ? 8 : 0,
-              fontSize: 13, fontWeight: 600, fontFamily: 'Inter, sans-serif',
-            }}
-          >
-            <ExpandIcon fullscreen={fullscreen} />
-            {fullscreen && ' Exit fullscreen'}
-          </button>
+          <>
+            {/* Locate me button - bottom left */}
+            <button
+              onClick={toggleLocate}
+              aria-label={locating ? 'Stop tracking location' : 'Show my location'}
+              style={{
+                position: 'absolute',
+                bottom: fullscreen ? 24 : 10,
+                left: fullscreen ? 16 : 10,
+                zIndex: 1000,
+                background: locating ? 'rgba(74,158,255,0.18)' : 'rgba(17,17,17,0.88)',
+                border: locating ? '1px solid #4a9eff' : '1px solid #333',
+                borderRadius: 8,
+                padding: fullscreen ? '10px 14px' : '7px 8px',
+                cursor: 'pointer',
+                color: locating ? '#4a9eff' : '#aaa',
+                display: 'flex', alignItems: 'center', gap: fullscreen ? 8 : 0,
+                fontSize: 13, fontWeight: 600, fontFamily: 'Inter, sans-serif',
+              }}
+            >
+              <LocateIcon active={locating} />
+              {fullscreen && (locating ? ' Tracking location' : ' Show my location')}
+            </button>
+
+            {/* Expand / collapse button - bottom right */}
+            <button
+              onClick={() => setFullscreen(f => !f)}
+              aria-label={fullscreen ? 'Exit fullscreen' : 'Expand map'}
+              style={{
+                position: 'absolute',
+                bottom: fullscreen ? 24 : 10,
+                right: fullscreen ? 16 : 10,
+                zIndex: 1000,
+                background: 'rgba(17,17,17,0.88)',
+                border: '1px solid #333',
+                borderRadius: 8,
+                padding: fullscreen ? '10px 14px' : '7px 8px',
+                cursor: 'pointer',
+                color: fullscreen ? '#fff' : '#aaa',
+                display: 'flex', alignItems: 'center', gap: fullscreen ? 8 : 0,
+                fontSize: 13, fontWeight: 600, fontFamily: 'Inter, sans-serif',
+              }}
+            >
+              <ExpandIcon fullscreen={fullscreen} />
+              {fullscreen && ' Exit fullscreen'}
+            </button>
+          </>
         )}
       </div>
     </div>
