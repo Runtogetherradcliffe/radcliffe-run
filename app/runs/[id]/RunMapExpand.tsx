@@ -3,6 +3,19 @@ import { useState, useEffect, useRef, ReactNode } from 'react'
 
 const MAP_HEIGHT = 300
 
+/* ── Fullscreen expand icon ── */
+function ExpandIcon({ fullscreen }: { fullscreen: boolean }) {
+  return fullscreen ? (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+      <path d="M5.5 1H2a1 1 0 0 0-1 1v3.5h1.5V3h2V1.5L5.5 1zM11 1.5V3h2v2.5H14.5V2a1 1 0 0 0-1-1H11zM1 11v2.5a1 1 0 0 0 1 1h3.5V13H3v-2H1zM13 13h-2v1.5H14.5V11H13v2z"/>
+    </svg>
+  ) : (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+      <path d="M1.5 1H5V2.5H3v2H1.5V1zM11 1h3.5v3.5H13V2.5h-2V1zM1.5 11H3v2h2v1.5H1.5V11zM13 13H11v1.5h3.5V11H13v2z"/>
+    </svg>
+  )
+}
+
 /* ── Bearing (degrees, 0 = north) ── */
 function bearing(a: [number, number], b: [number, number]): number {
   const lat1 = a[0] * Math.PI / 180, lat2 = b[0] * Math.PI / 180
@@ -43,8 +56,9 @@ async function loadGPXCoords(file: string): Promise<[number, number][]> {
 }
 
 export default function RunMapExpand({ file, accentColor = '#f5a623', rightButton }: { file: string; accentColor?: string; rightButton?: ReactNode }) {
-  const [open, setOpen]     = useState(false)
-  const [status, setStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle')
+  const [open, setOpen]           = useState(false)
+  const [fullscreen, setFullscreen] = useState(false)
+  const [status, setStatus]       = useState<'idle' | 'loading' | 'ready' | 'error'>('idle')
   const mapRef    = useRef<HTMLDivElement>(null)
   const mapObjRef = useRef<any>(null)
 
@@ -118,6 +132,19 @@ export default function RunMapExpand({ file, accentColor = '#f5a623', rightButto
     return () => { cancelled = true; clearTimeout(timer) }
   }, [open, file, accentColor])
 
+  // Invalidate map size when fullscreen toggles (after CSS transition)
+  useEffect(() => {
+    const t = setTimeout(() => mapObjRef.current?.invalidateSize(), 80)
+    return () => clearTimeout(t)
+  }, [fullscreen])
+
+  // Close fullscreen on Escape
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setFullscreen(false) }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+
   // Destroy map on component unmount
   useEffect(() => {
     return () => {
@@ -145,8 +172,11 @@ export default function RunMapExpand({ file, accentColor = '#f5a623', rightButto
         {rightButton}
       </div>
 
-      {/* Outer wrapper clips to 0 when closed; inner div always full height so Leaflet gets real dimensions */}
-      <div style={{
+      {/* Map wrapper — inline when open, fixed fullscreen overlay when expanded */}
+      <div style={fullscreen ? {
+        position: 'fixed', inset: 0, zIndex: 9999,
+        background: '#0a0a0a',
+      } : {
         height: open ? MAP_HEIGHT : 0,
         overflow: 'hidden',
         borderRadius: 10,
@@ -154,16 +184,50 @@ export default function RunMapExpand({ file, accentColor = '#f5a623', rightButto
         transition: 'height 0.25s ease, margin-top 0.25s ease',
         position: 'relative',
       }}>
-        <div ref={mapRef} style={{ width: '100%', height: MAP_HEIGHT, borderRadius: 10 }} />
+        {/* Single map div — ref never changes so Leaflet stays attached */}
+        <div
+          ref={mapRef}
+          style={{
+            width: '100%',
+            height: fullscreen ? '100dvh' : MAP_HEIGHT,
+            borderRadius: fullscreen ? 0 : 10,
+          }}
+        />
+
         {status === 'loading' && (
-          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#111', borderRadius: 10 }}>
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#111', borderRadius: fullscreen ? 0 : 10 }}>
             <p style={{ fontSize: 13, color: '#555' }}>Loading map…</p>
           </div>
         )}
         {status === 'error' && (
-          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#111', borderRadius: 10 }}>
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#111', borderRadius: fullscreen ? 0 : 10 }}>
             <p style={{ fontSize: 13, color: '#555' }}>Map unavailable</p>
           </div>
+        )}
+
+        {/* Expand / collapse button — shown when map is visible */}
+        {status === 'ready' && (
+          <button
+            onClick={() => setFullscreen(f => !f)}
+            aria-label={fullscreen ? 'Exit fullscreen' : 'Expand map'}
+            style={{
+              position: 'absolute',
+              bottom: fullscreen ? 24 : 10,
+              right: fullscreen ? 16 : 10,
+              zIndex: 1000,
+              background: 'rgba(17,17,17,0.88)',
+              border: '1px solid #333',
+              borderRadius: 8,
+              padding: fullscreen ? '10px 14px' : '7px 8px',
+              cursor: 'pointer',
+              color: fullscreen ? '#fff' : '#aaa',
+              display: 'flex', alignItems: 'center', gap: fullscreen ? 8 : 0,
+              fontSize: 13, fontWeight: 600, fontFamily: 'Inter, sans-serif',
+            }}
+          >
+            <ExpandIcon fullscreen={fullscreen} />
+            {fullscreen && ' Exit fullscreen'}
+          </button>
         )}
       </div>
     </div>
