@@ -108,6 +108,8 @@ export default function RunMapExpand({ file, accentColor = '#f5a623', rightButto
   const leafletRef       = useRef<any>(null)      // Leaflet instance after load
   const watchIdRef       = useRef<number | null>(null)
   const locationLayerRef = useRef<any>(null)      // pulsing dot + accuracy circle
+  const breadcrumbRef    = useRef<any>(null)      // purple dashed trail polyline
+  const trailCoordsRef   = useRef<[number, number][]>([])  // recorded positions
   const firstFixRef      = useRef(true)           // pan on first GPS fix always
   const fullscreenRef    = useRef(fullscreen)     // stable ref for watchPosition callback
 
@@ -218,8 +220,24 @@ export default function RunMapExpand({ file, accentColor = '#f5a623', rightButto
         const { latitude, longitude, accuracy } = pos.coords
         const latlng: [number, number] = [latitude, longitude]
 
-        if (locationLayerRef.current) locationLayerRef.current.remove()
+        // Accumulate breadcrumb trail
+        trailCoordsRef.current.push(latlng)
 
+        // Update or create breadcrumb polyline
+        if (breadcrumbRef.current) {
+          breadcrumbRef.current.setLatLngs(trailCoordsRef.current)
+        } else {
+          breadcrumbRef.current = Lm.polyline(trailCoordsRef.current, {
+            color: '#da82da',
+            weight: 3,
+            opacity: 0.85,
+            dashArray: '6 8',
+            lineCap: 'round',
+          }).addTo(mapObjRef.current)
+        }
+
+        // Update location dot + accuracy circle
+        if (locationLayerRef.current) locationLayerRef.current.remove()
         const dot = Lm.marker(latlng, {
           icon: locationDotIcon(Lm),
           interactive: false,
@@ -245,7 +263,7 @@ export default function RunMapExpand({ file, accentColor = '#f5a623', rightButto
         // Permission denied or unavailable - stop silently
         stopLocate()
       },
-      { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
+      { enableHighAccuracy: true, maximumAge: 0, timeout: 15000 }
     )
     setLocating(true)
   }
@@ -259,6 +277,11 @@ export default function RunMapExpand({ file, accentColor = '#f5a623', rightButto
       locationLayerRef.current.remove()
       locationLayerRef.current = null
     }
+    if (breadcrumbRef.current) {
+      breadcrumbRef.current.remove()
+      breadcrumbRef.current = null
+    }
+    trailCoordsRef.current = []
     setLocating(false)
   }
 
