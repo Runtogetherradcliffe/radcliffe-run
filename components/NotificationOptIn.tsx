@@ -68,7 +68,7 @@ export default function NotificationOptIn() {
     <div style={{
       position: 'fixed', bottom: 20, left: '50%', transform: 'translateX(-50%)',
       zIndex: 500, width: 'calc(100% - 40px)', maxWidth: 440,
-      background: '#111', border: '1px solid #2a2a2a',
+      background: 'var(--card)', border: '1px solid var(--border-2)',
       borderRadius: 14, padding: '16px 20px',
       display: 'flex', alignItems: 'center', gap: 14,
       boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
@@ -77,7 +77,7 @@ export default function NotificationOptIn() {
       {/* Icon */}
       <div style={{
         width: 40, height: 40, borderRadius: 10,
-        background: '#1a1500', border: '1px solid #2a2000',
+        background: 'var(--card)', border: '1px solid var(--border)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         flexShrink: 0, fontSize: 18,
       }}>
@@ -86,10 +86,10 @@ export default function NotificationOptIn() {
 
       {/* Text */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: 13, fontWeight: 700, color: '#fff', marginBottom: 2 }}>
+        <p style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--white)', marginBottom: 2 }}>
           Run reminders
         </p>
-        <p style={{ fontSize: 12, color: '#666', lineHeight: 1.4 }}>
+        <p style={{ fontSize: 12, color: 'var(--muted)', lineHeight: 1.4 }}>
           Get notified about Thursday runs and group updates.
         </p>
       </div>
@@ -99,8 +99,8 @@ export default function NotificationOptIn() {
         <button
           onClick={dismiss}
           style={{
-            padding: '7px 12px', borderRadius: 7, border: '1px solid #222',
-            background: 'transparent', color: '#555', fontSize: 12,
+            padding: '7px 12px', borderRadius: 7, border: '1px solid var(--border)',
+            background: 'transparent', color: 'var(--faint)', fontSize: 12,
             fontFamily: 'inherit', cursor: 'pointer', fontWeight: 500,
           }}
         >

@@ -29,7 +29,7 @@ function SectionHeading({ emoji, title, count }: { emoji: string; title: string;
     <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
       <span style={{ fontSize: 22 }}>{emoji}</span>
       <h2 style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em' }}>{title}</h2>
-      <span style={{ fontSize: 12, fontWeight: 600, color: '#555', background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 20, padding: '2px 10px', marginLeft: 2 }}>
+      <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--faint)', background: 'var(--card-hi)', border: '1px solid var(--border-2)', borderRadius: 20, padding: '2px 10px', marginLeft: 2 }}>
         {count}
       </span>
     </div>
@@ -39,12 +39,12 @@ function SectionHeading({ emoji, title, count }: { emoji: string; title: string;
 /* ── Parkrun venue card ── */
 function ParkrunCard({ result }: { result: ParkrunResult }) {
   return (
-    <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 12, padding: '18px 20px', marginBottom: 12 }}>
+    <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, padding: '18px 20px', marginBottom: 12 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
         <div>
-          <p style={{ fontSize: 15, fontWeight: 700, marginBottom: 2 }}>{result.venue} parkrun</p>
+          <p style={{ fontSize: 'var(--text-md)', fontWeight: 700, marginBottom: 2 }}>{result.venue} parkrun</p>
           {result.location && (
-            <p style={{ fontSize: 12, color: '#555' }}>📍 {result.location}</p>
+            <p style={{ fontSize: 12, color: 'var(--faint)' }}>📍 {result.location}</p>
           )}
         </div>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
@@ -65,7 +65,7 @@ function ParkrunCard({ result }: { result: ParkrunResult }) {
           )}
         </div>
       </div>
-      <p style={{ fontSize: 14, color: '#aaa', lineHeight: 1.7 }}>{result.narrative}</p>
+      <p style={{ fontSize: 'var(--text-base)', color: 'var(--dim)', lineHeight: 1.7 }}>{result.narrative}</p>
     </div>
   )
 }
@@ -75,17 +75,17 @@ function RaceCard({ result }: { result: RaceResult }) {
   const d = new Date(result.date)
   const day = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })
   return (
-    <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 12, padding: '18px 20px', marginBottom: 12 }}>
+    <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, padding: '18px 20px', marginBottom: 12 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10, gap: 12 }}>
         <div style={{ flex: 1 }}>
-          <p style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>{result.name}</p>
+          <p style={{ fontSize: 'var(--text-md)', fontWeight: 700, marginBottom: 4 }}>{result.name}</p>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
             <TerrainBadge terrain={result.terrain} />
             <span style={{ fontSize: 12, color: '#f5a623', fontWeight: 600 }}>{result.distance}</span>
-            <span style={{ fontSize: 12, color: '#555' }}>·</span>
-            <span style={{ fontSize: 12, color: '#555' }}>{day}</span>
-            <span style={{ fontSize: 12, color: '#555' }}>·</span>
-            <span style={{ fontSize: 12, color: '#555' }}>📍 {result.location}</span>
+            <span style={{ fontSize: 12, color: 'var(--faint)' }}>·</span>
+            <span style={{ fontSize: 12, color: 'var(--faint)' }}>{day}</span>
+            <span style={{ fontSize: 12, color: 'var(--faint)' }}>·</span>
+            <span style={{ fontSize: 12, color: 'var(--faint)' }}>📍 {result.location}</span>
           </div>
         </div>
         {result.podium && (
@@ -94,7 +94,7 @@ function RaceCard({ result }: { result: RaceResult }) {
           </span>
         )}
       </div>
-      <p style={{ fontSize: 14, color: '#aaa', lineHeight: 1.7 }}>{result.narrative}</p>
+      <p style={{ fontSize: 'var(--text-base)', color: 'var(--dim)', lineHeight: 1.7 }}>{result.narrative}</p>
     </div>
   )
 }
@@ -105,13 +105,13 @@ function SocialCard({ result }: { result: SocialRun }) {
   const day = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })
   return (
     <div style={{ background: 'rgba(196,168,232,0.04)', border: '1px solid rgba(196,168,232,0.15)', borderRadius: 12, padding: '18px 20px', marginBottom: 12 }}>
-      <p style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>{result.name}</p>
+      <p style={{ fontSize: 'var(--text-md)', fontWeight: 700, marginBottom: 4 }}>{result.name}</p>
       <div style={{ display: 'flex', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
-        <span style={{ fontSize: 12, color: '#555' }}>{day}</span>
-        <span style={{ fontSize: 12, color: '#555' }}>·</span>
-        <span style={{ fontSize: 12, color: '#555' }}>📍 {result.location}</span>
+        <span style={{ fontSize: 12, color: 'var(--faint)' }}>{day}</span>
+        <span style={{ fontSize: 12, color: 'var(--faint)' }}>·</span>
+        <span style={{ fontSize: 12, color: 'var(--faint)' }}>📍 {result.location}</span>
       </div>
-      <p style={{ fontSize: 14, color: '#aaa', lineHeight: 1.7 }}>{result.narrative}</p>
+      <p style={{ fontSize: 'var(--text-base)', color: 'var(--dim)', lineHeight: 1.7 }}>{result.narrative}</p>
     </div>
   )
 }
@@ -129,7 +129,7 @@ function RoundupPost({ roundup, featured }: { roundup: Roundup; featured?: boole
     <article>
       {/* Intro */}
       {roundup.intro && (
-        <p style={{ fontSize: featured ? 16 : 15, color: '#888', lineHeight: 1.75, marginBottom: 40, maxWidth: 680, borderLeft: '3px solid #1e1e1e', paddingLeft: 16 }}>
+        <p style={{ fontSize: featured ? 16 : 15, color: 'var(--muted)', lineHeight: 1.75, marginBottom: 40, maxWidth: 680, borderLeft: '3px solid #1e1e1e', paddingLeft: 16 }}>
           {roundup.intro}
         </p>
       )}
@@ -157,13 +157,13 @@ function RoundupPost({ roundup, featured }: { roundup: Roundup; featured?: boole
 
           {satRaces.length > 0 && (
             <>
-              <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#555', marginBottom: 12 }}>Saturday</p>
+              <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--faint)', marginBottom: 12 }}>Saturday</p>
               {satRaces.map((r, i) => <RaceCard key={i} result={r} />)}
             </>
           )}
           {sunRaces.length > 0 && (
             <>
-              <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#555', marginBottom: 12, marginTop: satRaces.length ? 20 : 0 }}>Sunday</p>
+              <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--faint)', marginBottom: 12, marginTop: satRaces.length ? 20 : 0 }}>Sunday</p>
               {sunRaces.map((r, i) => <RaceCard key={i} result={r} />)}
             </>
           )}
@@ -196,8 +196,8 @@ function PhotoGrid({ photos }: { photos: RoundupPhoto[] }) {
             position: 'relative',
             borderRadius: 10,
             overflow: 'hidden',
-            background: '#111',
-            border: '1px solid #1e1e1e',
+            background: 'var(--card)',
+            border: '1px solid var(--border)',
           }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -213,12 +213,12 @@ function PhotoGrid({ photos }: { photos: RoundupPhoto[] }) {
                 padding: '24px 12px 10px',
               }}>
                 {photo.caption && (
-                  <p style={{ fontSize: 11, fontWeight: 500, color: '#ddd', lineHeight: 1.4, marginBottom: photo.credit ? 3 : 0 }}>
+                  <p style={{ fontSize: 'var(--text-xs)', fontWeight: 500, color: 'var(--dim)', lineHeight: 1.4, marginBottom: photo.credit ? 3 : 0 }}>
                     {photo.caption}
                   </p>
                 )}
                 {photo.credit && (
-                  <p style={{ fontSize: 10, color: '#888' }}>📸 {photo.credit}</p>
+                  <p style={{ fontSize: 10, color: 'var(--muted)' }}>📸 {photo.credit}</p>
                 )}
               </div>
             )}
@@ -234,8 +234,8 @@ function Archive({ roundups }: { roundups: Roundup[] }) {
   const archived = roundups.slice(1)
   if (!archived.length) return null
   return (
-    <div style={{ borderTop: '1px solid #1e1e1e', paddingTop: 40, marginTop: 48 }}>
-      <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#555', marginBottom: 20 }}>Previous roundups</p>
+    <div style={{ borderTop: '1px solid var(--border)', paddingTop: 40, marginTop: 48 }}>
+      <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--faint)', marginBottom: 20 }}>Previous roundups</p>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         {archived.map(r => {
           const totalResults = r.parkrun.length + r.races.length + (r.social?.length ?? 0)
@@ -246,18 +246,18 @@ function Archive({ roundups }: { roundups: Roundup[] }) {
               border: '1px solid transparent', background: 'transparent',
             }}>
               <div>
-                <p style={{ fontSize: 14, fontWeight: 600, color: '#ccc', marginBottom: 2 }}>
+                <p style={{ fontSize: 'var(--text-base)', fontWeight: 600, color: 'var(--dim)', marginBottom: 2 }}>
                   Weekend of {formatWeekend(r.weekendOf)}
                 </p>
                 {r.intro && (
-                  <p style={{ fontSize: 12, color: '#444', maxWidth: 480, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  <p style={{ fontSize: 12, color: 'var(--muted)', maxWidth: 480, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {r.intro}
                   </p>
                 )}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0, marginLeft: 16 }}>
-                <span style={{ fontSize: 12, color: '#555' }}>{totalResults} results</span>
-                <span style={{ color: '#333', fontSize: 16 }}>›</span>
+                <span style={{ fontSize: 12, color: 'var(--faint)' }}>{totalResults} results</span>
+                <span style={{ color: 'var(--muted)', fontSize: 16 }}>›</span>
               </div>
             </a>
           )
@@ -280,17 +280,17 @@ export default function RoundupPage() {
       <main style={{ maxWidth: 780, margin: '0 auto', padding: '48px 24px 80px' }}>
 
         {/* Page header */}
-        <div style={{ marginBottom: 48, paddingBottom: 32, borderBottom: '1px solid #1e1e1e' }}>
-          <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#f5a623', marginBottom: 10 }}>Weekend Roundup</p>
+        <div style={{ marginBottom: 48, paddingBottom: 32, borderBottom: '1px solid var(--border)' }}>
+          <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#f5a623', marginBottom: 10 }}>Weekend Roundup</p>
           <h1 style={{ fontSize: 32, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1.15, marginBottom: 12 }}>
             Weekend of {weekend}
           </h1>
           <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
-            <span style={{ fontSize: 13, color: '#555' }}>
+            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--faint)' }}>
               {latest.parkrun.length} parkruns · {latest.races.length} races{latest.social?.length ? ` · ${latest.social.length} social` : ''}{photoCount ? ` · ${photoCount} photos` : ''}
             </span>
-            <span style={{ fontSize: 13, color: '#333' }}>·</span>
-            <span style={{ fontSize: 13, color: '#555' }}>{totalResults} results total</span>
+            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)' }}>·</span>
+            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--faint)' }}>{totalResults} results total</span>
           </div>
         </div>
 

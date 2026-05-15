@@ -6,15 +6,15 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 const INPUT_STYLE = {
-  width: '100%', background: '#0a0a0a', border: '1px solid #222',
-  borderRadius: 8, padding: '10px 14px', fontSize: 14, color: '#fff',
+  width: '100%', background: 'var(--bg)', border: '1px solid var(--border)',
+  borderRadius: 8, padding: '10px 14px', fontSize: 'var(--text-base)', color: 'var(--white)',
   fontFamily: 'Inter, sans-serif', outline: 'none', boxSizing: 'border-box' as const,
 }
 
 const BTN_STYLE = (disabled: boolean) => ({
   background: disabled ? '#1a1a1a' : '#f5a623',
   color: disabled ? '#333' : '#0a0a0a',
-  fontSize: 14, fontWeight: 700, padding: '12px 24px',
+  fontSize: 'var(--text-base)', fontWeight: 700, padding: '12px 24px',
   borderRadius: 8, border: 'none',
   cursor: disabled ? 'not-allowed' : 'pointer',
   fontFamily: 'Inter, sans-serif', transition: 'all 0.2s',
@@ -99,7 +99,7 @@ export default function SignInPage() {
 
   return (
     <div style={{
-      minHeight: '100vh', background: '#0a0a0a', display: 'flex',
+      minHeight: '100vh', background: 'var(--bg)', display: 'flex',
       alignItems: 'center', justifyContent: 'center', padding: 24,
       fontFamily: 'Inter, sans-serif',
     }}>
@@ -107,22 +107,22 @@ export default function SignInPage() {
 
         <Link href="/" style={{ textDecoration: 'none' }}>
           <p style={{ textAlign: 'center', fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 36 }}>
-            <span style={{ color: '#fff' }}>radcliffe.</span><span style={{ color: '#f5a623' }}>run</span>
+            <span style={{ color: 'var(--white)' }}>radcliffe.</span><span style={{ color: '#f5a623' }}>run</span>
           </p>
         </Link>
 
-        <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 16, padding: 36 }}>
+        <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 16, padding: 36 }}>
 
           {step === 'email' ? (
             <>
               <h1 style={{ fontSize: 20, fontWeight: 700, marginBottom: 6 }}>Sign in</h1>
-              <p style={{ fontSize: 14, color: '#888', marginBottom: 28, lineHeight: 1.6 }}>
+              <p style={{ fontSize: 'var(--text-base)', color: 'var(--muted)', marginBottom: 28, lineHeight: 1.6 }}>
                 Enter your registered email and we&apos;ll send you an 8-digit code. No password needed.
               </p>
 
               <form onSubmit={handleSendCode} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: '#888', marginBottom: 6 }}>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: 'var(--muted)', marginBottom: 6 }}>
                     Email address
                   </label>
                   <input
@@ -142,7 +142,7 @@ export default function SignInPage() {
                 </button>
               </form>
 
-              <p style={{ fontSize: 13, color: '#444', marginTop: 20, textAlign: 'center' }}>
+              <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)', marginTop: 20, textAlign: 'center' }}>
                 Not registered yet?{' '}
                 <Link href="/join" style={{ color: '#f5a623', textDecoration: 'none' }}>Join for free →</Link>
               </p>
@@ -150,14 +150,14 @@ export default function SignInPage() {
           ) : (
             <>
               <h1 style={{ fontSize: 20, fontWeight: 700, marginBottom: 6 }}>Enter your code</h1>
-              <p style={{ fontSize: 14, color: '#888', marginBottom: 28, lineHeight: 1.6 }}>
-                We&apos;ve sent an 8-digit code to <strong style={{ color: '#ccc' }}>{email}</strong>.
+              <p style={{ fontSize: 'var(--text-base)', color: 'var(--muted)', marginBottom: 28, lineHeight: 1.6 }}>
+                We&apos;ve sent an 8-digit code to <strong style={{ color: 'var(--dim)' }}>{email}</strong>.
                 Enter it below — check your spam if it doesn&apos;t arrive.
               </p>
 
               <form onSubmit={handleVerifyCode} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: '#888', marginBottom: 6 }}>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: 'var(--muted)', marginBottom: 6 }}>
                     6-digit code
                   </label>
                   <input
@@ -181,11 +181,11 @@ export default function SignInPage() {
                 </button>
               </form>
 
-              <p style={{ fontSize: 13, color: '#444', marginTop: 20, textAlign: 'center' }}>
+              <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)', marginTop: 20, textAlign: 'center' }}>
                 Wrong email?{' '}
                 <button
                   onClick={() => { setStep('email'); setCode(''); setError(null) }}
-                  style={{ background: 'none', border: 'none', color: '#f5a623', fontSize: 13, cursor: 'pointer', padding: 0, fontFamily: 'Inter, sans-serif' }}
+                  style={{ background: 'none', border: 'none', color: '#f5a623', fontSize: 'var(--text-sm)', cursor: 'pointer', padding: 0, fontFamily: 'Inter, sans-serif' }}
                 >
                   Go back
                 </button>
@@ -201,9 +201,9 @@ export default function SignInPage() {
 function ErrorBox({ error, showRegister }: { error: string; showRegister?: boolean }) {
   return (
     <div style={{ background: '#1a0a0a', border: '1px solid #3a1a1a', borderRadius: 8, padding: '10px 14px' }}>
-      <p style={{ fontSize: 13, color: '#e05252' }}>⚠️ {error}</p>
+      <p style={{ fontSize: 'var(--text-sm)', color: '#e05252' }}>⚠️ {error}</p>
       {showRegister && (
-        <p style={{ fontSize: 12, color: '#666', marginTop: 4 }}>
+        <p style={{ fontSize: 12, color: 'var(--muted)', marginTop: 4 }}>
           <Link href="/join" style={{ color: '#f5a623', textDecoration: 'none' }}>Register here →</Link>
         </p>
       )}

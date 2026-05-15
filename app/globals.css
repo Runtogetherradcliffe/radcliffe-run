@@ -30,6 +30,12 @@
   --radius-card: 12px;
   --radius-btn:  8px;
 
+  /* ── Text-size tokens (scaled up in large-font mode) ── */
+  --text-xs:   11px;
+  --text-sm:   13px;
+  --text-base: 14px;
+  --text-md:   15px;
+
   /* ── Responsive tokens (desktop defaults) ── */
   --stats-pad:        40px 32px;
   --stats-gap:        24px;
@@ -112,6 +118,63 @@ body {
 .leaflet-control-zoom a { background: #111 !important; color: #888 !important; border-color: #222 !important; }
 .leaflet-control-zoom a:hover { background: #1a1a1a !important; color: #fff !important; }
 .leaflet-control-attribution { background: rgba(10,10,10,.7) !important; color: #333 !important; font-size: 10px !important; }
+
+/* ── Light theme ── */
+html[data-theme="light"] {
+  --bg:        #f4f4f4;
+  --card:      #ffffff;
+  --card-hi:   #f0f0f0;
+  --border:    #e0e0e0;
+  --border-2:  #d0d0d0;
+  --orange:    #c47d0e;
+  --orange-lt: #e09010;
+  --orange-dk: #9a5f08;
+  --white:     #0a0a0a;
+  --dim:       #1a1a1a;
+  --muted:     #444444;
+  --faint:     #555555;
+  --purple:    #7c3db0;
+  --purple-bg: #f0e8f8;
+  --green:     #2e7d2e;
+  --green-bg:  #edf7ed;
+  --blue:      #2d6ca6;
+  --amber-col: #8a6010;
+}
+html[data-theme="light"] body {
+  background: var(--bg);
+  color: #1a1a1a;
+}
+html[data-theme="light"] .rtr-stats-bar {
+  background: #f5a623;
+}
+html[data-theme="light"] .roundup-archive-link:hover {
+  background: var(--card-hi) !important;
+  border-color: var(--border) !important;
+}
+
+/* Leaflet light-mode overrides */
+html[data-theme="light"] .leaflet-popup-content-wrapper {
+  background: #ffffff !important;
+  border: 1px solid #d0d0d0 !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12) !important;
+}
+html[data-theme="light"] .leaflet-popup-content { color: #333 !important; }
+html[data-theme="light"] .leaflet-popup-tip { background: #ffffff !important; }
+html[data-theme="light"] .leaflet-popup-close-button { color: #888 !important; }
+html[data-theme="light"] .leaflet-control-zoom a { background: #fff !important; color: #555 !important; border-color: #ccc !important; }
+html[data-theme="light"] .leaflet-control-zoom a:hover { background: #f0f0f0 !important; color: #111 !important; }
+html[data-theme="light"] .leaflet-control-attribution { background: rgba(244,244,244,0.85) !important; color: #888 !important; }
+
+/* ── Large font mode ── */
+html[data-fontsize="large"] {
+  --text-xs:   13px;
+  --text-sm:   15px;
+  --text-base: 16px;
+  --text-md:   17px;
+}
+html[data-fontsize="large"] body {
+  line-height: 1.8;
+}
 
 /* ── Roundup archive link hover ── */
 .roundup-archive-link { transition: background 0.15s, border-color 0.15s; }

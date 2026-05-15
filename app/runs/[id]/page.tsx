@@ -84,19 +84,19 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
         <section style={{ maxWidth: 680, margin: '0 auto', padding: '32px 24px 80px' }}>
 
           {/* Back */}
-          <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#555', textDecoration: 'none', marginBottom: 40 }}>
+          <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 'var(--text-sm)', color: 'var(--faint)', textDecoration: 'none', marginBottom: 40 }}>
             ← Upcoming runs
           </Link>
 
           {/* Header */}
           <div style={{ marginBottom: 32 }}>
             <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 6, marginBottom: 12 }}>
-              <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: accentColor }}>
+              <span style={{ fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: accentColor }}>
                 {isSocial ? 'Social run' : 'Thursday run'}
               </span>
-              <span style={{ fontSize: 11, color: '#333' }}>·</span>
-              <span style={{ fontSize: 11, color: '#777' }}>{fmtRunDate(run.date)}</span>
-              {!isSocial && <><span style={{ fontSize: 11, color: '#333' }}>·</span><span style={{ fontSize: 11, color: '#777' }}>7pm</span></>}
+              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)' }}>·</span>
+              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)' }}>{fmtRunDate(run.date)}</span>
+              {!isSocial && <><span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)' }}>·</span><span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)' }}>7pm</span></>}
             </div>
 
             <h1 style={{ fontSize: 'clamp(26px, 4vw, 40px)', fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: 16 }}>
@@ -114,11 +114,11 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
           </div>
 
           {/* Meeting point */}
-          <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 12, padding: '18px 20px', marginBottom: 20 }}>
-            <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#444', marginBottom: 10 }}>
+          <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, padding: '18px 20px', marginBottom: 20 }}>
+            <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 10 }}>
               Meeting point
             </p>
-            <p style={{ fontSize: 14, color: '#ccc', lineHeight: 1.5, marginBottom: run.meeting_map_url ? 14 : 0 }}>
+            <p style={{ fontSize: 'var(--text-base)', color: 'var(--dim)', lineHeight: 1.5, marginBottom: run.meeting_map_url ? 14 : 0 }}>
               📍 {(!run.on_tour && !isSocial)
                 ? <a href="https://maps.app.goo.gl/d1FUYuqmNVpsWUs99" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>Radcliffe Market</a>
                 : meetingPoint}
@@ -128,7 +128,7 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
                 href={run.meeting_map_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ fontSize: 13, fontWeight: 600, color: accentColor, textDecoration: 'none' }}
+                style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: accentColor, textDecoration: 'none' }}
               >
                 Open in maps →
               </a>
@@ -137,11 +137,11 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
 
           {/* Route description (DB override or static fallback) */}
           {routeDescription && route && (
-            <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 12, padding: '18px 20px', marginBottom: 20 }}>
-              <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#444', marginBottom: 10 }}>
+            <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, padding: '18px 20px', marginBottom: 20 }}>
+              <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 10 }}>
                 About this route
               </p>
-              <p style={{ fontSize: 14, color: '#bbb', lineHeight: 1.75 }}>{routeDescription}</p>
+              <p style={{ fontSize: 'var(--text-base)', color: 'var(--dim)', lineHeight: 1.75 }}>{routeDescription}</p>
               <div style={{ marginTop: 14 }}>
                 <RunMapExpand
                   file={route.file}
@@ -153,7 +153,7 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
                           href={(run.strava_url || route.strava)!}
                           target="_blank"
                           rel="noopener noreferrer"
-                          style={{ fontSize: 12, fontWeight: 600, color: '#fff', background: '#fc4c02', padding: '7px 14px', borderRadius: 6, textDecoration: 'none', whiteSpace: 'nowrap' }}
+                          style={{ fontSize: 12, fontWeight: 600, color: 'var(--white)', background: '#fc4c02', padding: '7px 14px', borderRadius: 6, textDecoration: 'none', whiteSpace: 'nowrap' }}
                         >
                           Strava
                         </a>
@@ -168,26 +168,26 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
 
           {/* Notes from DB (social runs / on-tour notes) */}
           {run.description && (
-            <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 12, padding: '18px 20px', marginBottom: 20 }}>
-              <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#444', marginBottom: 10 }}>
+            <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, padding: '18px 20px', marginBottom: 20 }}>
+              <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 10 }}>
                 Notes
               </p>
-              <p style={{ fontSize: 14, color: '#bbb', lineHeight: 1.75 }}>{run.description}</p>
+              <p style={{ fontSize: 'var(--text-base)', color: 'var(--dim)', lineHeight: 1.75 }}>{run.description}</p>
             </div>
           )}
 
           {/* Footer CTAs */}
-          <div style={{ marginTop: 40, paddingTop: 32, borderTop: '1px solid #1a1a1a', display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+          <div style={{ marginTop: 40, paddingTop: 32, borderTop: '1px solid var(--border)', display: 'flex', gap: 12, flexWrap: 'wrap' }}>
             <Link
               href="/"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 600, color: '#888', background: '#111', border: '1px solid #1e1e1e', padding: '10px 18px', borderRadius: 8, textDecoration: 'none' }}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--muted)', background: 'var(--card)', border: '1px solid var(--border)', padding: '10px 18px', borderRadius: 8, textDecoration: 'none' }}
             >
               ← All upcoming runs
             </Link>
             {run.route_slug && (
               <Link
                 href="/routes"
-                style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 600, color: '#888', background: '#111', border: '1px solid #1e1e1e', padding: '10px 18px', borderRadius: 8, textDecoration: 'none' }}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--muted)', background: 'var(--card)', border: '1px solid var(--border)', padding: '10px 18px', borderRadius: 8, textDecoration: 'none' }}
               >
                 Browse all routes →
               </Link>

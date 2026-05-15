@@ -88,8 +88,8 @@ function PaceBadge({ paceKey, showMiles, onToggle }: {
       onClick={onToggle}
       title={showMiles ? 'Switch to km' : 'Switch to miles'}
       style={{
-        fontSize: 11, color: '#888', background: 'rgba(255,255,255,0.03)',
-        border: '1px solid #1e1e1e', borderRadius: 5, padding: '3px 9px',
+        fontSize: 'var(--text-xs)', color: 'var(--muted)', background: 'rgba(255,255,255,0.03)',
+        border: '1px solid var(--border)', borderRadius: 5, padding: '3px 9px',
         cursor: 'pointer', fontFamily: 'inherit', outline: 'none',
         transition: 'background 0.15s',
       }}
@@ -134,12 +134,12 @@ export default function RunBadges({ group, hasJeffing, groupColor, terrain, onTo
 
         {/* Distance */}
         {group === '5K' && groupColor && (
-          <span style={{ fontSize: 11, fontWeight: 700, color: groupColor, background: `${groupColor}18`, border: `1px solid ${groupColor}40`, borderRadius: 5, padding: '3px 9px' }}>
+          <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: groupColor, background: `${groupColor}18`, border: `1px solid ${groupColor}40`, borderRadius: 5, padding: '3px 9px' }}>
             5–6k
           </span>
         )}
         {group === '8K' && groupColor && (
-          <span style={{ fontSize: 11, fontWeight: 700, color: groupColor, background: `${groupColor}18`, border: `1px solid ${groupColor}40`, borderRadius: 5, padding: '3px 9px' }}>
+          <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: groupColor, background: `${groupColor}18`, border: `1px solid ${groupColor}40`, borderRadius: 5, padding: '3px 9px' }}>
             8–10k
           </span>
         )}
@@ -160,9 +160,9 @@ export default function RunBadges({ group, hasJeffing, groupColor, terrain, onTo
               active={active === 'jeffing'}
               onToggle={() => toggle('jeffing')}
               activeColor={accentColor}
-              style={{ fontSize: 11, fontWeight: 600, color: '#f5a623', background: active === 'jeffing' ? 'rgba(245,166,35,0.14)' : 'rgba(245,166,35,0.08)', border: '1px solid rgba(245,166,35,0.25)', borderRadius: 5, padding: '3px 9px' }}
+              style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: '#f5a623', background: active === 'jeffing' ? 'rgba(245,166,35,0.14)' : 'rgba(245,166,35,0.08)', border: '1px solid rgba(245,166,35,0.25)', borderRadius: 5, padding: '3px 9px' }}
             />
-            <span style={{ fontSize: 11, color: '#666', background: 'rgba(255,255,255,0.03)', border: '1px solid #1e1e1e', borderRadius: 5, padding: '3px 9px' }}>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 5, padding: '3px 9px' }}>
               No minimum pace
             </span>
             {group === '5K' && groupColor && (
@@ -173,7 +173,7 @@ export default function RunBadges({ group, hasJeffing, groupColor, terrain, onTo
                   active={active === 'keepMeGoing'}
                   onToggle={() => toggle('keepMeGoing')}
                   activeColor={groupColor}
-                  style={{ fontSize: 11, fontWeight: 600, color: groupColor, background: active === 'keepMeGoing' ? `${groupColor}14` : `${groupColor}08`, border: `1px solid ${groupColor}30`, borderRadius: 5, padding: '3px 9px' }}
+                  style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: groupColor, background: active === 'keepMeGoing' ? `${groupColor}14` : `${groupColor}08`, border: `1px solid ${groupColor}30`, borderRadius: 5, padding: '3px 9px' }}
                 />
                 <PaceBadge paceKey="keepMeGoing" showMiles={showMiles} onToggle={() => setShowMiles(m => !m)} />
               </>
@@ -187,7 +187,7 @@ export default function RunBadges({ group, hasJeffing, groupColor, terrain, onTo
               active={active === 'keepMeGoing'}
               onToggle={() => toggle('keepMeGoing')}
               activeColor={groupColor!}
-              style={{ fontSize: 11, fontWeight: 600, color: groupColor!, background: active === 'keepMeGoing' ? `${groupColor}14` : `${groupColor}08`, border: `1px solid ${groupColor}30`, borderRadius: 5, padding: '3px 9px' }}
+              style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: groupColor!, background: active === 'keepMeGoing' ? `${groupColor}14` : `${groupColor}08`, border: `1px solid ${groupColor}30`, borderRadius: 5, padding: '3px 9px' }}
             />
             <PaceBadge paceKey="keepMeGoing" showMiles={showMiles} onToggle={() => setShowMiles(m => !m)} />
           </>
@@ -199,7 +199,7 @@ export default function RunBadges({ group, hasJeffing, groupColor, terrain, onTo
               active={active === 'challengeMe'}
               onToggle={() => toggle('challengeMe')}
               activeColor={groupColor}
-              style={{ fontSize: 11, fontWeight: 600, color: groupColor, background: active === 'challengeMe' ? `${groupColor}14` : `${groupColor}08`, border: `1px solid ${groupColor}30`, borderRadius: 5, padding: '3px 9px' }}
+              style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: groupColor, background: active === 'challengeMe' ? `${groupColor}14` : `${groupColor}08`, border: `1px solid ${groupColor}30`, borderRadius: 5, padding: '3px 9px' }}
             />
             <PaceBadge paceKey="challengeMe" showMiles={showMiles} onToggle={() => setShowMiles(m => !m)} />
           </>
@@ -230,14 +230,14 @@ export default function RunBadges({ group, hasJeffing, groupColor, terrain, onTo
           <button
             onClick={() => setActive(null)}
             aria-label="Close"
-            style={{ position: 'absolute', top: 10, right: 12, background: 'none', border: 'none', color: '#444', cursor: 'pointer', fontSize: 15, lineHeight: 1, padding: 4, fontFamily: 'inherit' }}
+            style={{ position: 'absolute', top: 10, right: 12, background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontSize: 'var(--text-md)', lineHeight: 1, padding: 4, fontFamily: 'inherit' }}
           >
             ✕
           </button>
           <p style={{ fontSize: 12, fontWeight: 700, color: info.color, marginBottom: 6, letterSpacing: '0.02em' }}>
             {info.name}
           </p>
-          <p style={{ fontSize: 13, color: '#999', lineHeight: 1.7, marginBottom: 10, paddingRight: 20 }}>
+          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)', lineHeight: 1.7, marginBottom: 10, paddingRight: 20 }}>
             {info.desc}
           </p>
           <a

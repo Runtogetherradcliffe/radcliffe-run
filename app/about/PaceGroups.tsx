@@ -19,12 +19,12 @@ export default function PaceGroups() {
         const showMiles = milesSet.has(i)
         return (
           <div key={g.name} style={{ background: g.bg, border: `1px solid ${g.border}`, borderRadius: 12, padding: '20px 18px' }}>
-            <p style={{ fontSize: 13, fontWeight: 700, color: g.color, marginBottom: 6 }}>{g.name}</p>
+            <p style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: g.color, marginBottom: 6 }}>{g.name}</p>
             <div style={{ display: 'flex', gap: 6, marginBottom: 12, flexWrap: 'wrap' }}>
-              <span style={{ fontSize: 11, fontWeight: 600, color: g.color, background: 'rgba(255,255,255,0.05)', border: `1px solid ${g.border}`, padding: '2px 7px', borderRadius: 4 }}>
+              <span style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: g.color, background: 'rgba(255,255,255,0.05)', border: `1px solid ${g.border}`, padding: '2px 7px', borderRadius: 4 }}>
                 {g.distance}
               </span>
-              <span style={{ fontSize: 11, fontWeight: 600, color: g.color, background: 'rgba(255,255,255,0.05)', border: `1px solid ${g.border}`, padding: '2px 7px', borderRadius: 4 }}>
+              <span style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: g.color, background: 'rgba(255,255,255,0.05)', border: `1px solid ${g.border}`, padding: '2px 7px', borderRadius: 4 }}>
                 {g.style}
               </span>
               {g.paceKm ? (
@@ -32,8 +32,8 @@ export default function PaceGroups() {
                   onClick={() => toggle(i)}
                   title={showMiles ? 'Switch to km' : 'Switch to miles'}
                   style={{
-                    fontSize: 11, fontWeight: 600, color: '#777',
-                    background: 'rgba(255,255,255,0.03)', border: '1px solid #2a2a2a',
+                    fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--muted)',
+                    background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-2)',
                     padding: '2px 7px', borderRadius: 4,
                     cursor: 'pointer', fontFamily: 'Inter, sans-serif',
                     transition: 'color 0.15s',
@@ -42,12 +42,12 @@ export default function PaceGroups() {
                   {showMiles ? g.paceMi : g.paceKm}
                 </button>
               ) : (
-                <span style={{ fontSize: 11, fontWeight: 600, color: '#555', background: 'rgba(255,255,255,0.03)', border: '1px solid #1a1a1a', padding: '2px 7px', borderRadius: 4 }}>
+                <span style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--faint)', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', padding: '2px 7px', borderRadius: 4 }}>
                   No minimum pace
                 </span>
               )}
             </div>
-            <p style={{ fontSize: 13, color: '#777', lineHeight: 1.7 }}>{g.desc}</p>
+            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)', lineHeight: 1.7 }}>{g.desc}</p>
           </div>
         )
       })}

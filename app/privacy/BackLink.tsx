@@ -19,7 +19,7 @@ export default function BackLink() {
       onClick={handleBack}
       style={{
         display: 'inline-flex', alignItems: 'center', gap: 6,
-        fontSize: 13, color: '#555', background: 'none', border: 'none',
+        fontSize: 'var(--text-sm)', color: 'var(--faint)', background: 'none', border: 'none',
         cursor: 'pointer', padding: 0, fontFamily: 'Inter, sans-serif',
         marginBottom: 40,
       }}

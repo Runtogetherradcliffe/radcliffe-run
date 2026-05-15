@@ -41,12 +41,12 @@ export default function RoundupBody({ content }: { content: string }) {
       const isTrail = currentSection === 'trail'
       elements.push(
         <h2 key={i} style={{
-          fontSize: 11, fontWeight: 700, textTransform: 'uppercase',
+          fontSize: 'var(--text-xs)', fontWeight: 700, textTransform: 'uppercase',
           letterSpacing: '0.12em',
-          color: isTrail ? '#c4a8e8' : '#f5a623',
+          color: isTrail ? 'var(--purple)' : 'var(--orange)',
           marginBottom: 20, marginTop: elements.length > 0 ? 44 : 0,
           paddingBottom: 10,
-          borderBottom: `1px solid ${isTrail ? '#1e1e3a' : '#1e1e1e'}`,
+          borderBottom: '1px solid var(--border)',
         }}>
           {token.text}
         </h2>
@@ -56,12 +56,12 @@ export default function RoundupBody({ content }: { content: string }) {
 
     if (token.type === 'heading' && token.depth === 3) {
       const cardStyle = currentSection === 'parkrun'
-        ? { background: '#111', borderLeft: '3px solid #f5a623', borderRadius: '0 8px 8px 0', padding: '16px 20px', marginBottom: 12 }
+        ? { background: 'var(--card)', borderLeft: '3px solid var(--orange)', borderRadius: '0 8px 8px 0', padding: '16px 20px', marginBottom: 12 }
         : currentSection === 'trail'
-        ? { background: '#0f0f1a', borderLeft: '3px solid #7c5cbf', border: '1px solid #1e1e3a', borderRadius: '0 8px 8px 0', padding: '16px 20px', marginBottom: 12 }
-        : { background: '#111', border: '1px solid #1a1a1a', borderRadius: 8, padding: '16px 20px', marginBottom: 12 }
+        ? { background: 'var(--purple-bg)', borderLeft: '3px solid #7c5cbf', border: '1px solid var(--border)', borderRadius: '0 8px 8px 0', padding: '16px 20px', marginBottom: 12 }
+        : { background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 8, padding: '16px 20px', marginBottom: 12 }
 
-      const h3Color = currentSection === 'trail' ? '#c4a8e8' : '#fff'
+      const h3Color = currentSection === 'trail' ? 'var(--purple)' : 'var(--white)'
 
       // Peek ahead for the next paragraph(s) belonging to this card
       const cardParagraphs: React.ReactNode[] = []
@@ -69,7 +69,7 @@ export default function RoundupBody({ content }: { content: string }) {
       while (j < tokens.length && tokens[j]?.type === 'paragraph') {
         const pToken = tokens[j] as { type: 'paragraph'; text: string }
         cardParagraphs.push(
-          <p key={j} style={{ fontSize: 14, color: '#bbb', lineHeight: 1.8, margin: 0 }}
+          <p key={j} style={{ fontSize: 'var(--text-base)', color: 'var(--dim)', lineHeight: 1.8, margin: 0 }}
              dangerouslySetInnerHTML={{ __html: inlineHtml(pToken.text) }} />
         )
         j++
@@ -77,7 +77,7 @@ export default function RoundupBody({ content }: { content: string }) {
 
       elements.push(
         <div key={i} style={cardStyle}>
-          <h3 style={{ fontSize: 15, fontWeight: 600, color: h3Color, marginBottom: cardParagraphs.length ? 10 : 0 }}>
+          <h3 style={{ fontSize: 'var(--text-md)', fontWeight: 600, color: h3Color, marginBottom: cardParagraphs.length ? 10 : 0 }}>
             {token.text}
           </h3>
           {cardParagraphs}
@@ -102,7 +102,7 @@ export default function RoundupBody({ content }: { content: string }) {
       if (boldOnly && isDayLabel(boldOnly[1])) {
         elements.push(
           <p key={i} style={{
-            fontSize: 11, fontWeight: 700, textTransform: 'uppercase',
+            fontSize: 'var(--text-xs)', fontWeight: 700, textTransform: 'uppercase',
             letterSpacing: '0.08em', color: '#f5a623',
             marginBottom: 12, marginTop: 24,
           }}>
@@ -114,14 +114,14 @@ export default function RoundupBody({ content }: { content: string }) {
 
       // Regular paragraph (section intro etc.)
       elements.push(
-        <p key={i} style={{ fontSize: 14, color: '#bbb', lineHeight: 1.85, marginBottom: 16 }}
+        <p key={i} style={{ fontSize: 'var(--text-base)', color: 'var(--dim)', lineHeight: 1.85, marginBottom: 16 }}
            dangerouslySetInnerHTML={{ __html: inlineHtml(text) }} />
       )
       return
     }
 
     if (token.type === 'hr') {
-      elements.push(<hr key={i} style={{ border: 'none', borderTop: '1px solid #1a1a1a', margin: '32px 0' }} />)
+      elements.push(<hr key={i} style={{ border: 'none', borderTop: '1px solid var(--border)', margin: '32px 0' }} />)
     }
   })
 
@@ -131,7 +131,7 @@ export default function RoundupBody({ content }: { content: string }) {
 /** Convert markdown inline syntax (bold, italic, links) to HTML safely */
 function inlineHtml(text: string) {
   return text
-    .replace(/\*\*(.+?)\*\*/g, '<strong style="color:#ddd;font-weight:600">$1</strong>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong style="color:var(--dim);font-weight:600">$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" style="color:#f5a623;text-decoration:none" target="_blank" rel="noopener">$1</a>')
+    .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" style="color:var(--orange);text-decoration:none" target="_blank" rel="noopener">$1</a>')
 }

@@ -45,12 +45,12 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
       <main style={{ flex: 1, padding: 32 }}>
         <div style={{ maxWidth: 800 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 8 }}>
-            <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#f5a623' }}>Posts</p>
+            <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#f5a623' }}>Posts</p>
             {post.published_at && (
-              <p style={{ fontSize: 11, color: '#555' }}>{fmtDate(post.published_at)}</p>
+              <p style={{ fontSize: 'var(--text-xs)', color: 'var(--faint)' }}>{fmtDate(post.published_at)}</p>
             )}
           </div>
-          <h1 style={{ fontSize: 24, fontWeight: 800, letterSpacing: '-0.02em', marginBottom: 32, color: '#ddd' }}>
+          <h1 style={{ fontSize: 24, fontWeight: 800, letterSpacing: '-0.02em', marginBottom: 32, color: 'var(--dim)' }}>
             {post.title || 'Untitled'}
           </h1>
           <PostEditor initial={initial} isNew={false} />

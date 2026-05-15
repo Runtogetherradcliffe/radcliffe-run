@@ -11,12 +11,12 @@ interface Snippet {
 }
 
 const INPUT: CSSProperties = {
-  width: '100%', background: '#0a0a0a', border: '1px solid #222',
-  borderRadius: 8, padding: '10px 14px', fontSize: 14, color: '#fff',
+  width: '100%', background: 'var(--bg)', border: '1px solid var(--border)',
+  borderRadius: 8, padding: '10px 14px', fontSize: 'var(--text-base)', color: 'var(--white)',
   fontFamily: 'Inter, sans-serif', outline: 'none', boxSizing: 'border-box',
 }
 const TEXTAREA: CSSProperties = { ...INPUT, resize: 'vertical', minHeight: 100, lineHeight: 1.7 }
-const LABEL: CSSProperties = { display: 'block', fontSize: 12, fontWeight: 600, color: '#888', marginBottom: 6, fontFamily: 'Inter, sans-serif' }
+const LABEL: CSSProperties = { display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--muted)', marginBottom: 6, fontFamily: 'Inter, sans-serif' }
 
 export default function SnippetsPage() {
   const [snippets, setSnippets] = useState<Snippet[]>([])
@@ -114,7 +114,7 @@ export default function SnippetsPage() {
             background: toast.type === 'ok' ? '#0a1a0a' : '#1a0a0a',
             border: `1px solid ${toast.type === 'ok' ? '#7cb87c' : '#e05252'}`,
             color: toast.type === 'ok' ? '#7cb87c' : '#e05252',
-            padding: '12px 20px', borderRadius: 10, fontSize: 14, fontWeight: 600,
+            padding: '12px 20px', borderRadius: 10, fontSize: 'var(--text-base)', fontWeight: 600,
           }}>
             {toast.msg}
           </div>
@@ -123,9 +123,9 @@ export default function SnippetsPage() {
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 32, gap: 16 }}>
           <div>
-            <a href="/admin/emails" style={{ fontSize: 12, color: '#777', textDecoration: 'none' }}>← Back to emails</a>
+            <a href="/admin/emails" style={{ fontSize: 12, color: 'var(--muted)', textDecoration: 'none' }}>← Back to emails</a>
             <h1 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em', marginTop: 6 }}>Message snippets</h1>
-            <p style={{ fontSize: 13, color: '#999', marginTop: 4 }}>
+            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)', marginTop: 4 }}>
               Pre-written messages you can insert into the custom message field when composing an email.
               Toggle active/inactive to control which appear in the composer — useful for seasonal messages like lights reminders.
             </p>
@@ -133,7 +133,7 @@ export default function SnippetsPage() {
           {!creating && !editing && (
             <button
               onClick={startCreate}
-              style={{ flexShrink: 0, background: '#f5a623', color: '#0a0a0a', border: 'none', borderRadius: 8, padding: '10px 18px', fontSize: 13, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
+              style={{ flexShrink: 0, background: '#f5a623', color: '#0a0a0a', border: 'none', borderRadius: 8, padding: '10px 18px', fontSize: 'var(--text-sm)', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
             >
               + New snippet
             </button>
@@ -142,8 +142,8 @@ export default function SnippetsPage() {
 
         {/* Create / Edit form */}
         {(creating || editing) && (
-          <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 12, padding: 24, marginBottom: 24 }}>
-            <p style={{ fontSize: 13, fontWeight: 700, color: '#ccc', marginBottom: 20 }}>
+          <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, padding: 24, marginBottom: 24 }}>
+            <p style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--dim)', marginBottom: 20 }}>
               {creating ? 'New snippet' : `Editing: ${editing?.title}`}
             </p>
             <div style={{ marginBottom: 16 }}>
@@ -174,7 +174,7 @@ export default function SnippetsPage() {
                 onChange={e => setForm(f => ({ ...f, active: e.target.checked }))}
                 style={{ accentColor: '#f5a623', width: 16, height: 16 }}
               />
-              <label htmlFor="active" style={{ fontSize: 13, color: '#ccc', cursor: 'pointer' }}>
+              <label htmlFor="active" style={{ fontSize: 'var(--text-sm)', color: 'var(--dim)', cursor: 'pointer' }}>
                 Active — show in email composer
               </label>
             </div>
@@ -182,13 +182,13 @@ export default function SnippetsPage() {
               <button
                 onClick={save}
                 disabled={saving || !form.title.trim() || !form.body.trim()}
-                style={{ padding: '10px 20px', borderRadius: 8, background: '#f5a623', border: 'none', color: '#0a0a0a', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
+                style={{ padding: '10px 20px', borderRadius: 8, background: '#f5a623', border: 'none', color: '#0a0a0a', fontSize: 'var(--text-sm)', fontWeight: 700, cursor: 'pointer' }}
               >
                 {saving ? 'Saving…' : 'Save'}
               </button>
               <button
                 onClick={cancel}
-                style={{ padding: '10px 18px', borderRadius: 8, background: 'transparent', border: '1px solid #333', color: '#888', fontSize: 13, cursor: 'pointer' }}
+                style={{ padding: '10px 18px', borderRadius: 8, background: 'transparent', border: '1px solid #333', color: 'var(--muted)', fontSize: 'var(--text-sm)', cursor: 'pointer' }}
               >
                 Cancel
               </button>
@@ -198,11 +198,11 @@ export default function SnippetsPage() {
 
         {/* Snippet list */}
         {loading ? (
-          <p style={{ color: '#999', fontSize: 14 }}>Loading…</p>
+          <p style={{ color: 'var(--muted)', fontSize: 'var(--text-base)' }}>Loading…</p>
         ) : snippets.length === 0 ? (
-          <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 12, padding: '40px 24px', textAlign: 'center' }}>
-            <p style={{ color: '#999', fontSize: 14, marginBottom: 12 }}>No snippets yet.</p>
-            <button onClick={startCreate} style={{ background: 'none', border: 'none', color: '#f5a623', fontSize: 13, cursor: 'pointer' }}>
+          <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, padding: '40px 24px', textAlign: 'center' }}>
+            <p style={{ color: 'var(--muted)', fontSize: 'var(--text-base)', marginBottom: 12 }}>No snippets yet.</p>
+            <button onClick={startCreate} style={{ background: 'none', border: 'none', color: '#f5a623', fontSize: 'var(--text-sm)', cursor: 'pointer' }}>
               Create your first snippet →
             </button>
           </div>
@@ -210,13 +210,13 @@ export default function SnippetsPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {snippets.map(s => (
               <div key={s.id} style={{
-                background: '#111', border: '1px solid #1e1e1e', borderRadius: 12, padding: '16px 20px',
+                background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, padding: '16px 20px',
                 opacity: s.active ? 1 : 0.5,
               }}>
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                      <p style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>{s.title}</p>
+                      <p style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--white)' }}>{s.title}</p>
                       <span style={{
                         fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 20,
                         background: s.active ? '#0a1a0a' : '#1a1a1a',
@@ -226,18 +226,18 @@ export default function SnippetsPage() {
                         {s.active ? 'Active' : 'Inactive'}
                       </span>
                     </div>
-                    <p style={{ fontSize: 13, color: '#999', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{s.body}</p>
+                    <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{s.body}</p>
                   </div>
                   <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
                     <button
                       onClick={() => toggleActive(s)}
-                      style={{ padding: '6px 12px', borderRadius: 6, background: 'transparent', border: '1px solid #222', color: '#888', fontSize: 12, cursor: 'pointer' }}
+                      style={{ padding: '6px 12px', borderRadius: 6, background: 'transparent', border: '1px solid var(--border)', color: 'var(--muted)', fontSize: 12, cursor: 'pointer' }}
                     >
                       {s.active ? 'Deactivate' : 'Activate'}
                     </button>
                     <button
                       onClick={() => startEdit(s)}
-                      style={{ padding: '6px 12px', borderRadius: 6, background: 'transparent', border: '1px solid #222', color: '#888', fontSize: 12, cursor: 'pointer' }}
+                      style={{ padding: '6px 12px', borderRadius: 6, background: 'transparent', border: '1px solid var(--border)', color: 'var(--muted)', fontSize: 12, cursor: 'pointer' }}
                     >
                       Edit
                     </button>

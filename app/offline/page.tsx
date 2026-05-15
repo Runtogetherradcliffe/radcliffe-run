@@ -20,7 +20,7 @@ export default function OfflinePage() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: '#0a0a0a',
+      background: 'var(--bg)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -32,7 +32,7 @@ export default function OfflinePage() {
         {/* Wordmark */}
         <p style={{
           fontSize: 18, fontWeight: 700, letterSpacing: '-0.02em',
-          marginBottom: 48, color: '#fff',
+          marginBottom: 48, color: 'var(--white)',
         }}>
           radcliffe.<span style={{ color: '#f5a623' }}>run</span>
         </p>
@@ -40,7 +40,7 @@ export default function OfflinePage() {
         {/* Icon */}
         <div style={{
           width: 72, height: 72, borderRadius: '50%',
-          background: '#111', border: '1px solid #1e1e1e',
+          background: 'var(--card)', border: '1px solid var(--border)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           margin: '0 auto 28px',
           fontSize: 32,
@@ -50,13 +50,13 @@ export default function OfflinePage() {
 
         <h1 style={{
           fontSize: 28, fontWeight: 800, letterSpacing: '-0.03em',
-          color: '#fff', marginBottom: 12,
+          color: 'var(--white)', marginBottom: 12,
         }}>
           You&apos;re offline
         </h1>
 
         <p style={{
-          fontSize: 16, color: '#666', lineHeight: 1.7, marginBottom: 36,
+          fontSize: 16, color: 'var(--muted)', lineHeight: 1.7, marginBottom: 36,
         }}>
           No internet connection right now. Check your signal and try again —
           we&apos;ll take you straight back to the site when you&apos;re reconnected.
@@ -71,7 +71,7 @@ export default function OfflinePage() {
             color: '#0a0a0a',
             border: 'none',
             borderRadius: 8,
-            fontSize: 14,
+            fontSize: 'var(--text-base)',
             fontWeight: 700,
             fontFamily: 'inherit',
             letterSpacing: '-0.01em',
@@ -82,7 +82,7 @@ export default function OfflinePage() {
           {retrying ? 'Trying…' : 'Try again'}
         </button>
 
-        <p style={{ fontSize: 13, color: '#333', marginTop: 32 }}>
+        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)', marginTop: 32 }}>
           Pages you&apos;ve visited recently may still be available below.
         </p>
 

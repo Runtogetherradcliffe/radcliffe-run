@@ -14,9 +14,9 @@ export default async function RoutesAdminPage() {
     <AdminShell userEmail={user.email ?? ''}>
       <main style={{ flex: 1, padding: 32 }}>
         <div style={{ marginBottom: 28 }}>
-          <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#f5a623', marginBottom: 8 }}>Library</p>
+          <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#f5a623', marginBottom: 8 }}>Library</p>
           <h1 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em' }}>Route descriptions</h1>
-          <p style={{ fontSize: 13, color: '#555', marginTop: 6 }}>Edit the description shown for each route on the site and in emails. Changes are saved to the database and override the default text.</p>
+          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--faint)', marginTop: 6 }}>Edit the description shown for each route on the site and in emails. Changes are saved to the database and override the default text.</p>
         </div>
         <RoutesAdminClient />
       </main>

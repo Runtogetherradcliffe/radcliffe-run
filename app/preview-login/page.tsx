@@ -33,7 +33,7 @@ export default async function PreviewLoginPage({
 
   return (
     <div style={{
-      minHeight: '100vh', background: '#0a0a0a', display: 'flex',
+      minHeight: '100vh', background: 'var(--bg)', display: 'flex',
       alignItems: 'center', justifyContent: 'center',
       fontFamily: 'Inter, -apple-system, sans-serif',
     }}>
@@ -44,8 +44,8 @@ export default async function PreviewLoginPage({
           radcliffe.<span style={{ color: '#f5a623' }}>run</span>
         </p>
 
-        <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 14, padding: '32px 28px' }}>
-          <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#555', marginBottom: 6 }}>Preview access</p>
+        <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 14, padding: '32px 28px' }}>
+          <p style={{ fontSize: 'var(--text-sm)', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--faint)', marginBottom: 6 }}>Preview access</p>
           <p style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 24 }}>Enter password</p>
 
           <form action={submit}>
@@ -58,17 +58,17 @@ export default async function PreviewLoginPage({
               required
               style={{
                 width: '100%', boxSizing: 'border-box',
-                background: '#0a0a0a', border: `1px solid ${error ? '#c0392b' : '#2a2a2a'}`,
-                borderRadius: 8, padding: '12px 14px', fontSize: 15, color: '#fff',
+                background: 'var(--bg)', border: `1px solid ${error ? '#c0392b' : '#2a2a2a'}`,
+                borderRadius: 8, padding: '12px 14px', fontSize: 'var(--text-md)', color: 'var(--white)',
                 fontFamily: 'inherit', outline: 'none', marginBottom: error ? 8 : 20,
               }}
             />
             {error && (
-              <p style={{ fontSize: 13, color: '#c0392b', marginBottom: 16 }}>Incorrect password — try again.</p>
+              <p style={{ fontSize: 'var(--text-sm)', color: '#c0392b', marginBottom: 16 }}>Incorrect password — try again.</p>
             )}
             <button type="submit" style={{
               width: '100%', padding: '12px', borderRadius: 8, border: 'none',
-              background: '#f5a623', color: '#0a0a0a', fontSize: 14, fontWeight: 700,
+              background: '#f5a623', color: '#0a0a0a', fontSize: 'var(--text-base)', fontWeight: 700,
               fontFamily: 'inherit', cursor: 'pointer', letterSpacing: '-0.01em',
             }}>
               Enter site
@@ -76,7 +76,7 @@ export default async function PreviewLoginPage({
           </form>
         </div>
 
-        <p style={{ textAlign: 'center', fontSize: 12, color: '#333', marginTop: 20 }}>
+        <p style={{ textAlign: 'center', fontSize: 12, color: 'var(--muted)', marginTop: 20 }}>
           This site is in preview — not yet public.
         </p>
       </div>

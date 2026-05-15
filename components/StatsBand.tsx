@@ -35,7 +35,7 @@ export default function StatsBand({ routeCount }: { routeCount: number }) {
           {STATS.map(({ num, mobile }) => (
             <div key={mobile} style={{ display: 'flex', alignItems: 'baseline', gap: 5, whiteSpace: 'nowrap' }}>
               <span style={{ fontSize: 20, fontWeight: 800, color: '#0a0a0a', letterSpacing: '-0.03em', lineHeight: 1 }}>{num}</span>
-              <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(10,10,10,0.55)' }}>{mobile}</span>
+              <span style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: 'rgba(10,10,10,0.55)' }}>{mobile}</span>
             </div>
           ))}
         </div>
@@ -49,7 +49,7 @@ export default function StatsBand({ routeCount }: { routeCount: number }) {
         {STATS.map(({ num, desktop }) => (
           <div key={desktop} style={{ textAlign: 'center' }}>
             <div style={{ fontSize: 48, fontWeight: 800, color: '#0a0a0a', letterSpacing: '-0.04em', lineHeight: 1 }}>{num}</div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(10,10,10,0.5)', marginTop: 6 }}>{desktop}</div>
+            <div style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'rgba(10,10,10,0.5)', marginTop: 6 }}>{desktop}</div>
           </div>
         ))}
       </div>

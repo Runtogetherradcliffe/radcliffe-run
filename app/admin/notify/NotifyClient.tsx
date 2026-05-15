@@ -65,12 +65,12 @@ export default function NotifyClient({ subscriberCount }: { subscriberCount: num
 
   const inputStyle: React.CSSProperties = {
     width: '100%', boxSizing: 'border-box',
-    background: '#0a0a0a', border: '1px solid #2a2a2a',
-    borderRadius: 8, padding: '11px 14px', fontSize: 14, color: '#fff',
+    background: 'var(--bg)', border: '1px solid var(--border-2)',
+    borderRadius: 8, padding: '11px 14px', fontSize: 'var(--text-base)', color: 'var(--white)',
     fontFamily: 'Inter, sans-serif', outline: 'none',
   }
   const labelStyle: React.CSSProperties = {
-    fontSize: 12, fontWeight: 600, color: '#555',
+    fontSize: 12, fontWeight: 600, color: 'var(--faint)',
     letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 8, display: 'block',
   }
 
@@ -82,8 +82,8 @@ export default function NotifyClient({ subscriberCount }: { subscriberCount: num
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           {PRESETS.map(p => (
             <button key={p.label} onClick={() => applyPreset(p)} style={{
-              padding: '7px 14px', borderRadius: 7, border: '1px solid #2a2a2a',
-              background: '#111', color: '#aaa', fontSize: 13, fontFamily: 'inherit',
+              padding: '7px 14px', borderRadius: 7, border: '1px solid var(--border-2)',
+              background: 'var(--card)', color: 'var(--dim)', fontSize: 'var(--text-sm)', fontFamily: 'inherit',
               cursor: 'pointer', fontWeight: 500,
             }}>
               {p.label}
@@ -93,7 +93,7 @@ export default function NotifyClient({ subscriberCount }: { subscriberCount: num
       </div>
 
       {/* Form */}
-      <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 14, padding: 28, display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 14, padding: 28, display: 'flex', flexDirection: 'column', gap: 20 }}>
 
         <div>
           <label style={labelStyle}>Title</label>
@@ -117,7 +117,7 @@ export default function NotifyClient({ subscriberCount }: { subscriberCount: num
             rows={3}
             style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.5 }}
           />
-          <p style={{ fontSize: 12, color: '#333', marginTop: 6 }}>{body.length}/200 characters</p>
+          <p style={{ fontSize: 12, color: 'var(--muted)', marginTop: 6 }}>{body.length}/200 characters</p>
         </div>
 
         <div>
@@ -129,7 +129,7 @@ export default function NotifyClient({ subscriberCount }: { subscriberCount: num
             placeholder="/"
             style={inputStyle}
           />
-          <p style={{ fontSize: 12, color: '#444', marginTop: 6 }}>
+          <p style={{ fontSize: 12, color: 'var(--muted)', marginTop: 6 }}>
             Where tapping the notification goes. Use / for homepage, /roundup for the latest roundup.
           </p>
         </div>
@@ -137,7 +137,7 @@ export default function NotifyClient({ subscriberCount }: { subscriberCount: num
         {/* Result / error */}
         {result && (
           <div style={{ background: '#0d2a0d', border: '1px solid #1a3d1a', borderRadius: 8, padding: '12px 16px' }}>
-            <p style={{ fontSize: 14, color: '#4caf76', fontWeight: 600 }}>
+            <p style={{ fontSize: 'var(--text-base)', color: '#4caf76', fontWeight: 600 }}>
               Sent to {result.sent} of {result.total} subscriber{result.total !== 1 ? 's' : ''}
               {result.failed > 0 ? ` (${result.failed} failed — expired subscriptions removed)` : ''}
             </p>
@@ -145,7 +145,7 @@ export default function NotifyClient({ subscriberCount }: { subscriberCount: num
         )}
         {error && (
           <div style={{ background: '#1a0a0a', border: '1px solid #3d1a1a', borderRadius: 8, padding: '12px 16px' }}>
-            <p style={{ fontSize: 14, color: '#cf6679' }}>Error: {error}</p>
+            <p style={{ fontSize: 'var(--text-base)', color: '#cf6679' }}>Error: {error}</p>
           </div>
         )}
 
@@ -156,7 +156,7 @@ export default function NotifyClient({ subscriberCount }: { subscriberCount: num
             padding: '13px', borderRadius: 8, border: 'none',
             background: subscriberCount === 0 ? '#1a1a1a' : '#f5a623',
             color: subscriberCount === 0 ? '#444' : '#0a0a0a',
-            fontSize: 14, fontWeight: 700, fontFamily: 'inherit',
+            fontSize: 'var(--text-base)', fontWeight: 700, fontFamily: 'inherit',
             cursor: sending || !title.trim() || !body.trim() || subscriberCount === 0 ? 'default' : 'pointer',
             opacity: sending ? 0.7 : 1,
           }}

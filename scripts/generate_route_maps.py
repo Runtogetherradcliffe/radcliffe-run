@@ -4,11 +4,15 @@ RTR Route Map Generator
 =======================
 Renders each GPX route as a branded map image for use on the radcliffe.run website.
 
-Output: public/route-maps/{slug}.webp  (800×450px, RTR branded)
+Output: public/route-maps/{slug}.webp        (800x450px, RTR dark theme)
+        public/route-maps/light/{slug}.webp  (800x450px, RTR light theme)
 
 Usage:
-    # Generate ALL routes (skips existing by default)
+    # Generate ALL routes - dark theme (skips existing by default)
     python3 scripts/generate_route_maps.py
+
+    # Generate ALL routes - light theme
+    python3 scripts/generate_route_maps.py --theme light
 
     # Generate specific slugs
     python3 scripts/generate_route_maps.py trail-8k--outwood-oab road-5k--oab-to-bury
@@ -51,12 +55,17 @@ HEIGHT = 450
 # ── Map style ─────────────────────────────────────────────────────────────────
 TILE_URL   = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"  # OSM standard
 
-# Post-processing
-BRIGHTNESS = 0.42    # Darken the basemap
-CONTRAST   = 1.5     # Increase contrast after darkening
-TINT_RGBA  = (70, 32, 0, 65)  # Warm amber tint overlay
+# Dark theme post-processing
+DARK_BRIGHTNESS = 0.42    # Darken the basemap
+DARK_CONTRAST   = 1.5     # Increase contrast after darkening
+DARK_TINT_RGBA  = (70, 32, 0, 65)  # Warm amber tint overlay
 
-# Route line (three-layer glow effect)
+# Light theme post-processing
+LIGHT_BRIGHTNESS = 0.96   # Very slight dim to soften the white basemap
+LIGHT_CONTRAST   = 1.05   # Very subtle contrast boost
+LIGHT_TINT_RGBA  = (255, 250, 240, 18)  # Barely-there warm tint
+
+# Route line (three-layer glow effect) - same for both themes
 LINE_DARK   = "#7a4800"   # Glow / underline
 LINE_ORANGE = "#f5a623"   # Main RTR orange
 LINE_LIGHT  = "#ffd280"   # Highlight on top
@@ -150,21 +159,38 @@ def render_map(coords: list[tuple[float, float]], zoom: int = 14) -> Image.Image
     return img
 
 
-def postprocess(img: Image.Image) -> Image.Image:
-    """Apply RTR styling: desaturate, darken, contrast boost, amber tint."""
-    # 1. Desaturate (convert to greyscale, blend back 20% colour)
-    grey = img.convert("L").convert("RGB")
-    img  = Image.blend(img, grey, alpha=0.85)
+def postprocess(img: Image.Image, theme: str = "dark") -> Image.Image:
+    """Apply RTR styling: desaturate, darken/lighten, contrast boost, tint."""
+    if theme == "light":
+        # Light theme: keep natural colours, very subtle adjustments only
+        # 1. Light desaturate (keep 40% colour for a muted map feel)
+        grey = img.convert("L").convert("RGB")
+        img  = Image.blend(img, grey, alpha=0.40)
 
-    # 2. Darken
-    img = ImageEnhance.Brightness(img).enhance(BRIGHTNESS)
+        # 2. Slight dim
+        img = ImageEnhance.Brightness(img).enhance(LIGHT_BRIGHTNESS)
 
-    # 3. Contrast
-    img = ImageEnhance.Contrast(img).enhance(CONTRAST)
+        # 3. Subtle contrast
+        img = ImageEnhance.Contrast(img).enhance(LIGHT_CONTRAST)
 
-    # 4. Amber tint overlay
-    tint = Image.new("RGBA", img.size, TINT_RGBA)
-    img  = Image.alpha_composite(img.convert("RGBA"), tint).convert("RGB")
+        # 4. Barely-there warm tint
+        tint = Image.new("RGBA", img.size, LIGHT_TINT_RGBA)
+        img  = Image.alpha_composite(img.convert("RGBA"), tint).convert("RGB")
+    else:
+        # Dark theme: desaturate heavily, darken, amber tint
+        # 1. Desaturate (convert to greyscale, blend back 20% colour)
+        grey = img.convert("L").convert("RGB")
+        img  = Image.blend(img, grey, alpha=0.85)
+
+        # 2. Darken
+        img = ImageEnhance.Brightness(img).enhance(DARK_BRIGHTNESS)
+
+        # 3. Contrast
+        img = ImageEnhance.Contrast(img).enhance(DARK_CONTRAST)
+
+        # 4. Amber tint overlay
+        tint = Image.new("RGBA", img.size, DARK_TINT_RGBA)
+        img  = Image.alpha_composite(img.convert("RGBA"), tint).convert("RGB")
 
     return img
 
@@ -204,7 +230,7 @@ def add_label(img: Image.Image, label: str = "THE ROUTE") -> Image.Image:
     return img
 
 
-def generate_map(gpx_path: Path, out_path: Path) -> bool:
+def generate_map(gpx_path: Path, out_path: Path, theme: str = "dark") -> bool:
     """Generate one map image. Returns True on success."""
     slug = gpx_path.stem
     try:
@@ -215,7 +241,7 @@ def generate_map(gpx_path: Path, out_path: Path) -> bool:
 
         zoom = best_zoom(coords)
         img = render_map(coords, zoom=zoom)
-        img = postprocess(img)
+        img = postprocess(img, theme=theme)
 
         out_path.parent.mkdir(parents=True, exist_ok=True)
         img.save(str(out_path), "WEBP", quality=85)
@@ -234,9 +260,13 @@ def main():
     parser.add_argument("slugs", nargs="*", help="Specific slug(s) to generate (omit for all)")
     parser.add_argument("--force", action="store_true", help="Overwrite existing images")
     parser.add_argument("--limit", type=int, default=0, help="Limit to N files (for testing)")
+    parser.add_argument("--theme", choices=["dark", "light"], default="dark",
+                        help="Map theme: 'dark' (default) or 'light' (outputs to route-maps/light/)")
     args = parser.parse_args()
 
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    # Light theme outputs to a subdirectory
+    out_dir = OUT_DIR / "light" if args.theme == "light" else OUT_DIR
+    out_dir.mkdir(parents=True, exist_ok=True)
 
     # Build file list
     if args.slugs:
@@ -256,23 +286,24 @@ def main():
     total = len(gpx_files)
     print(f"\nRTR Route Map Generator")
     print(f"  Source:  {GPX_DIR}")
-    print(f"  Output:  {OUT_DIR}")
-    print(f"  Size:    {WIDTH}×{HEIGHT}px")
+    print(f"  Output:  {out_dir}")
+    print(f"  Theme:   {args.theme}")
+    print(f"  Size:    {WIDTH}x{HEIGHT}px")
     print(f"  Routes:  {total}\n")
 
     ok = skipped = failed = 0
     for gpx_path in gpx_files:
-        out_path = OUT_DIR / f"{gpx_path.stem}.webp"
+        out_path = out_dir / f"{gpx_path.stem}.webp"
         if out_path.exists() and not args.force:
-            print(f"  –  {gpx_path.stem} (already exists, use --force to regenerate)")
+            print(f"  -  {gpx_path.stem} (already exists, use --force to regenerate)")
             skipped += 1
             continue
-        if generate_map(gpx_path, out_path):
+        if generate_map(gpx_path, out_path, theme=args.theme):
             ok += 1
         else:
             failed += 1
 
-    print(f"\nDone — {ok} generated, {skipped} skipped, {failed} failed")
+    print(f"\nDone - {ok} generated, {skipped} skipped, {failed} failed")
 
 
 if __name__ == "__main__":

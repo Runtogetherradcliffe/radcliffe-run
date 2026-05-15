@@ -14,14 +14,14 @@ type Post = {
 }
 
 const FIELD: React.CSSProperties = {
-  width: '100%', background: '#0d0d0d', border: '1px solid #1e1e1e',
-  borderRadius: 8, color: '#ddd', fontSize: 14, padding: '10px 14px',
+  width: '100%', background: '#0d0d0d', border: '1px solid var(--border)',
+  borderRadius: 8, color: 'var(--dim)', fontSize: 'var(--text-base)', padding: '10px 14px',
   fontFamily: 'Inter, sans-serif', boxSizing: 'border-box',
 }
 
 const LABEL: React.CSSProperties = {
-  fontSize: 11, fontWeight: 600, letterSpacing: '0.08em',
-  textTransform: 'uppercase', color: '#555', marginBottom: 6, display: 'block',
+  fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.08em',
+  textTransform: 'uppercase', color: 'var(--faint)', marginBottom: 6, display: 'block',
 }
 
 export default function PostEditor({ initial, isNew }: { initial: Post; isNew: boolean }) {
@@ -125,7 +125,7 @@ export default function PostEditor({ initial, isNew }: { initial: Post; isNew: b
     <div style={{ maxWidth: 800 }}>
 
       {error && (
-        <div style={{ background: '#1a0a0a', border: '1px solid #5a1a1a', borderRadius: 8, padding: '12px 16px', marginBottom: 20, fontSize: 13, color: '#e05252' }}>
+        <div style={{ background: '#1a0a0a', border: '1px solid #5a1a1a', borderRadius: 8, padding: '12px 16px', marginBottom: 20, fontSize: 'var(--text-sm)', color: '#e05252' }}>
           {error}
         </div>
       )}
@@ -164,7 +164,7 @@ export default function PostEditor({ initial, isNew }: { initial: Post; isNew: b
 
       {/* Summary */}
       <div style={{ marginBottom: 20 }}>
-        <label style={LABEL}>Summary <span style={{ color: '#333', fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(shown on cards)</span></label>
+        <label style={LABEL}>Summary <span style={{ color: 'var(--muted)', fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(shown on cards)</span></label>
         <input
           type="text"
           value={summary}
@@ -184,7 +184,7 @@ export default function PostEditor({ initial, isNew }: { initial: Post; isNew: b
           placeholder="Write the full post here…"
           style={{ ...FIELD, resize: 'vertical', lineHeight: 1.7 }}
         />
-        <p style={{ fontSize: 11, color: '#444', marginTop: 6 }}>Plain text. Paragraph breaks become paragraphs on the public page.</p>
+        <p style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)', marginTop: 6 }}>Plain text. Paragraph breaks become paragraphs on the public page.</p>
       </div>
 
       {/* Photos */}
@@ -194,7 +194,7 @@ export default function PostEditor({ initial, isNew }: { initial: Post; isNew: b
         {photoUrls.length > 0 && (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 12 }}>
             {photoUrls.map(url => (
-              <div key={url} style={{ position: 'relative', width: 100, height: 100, borderRadius: 8, overflow: 'hidden', border: '1px solid #1e1e1e', flexShrink: 0 }}>
+              <div key={url} style={{ position: 'relative', width: 100, height: 100, borderRadius: 8, overflow: 'hidden', border: '1px solid var(--border)', flexShrink: 0 }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 <button
@@ -202,7 +202,7 @@ export default function PostEditor({ initial, isNew }: { initial: Post; isNew: b
                   style={{
                     position: 'absolute', top: 4, right: 4,
                     background: 'rgba(0,0,0,0.7)', border: 'none', borderRadius: 4,
-                    color: '#fff', fontSize: 12, width: 22, height: 22, cursor: 'pointer',
+                    color: 'var(--white)', fontSize: 12, width: 22, height: 22, cursor: 'pointer',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}
                 >×</button>
@@ -223,8 +223,8 @@ export default function PostEditor({ initial, isNew }: { initial: Post; isNew: b
           onClick={() => fileRef.current?.click()}
           disabled={uploading}
           style={{
-            fontSize: 13, fontWeight: 600, color: '#888',
-            background: '#111', border: '1px solid #1e1e1e',
+            fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--muted)',
+            background: 'var(--card)', border: '1px solid var(--border)',
             padding: '9px 16px', borderRadius: 8, cursor: 'pointer',
           }}
         >
@@ -233,13 +233,13 @@ export default function PostEditor({ initial, isNew }: { initial: Post; isNew: b
       </div>
 
       {/* Actions */}
-      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', paddingTop: 20, borderTop: '1px solid #1a1a1a' }}>
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', paddingTop: 20, borderTop: '1px solid var(--border)' }}>
         <button
           onClick={() => save('draft')}
           disabled={saving || !title}
           style={{
-            fontSize: 13, fontWeight: 600, color: '#888',
-            background: '#111', border: '1px solid #1e1e1e',
+            fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--muted)',
+            background: 'var(--card)', border: '1px solid var(--border)',
             padding: '10px 18px', borderRadius: 8, cursor: 'pointer',
           }}
         >
@@ -250,7 +250,7 @@ export default function PostEditor({ initial, isNew }: { initial: Post; isNew: b
           onClick={() => save('published')}
           disabled={saving || !title}
           style={{
-            fontSize: 13, fontWeight: 700, color: '#0a0a0a',
+            fontSize: 'var(--text-sm)', fontWeight: 700, color: '#0a0a0a',
             background: status === 'published' ? '#7cb87c' : '#f5a623',
             border: 'none', padding: '10px 20px', borderRadius: 8, cursor: 'pointer',
           }}
@@ -264,7 +264,7 @@ export default function PostEditor({ initial, isNew }: { initial: Post; isNew: b
             target="_blank"
             rel="noopener noreferrer"
             style={{
-              fontSize: 13, fontWeight: 600, color: '#6b9fd4',
+              fontSize: 'var(--text-sm)', fontWeight: 600, color: '#6b9fd4',
               background: '#0d1221', border: '1px solid #1a2a44',
               padding: '10px 18px', borderRadius: 8, textDecoration: 'none',
             }}
@@ -277,16 +277,16 @@ export default function PostEditor({ initial, isNew }: { initial: Post; isNew: b
           <div style={{ marginLeft: 'auto' }}>
             {deleteConfirm ? (
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                <span style={{ fontSize: 12, color: '#888' }}>Sure?</span>
+                <span style={{ fontSize: 12, color: 'var(--muted)' }}>Sure?</span>
                 <button
                   onClick={deletePost}
-                  style={{ fontSize: 13, fontWeight: 600, color: '#e05252', background: 'none', border: '1px solid #5a1a1a', padding: '8px 14px', borderRadius: 8, cursor: 'pointer' }}
+                  style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: '#e05252', background: 'none', border: '1px solid #5a1a1a', padding: '8px 14px', borderRadius: 8, cursor: 'pointer' }}
                 >
                   Yes, delete
                 </button>
                 <button
                   onClick={() => setDeleteConfirm(false)}
-                  style={{ fontSize: 13, color: '#555', background: 'none', border: 'none', cursor: 'pointer' }}
+                  style={{ fontSize: 'var(--text-sm)', color: 'var(--faint)', background: 'none', border: 'none', cursor: 'pointer' }}
                 >
                   Cancel
                 </button>
@@ -294,7 +294,7 @@ export default function PostEditor({ initial, isNew }: { initial: Post; isNew: b
             ) : (
               <button
                 onClick={() => setDeleteConfirm(true)}
-                style={{ fontSize: 13, color: '#555', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+                style={{ fontSize: 'var(--text-sm)', color: 'var(--faint)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
               >
                 Delete post
               </button>

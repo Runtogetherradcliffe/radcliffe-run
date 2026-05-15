@@ -242,7 +242,7 @@ export default function RoutesClient({ nameOverrides = {} }: { nameOverrides?: R
         width: isMobile ? '100%' : 380,
         height: isMobile ? 260 : 'auto',
         flexShrink: 0,
-        background: '#0a0a0a',
+        background: 'var(--bg)',
         borderRight: isMobile ? 'none' : '1px solid #1e1e1e',
         borderBottom: isMobile ? '1px solid #1e1e1e' : 'none',
         display: 'flex', flexDirection: 'column', overflow: 'hidden',
@@ -252,7 +252,7 @@ export default function RoutesClient({ nameOverrides = {} }: { nameOverrides?: R
         <div style={{ padding: isMobile ? '12px 16px 10px' : '24px 20px 16px' }}>
           {!isMobile && (
             <>
-              <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#f5a623', marginBottom: 6 }}>Route library</p>
+              <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#f5a623', marginBottom: 6 }}>Route library</p>
               <h1 style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 16 }}>Explore the routes</h1>
             </>
           )}
@@ -281,7 +281,7 @@ export default function RoutesClient({ nameOverrides = {} }: { nameOverrides?: R
           </div>
 
           {/* Count */}
-          <p style={{ fontSize: 11, color: '#333', marginTop: 8 }}>{filtered.length} routes</p>
+          <p style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)', marginTop: 8 }}>{filtered.length} routes</p>
         </div>
 
         {/* Route list */}
@@ -297,12 +297,12 @@ export default function RoutesClient({ nameOverrides = {} }: { nameOverrides?: R
                 borderColor:  isSelected ? 'rgba(245,166,35,0.3)'  : 'transparent',
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-                  <span style={{ fontSize: isMobile ? 13 : 14, fontWeight: 600, color: isSelected ? '#fff' : '#ccc', lineHeight: 1.3, flex: 1 }}>
+                  <span style={{ fontSize: isMobile ? 13 : 14, fontWeight: 600, color: isSelected ? 'var(--white)' : 'var(--dim)', lineHeight: 1.3, flex: 1 }}>
                     {displayName(route)}
                   </span>
                   {!isMobile && <TerrainBadge terrain={route.terrain} />}
                   {isMobile && (
-                    <span style={{ fontSize: 11, color: isSelected ? '#f5a623' : '#555', flexShrink: 0 }}>
+                    <span style={{ fontSize: 'var(--text-xs)', color: isSelected ? '#f5a623' : '#555', flexShrink: 0 }}>
                       {route.distance_km}km
                     </span>
                   )}
@@ -310,7 +310,7 @@ export default function RoutesClient({ nameOverrides = {} }: { nameOverrides?: R
                 {!isMobile && (
                   <div style={{ display: 'flex', gap: 12, marginTop: 5 }}>
                     <span style={{ fontSize: 12, color: isSelected ? '#f5a623' : '#555' }}>{route.distance_km} km</span>
-                    <span style={{ fontSize: 12, color: '#333' }}>↑ {route.elevation_m}m</span>
+                    <span style={{ fontSize: 12, color: 'var(--muted)' }}>↑ {route.elevation_m}m</span>
                   </div>
                 )}
               </button>
@@ -325,7 +325,7 @@ export default function RoutesClient({ nameOverrides = {} }: { nameOverrides?: R
 
         {/* Loading spinner */}
         {loading && (
-          <div style={{ position: 'absolute', top: 16, left: '50%', transform: 'translateX(-50%)', background: 'rgba(10,10,10,0.9)', border: '1px solid #2a2a2a', borderRadius: 8, padding: '8px 16px', fontSize: 13, color: '#888', zIndex: 1000, backdropFilter: 'blur(8px)' }}>
+          <div style={{ position: 'absolute', top: 16, left: '50%', transform: 'translateX(-50%)', background: 'rgba(10,10,10,0.9)', border: '1px solid var(--border-2)', borderRadius: 8, padding: '8px 16px', fontSize: 'var(--text-sm)', color: 'var(--muted)', zIndex: 1000, backdropFilter: 'blur(8px)' }}>
             Loading route...
           </div>
         )}
@@ -334,7 +334,7 @@ export default function RoutesClient({ nameOverrides = {} }: { nameOverrides?: R
         {!selected && (
           <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center', pointerEvents: 'none' }}>
             <div style={{ fontSize: 32, marginBottom: 12 }}>🗺️</div>
-            <p style={{ fontSize: 14, color: '#555' }}>{isMobile ? 'Tap a route above' : 'Select a route from the list'}</p>
+            <p style={{ fontSize: 'var(--text-base)', color: 'var(--faint)' }}>{isMobile ? 'Tap a route above' : 'Select a route from the list'}</p>
           </div>
         )}
 
@@ -347,11 +347,11 @@ export default function RoutesClient({ nameOverrides = {} }: { nameOverrides?: R
               : { top: 16, right: 16, maxWidth: 268 }),
             zIndex: 1000,
             background: 'rgba(10,10,10,0.95)', backdropFilter: 'blur(12px)',
-            border: '1px solid #2a2a2a', borderRadius: 12, padding: isMobile ? '12px 16px' : 20,
+            border: '1px solid var(--border-2)', borderRadius: 12, padding: isMobile ? '12px 16px' : 20,
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: isMobile ? 6 : 10 }}>
               <div style={{ flex: 1 }}>
-                {!isMobile && <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#f5a623', marginBottom: 4 }}>Selected route</p>}
+                {!isMobile && <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#f5a623', marginBottom: 4 }}>Selected route</p>}
                 <p style={{ fontSize: isMobile ? 14 : 15, fontWeight: 700, lineHeight: 1.3 }}>{displayName(selected)}</p>
               </div>
               <button onClick={() => {
@@ -359,7 +359,7 @@ export default function RoutesClient({ nameOverrides = {} }: { nameOverrides?: R
                 polyRef.current?.remove(); polyRef.current = null
                 arrowsRef.current?.remove(); arrowsRef.current = null
               }}
-                style={{ background: 'none', border: 'none', color: '#555', cursor: 'pointer', fontSize: 18, lineHeight: 1, padding: '0 0 0 8px', flexShrink: 0 }}>
+                style={{ background: 'none', border: 'none', color: 'var(--faint)', cursor: 'pointer', fontSize: 18, lineHeight: 1, padding: '0 0 0 8px', flexShrink: 0 }}>
                 ×
               </button>
             </div>
@@ -369,13 +369,13 @@ export default function RoutesClient({ nameOverrides = {} }: { nameOverrides?: R
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <TerrainBadge terrain={selected.terrain} />
                 <span style={{ fontSize: 12, color: '#f5a623', fontWeight: 600 }}>{selected.distance_km} km</span>
-                <span style={{ fontSize: 12, color: '#555' }}>↑ {selected.elevation_m}m</span>
+                <span style={{ fontSize: 12, color: 'var(--faint)' }}>↑ {selected.elevation_m}m</span>
                 <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
                   {selected.strava && (
                     <a href={selected.strava} target="_blank" rel="noopener noreferrer" style={{
-                      fontSize: 11, fontWeight: 600,
+                      fontSize: 'var(--text-xs)', fontWeight: 600,
                       padding: '6px 10px', borderRadius: 6, textDecoration: 'none',
-                      background: '#fc4c02', color: '#fff',
+                      background: '#fc4c02', color: 'var(--white)',
                     }}>
                       Strava
                     </a>
@@ -392,20 +392,20 @@ export default function RoutesClient({ nameOverrides = {} }: { nameOverrides?: R
                     { label: 'Distance', value: `${selected.distance_km} km` },
                     { label: 'Elevation', value: `+${selected.elevation_m}m` },
                   ].map(({ label, value }) => (
-                    <div key={label} style={{ background: '#111', borderRadius: 8, padding: '10px 12px' }}>
-                      <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#555', marginBottom: 3 }}>{label}</p>
+                    <div key={label} style={{ background: 'var(--card)', borderRadius: 8, padding: '10px 12px' }}>
+                      <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--faint)', marginBottom: 3 }}>{label}</p>
                       <p style={{ fontSize: 16, fontWeight: 700, color: '#f5a623' }}>{value}</p>
                     </div>
                   ))}
                 </div>
-                <p style={{ fontSize: 12, color: '#555', marginBottom: 14 }}>📍 Starts at <a href="https://maps.app.goo.gl/d1FUYuqmNVpsWUs99" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'underline' }}>Radcliffe Market</a></p>
+                <p style={{ fontSize: 12, color: 'var(--faint)', marginBottom: 14 }}>📍 Starts at <a href="https://maps.app.goo.gl/d1FUYuqmNVpsWUs99" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'underline' }}>Radcliffe Market</a></p>
                 <div style={{ display: 'flex', gap: 8 }}>
                   <GpxButton file={selected.file} />
                   {selected.strava && (
                     <a href={selected.strava} target="_blank" rel="noopener noreferrer" style={{
                       flex: 1, textAlign: 'center', fontSize: 12, fontWeight: 600,
                       padding: '9px 12px', borderRadius: 7, textDecoration: 'none',
-                      background: '#fc4c02', color: '#fff', transition: 'opacity 0.15s',
+                      background: '#fc4c02', color: 'var(--white)', transition: 'opacity 0.15s',
                     }}>
                       View on Strava
                     </a>

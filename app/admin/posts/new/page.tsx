@@ -26,7 +26,7 @@ export default async function NewPostPage() {
     <AdminShell userEmail={user.email ?? ''}>
       <main style={{ flex: 1, padding: 32 }}>
         <div style={{ maxWidth: 800 }}>
-          <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#f5a623', marginBottom: 8 }}>Posts</p>
+          <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#f5a623', marginBottom: 8 }}>Posts</p>
           <h1 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em', marginBottom: 32 }}>New post</h1>
           <PostEditor initial={initial} isNew={true} />
         </div>

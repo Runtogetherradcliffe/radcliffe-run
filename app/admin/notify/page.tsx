@@ -20,9 +20,9 @@ export default async function AdminNotifyPage() {
       <main style={{ flex: 1, padding: 32, maxWidth: 680 }}>
 
         <div style={{ marginBottom: 32 }}>
-          <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#f5a623', marginBottom: 8 }}>Push notifications</p>
+          <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#f5a623', marginBottom: 8 }}>Push notifications</p>
           <h1 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em' }}>Send notification</h1>
-          <p style={{ fontSize: 14, color: '#555', marginTop: 8 }}>
+          <p style={{ fontSize: 'var(--text-base)', color: 'var(--faint)', marginTop: 8 }}>
             {count ?? 0} subscriber{count !== 1 ? 's' : ''} will receive this.
           </p>
         </div>

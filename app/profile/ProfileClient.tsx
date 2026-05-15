@@ -2,6 +2,7 @@
 
 import { useState, useEffect, ReactNode, CSSProperties } from 'react'
 import SignOutButton from './SignOutButton'
+import { applyTheme } from '@/components/ThemeProvider'
 
 type Member = {
   first_name: string
@@ -14,17 +15,19 @@ type Member = {
   medical_info: string | null
   email_opt_out: boolean
   photo_consent: boolean
+  theme: string
+  font_size: string
 }
 
 type PushState = 'loading' | 'unsupported' | 'denied' | 'subscribed' | 'unsubscribed'
 
 const INPUT: CSSProperties = {
-  width: '100%', background: '#0a0a0a', border: '1px solid #2a2a2a',
-  borderRadius: 8, padding: '10px 14px', fontSize: 14, color: '#fff',
+  width: '100%', background: 'var(--bg)', border: '1px solid var(--border-2)',
+  borderRadius: 8, padding: '10px 14px', fontSize: 'var(--text-base)', color: 'var(--white)',
   fontFamily: 'Inter, sans-serif', outline: 'none', boxSizing: 'border-box',
 }
 const LABEL: CSSProperties = {
-  display: 'block', fontSize: 12, fontWeight: 600, color: '#666',
+  display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--muted)',
   marginBottom: 6, fontFamily: 'Inter, sans-serif',
 }
 
@@ -37,15 +40,15 @@ function Section({ title, onEdit, editing, children }: {
   return (
     <div style={{ marginBottom: 24 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-        <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#555' }}>
+        <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--faint)' }}>
           {title}
         </p>
         {onEdit && !editing && (
           <button
             onClick={onEdit}
             style={{
-              background: 'none', border: '1px solid #2a2a2a', borderRadius: 6,
-              padding: '4px 10px', fontSize: 12, color: '#888', cursor: 'pointer',
+              background: 'none', border: '1px solid var(--border-2)', borderRadius: 6,
+              padding: '4px 10px', fontSize: 12, color: 'var(--muted)', cursor: 'pointer',
               fontFamily: 'Inter, sans-serif',
             }}
           >
@@ -53,7 +56,7 @@ function Section({ title, onEdit, editing, children }: {
           </button>
         )}
       </div>
-      <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 12, overflow: 'hidden' }}>
+      <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden' }}>
         {children}
       </div>
     </div>
@@ -64,10 +67,10 @@ function Row({ label, value, muted }: { label: string; value: string; muted?: bo
   return (
     <div style={{
       display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-      padding: '14px 20px', borderBottom: '1px solid #161616',
+      padding: '14px 20px', borderBottom: '1px solid var(--border)',
     }}>
-      <p style={{ fontSize: 13, color: '#666', flexShrink: 0, marginRight: 16 }}>{label}</p>
-      <p style={{ fontSize: 13, color: muted ? '#444' : '#ccc', textAlign: 'right' }}>{value}</p>
+      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)', flexShrink: 0, marginRight: 16 }}>{label}</p>
+      <p style={{ fontSize: 'var(--text-sm)', color: muted ? 'var(--faint)' : 'var(--dim)', textAlign: 'right' }}>{value}</p>
     </div>
   )
 }
@@ -81,7 +84,7 @@ function Toggle({ enabled, onChange, loading }: { enabled: boolean; onChange: ()
       style={{
         width: 44, height: 24, borderRadius: 12, border: 'none', flexShrink: 0,
         cursor: loading ? 'default' : 'pointer',
-        background: enabled ? '#f5a623' : '#2a2a2a',
+        background: enabled ? '#f5a623' : 'var(--border-2)',
         position: 'relative', transition: 'background 0.2s',
         opacity: loading ? 0.6 : 1,
       }}
@@ -90,7 +93,7 @@ function Toggle({ enabled, onChange, loading }: { enabled: boolean; onChange: ()
         position: 'absolute', top: 3,
         left: enabled ? 23 : 3,
         width: 18, height: 18, borderRadius: '50%',
-        background: '#fff', transition: 'left 0.2s',
+        background: 'var(--card)', transition: 'left 0.2s',
       }} />
     </button>
   )
@@ -108,6 +111,15 @@ export default function ProfileClient({ member: initial }: { member: Member }) {
   const [pushLoading, setPushLoading] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [appearanceSaving, setAppearanceSaving] = useState(false)
+
+  // ── Sync DB preferences to localStorage on mount ─────────────────
+  useEffect(() => {
+    localStorage.setItem('rtr-theme',    member.theme)
+    localStorage.setItem('rtr-fontsize', member.font_size)
+    applyTheme(member.theme, member.font_size)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // ── Check push subscription state on mount ──────────────────────
   useEffect(() => {
@@ -265,6 +277,28 @@ export default function ProfileClient({ member: initial }: { member: Member }) {
     }
   }
 
+  // ── Appearance helpers ─────────────────────────────────────────
+  const saveAppearance = async (update: { theme?: string; font_size?: string }) => {
+    const next = { theme: member.theme, font_size: member.font_size, ...update }
+    setAppearanceSaving(true)
+    try {
+      const res = await fetch('/api/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(update),
+      })
+      if (!res.ok) throw new Error()
+      setMember(m => ({ ...m, ...next }))
+      localStorage.setItem('rtr-theme',    next.theme)
+      localStorage.setItem('rtr-fontsize', next.font_size)
+      applyTheme(next.theme, next.font_size)
+    } catch {
+      showToast('Failed to save appearance preference', 'err')
+    } finally {
+      setAppearanceSaving(false)
+    }
+  }
+
   const f = (field: keyof Member) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm(prev => ({ ...prev, [field]: e.target.value }))
 
@@ -275,10 +309,10 @@ export default function ProfileClient({ member: initial }: { member: Member }) {
       {toast && (
         <div style={{
           position: 'fixed', top: 20, right: 20, zIndex: 9999,
-          background: toast.type === 'ok' ? '#0a1a0a' : '#1a0a0a',
+          background: toast.type === 'ok' ? 'var(--green-bg)' : '#1a0a0a',
           border: `1px solid ${toast.type === 'ok' ? '#7cb87c' : '#e05252'}`,
           color: toast.type === 'ok' ? '#7cb87c' : '#e05252',
-          padding: '12px 20px', borderRadius: 10, fontSize: 14, fontWeight: 600,
+          padding: '12px 20px', borderRadius: 10, fontSize: 'var(--text-base)', fontWeight: 600,
         }}>
           {toast.msg}
         </div>
@@ -365,22 +399,81 @@ export default function ProfileClient({ member: initial }: { member: Member }) {
         )}
       </Section>
 
+      {/* ── Appearance ── */}
+      <Section title="Appearance">
+        {/* Theme */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid var(--border)' }}>
+          <div>
+            <p style={{ fontSize: 'var(--text-base)', fontWeight: 600, color: 'var(--dim)', marginBottom: 3 }}>Colour scheme</p>
+            <p style={{ fontSize: 12, color: 'var(--muted)' }}>Choose how the site looks to you</p>
+          </div>
+          <div style={{ display: 'flex', gap: 6, opacity: appearanceSaving ? 0.6 : 1 }}>
+            {(['dark', 'light'] as const).map(t => (
+              <button
+                key={t}
+                onClick={() => member.theme !== t && saveAppearance({ theme: t })}
+                disabled={appearanceSaving}
+                style={{
+                  padding: '6px 14px', borderRadius: 8, fontSize: 'var(--text-sm)', fontWeight: 600,
+                  cursor: appearanceSaving ? 'default' : 'pointer',
+                  fontFamily: 'Inter, sans-serif',
+                  background: member.theme === t ? '#f5a623' : 'transparent',
+                  color:      member.theme === t ? '#0a0a0a' : 'var(--muted)',
+                  border:     member.theme === t ? 'none' : '1px solid var(--border-2)',
+                  transition: 'background 0.15s, color 0.15s',
+                }}
+              >
+                {t === 'dark' ? 'Dark' : 'Light'}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Font size */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px' }}>
+          <div>
+            <p style={{ fontSize: 'var(--text-base)', fontWeight: 600, color: 'var(--dim)', marginBottom: 3 }}>Text size</p>
+            <p style={{ fontSize: 12, color: 'var(--muted)' }}>Larger text may be easier to read</p>
+          </div>
+          <div style={{ display: 'flex', gap: 6, opacity: appearanceSaving ? 0.6 : 1 }}>
+            {(['normal', 'large'] as const).map(s => (
+              <button
+                key={s}
+                onClick={() => member.font_size !== s && saveAppearance({ font_size: s })}
+                disabled={appearanceSaving}
+                style={{
+                  padding: '6px 14px', borderRadius: 8, fontSize: 'var(--text-sm)', fontWeight: 600,
+                  cursor: appearanceSaving ? 'default' : 'pointer',
+                  fontFamily: 'Inter, sans-serif',
+                  background: member.font_size === s ? '#f5a623' : 'transparent',
+                  color:      member.font_size === s ? '#0a0a0a' : 'var(--muted)',
+                  border:     member.font_size === s ? 'none' : '1px solid var(--border-2)',
+                  transition: 'background 0.15s, color 0.15s',
+                }}
+              >
+                {s === 'normal' ? 'Normal' : 'Larger'}
+              </button>
+            ))}
+          </div>
+        </div>
+      </Section>
+
       {/* ── Preferences ── */}
       <Section title="Preferences">
         {/* Email */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid #161616' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid var(--border)' }}>
           <div>
-            <p style={{ fontSize: 14, fontWeight: 600, color: '#ddd', marginBottom: 3 }}>Club emails</p>
-            <p style={{ fontSize: 12, color: '#666' }}>Weekly run info and group announcements</p>
+            <p style={{ fontSize: 'var(--text-base)', fontWeight: 600, color: 'var(--dim)', marginBottom: 3 }}>Club emails</p>
+            <p style={{ fontSize: 12, color: 'var(--muted)' }}>Weekly run info and group announcements</p>
           </div>
           <Toggle enabled={!member.email_opt_out} onChange={toggleEmail} loading={emailToggling} />
         </div>
 
         {/* Photo consent */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid #161616' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid var(--border)' }}>
           <div>
-            <p style={{ fontSize: 14, fontWeight: 600, color: '#ddd', marginBottom: 3 }}>Photo consent</p>
-            <p style={{ fontSize: 12, color: '#666' }}>Allow group photos including you to be shared online</p>
+            <p style={{ fontSize: 'var(--text-base)', fontWeight: 600, color: 'var(--dim)', marginBottom: 3 }}>Photo consent</p>
+            <p style={{ fontSize: 12, color: 'var(--muted)' }}>Allow group photos including you to be shared online</p>
           </div>
           <Toggle enabled={member.photo_consent} onChange={togglePhoto} loading={photoToggling} />
         </div>
@@ -388,8 +481,8 @@ export default function ProfileClient({ member: initial }: { member: Member }) {
         {/* Push */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px' }}>
           <div>
-            <p style={{ fontSize: 14, fontWeight: 600, color: '#ddd', marginBottom: 3 }}>App notifications</p>
-            <p style={{ fontSize: 12, color: '#666' }}>
+            <p style={{ fontSize: 'var(--text-base)', fontWeight: 600, color: 'var(--dim)', marginBottom: 3 }}>App notifications</p>
+            <p style={{ fontSize: 12, color: 'var(--muted)' }}>
               {pushState === 'denied'
                 ? 'Blocked in browser settings — enable in your device settings'
                 : pushState === 'unsupported'
@@ -399,8 +492,8 @@ export default function ProfileClient({ member: initial }: { member: Member }) {
           </div>
           {pushState === 'denied' || pushState === 'unsupported' ? (
             <div style={{
-              fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 6,
-              background: '#1a1a1a', color: '#555', border: '1px solid #222',
+              fontSize: 'var(--text-xs)', fontWeight: 600, padding: '4px 10px', borderRadius: 6,
+              background: 'var(--card-hi)', color: 'var(--faint)', border: '1px solid var(--border)',
             }}>
               {pushState === 'denied' ? 'Blocked' : 'Unavailable'}
             </div>
@@ -419,22 +512,22 @@ export default function ProfileClient({ member: initial }: { member: Member }) {
       </div>
 
       {/* ── Danger zone ── */}
-      <div style={{ marginTop: 40, borderTop: '1px solid #1a1a1a', paddingTop: 32 }}>
-        <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#555', marginBottom: 16 }}>
+      <div style={{ marginTop: 40, borderTop: '1px solid var(--border)', paddingTop: 32 }}>
+        <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--faint)', marginBottom: 16 }}>
           Danger zone
         </p>
 
         {!deleteConfirm ? (
-          <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 12, padding: '20px' }}>
-            <p style={{ fontSize: 14, fontWeight: 600, color: '#ccc', marginBottom: 6 }}>Delete my account</p>
-            <p style={{ fontSize: 13, color: '#666', lineHeight: 1.6, marginBottom: 16 }}>
+          <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, padding: '20px' }}>
+            <p style={{ fontSize: 'var(--text-base)', fontWeight: 600, color: 'var(--dim)', marginBottom: 6 }}>Delete my account</p>
+            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)', lineHeight: 1.6, marginBottom: 16 }}>
               This permanently removes all your personal data, emergency contact details, and medical information from radcliffe.run. This cannot be undone.
             </p>
             <button
               onClick={() => setDeleteConfirm(true)}
               style={{
                 padding: '9px 18px', borderRadius: 8, background: 'transparent',
-                border: '1px solid #5a1a1a', color: '#e05252', fontSize: 13,
+                border: '1px solid rgba(224,82,82,0.4)', color: '#e05252', fontSize: 'var(--text-sm)',
                 fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif',
               }}
             >
@@ -442,9 +535,9 @@ export default function ProfileClient({ member: initial }: { member: Member }) {
             </button>
           </div>
         ) : (
-          <div style={{ background: '#120808', border: '1px solid #5a1a1a', borderRadius: 12, padding: '20px' }}>
-            <p style={{ fontSize: 14, fontWeight: 700, color: '#e05252', marginBottom: 8 }}>Are you sure?</p>
-            <p style={{ fontSize: 13, color: '#999', lineHeight: 1.6, marginBottom: 20 }}>
+          <div style={{ background: 'var(--card)', border: '1px solid rgba(224,82,82,0.3)', borderRadius: 12, padding: '20px' }}>
+            <p style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: '#e05252', marginBottom: 8 }}>Are you sure?</p>
+            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)', lineHeight: 1.6, marginBottom: 20 }}>
               Your account, emergency contact, and any medical information will be permanently deleted. You will be signed out immediately and cannot undo this.
             </p>
             <div style={{ display: 'flex', gap: 10 }}>
@@ -453,19 +546,19 @@ export default function ProfileClient({ member: initial }: { member: Member }) {
                 disabled={deleting}
                 style={{
                   padding: '9px 18px', borderRadius: 8, background: '#c0392b',
-                  border: 'none', color: '#fff', fontSize: 13, fontWeight: 700,
+                  border: 'none', color: 'var(--white)', fontSize: 'var(--text-sm)', fontWeight: 700,
                   cursor: deleting ? 'default' : 'pointer', opacity: deleting ? 0.7 : 1,
                   fontFamily: 'Inter, sans-serif',
                 }}
               >
-                {deleting ? 'Deleting…' : 'Yes, delete my account'}
+                {deleting ? 'Deleting...' : 'Yes, delete my account'}
               </button>
               <button
                 onClick={() => setDeleteConfirm(false)}
                 disabled={deleting}
                 style={{
                   padding: '9px 16px', borderRadius: 8, background: 'transparent',
-                  border: '1px solid #2a2a2a', color: '#888', fontSize: 13,
+                  border: '1px solid var(--border-2)', color: 'var(--muted)', fontSize: 'var(--text-sm)',
                   cursor: 'pointer', fontFamily: 'Inter, sans-serif',
                 }}
               >
@@ -479,6 +572,7 @@ export default function ProfileClient({ member: initial }: { member: Member }) {
   )
 }
 
+
 function SaveCancel({ saving, onSave, onCancel }: { saving: boolean; onSave: () => void; onCancel: () => void }) {
   return (
     <div style={{ display: 'flex', gap: 8 }}>
@@ -487,7 +581,7 @@ function SaveCancel({ saving, onSave, onCancel }: { saving: boolean; onSave: () 
         disabled={saving}
         style={{
           padding: '9px 20px', borderRadius: 8, background: '#f5a623',
-          border: 'none', color: '#0a0a0a', fontSize: 13, fontWeight: 700,
+          border: 'none', color: '#0a0a0a', fontSize: 'var(--text-sm)', fontWeight: 700,
           cursor: saving ? 'default' : 'pointer', opacity: saving ? 0.7 : 1,
           fontFamily: 'Inter, sans-serif',
         }}
@@ -498,7 +592,7 @@ function SaveCancel({ saving, onSave, onCancel }: { saving: boolean; onSave: () 
         onClick={onCancel}
         style={{
           padding: '9px 16px', borderRadius: 8, background: 'transparent',
-          border: '1px solid #2a2a2a', color: '#888', fontSize: 13,
+          border: '1px solid var(--border-2)', color: 'var(--muted)', fontSize: 'var(--text-sm)',
           cursor: 'pointer', fontFamily: 'Inter, sans-serif',
         }}
       >

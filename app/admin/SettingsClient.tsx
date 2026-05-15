@@ -2,6 +2,10 @@
 
 import { useState, useRef } from 'react'
 
+// Session order: { "6": [tuesdayIdx, thursdayIdx, soloIdx], "7": [...] }
+// Indices refer to position in the canonical sessions array for that week
+type SessionOrder = { [week: string]: [number, number, number] }
+
 type Settings = {
   hero_image_url: string | null
   sync_thursday_sheet: boolean
@@ -10,7 +14,33 @@ type Settings = {
   email_default_subject: string | null
   email_default_opening: string | null
   email_default_closing: string | null
+  c25k_enabled: boolean
+  c25k_registration_open: boolean
+  c25k_start_date: string | null
+  c25k_cohort_label: string | null
+  c25k_max_registrations: number | null
+  c25k_session_order: SessionOrder | null
 }
+
+// Canonical session descriptions for the two varying weeks
+const VARYING_WEEKS: { n: number; title: string; sessions: { label: string; short: string }[] }[] = [
+  {
+    n: 6, title: 'Week 6 — 20-min milestone',
+    sessions: [
+      { label: 'Run 1 — 5+5+5 min intervals',  short: '5+5+5 (15 min)' },
+      { label: 'Run 2 — 8+8 min intervals',     short: '8+8 (16 min)' },
+      { label: 'Run 3 — 20 min non-stop',       short: '20 min non-stop' },
+    ],
+  },
+  {
+    n: 7, title: 'Week 7 — Stretch to 25 min',
+    sessions: [
+      { label: 'Run 1 — 5+8+5 min intervals',  short: '5+8+5 (18 min)' },
+      { label: 'Run 2 — 10+10 min intervals',   short: '10+10 (20 min)' },
+      { label: 'Run 3 — 25 min non-stop',       short: '25 min non-stop' },
+    ],
+  },
+]
 
 export default function SettingsClient({ initial }: { initial: Settings }) {
   const [heroUrl,            setHeroUrl]            = useState(initial.hero_image_url ?? '')
@@ -20,6 +50,14 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
   const [emailSubject,       setEmailSubject]       = useState(initial.email_default_subject ?? '')
   const [emailOpening,       setEmailOpening]       = useState(initial.email_default_opening ?? '')
   const [emailClosing,       setEmailClosing]       = useState(initial.email_default_closing ?? '')
+  const [c25kEnabled,        setC25kEnabled]        = useState(initial.c25k_enabled)
+  const [c25kRegOpen,        setC25kRegOpen]        = useState(initial.c25k_registration_open)
+  const [c25kStartDate,      setC25kStartDate]      = useState(initial.c25k_start_date ?? '')
+  const [c25kCohortLabel,    setC25kCohortLabel]    = useState(initial.c25k_cohort_label ?? '')
+  const [c25kMaxReg,         setC25kMaxReg]         = useState<string>(initial.c25k_max_registrations?.toString() ?? '')
+  const [c25kSessionOrder,   setC25kSessionOrder]   = useState<SessionOrder>(
+    initial.c25k_session_order ?? { '6': [0, 1, 2], '7': [0, 1, 2] }
+  )
   const [saving,        setSaving]        = useState(false)
   const [uploading,     setUploading]     = useState(false)
   const [saved,         setSaved]         = useState(false)
@@ -78,6 +116,12 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
           email_default_subject: emailSubject.trim(),
           email_default_opening: emailOpening.trim(),
           email_default_closing: emailClosing.trim(),
+          c25k_enabled:             c25kEnabled,
+          c25k_registration_open:   c25kRegOpen,
+          c25k_start_date:          c25kStartDate.trim() || null,
+          c25k_cohort_label:        c25kCohortLabel.trim() || null,
+          c25k_max_registrations:   c25kMaxReg.trim() ? parseInt(c25kMaxReg, 10) : null,
+          c25k_session_order:       c25kSessionOrder,
         }),
       })
       if (!res.ok) throw new Error((await res.json()).error)
@@ -91,10 +135,10 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
   }
 
   const toggleRow = (label: string, sub: string, checked: boolean, onChange: (v: boolean) => void) => (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', borderBottom: '1px solid #1a1a1a' }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', borderBottom: '1px solid var(--border)' }}>
       <div>
-        <p style={{ fontSize: 14, fontWeight: 600, color: '#ccc', marginBottom: 2 }}>{label}</p>
-        <p style={{ fontSize: 12, color: '#999' }}>{sub}</p>
+        <p style={{ fontSize: 'var(--text-base)', fontWeight: 600, color: 'var(--dim)', marginBottom: 2 }}>{label}</p>
+        <p style={{ fontSize: 12, color: 'var(--muted)' }}>{sub}</p>
       </div>
       <button
         onClick={() => onChange(!checked)}
@@ -107,22 +151,22 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
   )
 
   return (
-    <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 12, padding: 24 }}>
+    <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, padding: 24 }}>
 
       {/* Hero image upload */}
       <div style={{ marginBottom: 24 }}>
-        <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#999', marginBottom: 12 }}>
+        <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 12 }}>
           Hero image
         </p>
 
         {/* Preview */}
         {preview && (
-          <div style={{ marginBottom: 12, borderRadius: 10, overflow: 'hidden', height: 160, position: 'relative', background: '#0a0a0a' }}>
+          <div style={{ marginBottom: 12, borderRadius: 10, overflow: 'hidden', height: 160, position: 'relative', background: 'var(--bg)' }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={preview} alt="Hero preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             {uploading && (
               <div style={{ position: 'absolute', inset: 0, background: 'rgba(10,10,10,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <p style={{ fontSize: 13, color: '#f5a623' }}>Uploading…</p>
+                <p style={{ fontSize: 'var(--text-sm)', color: '#f5a623' }}>Uploading…</p>
               </div>
             )}
           </div>
@@ -139,25 +183,25 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
           <button
             onClick={() => fileRef.current?.click()}
             disabled={uploading}
-            style={{ background: '#1a1a1a', border: '1px solid #2a2a2a', color: '#ccc', borderRadius: 8, padding: '9px 16px', fontSize: 13, fontWeight: 500, cursor: uploading ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif' }}
+            style={{ background: 'var(--card-hi)', border: '1px solid var(--border-2)', color: 'var(--dim)', borderRadius: 8, padding: '9px 16px', fontSize: 'var(--text-sm)', fontWeight: 500, cursor: uploading ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif' }}
           >
             {uploading ? 'Uploading…' : preview ? 'Replace image' : 'Upload image'}
           </button>
           {preview && (
             <button
               onClick={() => { setPreview(null); setHeroUrl('') }}
-              style={{ background: 'transparent', border: '1px solid #2a2a2a', color: '#999', borderRadius: 8, padding: '9px 16px', fontSize: 13, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}
+              style={{ background: 'transparent', border: '1px solid var(--border-2)', color: 'var(--muted)', borderRadius: 8, padding: '9px 16px', fontSize: 'var(--text-sm)', cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}
             >
               Remove
             </button>
           )}
-          <p style={{ fontSize: 11, color: '#444' }}>JPG, PNG or WebP · landscape recommended</p>
+          <p style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)' }}>JPG, PNG or WebP · landscape recommended</p>
         </div>
       </div>
 
       {/* Sync toggles */}
       <div style={{ marginBottom: 24 }}>
-        <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#999', marginBottom: 4 }}>
+        <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 4 }}>
           Sync sources
         </p>
         {toggleRow('Thursday runs sheet', 'Syncs weekly 8k/5k groups from Google Sheets', syncThursday, setSyncThursday)}
@@ -167,10 +211,10 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
 
       {/* Email defaults */}
       <div style={{ marginBottom: 24 }}>
-        <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#999', marginBottom: 12 }}>
+        <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 12 }}>
           Email defaults
         </p>
-        <p style={{ fontSize: 12, color: '#666', marginBottom: 16, lineHeight: 1.6 }}>
+        <p style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 16, lineHeight: 1.6 }}>
           Pre-filled when composing a new email. Can be overridden per-email in the composer.
         </p>
         {[
@@ -179,15 +223,15 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
           { label: 'Default closing', value: emailClosing, set: setEmailClosing, placeholder: "See you out there!\n\nradcliffe.run", rows: 4 },
         ].map(({ label, value, set, placeholder, rows }) => (
           <div key={label} style={{ marginBottom: 14 }}>
-            <p style={{ fontSize: 12, fontWeight: 600, color: '#666', marginBottom: 6 }}>{label}</p>
+            <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--muted)', marginBottom: 6 }}>{label}</p>
             <textarea
               value={value}
               onChange={e => set(e.target.value)}
               placeholder={placeholder}
               rows={rows}
               style={{
-                width: '100%', background: '#0a0a0a', border: '1px solid #2a2a2a',
-                borderRadius: 8, padding: '10px 14px', fontSize: 13, color: '#ccc',
+                width: '100%', background: 'var(--bg)', border: '1px solid var(--border-2)',
+                borderRadius: 8, padding: '10px 14px', fontSize: 'var(--text-sm)', color: 'var(--dim)',
                 fontFamily: 'Inter, sans-serif', outline: 'none', resize: 'vertical',
                 lineHeight: 1.6, boxSizing: 'border-box',
               }}
@@ -196,17 +240,121 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
         ))}
       </div>
 
+      {/* C25K settings */}
+      <div style={{ marginBottom: 24 }}>
+        <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 4 }}>
+          Couch to 5K
+        </p>
+        {toggleRow('Show C25K section', 'Makes /c25k visible. When off, the page returns a 404.', c25kEnabled, setC25kEnabled)}
+        {toggleRow('Registration open', 'Allows new registrations via /join?c25k=true. Turn off after the cohort starts if needed.', c25kRegOpen, setC25kRegOpen)}
+        <div style={{ paddingTop: 14, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div>
+            <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--muted)', marginBottom: 6 }}>Cohort label <span style={{ color: 'var(--muted)', fontWeight: 400 }}>(optional)</span></p>
+            <input
+              type="text"
+              value={c25kCohortLabel}
+              onChange={e => setC25kCohortLabel(e.target.value)}
+              placeholder="e.g. Spring 2026"
+              style={{
+                width: '100%', background: 'var(--bg)', border: '1px solid var(--border-2)',
+                borderRadius: 8, padding: '10px 14px', fontSize: 'var(--text-sm)', color: 'var(--dim)',
+                fontFamily: 'Inter, sans-serif', outline: 'none', boxSizing: 'border-box',
+              }}
+            />
+          </div>
+          <div>
+            <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--muted)', marginBottom: 6 }}>Start date <span style={{ color: 'var(--muted)', fontWeight: 400 }}>(optional — shown on /c25k page)</span></p>
+            <input
+              type="date"
+              value={c25kStartDate}
+              onChange={e => setC25kStartDate(e.target.value)}
+              style={{
+                background: 'var(--bg)', border: '1px solid var(--border-2)',
+                borderRadius: 8, padding: '10px 14px', fontSize: 'var(--text-sm)', color: 'var(--dim)',
+                fontFamily: 'Inter, sans-serif', outline: 'none', colorScheme: 'dark',
+              }}
+            />
+          </div>
+          <div>
+            <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--muted)', marginBottom: 6 }}>Max registrations <span style={{ color: 'var(--muted)', fontWeight: 400 }}>(optional — leave blank for no limit)</span></p>
+            <input
+              type="number"
+              min={1}
+              value={c25kMaxReg}
+              onChange={e => setC25kMaxReg(e.target.value)}
+              placeholder="e.g. 20"
+              style={{
+                width: 120, background: 'var(--bg)', border: '1px solid var(--border-2)',
+                borderRadius: 8, padding: '10px 14px', fontSize: 'var(--text-sm)', color: 'var(--dim)',
+                fontFamily: 'Inter, sans-serif', outline: 'none', boxSizing: 'border-box',
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Session order for varying weeks */}
+        <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid var(--border)' }}>
+          <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--muted)', marginBottom: 4 }}>Session order</p>
+          <p style={{ fontSize: 12, color: 'var(--faint)', marginBottom: 14, lineHeight: 1.5 }}>
+            For weeks 6 and 7, assign which run goes on each day. The longest run shouldn&rsquo;t be left as the solo session.
+          </p>
+          {VARYING_WEEKS.map(wk => {
+            const order = c25kSessionOrder[wk.n.toString()] ?? [0, 1, 2]
+            const slots: { key: 0 | 1 | 2; label: string }[] = [
+              { key: 0, label: 'Tuesday group' },
+              { key: 1, label: 'Thursday group' },
+              { key: 2, label: 'Solo run' },
+            ]
+            const selectStyle: React.CSSProperties = {
+              background: 'var(--bg)', border: '1px solid var(--border-2)',
+              borderRadius: 8, padding: '8px 12px', fontSize: 12, color: 'var(--dim)',
+              fontFamily: 'Inter, sans-serif', outline: 'none', colorScheme: 'dark',
+              width: '100%', cursor: 'pointer',
+            }
+            return (
+              <div key={wk.n} style={{ marginBottom: 16 }}>
+                <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--muted)', marginBottom: 8 }}>{wk.title}</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {slots.map(slot => (
+                    <div key={slot.key} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <span style={{ fontSize: 'var(--text-xs)', color: 'var(--faint)', width: 108, flexShrink: 0 }}>{slot.label}</span>
+                      <select
+                        value={order[slot.key]}
+                        onChange={e => {
+                          const newIdx = parseInt(e.target.value, 10)
+                          const newOrder: [number, number, number] = [...order] as [number, number, number]
+                          // Swap with whatever slot currently holds newIdx
+                          const swapSlot = newOrder.indexOf(newIdx)
+                          if (swapSlot !== -1) newOrder[swapSlot] = newOrder[slot.key]
+                          newOrder[slot.key] = newIdx
+                          setC25kSessionOrder({ ...c25kSessionOrder, [wk.n.toString()]: newOrder })
+                        }}
+                        style={selectStyle}
+                      >
+                        {wk.sessions.map((s, i) => (
+                          <option key={i} value={i}>{s.short}</option>
+                        ))}
+                      </select>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
       {/* Save */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <button
           onClick={save}
           disabled={saving || uploading}
-          style={{ background: '#f5a623', color: '#0a0a0a', border: 'none', borderRadius: 8, padding: '10px 20px', fontSize: 13, fontWeight: 700, cursor: (saving || uploading) ? 'not-allowed' : 'pointer', opacity: (saving || uploading) ? 0.7 : 1, fontFamily: 'Inter, sans-serif' }}
+          style={{ background: '#f5a623', color: '#0a0a0a', border: 'none', borderRadius: 8, padding: '10px 20px', fontSize: 'var(--text-sm)', fontWeight: 700, cursor: (saving || uploading) ? 'not-allowed' : 'pointer', opacity: (saving || uploading) ? 0.7 : 1, fontFamily: 'Inter, sans-serif' }}
         >
           {saving ? 'Saving…' : 'Save settings'}
         </button>
-        {saved && <p style={{ fontSize: 13, color: '#4caf76' }}>Saved ✓</p>}
-        {error && <p style={{ fontSize: 13, color: '#e05c5c' }}>{error}</p>}
+        {saved && <p style={{ fontSize: 'var(--text-sm)', color: '#4caf76' }}>Saved ✓</p>}
+        {error && <p style={{ fontSize: 'var(--text-sm)', color: '#e05c5c' }}>{error}</p>}
       </div>
     </div>
   )

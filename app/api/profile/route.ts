@@ -6,6 +6,7 @@ const ALLOWED_FIELDS = [
   'first_name', 'last_name', 'mobile',
   'emergency_name', 'emergency_phone', 'emergency_relationship',
   'medical_info', 'email_opt_out', 'photo_consent',
+  'theme', 'font_size',
 ]
 
 // PATCH /api/profile — update the authenticated member's own record

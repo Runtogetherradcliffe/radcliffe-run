@@ -69,7 +69,7 @@ const TERRAIN_COLOURS: Record<string, { bg: string; color: string; border: strin
 
 function TerrainBadge({ terrain }: { terrain: string | null }) {
   if (!terrain) return null
-  const c = TERRAIN_COLOURS[terrain] ?? { bg: '#111', color: '#555', border: '#222' }
+  const c = TERRAIN_COLOURS[terrain] ?? { bg: '#111', color: 'var(--faint)', border: '#222' }
   return (
     <span style={{
       display: 'inline-block', fontSize: 10, fontWeight: 700, padding: '2px 7px',
@@ -81,13 +81,13 @@ function TerrainBadge({ terrain }: { terrain: string | null }) {
 
 function inputStyle(extra: React.CSSProperties = {}): React.CSSProperties {
   return {
-    width: '100%', background: '#0a0a0a', border: '1px solid #222', borderRadius: 8,
-    padding: '9px 12px', fontSize: 14, color: '#fff', fontFamily: 'Inter, sans-serif',
+    width: '100%', background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 8,
+    padding: '9px 12px', fontSize: 'var(--text-base)', color: 'var(--white)', fontFamily: 'Inter, sans-serif',
     outline: 'none', boxSizing: 'border-box', ...extra,
   }
 }
 function labelStyle(): React.CSSProperties {
-  return { display: 'block', fontSize: 11, fontWeight: 600, color: '#555', marginBottom: 5, letterSpacing: '0.06em', textTransform: 'uppercase' }
+  return { display: 'block', fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--faint)', marginBottom: 5, letterSpacing: '0.06em', textTransform: 'uppercase' }
 }
 
 export default function RunsClient({ runs: initial }: { runs: Run[] }) {
@@ -251,7 +251,7 @@ export default function RunsClient({ runs: initial }: { runs: Run[] }) {
         <div style={{ display: 'flex', gap: 8 }}>
           {(['upcoming', 'past'] as const).map(v => (
             <button key={v} onClick={() => setShowPast(v === 'past')} style={{
-              fontSize: 13, fontWeight: 600, padding: '7px 14px', borderRadius: 8, cursor: 'pointer',
+              fontSize: 'var(--text-sm)', fontWeight: 600, padding: '7px 14px', borderRadius: 8, cursor: 'pointer',
               fontFamily: 'Inter, sans-serif', border: '1px solid',
               background: (v === 'past') === showPast ? '#f5a623' : 'transparent',
               color:      (v === 'past') === showPast ? '#0a0a0a' : '#555',
@@ -263,14 +263,14 @@ export default function RunsClient({ runs: initial }: { runs: Run[] }) {
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           <button onClick={syncFromSheet} disabled={syncing} style={{
-            fontSize: 13, fontWeight: 600, padding: '8px 16px', borderRadius: 8, cursor: syncing ? 'wait' : 'pointer',
-            background: 'transparent', color: syncing ? '#555' : '#888', border: '1px solid #2a2a2a',
+            fontSize: 'var(--text-sm)', fontWeight: 600, padding: '8px 16px', borderRadius: 8, cursor: syncing ? 'wait' : 'pointer',
+            background: 'transparent', color: syncing ? '#555' : '#888', border: '1px solid var(--border-2)',
             fontFamily: 'Inter, sans-serif',
           }}>
             {syncing ? 'Syncing…' : '↻ Sync from sheet'}
           </button>
           <button onClick={openAdd} style={{
-            fontSize: 13, fontWeight: 700, padding: '8px 16px', borderRadius: 8, cursor: 'pointer',
+            fontSize: 'var(--text-sm)', fontWeight: 700, padding: '8px 16px', borderRadius: 8, cursor: 'pointer',
             background: '#f5a623', color: '#0a0a0a', border: 'none', fontFamily: 'Inter, sans-serif',
           }}>
             + Add run
@@ -283,7 +283,7 @@ export default function RunsClient({ runs: initial }: { runs: Run[] }) {
           background: syncResult.errors > 0 ? '#1a0d0d' : '#0d1a0d',
           border: `1px solid ${syncResult.errors > 0 ? '#3d1a1a' : '#1a3d1a'}`,
           borderRadius: 8, padding: '10px 16px', marginBottom: 16,
-          fontSize: 13, color: syncResult.errors > 0 ? '#e05252' : '#4caf76',
+          fontSize: 'var(--text-sm)', color: syncResult.errors > 0 ? '#e05252' : '#4caf76',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}>
           <span>
@@ -291,19 +291,19 @@ export default function RunsClient({ runs: initial }: { runs: Run[] }) {
               ? `Sync done — ${syncResult.inserted} added, ${syncResult.updated} updated, ${syncResult.errors} errors`
               : `Sync complete — ${syncResult.inserted} added, ${syncResult.updated} updated`}
           </span>
-          <button onClick={() => setSyncResult(null)} style={{ background: 'none', border: 'none', color: '#555', cursor: 'pointer', fontSize: 16, lineHeight: 1 }}>×</button>
+          <button onClick={() => setSyncResult(null)} style={{ background: 'none', border: 'none', color: 'var(--faint)', cursor: 'pointer', fontSize: 16, lineHeight: 1 }}>×</button>
         </div>
       )}
 
       {/* Slide-in form */}
       {showForm && (
         <div style={{
-          background: '#111', border: '1px solid #1e1e1e', borderRadius: 12,
+          background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12,
           padding: 24, marginBottom: 24,
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-            <h2 style={{ fontSize: 15, fontWeight: 700 }}>{editId ? 'Edit run' : 'New run'}</h2>
-            <button onClick={closeForm} style={{ background: 'none', border: 'none', color: '#555', fontSize: 18, cursor: 'pointer', lineHeight: 1 }}>×</button>
+            <h2 style={{ fontSize: 'var(--text-md)', fontWeight: 700 }}>{editId ? 'Edit run' : 'New run'}</h2>
+            <button onClick={closeForm} style={{ background: 'none', border: 'none', color: 'var(--faint)', fontSize: 18, cursor: 'pointer', lineHeight: 1 }}>×</button>
           </div>
 
           <form onSubmit={handleSave}>
@@ -419,19 +419,19 @@ export default function RunsClient({ runs: initial }: { runs: Run[] }) {
               </label>
             </div>
 
-            {formError && <p style={{ fontSize: 13, color: '#e05252', marginBottom: 16 }}>⚠️ {formError}</p>}
+            {formError && <p style={{ fontSize: 'var(--text-sm)', color: '#e05252', marginBottom: 16 }}>⚠️ {formError}</p>}
 
             <div style={{ display: 'flex', gap: 10 }}>
               <button type="submit" disabled={saving} style={{
-                fontSize: 14, fontWeight: 700, padding: '10px 20px', borderRadius: 8,
+                fontSize: 'var(--text-base)', fontWeight: 700, padding: '10px 20px', borderRadius: 8,
                 background: saving ? '#2a2a2a' : '#f5a623', color: saving ? '#555' : '#0a0a0a',
                 border: 'none', cursor: saving ? 'wait' : 'pointer', fontFamily: 'Inter, sans-serif',
               }}>
                 {saving ? 'Saving…' : editId ? 'Save changes' : 'Add run'}
               </button>
               <button type="button" onClick={closeForm} style={{
-                fontSize: 14, fontWeight: 500, padding: '10px 20px', borderRadius: 8,
-                background: 'transparent', color: '#555', border: '1px solid #222', cursor: 'pointer', fontFamily: 'Inter, sans-serif',
+                fontSize: 'var(--text-base)', fontWeight: 500, padding: '10px 20px', borderRadius: 8,
+                background: 'transparent', color: 'var(--faint)', border: '1px solid var(--border)', cursor: 'pointer', fontFamily: 'Inter, sans-serif',
               }}>
                 Cancel
               </button>
@@ -442,15 +442,15 @@ export default function RunsClient({ runs: initial }: { runs: Run[] }) {
 
       {/* Run list */}
       {displayed.length === 0 ? (
-        <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 12, padding: '48px 20px', textAlign: 'center' }}>
-          <p style={{ fontSize: 14, color: '#555' }}>{showPast ? 'No past runs recorded' : 'No upcoming runs scheduled'}</p>
-          {!showPast && <button onClick={openAdd} style={{ marginTop: 12, fontSize: 13, color: '#f5a623', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>Add the first one →</button>}
+        <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, padding: '48px 20px', textAlign: 'center' }}>
+          <p style={{ fontSize: 'var(--text-base)', color: 'var(--faint)' }}>{showPast ? 'No past runs recorded' : 'No upcoming runs scheduled'}</p>
+          {!showPast && <button onClick={openAdd} style={{ marginTop: 12, fontSize: 'var(--text-sm)', color: '#f5a623', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>Add the first one →</button>}
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {displayed.map(run => (
             <div key={run.id} style={{
-              background: '#111', border: '1px solid #1e1e1e', borderRadius: 12,
+              background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12,
               padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 20,
               opacity: run.cancelled ? 0.55 : 1,
             }}>
@@ -458,15 +458,15 @@ export default function RunsClient({ runs: initial }: { runs: Run[] }) {
               {(() => { const { day, month, weekday } = fmtDate(run.date); return (
               <div style={{ minWidth: 52, textAlign: 'center', flexShrink: 0 }}>
                 <p style={{ fontSize: 22, fontWeight: 800, lineHeight: 1, color: run.cancelled ? '#555' : '#f5a623', letterSpacing: '-0.02em' }}>{day}</p>
-                <p style={{ fontSize: 11, color: '#444', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{month}</p>
-                <p style={{ fontSize: 10, color: '#333' }}>{weekday}</p>
+                <p style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{month}</p>
+                <p style={{ fontSize: 10, color: 'var(--muted)' }}>{weekday}</p>
               </div>
               )})()}
 
               {/* Details */}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
-                  <p style={{ fontSize: 15, fontWeight: 700, color: '#ddd', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  <p style={{ fontSize: 'var(--text-md)', fontWeight: 700, color: 'var(--dim)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {run.title}
                   </p>
                   {run.cancelled && (
@@ -502,10 +502,10 @@ export default function RunsClient({ runs: initial }: { runs: Run[] }) {
                   <TerrainBadge terrain={run.terrain} />
                 </div>
                 <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
-                  {run.distance_km && <span style={{ fontSize: 12, color: '#555' }}>{run.distance_km} km</span>}
-                  {run.leader_name && <span style={{ fontSize: 12, color: '#555' }}>Led by {run.leader_name}</span>}
-                  {run.route_slug  && <span style={{ fontSize: 12, color: '#444' }}>Route: {run.route_slug}</span>}
-                  <span style={{ fontSize: 12, color: '#333' }}>{run.meeting_point}</span>
+                  {run.distance_km && <span style={{ fontSize: 12, color: 'var(--faint)' }}>{run.distance_km} km</span>}
+                  {run.leader_name && <span style={{ fontSize: 12, color: 'var(--faint)' }}>Led by {run.leader_name}</span>}
+                  {run.route_slug  && <span style={{ fontSize: 12, color: 'var(--muted)' }}>Route: {run.route_slug}</span>}
+                  <span style={{ fontSize: 12, color: 'var(--muted)' }}>{run.meeting_point}</span>
                   {run.meeting_map_url && (
                     <a href={run.meeting_map_url} target="_blank" rel="noopener noreferrer"
                       style={{ fontSize: 12, color: '#f5a623', textDecoration: 'none' }}
@@ -514,14 +514,14 @@ export default function RunsClient({ runs: initial }: { runs: Run[] }) {
                     </a>
                   )}
                 </div>
-                {run.description && <p style={{ fontSize: 12, color: '#444', marginTop: 4 }}>{run.description}</p>}
+                {run.description && <p style={{ fontSize: 12, color: 'var(--muted)', marginTop: 4 }}>{run.description}</p>}
               </div>
 
               {/* Actions */}
               <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
                 <button onClick={() => openEdit(run)} style={{
                   fontSize: 12, padding: '6px 12px', borderRadius: 6, cursor: 'pointer',
-                  background: 'transparent', border: '1px solid #222', color: '#666',
+                  background: 'transparent', border: '1px solid var(--border)', color: 'var(--muted)',
                   fontFamily: 'Inter, sans-serif', fontWeight: 500,
                 }}>
                   Edit
@@ -543,7 +543,7 @@ export default function RunsClient({ runs: initial }: { runs: Run[] }) {
                   disabled={deleting === run.id}
                   style={{
                     fontSize: 12, padding: '6px 12px', borderRadius: 6, cursor: deleting === run.id ? 'wait' : 'pointer',
-                    background: 'transparent', border: '1px solid #1e1e1e', color: '#333',
+                    background: 'transparent', border: '1px solid var(--border)', color: 'var(--muted)',
                     fontFamily: 'Inter, sans-serif', fontWeight: 500,
                   }}
                 >
@@ -555,7 +555,7 @@ export default function RunsClient({ runs: initial }: { runs: Run[] }) {
         </div>
       )}
 
-      <p style={{ fontSize: 12, color: '#333', marginTop: 16 }}>
+      <p style={{ fontSize: 12, color: 'var(--muted)', marginTop: 16 }}>
         {displayed.length} {showPast ? 'past' : 'upcoming'} run{displayed.length !== 1 ? 's' : ''}
       </p>
     </div>

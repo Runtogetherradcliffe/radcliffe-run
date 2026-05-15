@@ -8,7 +8,7 @@ export const metadata = { title: 'Posts — radcliffe.run admin' }
 export const dynamic = 'force-dynamic'
 
 const STATUS_CHIP: Record<string, { bg: string; color: string; label: string }> = {
-  draft:     { bg: '#1a1a1a', color: '#888',    label: 'Draft' },
+  draft:     { bg: '#1a1a1a', color: 'var(--muted)',    label: 'Draft' },
   published: { bg: '#0a1a0a', color: '#7cb87c', label: 'Published' },
   archived:  { bg: '#1a0d00', color: '#b06830', label: 'Archived' },
 }
@@ -46,13 +46,13 @@ export default async function AdminPostsPage() {
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 32, gap: 16 }}>
           <div>
-            <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#f5a623', marginBottom: 8 }}>Posts</p>
+            <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#f5a623', marginBottom: 8 }}>Posts</p>
             <h1 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em' }}>Roundups &amp; news</h1>
           </div>
           <Link href="/admin/posts/new" style={{
             display: 'inline-flex', alignItems: 'center', gap: 6,
             background: '#f5a623', color: '#0a0a0a',
-            fontSize: 13, fontWeight: 700, padding: '10px 18px',
+            fontSize: 'var(--text-sm)', fontWeight: 700, padding: '10px 18px',
             borderRadius: 8, textDecoration: 'none', whiteSpace: 'nowrap',
           }}>
             + New post
@@ -61,12 +61,12 @@ export default async function AdminPostsPage() {
 
         {/* Active posts */}
         <section style={{ marginBottom: 40 }}>
-          <h2 style={{ fontSize: 15, fontWeight: 700, color: '#ccc', marginBottom: 12 }}>All posts</h2>
-          <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 12, overflow: 'hidden' }}>
+          <h2 style={{ fontSize: 'var(--text-md)', fontWeight: 700, color: 'var(--dim)', marginBottom: 12 }}>All posts</h2>
+          <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden' }}>
             {active.length === 0 ? (
               <div style={{ padding: '32px 24px', textAlign: 'center' }}>
-                <p style={{ color: '#999', fontSize: 14 }}>No posts yet.</p>
-                <Link href="/admin/posts/new" style={{ fontSize: 13, color: '#f5a623', textDecoration: 'none' }}>Write your first post →</Link>
+                <p style={{ color: 'var(--muted)', fontSize: 'var(--text-base)' }}>No posts yet.</p>
+                <Link href="/admin/posts/new" style={{ fontSize: 'var(--text-sm)', color: '#f5a623', textDecoration: 'none' }}>Write your first post →</Link>
               </div>
             ) : active.map((p, i) => {
               const chip = STATUS_CHIP[p.status] ?? STATUS_CHIP.draft
@@ -82,21 +82,21 @@ export default async function AdminPostsPage() {
                         {TYPE_LABEL[p.type] ?? p.type}
                       </span>
                       {p.photo_urls?.length > 0 && (
-                        <span style={{ fontSize: 10, color: '#555' }}>📷 {p.photo_urls.length}</span>
+                        <span style={{ fontSize: 10, color: 'var(--faint)' }}>📷 {p.photo_urls.length}</span>
                       )}
                     </div>
-                    <p style={{ fontSize: 14, fontWeight: 600, color: '#fff', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <p style={{ fontSize: 'var(--text-base)', fontWeight: 600, color: 'var(--white)', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {p.title}
                     </p>
-                    <p style={{ fontSize: 12, color: '#999' }}>
+                    <p style={{ fontSize: 12, color: 'var(--muted)' }}>
                       {p.published_at ? `Published ${fmtDate(p.published_at)}` : `Created ${fmtDate(p.created_at)}`}
                     </p>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
-                    <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 9px', borderRadius: 20, background: chip.bg, color: chip.color, border: `1px solid ${chip.color}33` }}>
+                    <span style={{ fontSize: 'var(--text-xs)', fontWeight: 600, padding: '3px 9px', borderRadius: 20, background: chip.bg, color: chip.color, border: `1px solid ${chip.color}33` }}>
                       {chip.label}
                     </span>
-                    <span style={{ fontSize: 13, color: '#333' }}>→</span>
+                    <span style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)' }}>→</span>
                   </div>
                 </Link>
               )
@@ -107,8 +107,8 @@ export default async function AdminPostsPage() {
         {/* Archived */}
         {archived.length > 0 && (
           <section>
-            <h2 style={{ fontSize: 15, fontWeight: 700, color: '#555', marginBottom: 12 }}>Archived</h2>
-            <div style={{ background: '#0d0d0d', border: '1px solid #1a1a1a', borderRadius: 12, overflow: 'hidden' }}>
+            <h2 style={{ fontSize: 'var(--text-md)', fontWeight: 700, color: 'var(--faint)', marginBottom: 12 }}>Archived</h2>
+            <div style={{ background: '#0d0d0d', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden' }}>
               {archived.map((p, i) => {
                 const chip = STATUS_CHIP.archived
                 return (
@@ -118,14 +118,14 @@ export default async function AdminPostsPage() {
                     borderBottom: i < archived.length - 1 ? '1px solid #181818' : 'none',
                   }}>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontSize: 14, fontWeight: 600, color: '#555', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <p style={{ fontSize: 'var(--text-base)', fontWeight: 600, color: 'var(--faint)', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {p.title}
                       </p>
-                      <p style={{ fontSize: 12, color: '#444' }}>
+                      <p style={{ fontSize: 12, color: 'var(--muted)' }}>
                         {p.published_at ? fmtDate(p.published_at) : '—'}
                       </p>
                     </div>
-                    <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 9px', borderRadius: 20, background: chip.bg, color: chip.color, border: `1px solid ${chip.color}33` }}>
+                    <span style={{ fontSize: 'var(--text-xs)', fontWeight: 600, padding: '3px 9px', borderRadius: 20, background: chip.bg, color: chip.color, border: `1px solid ${chip.color}33` }}>
                       {chip.label}
                     </span>
                   </Link>

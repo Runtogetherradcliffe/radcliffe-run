@@ -121,6 +121,6 @@ export default function RunMap({ gpxFile, center, onTour = false, meetingLabel =
   }, [gpxFile, center, onTour, meetingLabel])
 
   return (
-    <div ref={mapRef} style={{ height: 360, borderRadius: 12, overflow: 'hidden', border: '1px solid #1e1e1e' }} />
+    <div ref={mapRef} style={{ height: 360, borderRadius: 12, overflow: 'hidden', border: '1px solid var(--border)' }} />
   )
 }

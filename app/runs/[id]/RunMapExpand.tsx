@@ -298,7 +298,7 @@ export default function RunMapExpand({ file, accentColor = '#f5a623', rightButto
           onClick={() => setOpen(o => !o)}
           style={{
             display: 'inline-flex', alignItems: 'center', gap: 6,
-            fontSize: 13, fontWeight: 600, color: accentColor,
+            fontSize: 'var(--text-sm)', fontWeight: 600, color: accentColor,
             background: 'none', border: 'none', padding: 0, cursor: 'pointer',
             fontFamily: 'Inter, sans-serif',
           }}
@@ -311,7 +311,7 @@ export default function RunMapExpand({ file, accentColor = '#f5a623', rightButto
       {/* Map wrapper */}
       <div style={fullscreen ? {
         position: 'fixed', inset: 0, zIndex: 9999,
-        background: '#0a0a0a',
+        background: 'var(--bg)',
       } : {
         height: open ? MAP_HEIGHT : 0,
         overflow: 'hidden',
@@ -331,13 +331,13 @@ export default function RunMapExpand({ file, accentColor = '#f5a623', rightButto
         />
 
         {status === 'loading' && (
-          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#111', borderRadius: fullscreen ? 0 : 10 }}>
-            <p style={{ fontSize: 13, color: '#555' }}>Loading map...</p>
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--card)', borderRadius: fullscreen ? 0 : 10 }}>
+            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--faint)' }}>Loading map...</p>
           </div>
         )}
         {status === 'error' && (
-          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#111', borderRadius: fullscreen ? 0 : 10 }}>
-            <p style={{ fontSize: 13, color: '#555' }}>Map unavailable</p>
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--card)', borderRadius: fullscreen ? 0 : 10 }}>
+            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--faint)' }}>Map unavailable</p>
           </div>
         )}
 
@@ -359,7 +359,7 @@ export default function RunMapExpand({ file, accentColor = '#f5a623', rightButto
                 cursor: 'pointer',
                 color: locating ? '#4a9eff' : '#aaa',
                 display: 'flex', alignItems: 'center', gap: fullscreen ? 8 : 0,
-                fontSize: 13, fontWeight: 600, fontFamily: 'Inter, sans-serif',
+                fontSize: 'var(--text-sm)', fontWeight: 600, fontFamily: 'Inter, sans-serif',
               }}
             >
               <LocateIcon active={locating} />
@@ -382,7 +382,7 @@ export default function RunMapExpand({ file, accentColor = '#f5a623', rightButto
                 cursor: 'pointer',
                 color: fullscreen ? '#fff' : '#aaa',
                 display: 'flex', alignItems: 'center', gap: fullscreen ? 8 : 0,
-                fontSize: 13, fontWeight: 600, fontFamily: 'Inter, sans-serif',
+                fontSize: 'var(--text-sm)', fontWeight: 600, fontFamily: 'Inter, sans-serif',
               }}
             >
               <ExpandIcon fullscreen={fullscreen} />

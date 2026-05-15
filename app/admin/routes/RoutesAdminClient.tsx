@@ -20,8 +20,8 @@ const TERRAIN_COLOURS: Record<string, { bg: string; color: string; border: strin
 
 function inputStyle(extra: React.CSSProperties = {}): React.CSSProperties {
   return {
-    width: '100%', background: '#0a0a0a', border: '1px solid #222', borderRadius: 8,
-    padding: '9px 12px', fontSize: 14, color: '#fff', fontFamily: 'Inter, sans-serif',
+    width: '100%', background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 8,
+    padding: '9px 12px', fontSize: 'var(--text-base)', color: 'var(--white)', fontFamily: 'Inter, sans-serif',
     outline: 'none', boxSizing: 'border-box', resize: 'vertical', ...extra,
   }
 }
@@ -123,7 +123,7 @@ export default function RoutesAdminClient() {
   }
 
   if (loading) {
-    return <p style={{ fontSize: 14, color: '#555' }}>Loading routes...</p>
+    return <p style={{ fontSize: 'var(--text-base)', color: 'var(--faint)' }}>Loading routes...</p>
   }
 
   const overrideCount = Object.keys(overrides).length
@@ -132,17 +132,17 @@ export default function RoutesAdminClient() {
     <div>
       {/* Stats */}
       <div style={{ display: 'flex', gap: 16, marginBottom: 20 }}>
-        <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 8, padding: '10px 16px' }}>
+        <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 16px' }}>
           <span style={{ fontSize: 20, fontWeight: 800, color: '#f5a623' }}>{ROUTES.length}</span>
-          <span style={{ fontSize: 12, color: '#555', marginLeft: 8 }}>routes</span>
+          <span style={{ fontSize: 12, color: 'var(--faint)', marginLeft: 8 }}>routes</span>
         </div>
-        <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 8, padding: '10px 16px' }}>
+        <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 16px' }}>
           <span style={{ fontSize: 20, fontWeight: 800, color: '#4caf76' }}>{overrideCount}</span>
-          <span style={{ fontSize: 12, color: '#555', marginLeft: 8 }}>custom descriptions</span>
+          <span style={{ fontSize: 12, color: 'var(--faint)', marginLeft: 8 }}>custom descriptions</span>
         </div>
-        <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 8, padding: '10px 16px' }}>
+        <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 16px' }}>
           <span style={{ fontSize: 20, fontWeight: 800, color: '#5b9bd5' }}>{ROUTES.length - overrideCount}</span>
-          <span style={{ fontSize: 12, color: '#555', marginLeft: 8 }}>using default</span>
+          <span style={{ fontSize: 12, color: 'var(--faint)', marginLeft: 8 }}>using default</span>
         </div>
       </div>
 
@@ -171,14 +171,14 @@ export default function RoutesAdminClient() {
         />
       </div>
 
-      <p style={{ fontSize: 12, color: '#333', marginBottom: 16 }}>{filtered.length} routes shown</p>
+      <p style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 16 }}>{filtered.length} routes shown</p>
 
       {/* Route list by category */}
       {grouped.map(({ cat, routes }) => (
         <div key={cat} style={{ marginBottom: 32 }}>
-          <h2 style={{ fontSize: 13, fontWeight: 700, color: '#666', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10, paddingBottom: 8, borderBottom: '1px solid #1e1e1e' }}>
+          <h2 style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10, paddingBottom: 8, borderBottom: '1px solid #1e1e1e' }}>
             {CATEGORY_LABELS[cat]}
-            <span style={{ fontWeight: 400, color: '#333', marginLeft: 8 }}>({routes.length})</span>
+            <span style={{ fontWeight: 400, color: 'var(--muted)', marginLeft: 8 }}>({routes.length})</span>
           </h2>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -191,16 +191,16 @@ export default function RoutesAdminClient() {
 
               return (
                 <div key={route.slug} style={{
-                  background: '#111', border: '1px solid #1e1e1e', borderRadius: 10,
+                  background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 10,
                   padding: '14px 18px',
                   borderLeft: hasOverride ? '3px solid #4caf76' : '3px solid transparent',
                 }}>
                   {/* Header row */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: isEditing ? 12 : currentDesc ? 6 : 0 }}>
-                    <span style={{ fontSize: 14, fontWeight: 700, color: '#ddd', flex: 1 }}>
+                    <span style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--dim)', flex: 1 }}>
                       {override?.name ?? route.name}
                       {override?.name && override.name !== route.name && (
-                        <span style={{ fontSize: 11, color: '#555', fontWeight: 400, marginLeft: 8 }}>
+                        <span style={{ fontSize: 'var(--text-xs)', color: 'var(--faint)', fontWeight: 400, marginLeft: 8 }}>
                           (was: {route.name})
                         </span>
                       )}
@@ -210,7 +210,7 @@ export default function RoutesAdminClient() {
                       letterSpacing: '0.08em', textTransform: 'uppercase',
                       background: tc.bg, color: tc.color, border: `1px solid ${tc.border}`,
                     }}>{route.terrain}</span>
-                    <span style={{ fontSize: 12, color: '#555' }}>{route.distance_km} km</span>
+                    <span style={{ fontSize: 12, color: 'var(--faint)' }}>{route.distance_km} km</span>
                     {hasOverride && (
                       <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 7px', borderRadius: 4, background: '#0d2a0d', color: '#4caf76', border: '1px solid #1a3d1a', letterSpacing: '0.06em' }}>
                         CUSTOM
@@ -218,7 +218,7 @@ export default function RoutesAdminClient() {
                     )}
                     {saveResult?.slug === route.slug && (
                       <span style={{
-                        fontSize: 11, fontWeight: 600, color: saveResult.ok ? '#4caf76' : '#e05252',
+                        fontSize: 'var(--text-xs)', fontWeight: 600, color: saveResult.ok ? '#4caf76' : '#e05252',
                       }}>
                         {saveResult.msg}
                       </span>
@@ -226,7 +226,7 @@ export default function RoutesAdminClient() {
                     {!isEditing && (
                       <button onClick={() => startEdit(route.slug)} style={{
                         fontSize: 12, padding: '5px 12px', borderRadius: 6, cursor: 'pointer',
-                        background: 'transparent', border: '1px solid #222', color: '#666',
+                        background: 'transparent', border: '1px solid var(--border)', color: 'var(--muted)',
                         fontFamily: 'Inter, sans-serif', fontWeight: 500,
                       }}>
                         Edit
@@ -236,10 +236,10 @@ export default function RoutesAdminClient() {
 
                   {/* Description display */}
                   {!isEditing && currentDesc && (
-                    <p style={{ fontSize: 13, color: '#888', lineHeight: 1.6 }}>{currentDesc}</p>
+                    <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)', lineHeight: 1.6 }}>{currentDesc}</p>
                   )}
                   {!isEditing && !currentDesc && (
-                    <p style={{ fontSize: 12, color: '#333', fontStyle: 'italic' }}>No description</p>
+                    <p style={{ fontSize: 12, color: 'var(--muted)', fontStyle: 'italic' }}>No description</p>
                   )}
 
                   {/* Edit form */}
@@ -258,7 +258,7 @@ export default function RoutesAdminClient() {
                           onClick={() => saveDescription(route.slug)}
                           disabled={saving || !editText.trim()}
                           style={{
-                            fontSize: 13, fontWeight: 700, padding: '8px 16px', borderRadius: 8,
+                            fontSize: 'var(--text-sm)', fontWeight: 700, padding: '8px 16px', borderRadius: 8,
                             background: saving || !editText.trim() ? '#2a2a2a' : '#f5a623',
                             color: saving || !editText.trim() ? '#555' : '#0a0a0a',
                             border: 'none', cursor: saving ? 'wait' : 'pointer',
@@ -268,8 +268,8 @@ export default function RoutesAdminClient() {
                           {saving ? 'Saving...' : 'Save'}
                         </button>
                         <button onClick={cancelEdit} style={{
-                          fontSize: 13, fontWeight: 500, padding: '8px 16px', borderRadius: 8,
-                          background: 'transparent', color: '#555', border: '1px solid #222',
+                          fontSize: 'var(--text-sm)', fontWeight: 500, padding: '8px 16px', borderRadius: 8,
+                          background: 'transparent', color: 'var(--faint)', border: '1px solid var(--border)',
                           cursor: 'pointer', fontFamily: 'Inter, sans-serif',
                         }}>
                           Cancel
@@ -290,8 +290,8 @@ export default function RoutesAdminClient() {
                         )}
                       </div>
                       {route.description && hasOverride && (
-                        <p style={{ fontSize: 11, color: '#333', marginTop: 10, lineHeight: 1.5 }}>
-                          <span style={{ color: '#555', fontWeight: 600 }}>Default:</span> {route.description}
+                        <p style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)', marginTop: 10, lineHeight: 1.5 }}>
+                          <span style={{ color: 'var(--faint)', fontWeight: 600 }}>Default:</span> {route.description}
                         </p>
                       )}
                     </div>

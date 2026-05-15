@@ -80,14 +80,14 @@ export default function GpxButton({ file, accentColor = '#f5a623' }: { file: str
             onClick={e => e.stopPropagation()}
             style={{
               width: '100%', maxWidth: 480,
-              background: '#161616', borderTop: '1px solid #2a2a2a',
+              background: 'var(--card)', borderTop: '1px solid var(--border)',
               borderRadius: '16px 16px 0 0', padding: '20px 20px 40px',
             }}
           >
-            <div style={{ width: 36, height: 4, background: '#333', borderRadius: 2, margin: '0 auto 20px' }} />
-            <p style={{ fontSize: 15, fontWeight: 700, color: '#fff', marginBottom: 6 }}>Download GPX route</p>
-            <p style={{ fontSize: 13, color: '#666', lineHeight: 1.6, marginBottom: 20 }}>
-              Tap <strong style={{ color: '#aaa' }}>Save to Files</strong> in the sheet below, then open the file from the Files app to import into WorkOutDoors or any GPS app.
+            <div style={{ width: 36, height: 4, background: 'var(--border-2)', borderRadius: 2, margin: '0 auto 20px' }} />
+            <p style={{ fontSize: 'var(--text-md)', fontWeight: 700, color: 'var(--white)', marginBottom: 6 }}>Download GPX route</p>
+            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)', lineHeight: 1.6, marginBottom: 20 }}>
+              Tap <strong style={{ color: 'var(--dim)' }}>Save to Files</strong> in the sheet below, then open the file from the Files app to import into WorkOutDoors or any GPS app.
             </p>
 
             {/* Share the file — iOS shows "Save to Files" which lets users open with WorkOutDoors.
@@ -106,7 +106,7 @@ export default function GpxButton({ file, accentColor = '#f5a623' }: { file: str
                 }}
                 style={{
                   width: '100%', background: accentColor, color: '#0a0a0a', border: 'none',
-                  borderRadius: 10, fontSize: 14, fontWeight: 700, padding: '13px',
+                  borderRadius: 10, fontSize: 'var(--text-base)', fontWeight: 700, padding: '13px',
                   cursor: 'pointer', fontFamily: 'inherit', marginBottom: 10,
                 }}
               >
@@ -121,8 +121,8 @@ export default function GpxButton({ file, accentColor = '#f5a623' }: { file: str
                 setShowPanel(false)
               }}
               style={{
-                width: '100%', background: '#1e1e1e', color: '#ccc', border: '1px solid #2a2a2a',
-                borderRadius: 10, fontSize: 14, fontWeight: 500, padding: '13px',
+                width: '100%', background: 'var(--card-hi)', color: 'var(--dim)', border: '1px solid var(--border)',
+                borderRadius: 10, fontSize: 'var(--text-base)', fontWeight: 500, padding: '13px',
                 cursor: 'pointer', fontFamily: 'inherit', marginBottom: 10,
               }}
             >
@@ -133,7 +133,7 @@ export default function GpxButton({ file, accentColor = '#f5a623' }: { file: str
               onClick={() => setShowPanel(false)}
               style={{
                 width: '100%', background: 'transparent', border: 'none',
-                color: '#555', fontSize: 14, padding: '10px',
+                color: 'var(--faint)', fontSize: 'var(--text-base)', padding: '10px',
                 cursor: 'pointer', fontFamily: 'inherit',
               }}
             >

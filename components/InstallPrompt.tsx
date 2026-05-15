@@ -83,7 +83,7 @@ export default function InstallPrompt() {
     <div style={{
       position: 'fixed', bottom: 20, left: '50%', transform: 'translateX(-50%)',
       zIndex: 490, width: 'calc(100% - 40px)', maxWidth: 440,
-      background: '#111', border: '1px solid #2a2a2a',
+      background: 'var(--card)', border: '1px solid var(--border-2)',
       borderRadius: 14, padding: '16px 20px',
       boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
       fontFamily: 'Inter, sans-serif',
@@ -96,30 +96,30 @@ export default function InstallPrompt() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/icon-192.png" alt="" style={{ width: 40, height: 40, borderRadius: 10, flexShrink: 0 }} />
               <div>
-                <p style={{ fontSize: 13, fontWeight: 700, color: '#fff', marginBottom: 2 }}>Add to Home Screen</p>
-                <p style={{ fontSize: 12, color: '#666', lineHeight: 1.4 }}>Get quick access to radcliffe.run like an app.</p>
+                <p style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--white)', marginBottom: 2 }}>Add to Home Screen</p>
+                <p style={{ fontSize: 12, color: 'var(--muted)', lineHeight: 1.4 }}>Get quick access to radcliffe.run like an app.</p>
               </div>
             </div>
             <button
               onClick={dismiss}
-              style={{ background: 'none', border: 'none', color: '#444', fontSize: 18, cursor: 'pointer', flexShrink: 0, lineHeight: 1, padding: 0 }}
+              style={{ background: 'none', border: 'none', color: 'var(--muted)', fontSize: 18, cursor: 'pointer', flexShrink: 0, lineHeight: 1, padding: 0 }}
               aria-label="Dismiss"
             >×</button>
           </div>
 
           {/* Step-by-step instruction */}
-          <div style={{ background: '#0d0d0d', borderRadius: 10, padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ background: 'var(--card)', borderRadius: 10, padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
             <Step n={1}>
               Tap the{' '}
               <ShareIcon />{' '}
-              <span style={{ color: '#ccc' }}>Share</span> button at the bottom of Safari
+              <span style={{ color: 'var(--dim)' }}>Share</span> button at the bottom of Safari
             </Step>
             <Step n={2}>
               Scroll down and tap{' '}
-              <span style={{ color: '#fff', fontWeight: 600 }}>Add to Home Screen</span>
+              <span style={{ color: 'var(--white)', fontWeight: 600 }}>Add to Home Screen</span>
             </Step>
             <Step n={3}>
-              Tap <span style={{ color: '#fff', fontWeight: 600 }}>Add</span> to confirm
+              Tap <span style={{ color: 'var(--white)', fontWeight: 600 }}>Add</span> to confirm
             </Step>
           </div>
         </div>
@@ -129,15 +129,15 @@ export default function InstallPrompt() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/icon-192.png" alt="" style={{ width: 40, height: 40, borderRadius: 10, flexShrink: 0 }} />
           <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={{ fontSize: 13, fontWeight: 700, color: '#fff', marginBottom: 2 }}>Add to Home Screen</p>
-            <p style={{ fontSize: 12, color: '#666', lineHeight: 1.4 }}>Install radcliffe.run for quick access.</p>
+            <p style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--white)', marginBottom: 2 }}>Add to Home Screen</p>
+            <p style={{ fontSize: 12, color: 'var(--muted)', lineHeight: 1.4 }}>Install radcliffe.run for quick access.</p>
           </div>
           <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
             <button
               onClick={dismiss}
               style={{
-                padding: '7px 12px', borderRadius: 7, border: '1px solid #222',
-                background: 'transparent', color: '#555', fontSize: 12,
+                padding: '7px 12px', borderRadius: 7, border: '1px solid var(--border)',
+                background: 'transparent', color: 'var(--faint)', fontSize: 12,
                 fontFamily: 'inherit', cursor: 'pointer', fontWeight: 500,
               }}
             >
@@ -166,12 +166,12 @@ function Step({ n, children }: { n: number; children: React.ReactNode }) {
   return (
     <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
       <span style={{
-        width: 20, height: 20, borderRadius: '50%', background: '#1e1e1e',
-        border: '1px solid #2a2a2a', display: 'flex', alignItems: 'center',
-        justifyContent: 'center', fontSize: 11, fontWeight: 700, color: '#f5a623',
+        width: 20, height: 20, borderRadius: '50%', background: 'var(--card-hi)',
+        border: '1px solid var(--border-2)', display: 'flex', alignItems: 'center',
+        justifyContent: 'center', fontSize: 'var(--text-xs)', fontWeight: 700, color: '#f5a623',
         flexShrink: 0, marginTop: 1,
       }}>{n}</span>
-      <p style={{ fontSize: 12, color: '#888', lineHeight: 1.5, margin: 0 }}>{children}</p>
+      <p style={{ fontSize: 12, color: 'var(--muted)', lineHeight: 1.5, margin: 0 }}>{children}</p>
     </div>
   )
 }

@@ -59,7 +59,7 @@ export default async function UnsubscribePage({
       }}>
         <Link href="/" style={{ textDecoration: 'none' }}>
           <p style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 48 }}>
-            <span style={{ color: '#fff' }}>radcliffe.</span>
+            <span style={{ color: 'var(--white)' }}>radcliffe.</span>
             <span style={{ color: '#f5a623' }}>run</span>
           </p>
         </Link>
@@ -70,7 +70,7 @@ export default async function UnsubscribePage({
             <h1 style={{ fontSize: 24, fontWeight: 800, letterSpacing: '-0.02em', marginBottom: 12 }}>
               You&apos;ve been unsubscribed
             </h1>
-            <p style={{ fontSize: 15, color: '#999', lineHeight: 1.7, marginBottom: 32 }}>
+            <p style={{ fontSize: 'var(--text-md)', color: 'var(--muted)', lineHeight: 1.7, marginBottom: 32 }}>
               You won&apos;t receive any more club emails from radcliffe.run.
               You can re-enable them anytime from your profile.
             </p>
@@ -78,7 +78,7 @@ export default async function UnsubscribePage({
               href="/profile"
               style={{
                 display: 'inline-block', padding: '10px 24px', borderRadius: 8,
-                background: '#f5a623', color: '#0a0a0a', fontSize: 14,
+                background: '#f5a623', color: '#0a0a0a', fontSize: 'var(--text-base)',
                 fontWeight: 700, textDecoration: 'none',
               }}
             >
@@ -93,11 +93,11 @@ export default async function UnsubscribePage({
             <h1 style={{ fontSize: 24, fontWeight: 800, letterSpacing: '-0.02em', marginBottom: 12 }}>
               Already unsubscribed
             </h1>
-            <p style={{ fontSize: 15, color: '#999', lineHeight: 1.7, marginBottom: 32 }}>
+            <p style={{ fontSize: 'var(--text-md)', color: 'var(--muted)', lineHeight: 1.7, marginBottom: 32 }}>
               You&apos;re already opted out of club emails. You can manage your
               preferences from your profile.
             </p>
-            <Link href="/profile" style={{ color: '#f5a623', textDecoration: 'none', fontSize: 14 }}>
+            <Link href="/profile" style={{ color: '#f5a623', textDecoration: 'none', fontSize: 'var(--text-base)' }}>
               Go to profile →
             </Link>
           </>
@@ -109,11 +109,11 @@ export default async function UnsubscribePage({
             <h1 style={{ fontSize: 24, fontWeight: 800, letterSpacing: '-0.02em', marginBottom: 12 }}>
               Invalid link
             </h1>
-            <p style={{ fontSize: 15, color: '#999', lineHeight: 1.7, marginBottom: 32 }}>
+            <p style={{ fontSize: 'var(--text-md)', color: 'var(--muted)', lineHeight: 1.7, marginBottom: 32 }}>
               This unsubscribe link isn&apos;t valid. If you&apos;d like to opt out,
               sign in to manage your preferences.
             </p>
-            <Link href="/signin" style={{ color: '#f5a623', textDecoration: 'none', fontSize: 14 }}>
+            <Link href="/signin" style={{ color: '#f5a623', textDecoration: 'none', fontSize: 'var(--text-base)' }}>
               Sign in →
             </Link>
           </>
@@ -125,11 +125,11 @@ export default async function UnsubscribePage({
             <h1 style={{ fontSize: 24, fontWeight: 800, letterSpacing: '-0.02em', marginBottom: 12 }}>
               Something went wrong
             </h1>
-            <p style={{ fontSize: 15, color: '#999', lineHeight: 1.7, marginBottom: 32 }}>
+            <p style={{ fontSize: 'var(--text-md)', color: 'var(--muted)', lineHeight: 1.7, marginBottom: 32 }}>
               We couldn&apos;t process your request. Please try again or sign in
               to manage your preferences.
             </p>
-            <Link href="/signin" style={{ color: '#f5a623', textDecoration: 'none', fontSize: 14 }}>
+            <Link href="/signin" style={{ color: '#f5a623', textDecoration: 'none', fontSize: 'var(--text-base)' }}>
               Sign in →
             </Link>
           </>

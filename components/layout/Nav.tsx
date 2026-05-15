@@ -11,6 +11,7 @@ export default function Nav() {
   const [signedIn, setSignedIn] = useState(false)
   const [isLeader, setIsLeader] = useState(false)
   const [isAdmin,  setIsAdmin]  = useState(false)
+  const [isC25K,   setIsC25K]   = useState(false)
 
   const ADMIN_EMAILS = ['paul.j.cox@gmail.com', 'pjcox@fastmail.fm', 'runtogetherradcliffe@gmail.com']
 
@@ -32,17 +33,18 @@ export default function Nav() {
         setIsAdmin(ADMIN_EMAILS.includes(session.user.email))
         const { data } = await supabase
           .from('members')
-          .select('is_run_leader')
+          .select('is_run_leader, cohort')
           .eq('email', session.user.email)
           .single()
         setIsLeader(!!data?.is_run_leader)
+        setIsC25K(data?.cohort === 'c25k')
       }
     }
     loadSession()
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
       setSignedIn(!!session)
-      if (!session) { setIsLeader(false); setIsAdmin(false) }
+      if (!session) { setIsLeader(false); setIsAdmin(false); setIsC25K(false) }
     })
     return () => subscription.unsubscribe()
   }, [])
@@ -65,16 +67,16 @@ export default function Nav() {
       <nav style={{
         position: 'sticky', top: 0, zIndex: 1000,
         height: 60,
-        background: 'rgba(10,10,10,0.92)',
+        background: 'color-mix(in srgb, var(--bg) 92%, transparent)',
         backdropFilter: 'blur(16px)',
-        borderBottom: '1px solid #1e1e1e',
+        borderBottom: '1px solid var(--border)',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '0 20px',
       }}>
         {/* Wordmark */}
         <Link href="/" style={{ textDecoration: 'none' }} onClick={() => setOpen(false)}>
-          <span style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.02em', color: '#fff' }}>
-            radcliffe.<span style={{ color: '#f5a623' }}>run</span>
+          <span style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--white)' }}>
+            radcliffe.<span style={{ color: 'var(--orange)' }}>run</span>
           </span>
         </Link>
 
@@ -83,26 +85,34 @@ export default function Nav() {
           <div style={{ display: 'flex', gap: 28 }}>
             {links.map(({ href, label }) => (
               <Link key={href} href={href} style={{
-                fontSize: 14, fontWeight: 500, textDecoration: 'none',
-                color: active(href) ? '#fff' : '#555',
+                fontSize: 'var(--text-base)', fontWeight: 500, textDecoration: 'none',
+                color: active(href) ? 'var(--white)' : 'var(--faint)',
                 transition: 'color 0.2s',
               }}>
                 {label}
               </Link>
             ))}
           </div>
+          {isC25K && (
+            <Link href="/c25k/programme" style={{
+              fontSize: 'var(--text-sm)', fontWeight: 500, textDecoration: 'none',
+              color: active('/c25k/programme') ? 'var(--orange)' : 'var(--muted)',
+            }}>
+              My programme
+            </Link>
+          )}
           {isAdmin && (
             <Link href="/admin" style={{
-              fontSize: 13, fontWeight: 500, textDecoration: 'none',
-              color: '#555', padding: '6px 14px',
-              border: '1px solid #222', borderRadius: 8,
+              fontSize: 'var(--text-sm)', fontWeight: 500, textDecoration: 'none',
+              color: 'var(--faint)', padding: '6px 14px',
+              border: '1px solid var(--border-2)', borderRadius: 8,
             }}>
               Admin
             </Link>
           )}
           {signedIn ? (
             <Link href="/profile" style={{
-              fontSize: 13, fontWeight: 700, textDecoration: 'none',
+              fontSize: 'var(--text-sm)', fontWeight: 700, textDecoration: 'none',
               color: '#0a0a0a', background: '#f5a623',
               padding: '8px 18px', borderRadius: 8,
             }}>
@@ -110,7 +120,7 @@ export default function Nav() {
             </Link>
           ) : (
             <Link href="/join" style={{
-              fontSize: 13, fontWeight: 700, textDecoration: 'none',
+              fontSize: 'var(--text-sm)', fontWeight: 700, textDecoration: 'none',
               color: '#0a0a0a', background: '#f5a623',
               padding: '8px 18px', borderRadius: 8,
             }}>
@@ -125,7 +135,7 @@ export default function Nav() {
             display: isMobile ? 'flex' : 'none',
             alignItems: 'center', justifyContent: 'center',
             background: 'none', border: 'none', cursor: 'pointer',
-            padding: 8, color: '#fff',
+            padding: 8, color: 'var(--white)',
           }}
           onClick={() => setOpen(o => !o)}
           aria-label={open ? 'Close menu' : 'Open menu'}
@@ -149,12 +159,12 @@ export default function Nav() {
       {isMobile && open && (
         <div style={{
           position: 'fixed', inset: '60px 0 0 0', zIndex: 999,
-          background: 'rgba(10,10,10,0.98)',
+          background: 'color-mix(in srgb, var(--bg) 98%, transparent)',
           backdropFilter: 'blur(16px)',
           display: 'flex', flexDirection: 'column',
           alignItems: 'center', justifyContent: 'center',
           gap: 28,
-          borderTop: '1px solid #1e1e1e',
+          borderTop: '1px solid var(--border)',
         }}>
           {links.map(({ href, label }) => (
             <Link
@@ -162,7 +172,7 @@ export default function Nav() {
               href={href}
               style={{
                 fontSize: 22, fontWeight: 600,
-                color: active(href) ? '#fff' : '#888',
+                color: active(href) ? 'var(--white)' : 'var(--muted)',
                 textDecoration: 'none', letterSpacing: '-0.02em',
               }}
               onClick={() => setOpen(false)}
@@ -176,12 +186,26 @@ export default function Nav() {
               href="/leader"
               style={{
                 fontSize: 22, fontWeight: 600,
-                color: active('/leader') ? '#fff' : '#888',
+                color: active('/leader') ? 'var(--white)' : 'var(--muted)',
                 textDecoration: 'none', letterSpacing: '-0.02em',
               }}
               onClick={() => setOpen(false)}
             >
               Emergency contacts
+            </Link>
+          )}
+
+          {isC25K && (
+            <Link
+              href="/c25k/programme"
+              style={{
+                fontSize: 22, fontWeight: 600,
+                color: active('/c25k/programme') ? 'var(--orange)' : 'var(--muted)',
+                textDecoration: 'none', letterSpacing: '-0.02em',
+              }}
+              onClick={() => setOpen(false)}
+            >
+              My programme
             </Link>
           )}
 
@@ -214,7 +238,7 @@ export default function Nav() {
               <Link
                 href="/signin"
                 style={{
-                  fontSize: 15, fontWeight: 500, color: '#555',
+                  fontSize: 'var(--text-md)', fontWeight: 500, color: 'var(--faint)',
                   textDecoration: 'none',
                 }}
                 onClick={() => setOpen(false)}
@@ -225,10 +249,10 @@ export default function Nav() {
           )}
 
           {isAdmin && (
-            <div style={{ borderTop: '1px solid #1a1a1a', paddingTop: 20 }}>
+            <div style={{ borderTop: '1px solid var(--border)', paddingTop: 20 }}>
               <Link
                 href="/admin"
-                style={{ fontSize: 13, color: '#444', textDecoration: 'none' }}
+                style={{ fontSize: 'var(--text-sm)', color: 'var(--faint)', textDecoration: 'none' }}
                 onClick={() => setOpen(false)}
               >
                 Admin

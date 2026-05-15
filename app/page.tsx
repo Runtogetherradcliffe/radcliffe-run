@@ -9,6 +9,7 @@ import { supabaseAdmin } from '@/lib/supabase'
 import { ROUTES } from '@/lib/routes'
 import { existsSync } from 'fs'
 import { join } from 'path'
+import ThemeMapImage from '@/components/ThemeMapImage'
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 const DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
@@ -88,7 +89,7 @@ export default async function HomePage() {
     supabase.auth.getUser(),
     supabaseAdmin()
       .from('site_settings')
-      .select('hero_image_url, sync_social_sheet, show_social_calendar')
+      .select('hero_image_url, sync_social_sheet, show_social_calendar, c25k_enabled, c25k_registration_open, c25k_start_date, c25k_cohort_label')
       .single(),
     supabase
       .from('runs')
@@ -111,6 +112,10 @@ export default async function HomePage() {
   const heroImageUrl        = siteSettings?.hero_image_url ?? null
   const showSocialRuns      = siteSettings?.sync_social_sheet ?? true
   const showSocialCalendar  = siteSettings?.show_social_calendar ?? false
+  const c25kEnabled         = siteSettings?.c25k_enabled ?? false
+  const c25kRegOpen         = siteSettings?.c25k_registration_open ?? false
+  const c25kStartDate       = siteSettings?.c25k_start_date as string | null ?? null
+  const c25kCohortLabel     = siteSettings?.c25k_cohort_label as string | null ?? null
 
   // Social runs depend on the settings toggle so fetched after
   const { data: socialRunsData } = showSocialRuns
@@ -149,7 +154,7 @@ export default async function HomePage() {
 
           <div>
             <div style={{ marginBottom: 24 }}>
-              <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#f5a623' }}>
+              <span style={{ fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#f5a623' }}>
                 Radcliffe &middot; Greater Manchester &middot; Est. 2022
               </span>
             </div>
@@ -158,31 +163,31 @@ export default async function HomePage() {
               Every<br />Thursday.<br /><span style={{ color: '#f5a623' }}>Free.</span>
             </h1>
 
-            <p style={{ fontSize: 17, fontWeight: 300, color: '#aaa', lineHeight: 1.8, maxWidth: 420, marginBottom: 28 }}>
+            <p style={{ fontSize: 17, fontWeight: 300, color: 'var(--dim)', lineHeight: 1.8, maxWidth: 420, marginBottom: 28 }}>
               Good routes. Good people. A run for every level. Every week in Radcliffe.
             </p>
 
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 36 }}>
               {['7pm start', 'All abilities'].map(tag => (
-                <span key={tag} style={{ fontSize: 12, color: '#888', border: '1px solid #1a1a1a', borderRadius: 20, padding: '4px 12px' }}>{tag}</span>
+                <span key={tag} style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)', border: '1px solid var(--border)', borderRadius: 20, padding: '4px 12px' }}>{tag}</span>
               ))}
-              <a href="https://maps.app.goo.gl/d1FUYuqmNVpsWUs99" target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: '#888', border: '1px solid #1a1a1a', borderRadius: 20, padding: '4px 12px', textDecoration: 'none' }}>Radcliffe Market</a>
+              <a href="https://maps.app.goo.gl/d1FUYuqmNVpsWUs99" target="_blank" rel="noopener noreferrer" style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)', border: '1px solid var(--border)', borderRadius: 20, padding: '4px 12px', textDecoration: 'none' }}>Radcliffe Market</a>
             </div>
 
             {!isRegistered && (
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
-              <Link href="/join" style={{ display: 'inline-flex', alignItems: 'center', background: '#f5a623', color: '#0a0a0a', fontSize: 14, fontWeight: 700, padding: '12px 24px', borderRadius: 8, textDecoration: 'none' }}>
+              <Link href="/join" style={{ display: 'inline-flex', alignItems: 'center', background: '#f5a623', color: '#0a0a0a', fontSize: 'var(--text-base)', fontWeight: 700, padding: '12px 24px', borderRadius: 8, textDecoration: 'none' }}>
                 Join the group
               </Link>
-              <Link href="/signin" style={{ display: 'inline-flex', alignItems: 'center', background: 'transparent', color: '#7cb87c', fontSize: 14, fontWeight: 500, padding: '12px 24px', borderRadius: 8, textDecoration: 'none', border: '1px solid rgba(124,184,124,0.3)' }}>
+              <Link href="/signin" style={{ display: 'inline-flex', alignItems: 'center', background: 'transparent', color: '#7cb87c', fontSize: 'var(--text-base)', fontWeight: 500, padding: '12px 24px', borderRadius: 8, textDecoration: 'none', border: '1px solid rgba(124,184,124,0.3)' }}>
                 Sign in
               </Link>
             </div>
             )}
             {!isRegistered && (
-              <p style={{ fontSize: 13, color: '#aaa', marginTop: 14, lineHeight: 1.7 }}>
+              <p style={{ fontSize: 'var(--text-sm)', color: 'var(--dim)', marginTop: 14, lineHeight: 1.7 }}>
                 New here?{' '}
-                <Link href="/about" style={{ color: '#ccc', textDecoration: 'underline' }}>Find out more about us</Link>
+                <Link href="/about" style={{ color: 'var(--dim)', textDecoration: 'underline' }}>Find out more about us</Link>
                 {' '}— we&apos;re a friendly group that welcomes runners of all abilities.
                 No need to book, just turn up. We do ask you to register so we have your contact details in case of an emergency on a run.
               </p>
@@ -210,8 +215,8 @@ export default async function HomePage() {
 
             {/* This week's runs card */}
             {nextWeekRuns.length > 0 && (
-              <div style={{ position: 'absolute', bottom: -20, left: -20, right: 20, background: 'rgba(17,17,17,0.96)', backdropFilter: 'blur(12px)', borderLeft: '3px solid #f5a623', borderRadius: '0 12px 12px 0', padding: '16px 20px', boxShadow: '0 16px 48px rgba(0,0,0,0.7)' }}>
-                <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#f5a623', marginBottom: 12 }}>
+              <div style={{ position: 'absolute', bottom: -20, left: -20, right: 20, background: 'var(--card)', backdropFilter: 'blur(12px)', borderLeft: '3px solid #f5a623', borderRadius: '0 12px 12px 0', padding: '16px 20px', boxShadow: '0 16px 48px rgba(0,0,0,0.4)', border: '1px solid var(--border)' }}>
+                <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#f5a623', marginBottom: 12 }}>
                   This week &middot; {fmtRunDate(nextWeekRuns[0].date)} &middot; 7pm
                 </p>
 
@@ -222,7 +227,7 @@ export default async function HomePage() {
                                : slug?.startsWith('trail-8k--') || slug?.startsWith('road-8k--') ? '8K'
                                : null
                     return (
-                      <Link key={run.id} href={`/runs/${run.id}`} style={{ display: 'flex', flexWrap: 'wrap', gap: 3, alignItems: 'center', padding: '8px 10px', borderRadius: 6, textDecoration: 'none', ...(group === '5K' ? { background: 'rgba(76,175,118,0.06)', border: '1px solid rgba(76,175,118,0.2)', color: '#4caf76' } : group === '8K' ? { background: 'rgba(91,155,213,0.06)', border: '1px solid rgba(91,155,213,0.2)', color: '#5b9bd5' } : { background: 'rgba(255,255,255,0.04)', border: '1px solid #222', color: '#888' }) }}>
+                      <Link key={run.id} href={`/runs/${run.id}`} style={{ display: 'flex', flexWrap: 'wrap', gap: 3, alignItems: 'center', padding: '8px 10px', borderRadius: 6, textDecoration: 'none', ...(group === '5K' ? { background: 'rgba(76,175,118,0.06)', border: '1px solid rgba(76,175,118,0.2)', color: '#4caf76' } : group === '8K' ? { background: 'rgba(91,155,213,0.06)', border: '1px solid rgba(91,155,213,0.2)', color: '#5b9bd5' } : { background: 'var(--card-hi)', border: '1px solid var(--border)', color: 'var(--muted)' }) }}>
                         {group === '5K' && (
                           <>
                             <span style={{ fontSize: 9, fontWeight: 700, background: 'rgba(76,175,118,0.2)', border: '1px solid rgba(76,175,118,0.4)', borderRadius: 3, padding: '1px 5px', color: '#4caf76' }}>5–6k</span>
@@ -239,17 +244,17 @@ export default async function HomePage() {
                           </>
                         )}
                         {!group && (
-                          <span style={{ fontSize: 13, fontWeight: 600, color: '#ccc' }}>{cleanTitle(run.title)}</span>
+                          <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--dim)' }}>{cleanTitle(run.title)}</span>
                         )}
-                        <span style={{ marginLeft: 'auto', fontSize: 11, fontWeight: 700 }}>→</span>
+                        <span style={{ marginLeft: 'auto', fontSize: 'var(--text-xs)', fontWeight: 700 }}>→</span>
                       </Link>
                     )
                   })}
                 </div>
 
-                <div style={{ marginTop: 12, paddingTop: 10, borderTop: '1px solid #1a1a1a', display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span style={{ fontSize: 12, color: '#555' }}>📍</span>
-                  <span style={{ fontSize: 12, color: '#555' }}>
+                <div style={{ marginTop: 12, paddingTop: 10, borderTop: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ fontSize: 'var(--text-xs)', color: 'var(--faint)' }}>📍</span>
+                  <span style={{ fontSize: 'var(--text-xs)', color: 'var(--faint)' }}>
                     {nextWeekRuns[0].on_tour ? nextWeekRuns[0].meeting_point : <a href="https://maps.app.goo.gl/d1FUYuqmNVpsWUs99" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>Radcliffe Market</a>}
                     {nextWeekRuns.length > 1 && nextWeekRuns[1].on_tour && nextWeekRuns[0].meeting_point !== nextWeekRuns[1].meeting_point
                       ? ` · ${nextWeekRuns[1].meeting_point}` : ''}
@@ -262,6 +267,63 @@ export default async function HomePage() {
 
         {/* ── STATS BAR ── */}
         <StatsBand routeCount={ROUTES.length} />
+
+        {/* ── COUCH TO 5K PROMO ── */}
+        {c25kEnabled && c25kRegOpen && (
+          <div style={{ background: 'var(--bg)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
+            <section className="rtr-section" style={{ paddingTop: 48, paddingBottom: 48 }}>
+              <div style={{
+                background: 'var(--card)',
+                border: '1px solid rgba(218,130,218,0.35)',
+                borderRadius: 16,
+                padding: 'clamp(28px, 4vw, 48px)',
+                position: 'relative', overflow: 'hidden',
+                display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 28,
+              }}>
+                {/* Background glow */}
+                <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 70% 80% at 0% 50%, rgba(218,130,218,0.08) 0%, transparent 60%)', pointerEvents: 'none' }} />
+
+                <div style={{ position: 'relative', maxWidth: 560 }}>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 16 }}>
+                    <span style={{
+                      fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase',
+                      color: '#0a0a0a', background: '#da82da', padding: '3px 10px', borderRadius: 99,
+                    }}>
+                      Couch to 5K
+                    </span>
+                    {c25kCohortLabel && (
+                      <span style={{ fontSize: 12, fontWeight: 500, color: '#da82da' }}>{c25kCohortLabel}</span>
+                    )}
+                  </div>
+
+                  <h2 style={{ fontSize: 'clamp(22px, 3.5vw, 30px)', fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1.1, margin: '0 0 12px' }}>
+                    New to running? Start here.
+                  </h2>
+                  <p style={{ fontSize: 'var(--text-base)', fontWeight: 300, color: 'var(--dim)', lineHeight: 1.7, margin: 0 }}>
+                    Our 10-week programme takes you from your sofa to running 5K — with the group beside you every step of the way.
+                    {c25kStartDate && (() => {
+                      const d = new Date(c25kStartDate + 'T00:00:00')
+                      const label = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+                      return <> Starting <strong style={{ color: 'var(--dim)' }}>{label}</strong>.</>
+                    })()}
+                  </p>
+                </div>
+
+                <div style={{ position: 'relative', flexShrink: 0 }}>
+                  <Link href="/c25k" style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 8,
+                    background: '#da82da', color: '#0a0a0a',
+                    fontSize: 'var(--text-base)', fontWeight: 700, padding: '13px 28px',
+                    borderRadius: 10, textDecoration: 'none', letterSpacing: '-0.01em',
+                    whiteSpace: 'nowrap',
+                  }}>
+                    Find out more →
+                  </Link>
+                </div>
+              </div>
+            </section>
+          </div>
+        )}
 
         {/* ── UPCOMING RUNS ── */}
         {(() => {
@@ -297,17 +359,17 @@ export default async function HomePage() {
             <section className="rtr-section">
               <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 32 }}>
                 <div>
-                  <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#f5a623', marginBottom: 8 }}>On the schedule</p>
+                  <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#f5a623', marginBottom: 8 }}>On the schedule</p>
                   <h2 style={{ fontSize: 32, fontWeight: 700, letterSpacing: '-0.02em' }}>Upcoming runs</h2>
                 </div>
-                <Link href="/routes" style={{ fontSize: 13, fontWeight: 500, color: '#555', textDecoration: 'none' }}>View all routes →</Link>
+                <Link href="/routes" style={{ fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--faint)', textDecoration: 'none' }}>View all routes →</Link>
               </div>
 
               {/* Calendar subscription */}
-              <div style={{ marginBottom: 28, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, padding: '14px 18px', background: '#111', border: '1px solid #1e1e1e', borderRadius: 10 }}>
+              <div style={{ marginBottom: 28, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, padding: '14px 18px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 10 }}>
                 <div>
-                  <p style={{ fontSize: 13, fontWeight: 600, color: '#ccc', marginBottom: 2 }}>Never miss a run</p>
-                  <p style={{ fontSize: 12, color: '#555' }}>Subscribe and every run appears automatically in your phone&apos;s calendar</p>
+                  <p style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--dim)', marginBottom: 2 }}>Never miss a run</p>
+                  <p style={{ fontSize: 'var(--text-xs)', color: 'var(--faint)' }}>Subscribe and every run appears automatically in your phone&apos;s calendar</p>
                 </div>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   <a
@@ -319,7 +381,7 @@ export default async function HomePage() {
                   {showSocialCalendar && (
                     <a
                       href="webcal://calendar.google.com/calendar/ical/fba15c422774be22b6adc0b5565205dd878a70d4a6a738fe3ff2fae1d08ac215%40group.calendar.google.com/public/basic.ics"
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 7, background: 'transparent', color: '#888', fontSize: 12, fontWeight: 600, textDecoration: 'none', border: '1px solid #222', whiteSpace: 'nowrap' }}
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 7, background: 'transparent', color: 'var(--muted)', fontSize: 12, fontWeight: 600, textDecoration: 'none', border: '1px solid var(--border)', whiteSpace: 'nowrap' }}
                     >
                       Social runs →
                     </a>
@@ -329,7 +391,7 @@ export default async function HomePage() {
 
               <div className="rtr-cards-grid">
                 {cards.length === 0 ? (
-                  <p style={{ color: '#555', fontSize: 14 }}>No upcoming runs scheduled yet.</p>
+                  <p style={{ color: 'var(--faint)', fontSize: 'var(--text-base)' }}>No upcoming runs scheduled yet.</p>
                 ) : cards.map(({ primary: run, companion }, cardIndex) => {
                   const linkedRoute = run.route_slug ? ROUTES.find(r => r.slug === run.route_slug) : null
                   const companionRoute = companion?.route_slug ? ROUTES.find(r => r.slug === companion.route_slug) : null
@@ -345,8 +407,8 @@ export default async function HomePage() {
                   const companionGroup = companion ? groupLabel(companion.route_slug) : null
 
                   const GROUP_BADGE: Record<string, React.CSSProperties> = {
-                    '5K': { background: 'rgba(10,10,10,0.8)', border: '1px solid rgba(76,175,118,0.6)', color: '#4caf76' },
-                    '8K': { background: 'rgba(10,10,10,0.8)', border: '1px solid rgba(91,155,213,0.6)', color: '#5b9bd5' },
+                    '5K': { background: 'var(--card)', border: '1px solid rgba(76,175,118,0.6)', color: '#4caf76' },
+                    '8K': { background: 'var(--card)', border: '1px solid rgba(91,155,213,0.6)', color: '#5b9bd5' },
                   }
                   const cardKey = (['walk','c25k'].includes(run.run_type)) ? run.run_type
                                 : run.run_type === 'social' ? 'social'
@@ -369,10 +431,10 @@ export default async function HomePage() {
                     ? '1px solid rgba(91,155,213,0.25)'
                     : run.run_type === 'social'
                     ? '1px solid rgba(196,168,232,0.2)'
-                    : '1px solid #1e1e1e'
+                    : '1px solid var(--border)'
 
                   return (
-                    <div key={run.id} style={{ background: '#111', border: cardBorder, borderRadius: 12, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                    <div key={run.id} style={{ background: 'var(--card)', border: cardBorder, borderRadius: 12, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
 
                         {/* ── Card header: map image or gradient fallback ── */}
                         <div style={{ height: headerHeight, position: 'relative', overflow: 'hidden', background: cardStyle.bg }}>
@@ -380,15 +442,10 @@ export default async function HomePage() {
                           {hasMap ? (
                             /* Map image — full cover */
                             <>
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img
-                                src={`/route-maps/${mapSlug}.webp`}
-                                alt=""
-                                loading={cardIndex === 0 ? 'eager' : 'lazy'}
+                              <ThemeMapImage
+                                slug={mapSlug}
                                 style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                               />
-                              {/* Bottom fade to blend into card body */}
-                              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 48, background: 'linear-gradient(to bottom, transparent, #111)', pointerEvents: 'none' }} />
                             </>
                           ) : (
                             /* Gradient fallback */
@@ -400,14 +457,14 @@ export default async function HomePage() {
                                 {isTwoGroups ? (
                                   <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
                                     <span style={{ fontSize: 32, fontWeight: 800, color: 'rgba(255,255,255,0.1)', letterSpacing: '-0.04em' }}>{run.distance_km}</span>
-                                    <span style={{ fontSize: 14, fontWeight: 700, color: 'rgba(255,255,255,0.06)' }}>/</span>
+                                    <span style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'rgba(255,255,255,0.06)' }}>/</span>
                                     <span style={{ fontSize: 32, fontWeight: 800, color: 'rgba(255,255,255,0.1)', letterSpacing: '-0.04em' }}>{companion!.distance_km}</span>
-                                    <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.05)' }}>km</span>
+                                    <span style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.05)' }}>km</span>
                                   </div>
                                 ) : run.distance_km ? (
                                   <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
                                     <span style={{ fontSize: 38, fontWeight: 800, color: 'rgba(255,255,255,0.1)', letterSpacing: '-0.04em' }}>{run.distance_km}</span>
-                                    <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.06)' }}>km</span>
+                                    <span style={{ fontSize: 'var(--text-base)', color: 'rgba(255,255,255,0.06)' }}>km</span>
                                   </div>
                                 ) : null}
                               </div>
@@ -444,19 +501,19 @@ export default async function HomePage() {
 
                         {/* ── Card body ── */}
                         <div style={{ padding: '14px 16px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                          <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#f5a623', marginBottom: 6 }}>
+                          <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#f5a623', marginBottom: 6 }}>
                             {fmtRunDate(run.date)} &middot; 7pm
                           </p>
-                          <p style={{ fontSize: 15, fontWeight: 700, marginBottom: 8, lineHeight: 1.3 }}>
+                          <p style={{ fontSize: 'var(--text-md)', fontWeight: 700, marginBottom: 8, lineHeight: 1.3 }}>
                             {cleanTitle(run.title)}
                           </p>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                            <span style={{ fontSize: 12, color: '#555' }}>📍 {run.on_tour ? run.meeting_point.split(',')[0] : <a href="https://maps.app.goo.gl/d1FUYuqmNVpsWUs99" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>Radcliffe Market</a>}</span>
+                            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--faint)' }}>📍 {run.on_tour ? run.meeting_point.split(',')[0] : <a href="https://maps.app.goo.gl/d1FUYuqmNVpsWUs99" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>Radcliffe Market</a>}</span>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                               {isTwoGroups ? (
-                                <span style={{ fontSize: 12, color: '#666' }}>{linkedRoute?.distance_km ?? run.distance_km}/{companionRoute?.distance_km ?? companion!.distance_km} km</span>
+                                <span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)' }}>{linkedRoute?.distance_km ?? run.distance_km}/{companionRoute?.distance_km ?? companion!.distance_km} km</span>
                               ) : run.distance_km ? (
-                                <span style={{ fontSize: 12, color: '#666' }}>{linkedRoute?.distance_km ?? run.distance_km} km</span>
+                                <span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)' }}>{linkedRoute?.distance_km ?? run.distance_km} km</span>
                               ) : null}
                               {run.terrain && <TerrainBadge terrain={run.terrain} />}
                             </div>
@@ -474,7 +531,7 @@ export default async function HomePage() {
                                     <span style={{ fontSize: 9, fontWeight: 600, background: 'rgba(245,166,35,0.12)', border: '1px solid rgba(245,166,35,0.3)', borderRadius: 3, padding: '1px 5px', color: '#f5a623' }}>Jeffing (run/walk)</span>
                                   )}
                                   <span style={{ fontSize: 9, fontWeight: 600, background: 'rgba(76,175,118,0.1)', border: '1px solid rgba(76,175,118,0.25)', borderRadius: 3, padding: '1px 5px', color: '#4caf76' }}>Continuous running</span>
-                                  <span style={{ marginLeft: 'auto', fontSize: 11, fontWeight: 700 }}>→</span>
+                                  <span style={{ marginLeft: 'auto', fontSize: 'var(--text-xs)', fontWeight: 700 }}>→</span>
                                 </Link>
                               )}
                               {/* 8K group (companion / longer) — always second */}
@@ -482,12 +539,12 @@ export default async function HomePage() {
                                 <Link href={`/runs/${companion.id}`} style={{ display: 'flex', flexWrap: 'wrap', gap: 3, alignItems: 'center', padding: '8px 10px', borderRadius: 6, textDecoration: 'none', ...(GROUP_BADGE[companionGroup] ?? {}) }}>
                                   <span style={{ fontSize: 9, fontWeight: 700, background: 'rgba(91,155,213,0.2)', border: '1px solid rgba(91,155,213,0.4)', borderRadius: 3, padding: '1px 5px', color: '#5b9bd5' }}>8–10k</span>
                                   <span style={{ fontSize: 9, fontWeight: 600, background: 'rgba(91,155,213,0.1)', border: '1px solid rgba(91,155,213,0.25)', borderRadius: 3, padding: '1px 5px', color: '#5b9bd5' }}>Continuous running</span>
-                                  <span style={{ marginLeft: 'auto', fontSize: 11, fontWeight: 700 }}>→</span>
+                                  <span style={{ marginLeft: 'auto', fontSize: 'var(--text-xs)', fontWeight: 700 }}>→</span>
                                 </Link>
                               )}
                             </>
                           ) : (
-                            <Link href={`/runs/${run.id}`} style={{ display: 'flex', flexDirection: 'column', gap: 5, padding: '8px 10px', borderRadius: 6, textDecoration: 'none', ...(primaryGroup ? GROUP_BADGE[primaryGroup] : { background: 'rgba(255,255,255,0.04)', border: '1px solid #222', color: '#888' }) }}>
+                            <Link href={`/runs/${run.id}`} style={{ display: 'flex', flexDirection: 'column', gap: 5, padding: '8px 10px', borderRadius: 6, textDecoration: 'none', ...(primaryGroup ? GROUP_BADGE[primaryGroup] : { background: 'var(--card-hi)', border: '1px solid var(--border)', color: 'var(--muted)' }) }}>
                               {primaryGroup ? (
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, alignItems: 'center' }}>
                                   {primaryGroup === '5K' && (
@@ -505,10 +562,10 @@ export default async function HomePage() {
                                       <span style={{ fontSize: 9, fontWeight: 600, background: 'rgba(91,155,213,0.1)', border: '1px solid rgba(91,155,213,0.25)', borderRadius: 3, padding: '1px 5px', color: '#5b9bd5' }}>Continuous running</span>
                                     </>
                                   )}
-                                  <span style={{ marginLeft: 'auto', fontSize: 11, fontWeight: 700 }}>→</span>
+                                  <span style={{ marginLeft: 'auto', fontSize: 'var(--text-xs)', fontWeight: 700 }}>→</span>
                                 </div>
                               ) : (
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11, fontWeight: 700, letterSpacing: '0.04em' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 'var(--text-xs)', fontWeight: 700, letterSpacing: '0.04em' }}>
                                   <span>View details</span>
                                   <span>→</span>
                                 </div>
@@ -527,11 +584,11 @@ export default async function HomePage() {
 
         {/* ── SOCIAL RUNS ── */}
         {socialRuns.length > 0 && (
-          <div style={{ background: '#0f0a1e', borderTop: '1px solid #1a1030' }}>
+          <div style={{ background: 'var(--card-hi)', borderTop: '1px solid var(--border)' }}>
             <section className="rtr-section">
               <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 32 }}>
                 <div>
-                  <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#c4a8e8', marginBottom: 8 }}>Beyond Thursdays</p>
+                  <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--purple)', marginBottom: 8 }}>Beyond Thursdays</p>
                   <h2 style={{ fontSize: 32, fontWeight: 700, letterSpacing: '-0.02em' }}>Social runs</h2>
                 </div>
               </div>
@@ -540,18 +597,14 @@ export default async function HomePage() {
                   const socialHasMap = !!run.route_slug && slugsWithMap.has(run.route_slug)
                   const socialHeaderHeight = socialHasMap ? 160 : 80
                   return (
-                  <div key={run.id} style={{ background: '#111', border: '1px solid rgba(196,168,232,0.15)', borderRadius: 12, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                  <div key={run.id} style={{ background: 'var(--card)', border: '1px solid rgba(196,168,232,0.15)', borderRadius: 12, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                     <div style={{ height: socialHeaderHeight, position: 'relative', background: 'linear-gradient(160deg,#100a20,#1c1030,#120a1c)', overflow: 'hidden' }}>
                       {socialHasMap ? (
                         <>
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={`/route-maps/${run.route_slug}.webp`}
-                            alt=""
-                            loading="lazy"
+                          <ThemeMapImage
+                            slug={run.route_slug!}
                             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                           />
-                          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 48, background: 'linear-gradient(to bottom, transparent, #111)', pointerEvents: 'none' }} />
                         </>
                       ) : (
                         <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 100% 70% at 50% 100%, rgba(196,168,232,0.35) 0%, transparent 70%)' }} />
@@ -561,15 +614,15 @@ export default async function HomePage() {
                       </span>
                     </div>
                     <div style={{ padding: '14px 16px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                      <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#c4a8e8', marginBottom: 6 }}>
+                      <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--purple)', marginBottom: 6 }}>
                         {fmtRunDate(run.date)}
                       </p>
-                      <p style={{ fontSize: 15, fontWeight: 700, marginBottom: 8, lineHeight: 1.3 }}>
+                      <p style={{ fontSize: 'var(--text-md)', fontWeight: 700, marginBottom: 8, lineHeight: 1.3 }}>
                         {cleanTitle(run.title)}
                       </p>
-                      <p style={{ fontSize: 12, color: '#555', marginBottom: 8 }}>📍 {run.meeting_point.split(',')[0]}</p>
+                      <p style={{ fontSize: 'var(--text-xs)', color: 'var(--faint)', marginBottom: 8 }}>📍 {run.meeting_point.split(',')[0]}</p>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                        {run.distance_km && <span style={{ fontSize: 12, color: '#666' }}>{run.distance_km} km</span>}
+                        {run.distance_km && <span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)' }}>{run.distance_km} km</span>}
                         {run.terrain && <TerrainBadge terrain={run.terrain} />}
                       </div>
                       <div style={{ marginTop: 'auto' }}>
@@ -589,11 +642,11 @@ export default async function HomePage() {
 
         {/* ── LATEST FROM RTR ── */}
         {(latestPosts ?? []).length > 0 && (
-          <div style={{ background: '#070707' }}>
+          <div style={{ background: 'var(--bg)' }}>
             <div style={{ maxWidth: 1100, margin: '0 auto', padding: '64px 24px' }}>
               <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 32, flexWrap: 'wrap', gap: 12 }}>
                 <h2 style={{ fontSize: 'clamp(20px, 3vw, 28px)', fontWeight: 800, letterSpacing: '-0.02em' }}>From the group</h2>
-                <Link href="/news" style={{ fontSize: 13, fontWeight: 600, color: '#f5a623', textDecoration: 'none' }}>
+                <Link href="/news" style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: '#f5a623', textDecoration: 'none' }}>
                   All posts →
                 </Link>
               </div>
@@ -607,7 +660,7 @@ export default async function HomePage() {
                     : null
                   const coverPhoto = post.photo_urls?.[0] ?? null
                   return (
-                    <Link key={post.id} href={`/news/${postSlug}`} style={{ display: 'block', textDecoration: 'none', background: '#111', border: '1px solid #1a1a1a', borderRadius: 12, overflow: 'hidden' }}>
+                    <Link key={post.id} href={`/news/${postSlug}`} style={{ display: 'block', textDecoration: 'none', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden' }}>
                       {coverPhoto && (
                         <div style={{ height: 160, overflow: 'hidden' }}>
                           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -617,11 +670,11 @@ export default async function HomePage() {
                       <div style={{ padding: '16px 18px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                           <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: typeColor }}>{typeLabel}</span>
-                          {dateStr && <span style={{ fontSize: 10, color: '#444' }}>{dateStr}</span>}
+                          {dateStr && <span style={{ fontSize: 10, color: 'var(--muted)' }}>{dateStr}</span>}
                         </div>
-                        <p style={{ fontSize: 15, fontWeight: 700, color: '#ddd', lineHeight: 1.3, marginBottom: post.summary ? 8 : 0 }}>{post.title}</p>
+                        <p style={{ fontSize: 'var(--text-md)', fontWeight: 700, color: 'var(--white)', lineHeight: 1.3, marginBottom: post.summary ? 8 : 0 }}>{post.title}</p>
                         {post.summary && (
-                          <p style={{ fontSize: 13, color: '#666', lineHeight: 1.5, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{post.summary}</p>
+                          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)', lineHeight: 1.5, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{post.summary}</p>
                         )}
                       </div>
                     </Link>
@@ -637,16 +690,16 @@ export default async function HomePage() {
           <div className="rtr-cta-section">
             <div style={{ background: 'linear-gradient(135deg, #061408, #0a1a0e)', border: '1px solid rgba(124,184,124,0.2)', borderRadius: 16, padding: '64px 48px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
               <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 60% 80% at 50% 0%, rgba(124,184,124,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
-              <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#7cb87c', marginBottom: 16, position: 'relative' }}>Come and run with us</p>
+              <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#7cb87c', marginBottom: 16, position: 'relative' }}>Come and run with us</p>
               <h2 style={{ fontSize: 36, fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 16, position: 'relative' }}>Register &mdash; it&apos;s free</h2>
-              <p style={{ fontSize: 16, fontWeight: 300, color: '#aaa', marginBottom: 32, maxWidth: 480, margin: '0 auto 32px', position: 'relative', lineHeight: 1.7 }}>
+              <p style={{ fontSize: 16, fontWeight: 300, color: 'var(--dim)', marginBottom: 32, maxWidth: 480, margin: '0 auto 32px', position: 'relative', lineHeight: 1.7 }}>
                 Join hundreds of Radcliffe runners. We only keep what we need to keep you safe on runs.
               </p>
               <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
-                <Link href="/join" style={{ display: 'inline-flex', alignItems: 'center', background: '#f5a623', color: '#0a0a0a', fontSize: 15, fontWeight: 700, padding: '14px 36px', borderRadius: 8, textDecoration: 'none' }}>
+                <Link href="/join" style={{ display: 'inline-flex', alignItems: 'center', background: '#f5a623', color: '#0a0a0a', fontSize: 'var(--text-md)', fontWeight: 700, padding: '14px 36px', borderRadius: 8, textDecoration: 'none' }}>
                   Register &mdash; it&apos;s free
                 </Link>
-                <Link href="/signin" style={{ display: 'inline-flex', alignItems: 'center', background: 'transparent', color: '#7cb87c', fontSize: 14, fontWeight: 500, padding: '14px 24px', borderRadius: 8, textDecoration: 'none', border: '1px solid rgba(124,184,124,0.3)' }}>
+                <Link href="/signin" style={{ display: 'inline-flex', alignItems: 'center', background: 'transparent', color: '#7cb87c', fontSize: 'var(--text-base)', fontWeight: 500, padding: '14px 24px', borderRadius: 8, textDecoration: 'none', border: '1px solid rgba(124,184,124,0.3)' }}>
                   Already registered? Sign in
                 </Link>
               </div>

@@ -24,7 +24,7 @@ function PlainBody({ content }: { content: string }) {
   return (
     <div>
       {paragraphs.map((para, i) => (
-        <p key={i} style={{ fontSize: 15, color: '#bbb', lineHeight: 1.85, marginBottom: 20 }}>
+        <p key={i} style={{ fontSize: 'var(--text-md)', color: 'var(--dim)', lineHeight: 1.85, marginBottom: 20 }}>
           {para}
         </p>
       ))}
@@ -86,20 +86,20 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
         <article style={{ maxWidth: 680, margin: '0 auto', padding: '32px 24px 80px' }}>
 
           {/* Back */}
-          <Link href="/news" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#555', textDecoration: 'none', marginBottom: 40 }}>
+          <Link href="/news" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 'var(--text-sm)', color: 'var(--faint)', textDecoration: 'none', marginBottom: 40 }}>
             ← All posts
           </Link>
 
           {/* Header */}
           <header style={{ marginBottom: 36, textAlign: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 14 }}>
-              <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: accentColor }}>
+              <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: accentColor }}>
                 {TYPE_LABEL[post.type] ?? post.type}
               </span>
               {post.published_at && (
                 <>
-                  <span style={{ fontSize: 11, color: '#333' }}>·</span>
-                  <span style={{ fontSize: 11, color: '#555' }}>{fmtDate(post.published_at)}</span>
+                  <span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)' }}>·</span>
+                  <span style={{ fontSize: 'var(--text-xs)', color: 'var(--faint)' }}>{fmtDate(post.published_at)}</span>
                 </>
               )}
             </div>
@@ -107,14 +107,14 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
               {post.title}
             </h1>
             {post.summary && (
-              <p style={{ fontSize: 15, color: '#666', marginTop: 12, lineHeight: 1.6 }}>
+              <p style={{ fontSize: 'var(--text-md)', color: 'var(--muted)', marginTop: 12, lineHeight: 1.6 }}>
                 {post.summary}
               </p>
             )}
           </header>
 
           {/* Divider */}
-          <hr style={{ border: 'none', borderTop: '1px solid #1a1a1a', marginBottom: 36 }} />
+          <hr style={{ border: 'none', borderTop: '1px solid var(--border)', marginBottom: 36 }} />
 
           {/* Photo gallery */}
           {post.photo_urls?.length > 0 && (
@@ -130,10 +130,10 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
           }
 
           {/* Footer */}
-          <div style={{ marginTop: 56, paddingTop: 28, borderTop: '1px solid #1a1a1a' }}>
+          <div style={{ marginTop: 56, paddingTop: 28, borderTop: '1px solid var(--border)' }}>
             <Link
               href="/news"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 600, color: '#888', background: '#111', border: '1px solid #1e1e1e', padding: '10px 18px', borderRadius: 8, textDecoration: 'none' }}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--muted)', background: 'var(--card)', border: '1px solid var(--border)', padding: '10px 18px', borderRadius: 8, textDecoration: 'none' }}
             >
               ← All posts
             </Link>

@@ -38,19 +38,19 @@ interface Props {
 }
 
 const INPUT = {
-  width: '100%', background: '#0a0a0a', border: '1px solid #222',
-  borderRadius: 8, padding: '10px 14px', fontSize: 14, color: '#fff',
+  width: '100%', background: 'var(--bg)', border: '1px solid var(--border)',
+  borderRadius: 8, padding: '10px 14px', fontSize: 'var(--text-base)', color: 'var(--white)',
   fontFamily: 'Inter, sans-serif', outline: 'none', boxSizing: 'border-box' as const,
 }
 const TEXTAREA = { ...INPUT, resize: 'vertical' as const, minHeight: 100, lineHeight: 1.7 }
-const LABEL = { display: 'block' as const, fontSize: 12, fontWeight: 600, color: '#888', marginBottom: 6, fontFamily: 'Inter, sans-serif' }
+const LABEL = { display: 'block' as const, fontSize: 12, fontWeight: 600, color: 'var(--muted)', marginBottom: 6, fontFamily: 'Inter, sans-serif' }
 
 function Section({ title, color = '#f5a623', children }: { title: string; color?: string; children: ReactNode }) {
   return (
-    <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 12, overflow: 'hidden', marginBottom: 16 }}>
-      <div style={{ padding: '14px 20px', borderBottom: '1px solid #1a1a1a', display: 'flex', alignItems: 'center', gap: 8 }}>
+    <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden', marginBottom: 16 }}>
+      <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8 }}>
         <span style={{ width: 3, height: 14, background: color, borderRadius: 2, display: 'inline-block' }} />
-        <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#ccc' }}>{title}</p>
+        <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--dim)' }}>{title}</p>
       </div>
       <div style={{ padding: '20px 20px' }}>{children}</div>
     </div>
@@ -72,7 +72,7 @@ function Toggle({ checked, onChange, label }: { checked: boolean; onChange: (v: 
           borderRadius: '50%', background: '#fff', transition: 'left 0.2s',
         }} />
       </div>
-      <span style={{ fontSize: 13, color: checked ? '#ccc' : '#555' }}>{label}</span>
+      <span style={{ fontSize: 'var(--text-sm)', color: checked ? '#ccc' : '#555' }}>{label}</span>
     </label>
   )
 }
@@ -233,7 +233,7 @@ export default function EmailComposer({ draft: initial, runOptions, isNew }: Pro
           background: toast.type === 'ok' ? '#0a1a0a' : '#1a0a0a',
           border: `1px solid ${toast.type === 'ok' ? '#7cb87c' : '#e05252'}`,
           color: toast.type === 'ok' ? '#7cb87c' : '#e05252',
-          padding: '12px 20px', borderRadius: 10, fontSize: 14, fontWeight: 600,
+          padding: '12px 20px', borderRadius: 10, fontSize: 'var(--text-base)', fontWeight: 600,
         }}>
           {toast.msg}
         </div>
@@ -245,10 +245,10 @@ export default function EmailComposer({ draft: initial, runOptions, isNew }: Pro
           position: 'fixed', inset: 0, zIndex: 9000, background: 'rgba(0,0,0,0.85)',
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24,
         }}>
-          <div style={{ background: '#111', border: '1px solid #222', borderRadius: 12, overflow: 'hidden', width: '100%', maxWidth: 680, maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 20px', borderBottom: '1px solid #1a1a1a' }}>
-              <p style={{ fontSize: 13, fontWeight: 700, color: '#ccc' }}>Email preview</p>
-              <button onClick={() => setPreviewOpen(false)} style={{ background: 'none', border: 'none', color: '#999', fontSize: 20, cursor: 'pointer', lineHeight: 1 }}>×</button>
+          <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden', width: '100%', maxWidth: 680, maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 20px', borderBottom: '1px solid var(--border)' }}>
+              <p style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--dim)' }}>Email preview</p>
+              <button onClick={() => setPreviewOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--muted)', fontSize: 20, cursor: 'pointer', lineHeight: 1 }}>×</button>
             </div>
             <iframe ref={previewRef} style={{ flex: 1, border: 'none', background: '#fff', minHeight: 500 }} title="Email preview" />
           </div>
@@ -260,7 +260,7 @@ export default function EmailComposer({ draft: initial, runOptions, isNew }: Pro
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28, gap: 12 }}>
           <div>
-            <a href="/admin/emails" style={{ fontSize: 12, color: '#999', textDecoration: 'none' }}>← All emails</a>
+            <a href="/admin/emails" style={{ fontSize: 12, color: 'var(--muted)', textDecoration: 'none' }}>← All emails</a>
             <h1 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.02em', marginTop: 6 }}>
               {isNew ? 'Compose email' : isSent ? 'Sent email' : 'Edit draft'}
             </h1>
@@ -301,7 +301,7 @@ export default function EmailComposer({ draft: initial, runOptions, isNew }: Pro
                 disabled={isSent}
                 style={INPUT}
               />
-              <p style={{ fontSize: 11, color: '#555', marginTop: 5 }}>Sends ~08:00 UTC on this date</p>
+              <p style={{ fontSize: 'var(--text-xs)', color: 'var(--faint)', marginTop: 5 }}>Sends ~08:00 UTC on this date</p>
             </div>
           </div>
           <div>
@@ -346,10 +346,10 @@ export default function EmailComposer({ draft: initial, runOptions, isNew }: Pro
             label="Include this week's run details (auto-populated from the selected Thursday)"
           />
           {draft.show_route_block && !draft.thursday_date && (
-            <p style={{ fontSize: 13, color: '#999', marginTop: 8 }}>Select a Thursday date above to preview the run details.</p>
+            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)', marginTop: 8 }}>Select a Thursday date above to preview the run details.</p>
           )}
           {draft.show_route_block && draft.thursday_date && (
-            <p style={{ fontSize: 13, color: '#7cb87c', marginTop: 8 }}>✓ Will include all runs for {draft.thursday_date} with descriptions and route links.</p>
+            <p style={{ fontSize: 'var(--text-sm)', color: '#7cb87c', marginTop: 8 }}>✓ Will include all runs for {draft.thursday_date} with descriptions and route links.</p>
           )}
         </Section>
 
@@ -362,14 +362,14 @@ export default function EmailComposer({ draft: initial, runOptions, isNew }: Pro
                 <div style={{ position: 'relative' }}>
                   <button
                     onClick={() => setSnippetMenuOpen(o => !o)}
-                    style={{ padding: '5px 12px', borderRadius: 6, background: 'transparent', border: '1px solid #333', color: '#888', fontSize: 12, cursor: 'pointer' }}
+                    style={{ padding: '5px 12px', borderRadius: 6, background: 'transparent', border: '1px solid #333', color: 'var(--muted)', fontSize: 12, cursor: 'pointer' }}
                   >
                     Insert snippet ▾
                   </button>
                   {snippetMenuOpen && (
                     <div style={{
                       position: 'absolute', top: '100%', right: 0, zIndex: 100, marginTop: 4,
-                      background: '#111', border: '1px solid #222', borderRadius: 8, minWidth: 220,
+                      background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 8, minWidth: 220,
                       boxShadow: '0 4px 16px rgba(0,0,0,0.4)', overflow: 'hidden',
                     }}>
                       {snippets.map(s => (
@@ -378,8 +378,8 @@ export default function EmailComposer({ draft: initial, runOptions, isNew }: Pro
                           onClick={() => insertSnippet(s.body)}
                           style={{
                             display: 'block', width: '100%', textAlign: 'left', padding: '10px 14px',
-                            background: 'none', border: 'none', borderBottom: '1px solid #1a1a1a',
-                            color: '#ccc', fontSize: 13, cursor: 'pointer', fontFamily: 'Inter, sans-serif',
+                            background: 'none', border: 'none', borderBottom: '1px solid var(--border)',
+                            color: 'var(--dim)', fontSize: 'var(--text-sm)', cursor: 'pointer', fontFamily: 'Inter, sans-serif',
                           }}
                         >
                           {s.title}
@@ -389,7 +389,7 @@ export default function EmailComposer({ draft: initial, runOptions, isNew }: Pro
                   )}
                 </div>
               )}
-              <a href="/admin/snippets" style={{ fontSize: 11, color: '#444', textDecoration: 'none' }}>
+              <a href="/admin/snippets" style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)', textDecoration: 'none' }}>
                 Manage snippets →
               </a>
             </div>
@@ -444,14 +444,14 @@ export default function EmailComposer({ draft: initial, runOptions, isNew }: Pro
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center', marginTop: 8 }}>
             <button
               onClick={() => { setPreviewOpen(true) }}
-              style={{ padding: '10px 18px', borderRadius: 8, background: 'transparent', border: '1px solid #333', color: '#888', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+              style={{ padding: '10px 18px', borderRadius: 8, background: 'transparent', border: '1px solid #333', color: 'var(--muted)', fontSize: 'var(--text-sm)', fontWeight: 600, cursor: 'pointer' }}
             >
               Preview
             </button>
             <button
               onClick={() => save(false, false)}
               disabled={saving}
-              style={{ padding: '10px 18px', borderRadius: 8, background: '#1a1a1a', border: '1px solid #333', color: '#ccc', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+              style={{ padding: '10px 18px', borderRadius: 8, background: 'var(--card-hi)', border: '1px solid #333', color: 'var(--dim)', fontSize: 'var(--text-sm)', fontWeight: 600, cursor: 'pointer' }}
             >
               {saving ? 'Saving…' : 'Save draft'}
             </button>
@@ -459,7 +459,7 @@ export default function EmailComposer({ draft: initial, runOptions, isNew }: Pro
               <button
                 onClick={() => save(false, true)}
                 disabled={saving}
-                style={{ padding: '10px 18px', borderRadius: 8, background: '#0d1a2a', border: '1px solid #6b9fd4', color: '#6b9fd4', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+                style={{ padding: '10px 18px', borderRadius: 8, background: '#0d1a2a', border: '1px solid #6b9fd4', color: '#6b9fd4', fontSize: 'var(--text-sm)', fontWeight: 600, cursor: 'pointer' }}
               >
                 Schedule send
               </button>
@@ -469,7 +469,7 @@ export default function EmailComposer({ draft: initial, runOptions, isNew }: Pro
                 if (confirm('Send this email to all registered runners now?')) save(true, false)
               }}
               disabled={sending || saving}
-              style={{ padding: '10px 20px', borderRadius: 8, background: '#f5a623', border: 'none', color: '#0a0a0a', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
+              style={{ padding: '10px 20px', borderRadius: 8, background: '#f5a623', border: 'none', color: '#0a0a0a', fontSize: 'var(--text-sm)', fontWeight: 700, cursor: 'pointer' }}
             >
               {sending ? 'Sending…' : 'Send now'}
             </button>

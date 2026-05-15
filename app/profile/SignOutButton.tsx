@@ -17,11 +17,11 @@ export default function SignOutButton() {
       onClick={handleSignOut}
       style={{
         background: 'transparent',
-        border: '1px solid #222',
+        border: '1px solid var(--border)',
         borderRadius: 8,
         padding: '10px 20px',
-        fontSize: 13,
-        color: '#555',
+        fontSize: 'var(--text-sm)',
+        color: 'var(--faint)',
         cursor: 'pointer',
         fontFamily: 'Inter, sans-serif',
         transition: 'all 0.2s',

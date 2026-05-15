@@ -40,7 +40,7 @@ export default function PhotoGallery({ urls }: { urls: string[] }) {
             style={{
               display: 'block', border: 'none', padding: 0, cursor: 'pointer',
               aspectRatio: isSingle ? '16/9' : '1',
-              overflow: 'hidden', background: '#111',
+              overflow: 'hidden', background: 'var(--card)',
             }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -75,13 +75,13 @@ export default function PhotoGallery({ urls }: { urls: string[] }) {
               onClick={close}
               style={{
                 position: 'absolute', top: -14, right: -14,
-                background: '#111', border: '1px solid #333', borderRadius: '50%',
-                width: 36, height: 36, fontSize: 18, cursor: 'pointer', color: '#aaa',
+                background: 'var(--card)', border: '1px solid #333', borderRadius: '50%',
+                width: 36, height: 36, fontSize: 18, cursor: 'pointer', color: 'var(--dim)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}
             >×</button>
             {/* Counter */}
-            <p style={{ textAlign: 'center', fontSize: 12, color: '#555', marginTop: 10 }}>
+            <p style={{ textAlign: 'center', fontSize: 12, color: 'var(--faint)', marginTop: 10 }}>
               {lightbox + 1} / {urls.length}
             </p>
           </div>
@@ -94,7 +94,7 @@ export default function PhotoGallery({ urls }: { urls: string[] }) {
                 style={{
                   position: 'fixed', left: 12, top: '50%', transform: 'translateY(-50%)',
                   background: 'rgba(0,0,0,0.5)', border: '1px solid #333', borderRadius: 8,
-                  width: 44, height: 44, fontSize: 20, cursor: 'pointer', color: '#ccc',
+                  width: 44, height: 44, fontSize: 20, cursor: 'pointer', color: 'var(--dim)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}
               >‹</button>
@@ -103,7 +103,7 @@ export default function PhotoGallery({ urls }: { urls: string[] }) {
                 style={{
                   position: 'fixed', right: 12, top: '50%', transform: 'translateY(-50%)',
                   background: 'rgba(0,0,0,0.5)', border: '1px solid #333', borderRadius: 8,
-                  width: 44, height: 44, fontSize: 20, cursor: 'pointer', color: '#ccc',
+                  width: 44, height: 44, fontSize: 20, cursor: 'pointer', color: 'var(--dim)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}
               >›</button>

@@ -62,8 +62,8 @@ export default function FaqAccordion() {
         const isOpen = open === i
         return (
           <div key={i} style={{
-            background: isOpen ? '#111' : 'transparent',
-            border: `1px solid ${isOpen ? '#2a2a2a' : '#1e1e1e'}`,
+            background: isOpen ? 'var(--card-hi)' : 'transparent',
+            border: `1px solid ${isOpen ? 'var(--border-2)' : 'var(--border)'}`,
             borderRadius: 10,
             overflow: 'hidden',
             transition: 'background 0.2s, border-color 0.2s',
@@ -76,15 +76,15 @@ export default function FaqAccordion() {
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16,
               }}
             >
-              <span style={{ fontSize: 15, fontWeight: 600, color: isOpen ? '#fff' : '#ccc', lineHeight: 1.4 }}>
+              <span style={{ fontSize: 'var(--text-md)', fontWeight: 600, color: isOpen ? 'var(--white)' : 'var(--dim)', lineHeight: 1.4 }}>
                 {faq.q}
               </span>
               <span style={{
                 flexShrink: 0, width: 22, height: 22, borderRadius: '50%',
-                background: isOpen ? '#f5a623' : '#1a1a1a',
-                border: `1px solid ${isOpen ? '#f5a623' : '#2a2a2a'}`,
+                background: isOpen ? '#f5a623' : 'var(--card-hi)',
+                border: `1px solid ${isOpen ? '#f5a623' : 'var(--border)'}`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 14, color: isOpen ? '#0a0a0a' : '#555',
+                fontSize: 'var(--text-base)', color: isOpen ? '#0a0a0a' : 'var(--muted)',
                 transition: 'all 0.2s',
                 transform: isOpen ? 'rotate(45deg)' : 'none',
               }}>
@@ -93,7 +93,7 @@ export default function FaqAccordion() {
             </button>
             {isOpen && (
               <div style={{ padding: '0 20px 18px' }}>
-                <p style={{ fontSize: 14, color: '#888', lineHeight: 1.8 }}>{faq.a}</p>
+                <p style={{ fontSize: 'var(--text-base)', color: 'var(--muted)', lineHeight: 1.8 }}>{faq.a}</p>
               </div>
             )}
           </div>

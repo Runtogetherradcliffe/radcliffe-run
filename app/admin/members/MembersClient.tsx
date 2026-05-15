@@ -104,15 +104,15 @@ export default function MembersClient({ members: initial }: { members: Member[] 
             }}
           >
             <p style={{ fontSize: 22, fontWeight: 800, color: filter === key ? (key === 'no_photo' ? '#e05252' : '#f5a623') : '#fff', letterSpacing: '-0.02em' }}>{value}</p>
-            <p style={{ fontSize: 12, color: '#666', marginTop: 2 }}>{label}</p>
+            <p style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>{label}</p>
           </button>
         ))}
         <div style={{
-          background: '#111', border: '1px solid #1e1e1e',
+          background: 'var(--card)', border: '1px solid var(--border)',
           borderRadius: 10, padding: '12px 20px', textAlign: 'left',
         }}>
           <p style={{ fontSize: 22, fontWeight: 800, color: '#f5a623', letterSpacing: '-0.02em' }}>{runLeaderCount}</p>
-          <p style={{ fontSize: 12, color: '#666', marginTop: 2 }}>Run leaders</p>
+          <p style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>Run leaders</p>
         </div>
       </div>
 
@@ -124,8 +124,8 @@ export default function MembersClient({ members: initial }: { members: Member[] 
           value={query}
           onChange={e => setQuery(e.target.value)}
           style={{
-            width: '100%', maxWidth: 400, background: '#111', border: '1px solid #222',
-            borderRadius: 8, padding: '10px 14px', fontSize: 14, color: '#fff',
+            width: '100%', maxWidth: 400, background: 'var(--card)', border: '1px solid var(--border)',
+            borderRadius: 8, padding: '10px 14px', fontSize: 'var(--text-base)', color: 'var(--white)',
             fontFamily: 'Inter, sans-serif', outline: 'none', boxSizing: 'border-box',
           }}
         />
@@ -133,16 +133,16 @@ export default function MembersClient({ members: initial }: { members: Member[] 
 
       {/* Table */}
       {filtered.length === 0 ? (
-        <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 12, padding: '48px 20px', textAlign: 'center' }}>
-          <p style={{ fontSize: 14, color: '#999' }}>No members found</p>
+        <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, padding: '48px 20px', textAlign: 'center' }}>
+          <p style={{ fontSize: 'var(--text-base)', color: 'var(--muted)' }}>No members found</p>
         </div>
       ) : (
-        <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 12, overflow: 'hidden' }}>
+        <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden' }}>
           {/* Header */}
           <div style={{
             display: 'grid', gridTemplateColumns: '1fr 1fr 140px 110px 100px 80px',
-            padding: '10px 20px', borderBottom: '1px solid #1a1a1a',
-            fontSize: 11, fontWeight: 600, color: '#444', letterSpacing: '0.08em', textTransform: 'uppercase',
+            padding: '10px 20px', borderBottom: '1px solid var(--border)',
+            fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase',
           }}>
             <span>Name</span><span>Email</span><span>Mobile</span>
             <span>Joined</span><span>Status</span><span></span>
@@ -161,7 +161,7 @@ export default function MembersClient({ members: initial }: { members: Member[] 
                 onClick={() => setExpanded(expanded === m.id ? null : m.id)}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <p style={{ fontSize: 14, fontWeight: 600, color: '#ddd' }}>
+                  <p style={{ fontSize: 'var(--text-base)', fontWeight: 600, color: 'var(--dim)' }}>
                     {m.first_name} {m.last_name}
                   </p>
                   {m.is_run_leader && (
@@ -172,14 +172,14 @@ export default function MembersClient({ members: initial }: { members: Member[] 
                     }}>Leader</span>
                   )}
                 </div>
-                <p style={{ fontSize: 13, color: '#666' }}>{m.email}</p>
-                <p style={{ fontSize: 13, color: '#999' }}>{m.mobile ?? '—'}</p>
-                <p style={{ fontSize: 12, color: '#444' }}>
+                <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)' }}>{m.email}</p>
+                <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)' }}>{m.mobile ?? '—'}</p>
+                <p style={{ fontSize: 12, color: 'var(--muted)' }}>
                   {new Date(m.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' })}
                 </p>
                 <span>
                   <span style={{
-                    display: 'inline-block', fontSize: 11, fontWeight: 600, padding: '3px 8px',
+                    display: 'inline-block', fontSize: 'var(--text-xs)', fontWeight: 600, padding: '3px 8px',
                     borderRadius: 4, letterSpacing: '0.05em',
                     background: m.status === 'active' ? '#0d2a0d' : '#1a1a1a',
                     color: m.status === 'active' ? '#4caf76' : '#555',
@@ -193,8 +193,8 @@ export default function MembersClient({ members: initial }: { members: Member[] 
                     onClick={() => toggleStatus(m.id, m.status)}
                     disabled={toggling === m.id}
                     style={{
-                      fontSize: 11, padding: '5px 10px', borderRadius: 6, cursor: toggling === m.id ? 'wait' : 'pointer',
-                      background: 'transparent', border: '1px solid #2a2a2a', color: '#999',
+                      fontSize: 'var(--text-xs)', padding: '5px 10px', borderRadius: 6, cursor: toggling === m.id ? 'wait' : 'pointer',
+                      background: 'transparent', border: '1px solid var(--border-2)', color: 'var(--muted)',
                       fontFamily: 'Inter, sans-serif', fontWeight: 500,
                     }}
                   >
@@ -208,29 +208,29 @@ export default function MembersClient({ members: initial }: { members: Member[] 
                 <div style={{ padding: '20px', background: '#0d0d0d', borderBottom: i < filtered.length - 1 ? '1px solid #1a1a1a' : 'none' }}>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, marginBottom: 20 }}>
                     <div>
-                      <p style={{ fontSize: 11, fontWeight: 600, color: '#444', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Emergency contact</p>
-                      <p style={{ fontSize: 13, color: '#ccc', fontWeight: 600 }}>{m.emergency_name}</p>
-                      <p style={{ fontSize: 13, color: '#666' }}>{m.emergency_relationship}</p>
-                      <p style={{ fontSize: 13, color: '#666' }}>{m.emergency_phone}</p>
+                      <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Emergency contact</p>
+                      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--dim)', fontWeight: 600 }}>{m.emergency_name}</p>
+                      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)' }}>{m.emergency_relationship}</p>
+                      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)' }}>{m.emergency_phone}</p>
                     </div>
                     <div>
-                      <p style={{ fontSize: 11, fontWeight: 600, color: '#444', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Medical info</p>
-                      <p style={{ fontSize: 13, color: m.medical_info ? '#ccc' : '#444' }}>
+                      <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Medical info</p>
+                      <p style={{ fontSize: 'var(--text-sm)', color: m.medical_info ? '#ccc' : '#444' }}>
                         {m.medical_info || 'None provided'}
                       </p>
                     </div>
                     <div>
-                      <p style={{ fontSize: 11, fontWeight: 600, color: '#444', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Consents</p>
-                      <p style={{ fontSize: 13, color: m.consent_data ? '#4caf76' : '#e05252' }}>
+                      <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Consents</p>
+                      <p style={{ fontSize: 'var(--text-sm)', color: m.consent_data ? '#4caf76' : '#e05252' }}>
                         {m.consent_data ? '✓' : '✗'} Data processing
                       </p>
-                      <p style={{ fontSize: 13, color: m.health_declaration ? '#4caf76' : '#e05252' }}>
+                      <p style={{ fontSize: 'var(--text-sm)', color: m.health_declaration ? '#4caf76' : '#e05252' }}>
                         {m.health_declaration ? '✓' : '✗'} Health declaration
                       </p>
-                      <p style={{ fontSize: 13, color: m.photo_consent ? '#4caf76' : '#e05252' }}>
+                      <p style={{ fontSize: 'var(--text-sm)', color: m.photo_consent ? '#4caf76' : '#e05252' }}>
                         {m.photo_consent ? '✓' : '✗'} Photo consent
                       </p>
-                      <p style={{ fontSize: 13, color: !m.email_opt_out ? '#4caf76' : '#e05252' }}>
+                      <p style={{ fontSize: 'var(--text-sm)', color: !m.email_opt_out ? '#4caf76' : '#e05252' }}>
                         {!m.email_opt_out ? '✓' : '✗'} Club emails
                       </p>
                     </div>
@@ -238,11 +238,11 @@ export default function MembersClient({ members: initial }: { members: Member[] 
 
                   {/* Run leader section */}
                   <div style={{
-                    borderTop: '1px solid #1a1a1a', paddingTop: 16,
+                    borderTop: '1px solid var(--border)', paddingTop: 16,
                     display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap',
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                      <p style={{ fontSize: 12, fontWeight: 600, color: '#999' }}>Run leader</p>
+                      <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--muted)' }}>Run leader</p>
                       <button
                         onClick={() => toggleLeader(m.id, m.is_run_leader)}
                         style={{
@@ -276,7 +276,7 @@ export default function MembersClient({ members: initial }: { members: Member[] 
         </div>
       )}
 
-      <p style={{ fontSize: 12, color: '#333', marginTop: 16 }}>
+      <p style={{ fontSize: 12, color: 'var(--muted)', marginTop: 16 }}>
         {filtered.length} of {members.length} members
         {query && ` matching "${query}"`}
         {filter !== 'all' && ` · ${filter} only`}
@@ -301,7 +301,7 @@ function UkaInput({ memberId, initialValue, onSave }: { memberId: string; initia
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
       <div>
-        <p style={{ fontSize: 11, fontWeight: 600, color: '#999', marginBottom: 4 }}>UKA number</p>
+        <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--muted)', marginBottom: 4 }}>UKA number</p>
         <div style={{ display: 'flex', gap: 6 }}>
           <input
             type="text"
@@ -309,8 +309,8 @@ function UkaInput({ memberId, initialValue, onSave }: { memberId: string; initia
             onChange={e => setValue(e.target.value)}
             placeholder="e.g. 5001234"
             style={{
-              background: '#111', border: '1px solid #2a2a2a', borderRadius: 6,
-              padding: '6px 10px', fontSize: 13, color: '#ccc',
+              background: 'var(--card)', border: '1px solid var(--border-2)', borderRadius: 6,
+              padding: '6px 10px', fontSize: 'var(--text-sm)', color: 'var(--dim)',
               fontFamily: 'Inter, sans-serif', outline: 'none', width: 130,
             }}
           />
@@ -318,7 +318,7 @@ function UkaInput({ memberId, initialValue, onSave }: { memberId: string; initia
             onClick={handleSave}
             disabled={saving}
             style={{
-              background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 6,
+              background: 'var(--card-hi)', border: '1px solid var(--border-2)', borderRadius: 6,
               padding: '6px 12px', fontSize: 12, fontWeight: 600,
               color: saved ? '#4caf76' : '#888', cursor: 'pointer',
               fontFamily: 'Inter, sans-serif',

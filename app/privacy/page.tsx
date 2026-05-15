@@ -10,28 +10,28 @@ export const metadata = {
 type Props = { searchParams: Promise<{ modal?: string }> }
 
 const sectionHeadStyle: React.CSSProperties = {
-  fontSize: 13, fontWeight: 600, color: '#f5a623',
+  fontSize: 'var(--text-sm)', fontWeight: 600, color: '#f5a623',
   letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12, marginTop: 40,
 }
 
 const headStyle: React.CSSProperties = {
-  fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 12, marginTop: 40, color: '#fff',
+  fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 12, marginTop: 40, color: 'var(--white)',
 }
 
 const paraStyle: React.CSSProperties = {
-  fontSize: 15, fontWeight: 300, color: '#aaa', lineHeight: 1.8, marginBottom: 12,
+  fontSize: 'var(--text-md)', fontWeight: 300, color: 'var(--dim)', lineHeight: 1.8, marginBottom: 12,
 }
 
 const tableRowStyle: React.CSSProperties = {
-  borderBottom: '1px solid #1a1a1a',
+  borderBottom: '1px solid var(--border)',
 }
 
 const tdStyle: React.CSSProperties = {
-  padding: '12px 16px', fontSize: 14, color: '#aaa', lineHeight: 1.6, verticalAlign: 'top',
+  padding: '12px 16px', fontSize: 'var(--text-base)', color: 'var(--dim)', lineHeight: 1.6, verticalAlign: 'top',
 }
 
 const tdLabelStyle: React.CSSProperties = {
-  ...tdStyle, color: '#666', width: '30%', fontWeight: 500,
+  ...tdStyle, color: 'var(--muted)', width: '30%', fontWeight: 500,
 }
 
 export default async function PrivacyPage({ searchParams }: Props) {
@@ -40,13 +40,13 @@ export default async function PrivacyPage({ searchParams }: Props) {
   return (
     <>
       {!isModal && <Nav />}
-      <main style={{ minHeight: isModal ? 'auto' : 'calc(100vh - 60px)', background: '#0a0a0a', padding: isModal ? '32px 24px 48px' : '60px 24px 80px' }}>
+      <main style={{ minHeight: isModal ? 'auto' : 'calc(100vh - 60px)', background: 'var(--bg)', padding: isModal ? '32px 24px 48px' : '60px 24px 80px' }}>
         <div style={{ maxWidth: 720, margin: '0 auto' }}>
 
           {!isModal && <BackLink />}
 
           {/* Header */}
-          <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#f5a623', marginBottom: 12 }}>
+          <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#f5a623', marginBottom: 12 }}>
             Legal
           </p>
           <h1 style={{ fontSize: 40, fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 12 }}>
@@ -77,13 +77,13 @@ export default async function PrivacyPage({ searchParams }: Props) {
             We collect the following categories of data when you register, sign in, or use the site:
           </p>
 
-          <div style={{ border: '1px solid #1a1a1a', borderRadius: 12, overflow: 'hidden', marginBottom: 24 }}>
+          <div style={{ border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden', marginBottom: 24 }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
-                <tr style={{ background: '#111' }}>
-                  <th style={{ ...tdStyle, color: '#fff', fontWeight: 600, textAlign: 'left' }}>Data</th>
-                  <th style={{ ...tdStyle, color: '#fff', fontWeight: 600, textAlign: 'left' }}>Purpose</th>
-                  <th style={{ ...tdStyle, color: '#fff', fontWeight: 600, textAlign: 'left' }}>Lawful basis</th>
+                <tr style={{ background: 'var(--card)' }}>
+                  <th style={{ ...tdStyle, color: 'var(--white)', fontWeight: 600, textAlign: 'left' }}>Data</th>
+                  <th style={{ ...tdStyle, color: 'var(--white)', fontWeight: 600, textAlign: 'left' }}>Purpose</th>
+                  <th style={{ ...tdStyle, color: 'var(--white)', fontWeight: 600, textAlign: 'left' }}>Lawful basis</th>
                 </tr>
               </thead>
               <tbody>
@@ -106,7 +106,7 @@ export default async function PrivacyPage({ searchParams }: Props) {
           </div>
 
           <p style={paraStyle}>
-            <strong style={{ color: '#ccc' }}>Health information</strong> is classed as special category data under Article 9 of the UK GDPR. We only store it if you explicitly consent during registration, and it is used solely for runner safety. You can leave this field blank.
+            <strong style={{ color: 'var(--dim)' }}>Health information</strong> is classed as special category data under Article 9 of the UK GDPR. We only store it if you explicitly consent during registration, and it is used solely for runner safety. You can leave this field blank.
           </p>
 
           {/* 3. Emergency contacts */}
@@ -123,12 +123,12 @@ export default async function PrivacyPage({ searchParams }: Props) {
           <p style={paraStyle}>
             We do not sell or share your data with third parties for marketing. We use the following services to operate the site:
           </p>
-          <div style={{ border: '1px solid #1a1a1a', borderRadius: 12, overflow: 'hidden', marginBottom: 24 }}>
+          <div style={{ border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden', marginBottom: 24 }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
-                <tr style={{ background: '#111' }}>
-                  <th style={{ ...tdStyle, color: '#fff', fontWeight: 600, textAlign: 'left' }}>Service</th>
-                  <th style={{ ...tdStyle, color: '#fff', fontWeight: 600, textAlign: 'left' }}>Purpose</th>
+                <tr style={{ background: 'var(--card)' }}>
+                  <th style={{ ...tdStyle, color: 'var(--white)', fontWeight: 600, textAlign: 'left' }}>Service</th>
+                  <th style={{ ...tdStyle, color: 'var(--white)', fontWeight: 600, textAlign: 'left' }}>Purpose</th>
                 </tr>
               </thead>
               <tbody>
@@ -151,12 +151,12 @@ export default async function PrivacyPage({ searchParams }: Props) {
 
           {/* 5. How long we keep your data */}
           <p style={sectionHeadStyle}>5. How long we keep your data</p>
-          <div style={{ border: '1px solid #1a1a1a', borderRadius: 12, overflow: 'hidden', marginBottom: 24 }}>
+          <div style={{ border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden', marginBottom: 24 }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
-                <tr style={{ background: '#111' }}>
-                  <th style={{ ...tdStyle, color: '#fff', fontWeight: 600, textAlign: 'left' }}>Data</th>
-                  <th style={{ ...tdStyle, color: '#fff', fontWeight: 600, textAlign: 'left' }}>Retention</th>
+                <tr style={{ background: 'var(--card)' }}>
+                  <th style={{ ...tdStyle, color: 'var(--white)', fontWeight: 600, textAlign: 'left' }}>Data</th>
+                  <th style={{ ...tdStyle, color: 'var(--white)', fontWeight: 600, textAlign: 'left' }}>Retention</th>
                 </tr>
               </thead>
               <tbody>
@@ -186,7 +186,7 @@ export default async function PrivacyPage({ searchParams }: Props) {
           <p style={paraStyle}>
             Under UK GDPR you have the following rights:
           </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 0, border: '1px solid #1a1a1a', borderRadius: 12, overflow: 'hidden', marginBottom: 24 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 0, border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden', marginBottom: 24 }}>
             {[
               ['Right to access', 'Request a copy of the data we hold about you.'],
               ['Right to rectification', 'Ask us to correct inaccurate data. You can update most details yourself on your profile page.'],
@@ -196,8 +196,8 @@ export default async function PrivacyPage({ searchParams }: Props) {
               ['Right to withdraw consent', 'Where we rely on consent (emails, photos, health data), you can withdraw it at any time — this does not affect the lawfulness of prior processing.'],
             ].map(([right, desc], i, arr) => (
               <div key={i} style={{ padding: '14px 16px', borderBottom: i < arr.length - 1 ? '1px solid #1a1a1a' : 'none' }}>
-                <p style={{ fontSize: 14, fontWeight: 600, color: '#ccc', marginBottom: 4 }}>{right}</p>
-                <p style={{ fontSize: 14, color: '#666', lineHeight: 1.6 }}>{desc}</p>
+                <p style={{ fontSize: 'var(--text-base)', fontWeight: 600, color: 'var(--dim)', marginBottom: 4 }}>{right}</p>
+                <p style={{ fontSize: 'var(--text-base)', color: 'var(--muted)', lineHeight: 1.6 }}>{desc}</p>
               </div>
             ))}
           </div>

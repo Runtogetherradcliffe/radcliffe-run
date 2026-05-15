@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 type Member = {
   id: string
@@ -20,10 +21,12 @@ export default function LeaderLookup({
   members,
   leaderName,
   ukaNumber,
+  c25kEnabled = false,
 }: {
   members: Member[]
   leaderName: string
   ukaNumber?: string
+  c25kEnabled?: boolean
 }) {
   const [query, setQuery] = useState('')
   const router = useRouter()
@@ -44,35 +47,35 @@ export default function LeaderLookup({
 
   return (
     <div style={{
-      minHeight: '100dvh', background: '#0a0a0a',
-      fontFamily: 'Inter, sans-serif', color: '#fff',
+      minHeight: '100dvh', background: 'var(--bg)',
+      fontFamily: 'Inter, sans-serif', color: 'var(--white)',
     }}>
       {/* Header */}
       <div style={{
-        background: '#111', borderBottom: '1px solid #1a1a1a',
+        background: 'var(--card)', borderBottom: '1px solid var(--border)',
         padding: '14px 20px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         position: 'sticky', top: 0, zIndex: 10,
       }}>
         <div>
           <a href="/" style={{ textDecoration: 'none' }}>
-            <p style={{ fontSize: 15, fontWeight: 800, letterSpacing: '-0.02em' }}>
+            <p style={{ fontSize: 'var(--text-md)', fontWeight: 800, letterSpacing: '-0.02em' }}>
               radcliffe<span style={{ color: '#f5a623' }}>.run</span>
             </p>
           </a>
-          <p style={{ fontSize: 11, color: '#555', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+          <p style={{ fontSize: 'var(--text-xs)', color: 'var(--faint)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
             Emergency contacts
           </p>
         </div>
         <div style={{ textAlign: 'right' }}>
-          <p style={{ fontSize: 12, color: '#888' }}>{leaderName}</p>
+          <p style={{ fontSize: 12, color: 'var(--muted)' }}>{leaderName}</p>
           {ukaNumber && (
-            <p style={{ fontSize: 11, color: '#555' }}>UKA {ukaNumber}</p>
+            <p style={{ fontSize: 'var(--text-xs)', color: 'var(--faint)' }}>UKA {ukaNumber}</p>
           )}
           <button
             onClick={signOut}
             style={{
-              marginTop: 4, fontSize: 11, color: '#444', background: 'none',
+              marginTop: 4, fontSize: 'var(--text-xs)', color: 'var(--muted)', background: 'none',
               border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'Inter, sans-serif',
             }}
           >
@@ -80,6 +83,27 @@ export default function LeaderLookup({
           </button>
         </div>
       </div>
+
+      {/* C25K shortcut */}
+      {c25kEnabled && (
+        <div style={{ padding: '16px 20px 0' }}>
+          <Link href="/leader/c25k" style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            background: 'linear-gradient(135deg,#0f060f,#160c16)',
+            border: '1px solid rgba(218,130,218,0.3)',
+            borderRadius: 12, padding: '14px 18px', textDecoration: 'none',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <span style={{ fontSize: 20 }}>🎓</span>
+              <div>
+                <p style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--white)', margin: '0 0 2px' }}>Couch to 5K</p>
+                <p style={{ fontSize: 12, color: 'var(--muted)', margin: 0 }}>Programme roster &amp; emergency contacts</p>
+              </div>
+            </div>
+            <span style={{ fontSize: 18, color: '#da82da' }}>→</span>
+          </Link>
+        </div>
+      )}
 
       {/* Search */}
       <div style={{ padding: '16px 20px 12px' }}>
@@ -91,13 +115,13 @@ export default function LeaderLookup({
             value={query}
             onChange={e => setQuery(e.target.value)}
             style={{
-              width: '100%', background: '#161616', border: '1px solid #2a2a2a',
-              borderRadius: 10, padding: '14px 16px', fontSize: 16, color: '#fff',
+              width: '100%', background: '#161616', border: '1px solid var(--border-2)',
+              borderRadius: 10, padding: '14px 16px', fontSize: 16, color: 'var(--white)',
               fontFamily: 'Inter, sans-serif', outline: 'none', boxSizing: 'border-box',
             }}
           />
         </div>
-        <p style={{ fontSize: 12, color: '#444', marginTop: 8 }}>
+        <p style={{ fontSize: 12, color: 'var(--muted)', marginTop: 8 }}>
           {members.length} active members — start typing to find someone
         </p>
       </div>
@@ -106,8 +130,8 @@ export default function LeaderLookup({
       <div style={{ padding: '0 20px 32px' }}>
         {showAll && (
           <div style={{
-            background: '#111', border: '1px solid #1e1e1e', borderRadius: 12,
-            padding: '40px 20px', textAlign: 'center', color: '#555', fontSize: 14,
+            background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12,
+            padding: '40px 20px', textAlign: 'center', color: 'var(--faint)', fontSize: 'var(--text-base)',
           }}>
             <p style={{ fontSize: 28, marginBottom: 12 }}>🔍</p>
             <p>Type a runner&apos;s name to find their emergency contact.</p>
@@ -116,8 +140,8 @@ export default function LeaderLookup({
 
         {!showAll && results.length === 0 && (
           <div style={{
-            background: '#111', border: '1px solid #1e1e1e', borderRadius: 12,
-            padding: '32px 20px', textAlign: 'center', color: '#555', fontSize: 14,
+            background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12,
+            padding: '32px 20px', textAlign: 'center', color: 'var(--faint)', fontSize: 'var(--text-base)',
           }}>
             No active members matching &ldquo;{query}&rdquo;
           </div>
@@ -136,20 +160,20 @@ function MemberCard({ m }: { m: Member }) {
 
   return (
     <div style={{
-      background: '#111', border: `1px solid ${hasMedical ? '#3a1a0a' : '#1e1e1e'}`,
+      background: 'var(--card)', border: `1px solid ${hasMedical ? '#3a1a0a' : '#1e1e1e'}`,
       borderRadius: 14, padding: '20px', marginBottom: 12,
       boxShadow: hasMedical ? '0 0 0 1px rgba(245,120,35,0.15)' : 'none',
     }}>
       {/* Runner name + mobile */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
         <div>
-          <p style={{ fontSize: 20, fontWeight: 800, letterSpacing: '-0.02em', color: '#fff' }}>
+          <p style={{ fontSize: 20, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--white)' }}>
             {m.first_name} {m.last_name}
           </p>
           {m.mobile && (
             <a
               href={`tel:${m.mobile}`}
-              style={{ fontSize: 15, color: '#f5a623', fontWeight: 600, textDecoration: 'none' }}
+              style={{ fontSize: 'var(--text-md)', color: '#f5a623', fontWeight: 600, textDecoration: 'none' }}
             >
               📞 {m.mobile}
             </a>
@@ -158,7 +182,7 @@ function MemberCard({ m }: { m: Member }) {
         <div style={{ display: 'flex', gap: 6, flexShrink: 0, marginLeft: 12 }}>
           {!m.photo_consent && (
             <span style={{
-              fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase',
+              fontSize: 'var(--text-xs)', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase',
               background: '#1a0a0a', color: '#e05252', border: '1px solid #3a1a1a',
               borderRadius: 6, padding: '4px 8px',
             }}>
@@ -167,7 +191,7 @@ function MemberCard({ m }: { m: Member }) {
           )}
           {hasMedical && (
             <span style={{
-              fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase',
+              fontSize: 'var(--text-xs)', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase',
               background: '#3a1a0a', color: '#f5a623', border: '1px solid #5a2a0a',
               borderRadius: 6, padding: '4px 8px',
             }}>
@@ -179,15 +203,15 @@ function MemberCard({ m }: { m: Member }) {
 
       {/* Emergency contact */}
       <div style={{
-        background: '#0a0a0a', borderRadius: 10, padding: '14px 16px', marginBottom: hasMedical ? 12 : 0,
+        background: 'var(--bg)', borderRadius: 10, padding: '14px 16px', marginBottom: hasMedical ? 12 : 0,
       }}>
-        <p style={{ fontSize: 11, fontWeight: 600, color: '#555', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
+        <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--faint)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
           Emergency contact
         </p>
-        <p style={{ fontSize: 17, fontWeight: 700, color: '#ddd', marginBottom: 2 }}>
+        <p style={{ fontSize: 17, fontWeight: 700, color: 'var(--dim)', marginBottom: 2 }}>
           {m.emergency_name}
         </p>
-        <p style={{ fontSize: 13, color: '#666', marginBottom: 10 }}>
+        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)', marginBottom: 10 }}>
           {m.emergency_relationship}
         </p>
         <a
@@ -210,10 +234,10 @@ function MemberCard({ m }: { m: Member }) {
           background: '#1c0d04', border: '1px solid #3a1a0a',
           borderRadius: 10, padding: '14px 16px',
         }}>
-          <p style={{ fontSize: 11, fontWeight: 600, color: '#995522', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
+          <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: '#995522', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
             ⚠️ Medical information
           </p>
-          <p style={{ fontSize: 14, color: '#ddaa88', lineHeight: 1.5 }}>
+          <p style={{ fontSize: 'var(--text-base)', color: '#ddaa88', lineHeight: 1.5 }}>
             {m.medical_info}
           </p>
         </div>
