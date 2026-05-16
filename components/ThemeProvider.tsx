@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 
 const LIGHT_VARS: Record<string, string> = {
@@ -48,6 +49,8 @@ export function applyTheme(theme: string, fontsize: string) {
  *    so a preference change on another device takes effect on next page load.
  */
 export default function ThemeProvider() {
+  const pathname = usePathname()
+
   useEffect(() => {
     // Pass 1: apply cached value instantly
     const cachedTheme    = localStorage.getItem('rtr-theme')    ?? 'dark'
@@ -82,7 +85,7 @@ export default function ThemeProvider() {
     }
 
     syncFromServer()
-  }, [])
+  }, [pathname])
 
   return null
 }
