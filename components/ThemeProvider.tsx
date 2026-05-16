@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { createClient } from '@/utils/supabase/client'
 
 const LIGHT_VARS: Record<string, string> = {
   '--bg': '#f4f4f4', '--card': '#ffffff', '--card-hi': '#f0f0f0',
@@ -41,14 +42,46 @@ export function applyTheme(theme: string, fontsize: string) {
 }
 
 /**
- * Reads cached theme/font-size from localStorage and applies it immediately
- * after hydration. Works alongside the anti-flash inline script in layout.tsx.
+ * Applies theme/font-size in two passes:
+ * 1. Immediately from localStorage (no flash - matches the anti-flash inline script in layout.tsx)
+ * 2. Silently syncs from Supabase in the background if the member is logged in,
+ *    so a preference change on another device takes effect on next page load.
  */
 export default function ThemeProvider() {
   useEffect(() => {
-    const theme    = localStorage.getItem('rtr-theme')    ?? 'dark'
-    const fontsize = localStorage.getItem('rtr-fontsize') ?? 'normal'
-    applyTheme(theme, fontsize)
+    // Pass 1: apply cached value instantly
+    const cachedTheme    = localStorage.getItem('rtr-theme')    ?? 'dark'
+    const cachedFontsize = localStorage.getItem('rtr-fontsize') ?? 'normal'
+    applyTheme(cachedTheme, cachedFontsize)
+
+    // Pass 2: sync from server if member is logged in
+    async function syncFromServer() {
+      try {
+        const supabase = createClient()
+        const { data: { session } } = await supabase.auth.getSession()
+        if (!session?.user?.email) return
+
+        const { data } = await supabase
+          .from('members')
+          .select('theme, font_size')
+          .eq('email', session.user.email)
+          .single()
+        if (!data) return
+
+        const serverTheme    = data.theme     ?? 'dark'
+        const serverFontsize = data.font_size  ?? 'normal'
+
+        if (serverTheme !== cachedTheme || serverFontsize !== cachedFontsize) {
+          localStorage.setItem('rtr-theme',    serverTheme)
+          localStorage.setItem('rtr-fontsize', serverFontsize)
+          applyTheme(serverTheme, serverFontsize)
+        }
+      } catch {
+        // Silently ignore - cached value already applied
+      }
+    }
+
+    syncFromServer()
   }, [])
 
   return null
