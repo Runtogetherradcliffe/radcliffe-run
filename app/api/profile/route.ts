@@ -46,6 +46,13 @@ export async function DELETE() {
 
   const admin = supabaseAdmin()
 
+  // Look up the member's id before deletion (needed for push subscription cleanup)
+  const { data: member } = await admin
+    .from('members')
+    .select('id')
+    .eq('email', user.email)
+    .maybeSingle()
+
   // Delete the member row (removes all personal data, emergency contact, medical info)
   const { error: memberError } = await admin
     .from('members')
@@ -57,8 +64,10 @@ export async function DELETE() {
     return NextResponse.json({ error: 'Failed to delete account' }, { status: 500 })
   }
 
-  // Remove any push subscriptions for this user
-  await admin.from('push_subscriptions').delete().eq('user_id', user.id)
+  // Remove any push subscriptions for this member
+  if (member?.id) {
+    await admin.from('push_subscriptions').delete().eq('member_id', member.id)
+  }
 
   // Delete the Supabase auth user entirely
   const { error: authError } = await admin.auth.admin.deleteUser(user.id)

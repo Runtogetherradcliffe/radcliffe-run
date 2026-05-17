@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { createClient as createServerClient } from '@/utils/supabase/server'
+import { supabaseAdmin } from '@/lib/supabase'
 
-const supabaseAdmin = createClient(
+const supabaseAdminDirect = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
@@ -16,10 +18,27 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid subscription object' }, { status: 400 })
     }
 
-    const { error } = await supabaseAdmin
+    // Look up the authenticated member's id so we can link the subscription for GDPR cleanup
+    let memberId: string | null = null
+    try {
+      const supabase = await createServerClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user?.email) {
+        const { data: member } = await supabaseAdmin()
+          .from('members')
+          .select('id')
+          .eq('email', user.email)
+          .maybeSingle()
+        memberId = member?.id ?? null
+      }
+    } catch {
+      // Non-fatal: subscription saved without member link
+    }
+
+    const { error } = await supabaseAdminDirect
       .from('push_subscriptions')
       .upsert(
-        { endpoint, p256dh: keys.p256dh, auth: keys.auth },
+        { endpoint, p256dh: keys.p256dh, auth: keys.auth, member_id: memberId },
         { onConflict: 'endpoint' }
       )
 
@@ -44,7 +63,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'endpoint required' }, { status: 400 })
     }
 
-    const { error } = await supabaseAdmin
+    const { error } = await supabaseAdminDirect
       .from('push_subscriptions')
       .delete()
       .eq('endpoint', endpoint)
