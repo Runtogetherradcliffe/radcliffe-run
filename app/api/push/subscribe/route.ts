@@ -63,7 +63,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'endpoint required' }, { status: 400 })
     }
 
-    const { error } = await supabaseAdmin
+    const { error } = await supabaseAdminDirect
       .from('push_subscriptions')
       .delete()
       .eq('endpoint', endpoint)
