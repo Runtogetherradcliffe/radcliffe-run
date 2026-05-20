@@ -97,7 +97,12 @@ async function loadGPXCoords(file: string): Promise<[number, number][]> {
   return pts.map(p => [parseFloat(p.getAttribute('lat')!), parseFloat(p.getAttribute('lon')!)])
 }
 
-export default function RunMapExpand({ file, accentColor = '#f5a623', rightButton }: { file: string; accentColor?: string; rightButton?: ReactNode }) {
+const TILE_ROAD  = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
+const TILE_TRAIL = `https://api.thunderforest.com/outdoors/{z}/{x}/{y}.png?apikey=${process.env.NEXT_PUBLIC_THUNDERFOREST_API_KEY}`
+const ATTR_ROAD  = '© OpenStreetMap © CARTO'
+const ATTR_TRAIL = '© <a href="https://www.thunderforest.com">Thunderforest</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+
+export default function RunMapExpand({ file, terrain, accentColor = '#f5a623', rightButton }: { file: string; terrain?: string; accentColor?: string; rightButton?: ReactNode }) {
   const [open, setOpen]             = useState(false)
   const [fullscreen, setFullscreen] = useState(false)
   const [status, setStatus]         = useState<'idle' | 'loading' | 'ready' | 'error'>('idle')
@@ -147,8 +152,9 @@ export default function RunMapExpand({ file, accentColor = '#f5a623', rightButto
         const map = Lm.map(mapRef.current, { center: [53.5609, -2.3265] as [number, number], zoom: 13 })
         mapObjRef.current = map
 
-        Lm.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-          attribution: '© OpenStreetMap © CARTO', maxZoom: 19,
+        const isTrail = terrain === 'trail'
+        Lm.tileLayer(isTrail ? TILE_TRAIL : TILE_ROAD, {
+          attribution: isTrail ? ATTR_TRAIL : ATTR_ROAD, maxZoom: 19,
         }).addTo(map)
 
         const coords = await loadGPXCoords(file)

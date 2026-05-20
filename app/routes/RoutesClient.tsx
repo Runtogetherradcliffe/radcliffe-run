@@ -4,6 +4,12 @@ import { ROUTES, TERRAIN_LABELS, type Route, type Terrain, type Category } from 
 import type { RouteOverrides } from '@/lib/routeDescriptions'
 import GpxButton from '@/app/runs/[id]/GpxButton'
 
+/* ── Map tile sources ── */
+const TILE_ROAD  = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
+const TILE_TRAIL = `https://api.thunderforest.com/outdoors/{z}/{x}/{y}.png?apikey=${process.env.NEXT_PUBLIC_THUNDERFOREST_API_KEY}`
+const ATTR_ROAD  = '© OpenStreetMap © CARTO'
+const ATTR_TRAIL = '© <a href="https://www.thunderforest.com">Thunderforest</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+
 /* ── Terrain colours ── */
 const TERRAIN_STYLE: Record<Terrain, { bg: string; color: string; border: string }> = {
   trail: { bg: '#0d1a0d', color: '#7cb87c', border: '#1a3a1a' },
@@ -93,12 +99,14 @@ export default function RoutesClient({ nameOverrides = {} }: { nameOverrides?: R
   const [loading,  setLoading]  = useState(false)
   const [mapReady, setMapReady] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
-  const mapRef     = useRef<HTMLDivElement>(null)
-  const leafletRef = useRef<any>(null)
-  const mapObjRef  = useRef<any>(null)
-  const polyRef    = useRef<any>(null)
-  const arrowsRef  = useRef<any>(null)
-  const markerRef  = useRef<any>(null)
+  const mapRef          = useRef<HTMLDivElement>(null)
+  const leafletRef      = useRef<any>(null)
+  const mapObjRef       = useRef<any>(null)
+  const polyRef         = useRef<any>(null)
+  const arrowsRef       = useRef<any>(null)
+  const markerRef       = useRef<any>(null)
+  const tileLayerRef    = useRef<any>(null)
+  const currentTerrain  = useRef<string>('road')
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 768px)')
@@ -141,10 +149,11 @@ export default function RoutesClient({ nameOverrides = {} }: { nameOverrides?: R
       })
       mapObjRef.current = map
 
-      leafletRef.current.tileLayer(
-        'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-        { attribution: '© OpenStreetMap © CARTO', maxZoom: 19 }
+      tileLayerRef.current = leafletRef.current.tileLayer(
+        TILE_ROAD,
+        { attribution: ATTR_ROAD, maxZoom: 19 }
       ).addTo(map)
+      currentTerrain.current = 'road'
 
       const MEETING: [number, number] = [53.5609, -2.3265]
       const meetIcon = leafletRef.current.divIcon({
@@ -177,7 +186,18 @@ export default function RoutesClient({ nameOverrides = {} }: { nameOverrides?: R
       if (!coords.length) return
       const L = leafletRef.current
 
-      // Remove previous layers
+      // Swap tile layer if terrain changed
+      const targetTerrain = route.terrain === 'trail' ? 'trail' : 'road'
+      if (currentTerrain.current !== targetTerrain) {
+        tileLayerRef.current?.remove()
+        tileLayerRef.current = L.tileLayer(
+          targetTerrain === 'trail' ? TILE_TRAIL : TILE_ROAD,
+          { attribution: targetTerrain === 'trail' ? ATTR_TRAIL : ATTR_ROAD, maxZoom: 19 }
+        ).addTo(mapObjRef.current)
+        currentTerrain.current = targetTerrain
+      }
+
+      // Remove previous route layers
       polyRef.current?.remove()
       arrowsRef.current?.remove()
 

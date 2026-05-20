@@ -145,6 +145,7 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
               <div style={{ marginTop: 14 }}>
                 <RunMapExpand
                   file={route.file}
+                  terrain={run.terrain ?? undefined}
                   accentColor={accentColor}
                   rightButton={
                     <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
