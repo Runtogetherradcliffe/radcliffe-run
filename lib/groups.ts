@@ -32,10 +32,10 @@ export const RUN_GROUPS: RunGroup[] = [
   {
     name: 'Keep Me Going',
     distance: '5–6k',
-    style: 'Continuous running',
+    style: 'Running',
     paceKm: '6:15–7:30 /km',
     paceMi: '10–12 min/mi',
-    desc: 'Continuous running with regular regroups. A comfortable, social pace with two leaders — one at the front, one at the back.',
+    desc: 'Running with regular regroups. A comfortable, social pace with two leaders - one at the front, one at the back.',
     color: 'var(--blue)',
     bg: 'var(--group-blue-bg)',
     border: 'var(--group-blue-border)',
@@ -43,7 +43,7 @@ export const RUN_GROUPS: RunGroup[] = [
   {
     name: 'Challenge Me',
     distance: '8–10k',
-    style: 'Continuous running',
+    style: 'Running',
     paceKm: '5:35–6:50 /km',
     paceMi: '9–11 min/mi',
     desc: 'Longer distance for more experienced runners looking to push further. Road and trail routes, with leaders front and back.',
