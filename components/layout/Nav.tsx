@@ -181,6 +181,20 @@ export default function Nav() {
             </Link>
           ))}
 
+          <a
+            href="https://justalittlebit.co.uk/product/runtogether-radcliffe"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              fontSize: 22, fontWeight: 600,
+              color: 'var(--muted)',
+              textDecoration: 'none', letterSpacing: '-0.02em',
+            }}
+            onClick={() => setOpen(false)}
+          >
+            Merch
+          </a>
+
           {isLeader && (
             <Link
               href="/leader"
