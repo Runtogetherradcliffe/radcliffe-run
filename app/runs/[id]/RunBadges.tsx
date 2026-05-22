@@ -12,7 +12,7 @@ const GROUP_TEXT: Record<GroupKey, { name: string; desc: string }> = {
   },
   keepMeGoing: {
     name: 'Keep Me Going',
-    desc: 'Continuous running with regular regroups. A comfortable, social pace with two leaders — one at the front, one at the back.',
+    desc: 'Running with regular regroups. A comfortable, social pace with two leaders - one at the front, one at the back.',
   },
   challengeMe: {
     name: 'Challenge Me',
@@ -168,7 +168,7 @@ export default function RunBadges({ group, hasJeffing, groupColor, terrain, onTo
             {group === '5K' && groupColor && (
               <>
                 <InfoBadge
-                  label="Continuous running"
+                  label="Running"
                   groupKey="keepMeGoing"
                   active={active === 'keepMeGoing'}
                   onToggle={() => toggle('keepMeGoing')}
@@ -182,7 +182,7 @@ export default function RunBadges({ group, hasJeffing, groupColor, terrain, onTo
         ) : group === '5K' && groupColor ? (
           <>
             <InfoBadge
-              label="Continuous running"
+              label="Running"
               groupKey="keepMeGoing"
               active={active === 'keepMeGoing'}
               onToggle={() => toggle('keepMeGoing')}
@@ -194,7 +194,7 @@ export default function RunBadges({ group, hasJeffing, groupColor, terrain, onTo
         ) : group === '8K' && groupColor ? (
           <>
             <InfoBadge
-              label="Continuous running"
+              label="Running"
               groupKey="challengeMe"
               active={active === 'challengeMe'}
               onToggle={() => toggle('challengeMe')}
