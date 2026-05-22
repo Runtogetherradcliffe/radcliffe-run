@@ -92,6 +92,17 @@ export default function Nav() {
                 {label}
               </Link>
             ))}
+            <a
+              href="https://justalittlebit.co.uk/product/runtogether-radcliffe"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                fontSize: 'var(--text-base)', fontWeight: 500, textDecoration: 'none',
+                color: 'var(--faint)', transition: 'color 0.2s',
+              }}
+            >
+              Merch
+            </a>
           </div>
           {isC25K && (
             <Link href="/c25k/programme" style={{
@@ -180,6 +191,20 @@ export default function Nav() {
               {label}
             </Link>
           ))}
+
+          <a
+            href="https://justalittlebit.co.uk/product/runtogether-radcliffe"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              fontSize: 22, fontWeight: 600,
+              color: 'var(--muted)',
+              textDecoration: 'none', letterSpacing: '-0.02em',
+            }}
+            onClick={() => setOpen(false)}
+          >
+            Merch
+          </a>
 
           {isLeader && (
             <Link
