@@ -194,7 +194,7 @@ export default async function HomePage() {
             )}
             {isRegistered && (
               <p style={{ fontSize: 'var(--text-sm)', color: 'var(--dim)', marginTop: 14, lineHeight: 1.7 }}>
-                You&apos;re registered - no need to book. Just turn up at Radcliffe Market at 7pm on Thursdays.
+                You&apos;re registered - no need to book. Just turn up!
               </p>
             )}
           </div>
