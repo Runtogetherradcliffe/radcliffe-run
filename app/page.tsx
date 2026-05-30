@@ -188,8 +188,13 @@ export default async function HomePage() {
               <p style={{ fontSize: 'var(--text-sm)', color: 'var(--dim)', marginTop: 14, lineHeight: 1.7 }}>
                 New here?{' '}
                 <Link href="/about" style={{ color: 'var(--dim)', textDecoration: 'underline' }}>Find out more about us</Link>
-                {' '}— we&apos;re a friendly group that welcomes runners of all abilities.
+                {' '}- we&apos;re a friendly group that welcomes runners of all abilities.
                 No need to book, just turn up. We do ask you to register so we have your contact details in case of an emergency on a run.
+              </p>
+            )}
+            {isRegistered && (
+              <p style={{ fontSize: 'var(--text-sm)', color: 'var(--dim)', marginTop: 14, lineHeight: 1.7 }}>
+                You&apos;re registered - no need to book. Just turn up at Radcliffe Market at 7pm on Thursdays.
               </p>
             )}
           </div>
@@ -371,22 +376,12 @@ export default async function HomePage() {
                   <p style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--dim)', marginBottom: 2 }}>Never miss a run</p>
                   <p style={{ fontSize: 'var(--text-xs)', color: 'var(--faint)' }}>Subscribe and every run appears automatically in your phone&apos;s calendar</p>
                 </div>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  <a
-                    href="webcal://calendar.google.com/calendar/ical/1e8d26a3b27472c802fdf9e914db1577e4eddae7cbf3b1f6a4f30984626bc7df%40group.calendar.google.com/public/basic.ics"
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 7, background: '#f5a623', color: '#0a0a0a', fontSize: 12, fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap' }}
-                  >
-                    Thursday runs →
-                  </a>
-                  {showSocialCalendar && (
-                    <a
-                      href="webcal://calendar.google.com/calendar/ical/fba15c422774be22b6adc0b5565205dd878a70d4a6a738fe3ff2fae1d08ac215%40group.calendar.google.com/public/basic.ics"
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 7, background: 'transparent', color: 'var(--muted)', fontSize: 12, fontWeight: 600, textDecoration: 'none', border: '1px solid var(--border)', whiteSpace: 'nowrap' }}
-                    >
-                      Social runs →
-                    </a>
-                  )}
-                </div>
+                <a
+                  href="webcal://calendar.google.com/calendar/ical/1e8d26a3b27472c802fdf9e914db1577e4eddae7cbf3b1f6a4f30984626bc7df%40group.calendar.google.com/public/basic.ics"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 7, background: '#f5a623', color: '#0a0a0a', fontSize: 12, fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap' }}
+                >
+                  Thursday runs →
+                </a>
               </div>
 
               <div className="rtr-cards-grid">
@@ -592,6 +587,20 @@ export default async function HomePage() {
                   <h2 style={{ fontSize: 32, fontWeight: 700, letterSpacing: '-0.02em' }}>Social runs</h2>
                 </div>
               </div>
+              {showSocialCalendar && (
+                <div style={{ marginBottom: 28, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, padding: '14px 18px', background: 'var(--card)', border: '1px solid rgba(196,168,232,0.2)', borderRadius: 10 }}>
+                  <div>
+                    <p style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--dim)', marginBottom: 2 }}>Never miss a social run</p>
+                    <p style={{ fontSize: 'var(--text-xs)', color: 'var(--faint)' }}>Subscribe and every social run appears automatically in your phone&apos;s calendar</p>
+                  </div>
+                  <a
+                    href="webcal://calendar.google.com/calendar/ical/fba15c422774be22b6adc0b5565205dd878a70d4a6a738fe3ff2fae1d08ac215%40group.calendar.google.com/public/basic.ics"
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 7, background: 'rgba(196,168,232,0.15)', color: '#c4a8e8', fontSize: 12, fontWeight: 700, textDecoration: 'none', border: '1px solid rgba(196,168,232,0.3)', whiteSpace: 'nowrap' }}
+                  >
+                    Social runs →
+                  </a>
+                </div>
+              )}
               <div className="rtr-cards-grid">
                 {socialRuns.map(run => {
                   const socialHasMap = !!run.route_slug && slugsWithMap.has(run.route_slug)
