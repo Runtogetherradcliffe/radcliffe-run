@@ -1,8 +1,9 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { ROUTES, type Category } from '@/lib/routes'
 
 type Override = { slug: string; name?: string; description?: string; updated_at: string }
+type FileStatus = { ok: boolean; msg: string }
 
 const CATEGORY_ORDER: Category[] = ['road-5k', 'road-8k', 'trail-5k', 'trail-8k', 'social-long-run']
 const CATEGORY_LABELS: Record<Category, string> = {
@@ -26,6 +27,14 @@ function inputStyle(extra: React.CSSProperties = {}): React.CSSProperties {
   }
 }
 
+function smallBtn(extra: React.CSSProperties = {}): React.CSSProperties {
+  return {
+    fontSize: 12, fontWeight: 500, padding: '5px 10px', borderRadius: 6, cursor: 'pointer',
+    background: 'transparent', border: '1px solid var(--border)', color: 'var(--muted)',
+    fontFamily: 'Inter, sans-serif', ...extra,
+  }
+}
+
 export default function RoutesAdminClient() {
   const [overrides, setOverrides] = useState<Record<string, Override>>({})
   const [loading, setLoading] = useState(true)
@@ -35,6 +44,18 @@ export default function RoutesAdminClient() {
   const [saveResult, setSaveResult] = useState<{ slug: string; ok: boolean; msg: string } | null>(null)
   const [filterCat, setFilterCat] = useState<'all' | Category>('all')
   const [search, setSearch] = useState('')
+
+  // File upload state
+  const [gpxUploading, setGpxUploading] = useState<Set<string>>(new Set())
+  const [gpxStatus, setGpxStatus] = useState<Record<string, FileStatus>>({})
+  const [imgUploading, setImgUploading] = useState<Set<string>>(new Set())
+  const [imgStatus, setImgStatus] = useState<Record<string, FileStatus>>({})
+  const [showMapUpload, setShowMapUpload] = useState<Set<string>>(new Set())
+
+  // Hidden file input refs
+  const gpxInputRefs = useRef<Record<string, HTMLInputElement | null>>({})
+  const darkImgRefs = useRef<Record<string, HTMLInputElement | null>>({})
+  const lightImgRefs = useRef<Record<string, HTMLInputElement | null>>({})
 
   useEffect(() => {
     fetch('/api/admin/routes')
@@ -122,6 +143,63 @@ export default function RoutesAdminClient() {
     }
   }
 
+  async function uploadGpx(slug: string, file: File) {
+    setGpxUploading(prev => new Set(prev).add(slug))
+    setGpxStatus(prev => ({ ...prev, [slug]: { ok: true, msg: 'Uploading...' } }))
+    try {
+      const fd = new FormData()
+      fd.append('gpx', file)
+      const res = await fetch(`/api/admin/routes/${slug}/gpx`, { method: 'POST', body: fd })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Upload failed')
+      setGpxStatus(prev => ({ ...prev, [slug]: { ok: true, msg: 'GPX updated - pushed to staging' } }))
+      setTimeout(() => setGpxStatus(prev => { const n = { ...prev }; delete n[slug]; return n }), 5000)
+    } catch (err: unknown) {
+      setGpxStatus(prev => ({ ...prev, [slug]: { ok: false, msg: err instanceof Error ? err.message : 'Upload failed' } }))
+    } finally {
+      setGpxUploading(prev => { const n = new Set(prev); n.delete(slug); return n })
+      // Reset the file input
+      if (gpxInputRefs.current[slug]) gpxInputRefs.current[slug]!.value = ''
+    }
+  }
+
+  async function uploadMapImages(slug: string) {
+    const darkFile = darkImgRefs.current[slug]?.files?.[0] ?? null
+    const lightFile = lightImgRefs.current[slug]?.files?.[0] ?? null
+    if (!darkFile && !lightFile) return
+
+    setImgUploading(prev => new Set(prev).add(slug))
+    setImgStatus(prev => ({ ...prev, [slug]: { ok: true, msg: 'Uploading...' } }))
+    try {
+      const fd = new FormData()
+      if (darkFile) fd.append('dark', darkFile)
+      if (lightFile) fd.append('light', lightFile)
+      const res = await fetch(`/api/admin/routes/${slug}/map-image`, { method: 'POST', body: fd })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Upload failed')
+      const uploaded: string[] = data.uploaded ?? []
+      setImgStatus(prev => ({ ...prev, [slug]: { ok: true, msg: `Map image${uploaded.length > 1 ? 's' : ''} updated (${uploaded.join(' + ')}) - pushed to staging` } }))
+      setTimeout(() => setImgStatus(prev => { const n = { ...prev }; delete n[slug]; return n }), 5000)
+      // Reset inputs and collapse
+      if (darkImgRefs.current[slug]) darkImgRefs.current[slug]!.value = ''
+      if (lightImgRefs.current[slug]) lightImgRefs.current[slug]!.value = ''
+      setShowMapUpload(prev => { const n = new Set(prev); n.delete(slug); return n })
+    } catch (err: unknown) {
+      setImgStatus(prev => ({ ...prev, [slug]: { ok: false, msg: err instanceof Error ? err.message : 'Upload failed' } }))
+    } finally {
+      setImgUploading(prev => { const n = new Set(prev); n.delete(slug); return n })
+    }
+  }
+
+  function toggleMapUpload(slug: string) {
+    setShowMapUpload(prev => {
+      const n = new Set(prev)
+      if (n.has(slug)) n.delete(slug)
+      else n.add(slug)
+      return n
+    })
+  }
+
   if (loading) {
     return <p style={{ fontSize: 'var(--text-base)', color: 'var(--faint)' }}>Loading routes...</p>
   }
@@ -188,6 +266,11 @@ export default function RoutesAdminClient() {
               const currentDesc = override?.description ?? route.description
               const hasOverride = !!override
               const tc = TERRAIN_COLOURS[route.terrain]
+              const isGpxUploading = gpxUploading.has(route.slug)
+              const isImgUploading = imgUploading.has(route.slug)
+              const gpxSt = gpxStatus[route.slug]
+              const imgSt = imgStatus[route.slug]
+              const mapExpanded = showMapUpload.has(route.slug)
 
               return (
                 <div key={route.slug} style={{
@@ -196,7 +279,7 @@ export default function RoutesAdminClient() {
                   borderLeft: hasOverride ? '3px solid #4caf76' : '3px solid transparent',
                 }}>
                   {/* Header row */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: isEditing ? 12 : currentDesc ? 6 : 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: isEditing ? 12 : currentDesc ? 6 : 4 }}>
                     <span style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--dim)', flex: 1 }}>
                       {override?.name ?? route.name}
                       {override?.name && override.name !== route.name && (
@@ -294,6 +377,94 @@ export default function RoutesAdminClient() {
                           <span style={{ color: 'var(--faint)', fontWeight: 600 }}>Default:</span> {route.description}
                         </p>
                       )}
+                    </div>
+                  )}
+
+                  {/* File management row */}
+                  <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid var(--border)', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                    {/* GPX replace */}
+                    <input
+                      type="file"
+                      accept=".gpx"
+                      ref={el => { gpxInputRefs.current[route.slug] = el }}
+                      style={{ display: 'none' }}
+                      onChange={e => {
+                        const f = e.target.files?.[0]
+                        if (f) uploadGpx(route.slug, f)
+                      }}
+                    />
+                    <button
+                      onClick={() => gpxInputRefs.current[route.slug]?.click()}
+                      disabled={isGpxUploading}
+                      style={smallBtn({
+                        cursor: isGpxUploading ? 'wait' : 'pointer',
+                        color: isGpxUploading ? 'var(--faint)' : 'var(--muted)',
+                      })}
+                    >
+                      {isGpxUploading ? 'Uploading GPX...' : 'Replace GPX'}
+                    </button>
+
+                    {gpxSt && (
+                      <span style={{ fontSize: 12, color: gpxSt.ok ? '#4caf76' : '#e05252' }}>
+                        {gpxSt.msg}
+                      </span>
+                    )}
+
+                    {/* Map image toggle */}
+                    <button
+                      onClick={() => toggleMapUpload(route.slug)}
+                      disabled={isImgUploading}
+                      style={smallBtn({ marginLeft: 4 })}
+                    >
+                      {mapExpanded ? 'Hide map images' : 'Update map image'}
+                    </button>
+
+                    {imgSt && (
+                      <span style={{ fontSize: 12, color: imgSt.ok ? '#4caf76' : '#e05252' }}>
+                        {imgSt.msg}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Map image upload (expanded) */}
+                  {mapExpanded && (
+                    <div style={{
+                      marginTop: 10, padding: '12px 14px', background: 'var(--bg)',
+                      border: '1px solid var(--border)', borderRadius: 8,
+                    }}>
+                      <p style={{ fontSize: 12, color: 'var(--faint)', marginBottom: 10 }}>
+                        Upload replacement .webp images. Run <code style={{ background: '#1a1a1a', padding: '1px 5px', borderRadius: 3, fontSize: 11 }}>generate_route_maps.py {route.slug}</code> locally to generate them.
+                      </p>
+                      <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 10 }}>
+                        <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                          <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Dark</span>
+                          <input
+                            type="file"
+                            accept=".webp,image/webp"
+                            ref={el => { darkImgRefs.current[route.slug] = el }}
+                            style={{ fontSize: 12, color: 'var(--muted)' }}
+                          />
+                        </label>
+                        <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                          <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Light</span>
+                          <input
+                            type="file"
+                            accept=".webp,image/webp"
+                            ref={el => { lightImgRefs.current[route.slug] = el }}
+                            style={{ fontSize: 12, color: 'var(--muted)' }}
+                          />
+                        </label>
+                      </div>
+                      <button
+                        onClick={() => uploadMapImages(route.slug)}
+                        disabled={isImgUploading}
+                        style={smallBtn({
+                          background: '#1a1a1a',
+                          cursor: isImgUploading ? 'wait' : 'pointer',
+                        })}
+                      >
+                        {isImgUploading ? 'Uploading...' : 'Upload images'}
+                      </button>
                     </div>
                   )}
                 </div>
