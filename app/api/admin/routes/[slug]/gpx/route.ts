@@ -42,7 +42,7 @@ export async function POST(
     repoPath,
     buffer,
     `admin: replace GPX for ${slug}`,
-    'staging'
+    'main'
   )
 
   if (!result.ok) {

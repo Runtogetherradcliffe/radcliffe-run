@@ -41,7 +41,7 @@ export async function POST(
       repoPath,
       buffer,
       `admin: replace dark map image for ${slug}`,
-      'staging'
+      'main'
     )
     results.push({ file: 'dark', ...result })
   }
@@ -61,7 +61,7 @@ export async function POST(
       repoPath,
       buffer,
       `admin: replace light map image for ${slug}`,
-      'staging'
+      'main'
     )
     results.push({ file: 'light', ...result })
   }
