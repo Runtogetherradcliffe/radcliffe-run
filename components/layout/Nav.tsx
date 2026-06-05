@@ -13,8 +13,6 @@ export default function Nav() {
   const [isAdmin,  setIsAdmin]  = useState(false)
   const [isC25K,   setIsC25K]   = useState(false)
 
-  const ADMIN_EMAILS = ['paul.j.cox@gmail.com', 'pjcox@fastmail.fm', 'runtogetherradcliffe@gmail.com']
-
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 768px)')
     const update = () => setIsMobile(mq.matches)
@@ -26,25 +24,42 @@ export default function Nav() {
   useEffect(() => {
     const supabase = createClient()
 
-    async function loadSession() {
+    async function loadRoles() {
       const { data: { session } } = await supabase.auth.getSession()
       setSignedIn(!!session)
-      if (session?.user?.email) {
-        setIsAdmin(ADMIN_EMAILS.includes(session.user.email))
-        const { data } = await supabase
-          .from('members')
-          .select('is_run_leader, cohort')
-          .eq('email', session.user.email)
-          .single()
-        setIsLeader(!!data?.is_run_leader)
-        setIsC25K(data?.cohort === 'c25k')
+      if (session) {
+        try {
+          const res = await fetch('/api/me')
+          if (res.ok) {
+            const me = await res.json()
+            setIsLeader(me.isLeader)
+            setIsAdmin(me.isAdmin)
+            setIsC25K(me.isC25K)
+          }
+        } catch { /* ignore network errors */ }
       }
     }
-    loadSession()
+    loadRoles()
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
       setSignedIn(!!session)
-      if (!session) { setIsLeader(false); setIsAdmin(false); setIsC25K(false) }
+      if (!session) {
+        setIsLeader(false)
+        setIsAdmin(false)
+        setIsC25K(false)
+      } else {
+        // Re-fetch roles when session is established (e.g. after magic link sign-in)
+        fetch('/api/me')
+          .then(r => r.ok ? r.json() : null)
+          .then(me => {
+            if (me) {
+              setIsLeader(me.isLeader)
+              setIsAdmin(me.isAdmin)
+              setIsC25K(me.isC25K)
+            }
+          })
+          .catch(() => { /* ignore */ })
+      }
     })
     return () => subscription.unsubscribe()
   }, [])
