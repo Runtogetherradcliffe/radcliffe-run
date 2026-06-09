@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# radcliffe.run
 
-## Getting Started
+Website and member platform for Run Together Radcliffe (RTR), a running group of ~600
+members in Radcliffe, Greater Manchester. Replaces the old RunTogether/ClubSpark site.
 
-First, run the development server:
+Live at https://radcliffe.run
+
+## What it does
+
+- Member registration with GDPR-compliant emergency contacts and consent capture
+- Run schedule (synced from Google Sheets) with interactive GPX route maps (71+ routes)
+- Weekly member email (composed and scheduled in the admin area, sent via Brevo)
+- Admin area: members, runs, routes, emails, roundup posts, site settings
+- Run leader tools: emergency contact lookup, C25K roster
+- Couch to 5K module: public programme page, registration, member programme view
+- Light/dark theme and font size preference per member
+- PWA: installable, offline page, service worker
+
+## Stack
+
+| Layer | Choice |
+|---|---|
+| Framework | Next.js (App Router, TypeScript) |
+| Styling | Tailwind CSS v4 |
+| Database + auth | Supabase (separate dev and production projects) |
+| Content email | Brevo transactional API (`lib/brevo.ts`) |
+| Auth email (OTP/magic link) | Supabase Auth via Resend SMTP (configured in Supabase dashboard) |
+| Maps | Leaflet.js |
+| Hosting | Vercel (`main` = production, `staging` = preview) |
+| DNS + inbound mail | Cloudflare (Email Routing forwards hello@ to the group Gmail) |
+
+## Development
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev        # http://localhost:3000
+npm run lint
+npx tsc --noEmit   # typecheck
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`.env.local` points at the DEV Supabase project, not production. Local email sends hit
+the dev members table only. See `docs/ARCHITECTURE.md` for the full environment variable
+list and the dev/production split.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deployment
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Staging-first, always:
 
-## Learn More
+1. Push changes to the `staging` branch - Vercel builds a preview URL
+2. Review and approve on the preview
+3. Merge `staging` into `main` - Vercel deploys to radcliffe.run
 
-To learn more about Next.js, take a look at the following resources:
+Never push directly to `main`. Before any deploy, run the pre-deployment checklist in
+`docs/ARCHITECTURE.md` (schema check, lint, scope review).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Documentation
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `AGENTS.md` - critical invariants and rules. Read before changing anything.
+- `docs/ARCHITECTURE.md` - full architecture reference: schema, email system, auth,
+  theming, cron, deployment, gotchas.
