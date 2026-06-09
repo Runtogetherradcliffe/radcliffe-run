@@ -42,6 +42,11 @@ export async function sendScheduledEmail(emailId: string): Promise<SendResult> {
 
   if (emailErr || !email) return { ok: false, sent: 0, failed: 0, error: 'Email not found', status: 404 }
   if (email.status === 'sent') return { ok: false, sent: 0, failed: 0, error: 'Already sent', status: 400 }
+  // Fail fast on a missing subject: providers reject an empty subject, so without
+  // this every per-member send would fail and report a generic error.
+  if (!email.subject || !email.subject.trim()) {
+    return { ok: false, sent: 0, failed: 0, error: 'This email has no subject line. Add one before sending.', status: 400 }
+  }
 
   // Load site settings for defaults
   const { data: settings } = await db

@@ -550,6 +550,10 @@ export default function EmailComposer({ draft: initial, runOptions, members, isN
             )}
             <button
               onClick={() => {
+                if (!draft.subject.trim()) {
+                  showToast('Add a subject line before sending', 'err')
+                  return
+                }
                 const n = draft.recipient_member_ids.length
                 if (draft.recipient_filter === 'selected' && n === 0) {
                   showToast('Select at least one member first', 'err')
