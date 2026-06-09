@@ -4,49 +4,22 @@
  * make an internal HTTP call to itself, avoiding double-timeout issues.
  */
 
-import { createHmac } from 'crypto'
 import { supabaseAdmin } from '@/lib/supabase'
 import { buildEmailHtml, buildEmailText, RunInfo } from '@/lib/buildEmail'
 import { ROUTES } from '@/lib/routes'
 import { getRouteOverrides } from '@/lib/routeDescriptions'
+import { sendBrevoEmail } from '@/lib/brevo'
+import { makeUnsubscribeToken } from '@/lib/unsubscribe'
 
 const SITE_URL           = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://radcliffe.run'
-const RESEND_KEY         = process.env.RESEND_API_KEY ?? ''
 const FROM_ADDRESS       = process.env.EMAIL_FROM ?? 'noreply@radcliffe.run'
 const FROM_NAME          = process.env.EMAIL_FROM_NAME ?? 'Run Together Radcliffe'
-const UNSUBSCRIBE_SECRET = process.env.UNSUBSCRIBE_SECRET ?? ''
-const BATCH_SIZE         = 50
-
-/** Generate an HMAC-SHA256 token for the given member ID so unsubscribe
- *  links cannot be forged or used to opt out arbitrary members. */
-function makeUnsubscribeToken(memberId: string): string {
-  if (!UNSUBSCRIBE_SECRET) throw new Error('UNSUBSCRIBE_SECRET env var is not set')
-  return createHmac('sha256', UNSUBSCRIBE_SECRET).update(memberId).digest('hex')
-}
-
-interface ResendEmailPayload {
-  from: string
-  to: string[]
-  subject: string
-  html: string
-  text: string
-}
-
-async function sendBatch(emails: ResendEmailPayload[]): Promise<{ ok: boolean; errors: string[] }> {
-  const res = await fetch('https://api.resend.com/emails/batch', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${RESEND_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(emails),
-  })
-  if (!res.ok) {
-    const err = await res.text()
-    return { ok: false, errors: [err] }
-  }
-  return { ok: true, errors: [] }
-}
+// Brevo transactional sends are one request per recipient, so each member gets
+// a personalised unsubscribe link in the body *and* a matching List-Unsubscribe
+// header. Cap how many run at once to stay within Brevo's rate limit. At ~0.5s
+// per send this is ~10 requests/sec peak; 100 members complete in ~10s, well
+// inside the 60s function budget (see maxDuration on the cron + send routes).
+const SEND_CONCURRENCY   = 5
 
 export interface SendResult {
   ok: boolean
@@ -121,14 +94,21 @@ export async function sendScheduledEmail(emailId: string): Promise<SendResult> {
   const html = buildEmailHtml(emailData)
   const text = buildEmailText(emailData)
 
-  // Load recipients
+  // Load recipients. Always restricted to active, non-opted-out members.
   let recipientQuery = db
     .from('members')
     .select('id, email, first_name')
     .eq('status', 'active')
     .eq('email_opt_out', false)
 
-  if (email.recipient_filter !== 'all') {
+  if (email.recipient_filter === 'selected') {
+    // Targeted send to a hand-picked list of member ids.
+    const ids = (email.recipient_member_ids ?? []) as string[]
+    if (ids.length === 0) {
+      return { ok: false, sent: 0, failed: 0, error: 'No members selected', status: 400 }
+    }
+    recipientQuery = recipientQuery.in('id', ids)
+  } else if (email.recipient_filter !== 'all') {
     recipientQuery = recipientQuery.eq('cohort', email.recipient_filter)
   }
 
@@ -138,33 +118,56 @@ export async function sendScheduledEmail(emailId: string): Promise<SendResult> {
     return { ok: false, sent: 0, failed: 0, error: 'No recipients found', status: 400 }
   }
 
-  // Build personalised payloads
-  const payloads: ResendEmailPayload[] = members.map(m => {
-    const token = makeUnsubscribeToken(m.id)
-    const unsubscribeUrl = `${SITE_URL}/unsubscribe?id=${m.id}&token=${token}`
-    return {
-      from:    `${FROM_NAME} <${FROM_ADDRESS}>`,
-      to:      [m.email],
-      subject: email.subject,
-      html:    html.replaceAll('{{UNSUBSCRIBE_URL}}', unsubscribeUrl),
-      text:    text.replaceAll('{{UNSUBSCRIBE_URL}}', unsubscribeUrl),
-    }
-  })
-
-  // Send in batches
+  // Send one personalised email per member. Each gets a unique unsubscribe URL
+  // baked into the body and a List-Unsubscribe header pointing at our own
+  // /unsubscribe endpoint, so opting out (in-body link or the mail client's
+  // native unsubscribe) updates our database.
   let successCount = 0
   const failures: string[] = []
-  for (let i = 0; i < payloads.length; i += BATCH_SIZE) {
-    const chunk = payloads.slice(i, i + BATCH_SIZE)
-    const result = await sendBatch(chunk)
-    if (result.ok) {
-      successCount += chunk.length
-    } else {
-      failures.push(...result.errors)
+
+  const sendToMember = async (m: { id: string; email: string; first_name: string | null }) => {
+    const token = makeUnsubscribeToken(m.id)
+    // In-body link goes to the friendly /unsubscribe page; the List-Unsubscribe
+    // header points at /api/unsubscribe, which handles the mail client's
+    // one-click POST (a page.tsx cannot). Both opt the member out in our DB.
+    const pageUrl   = `${SITE_URL}/unsubscribe?id=${m.id}&token=${token}`
+    const headerUrl = `${SITE_URL}/api/unsubscribe?id=${m.id}&token=${token}`
+    const result = await sendBrevoEmail({
+      sender:      { name: FROM_NAME, email: FROM_ADDRESS },
+      to:          [{ email: m.email, name: m.first_name ?? undefined }],
+      subject:     email.subject,
+      htmlContent: html.replaceAll('{{UNSUBSCRIBE_URL}}', pageUrl),
+      textContent: text.replaceAll('{{UNSUBSCRIBE_URL}}', pageUrl),
+      // Brevo adds `List-Unsubscribe-Post: One-Click` itself. We only set the
+      // URL. /api/unsubscribe handles both the one-click POST and a plain GET,
+      // so opt-out works whether or not the client uses one-click.
+      headers: { 'List-Unsubscribe': `<${headerUrl}>` },
+    })
+    if (result.ok) successCount++
+    else failures.push(`${m.email}: ${result.error ?? 'unknown error'}`)
+  }
+
+  // Bounded concurrency — process SEND_CONCURRENCY members at a time.
+  for (let i = 0; i < members.length; i += SEND_CONCURRENCY) {
+    await Promise.all(members.slice(i, i + SEND_CONCURRENCY).map(sendToMember))
+  }
+
+  // Only mark as sent if at least one email actually went out. If every send
+  // failed (bad API key, Brevo outage, etc.) leave the email 'scheduled' so the
+  // next cron run retries it, rather than silently swallowing the newsletter.
+  // A partial failure still marks sent: the members who received it must not be
+  // re-emailed on the next run.
+  if (successCount === 0) {
+    return {
+      ok: false,
+      sent: 0,
+      failed: failures.length,
+      errors: failures.length > 0 ? failures : undefined,
+      error: 'All sends failed; email left scheduled for retry',
+      status: 502,
     }
   }
 
-  // Mark as sent
   await db
     .from('scheduled_emails')
     .update({ status: 'sent', sent_at: new Date().toISOString(), recipient_count: successCount })

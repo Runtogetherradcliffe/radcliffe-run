@@ -41,6 +41,7 @@ export async function POST(req: NextRequest) {
     show_closing:     body.show_closing     ?? true,
     closing_text:     body.closing_text     ?? settings?.email_default_closing ?? '',
     recipient_filter: body.recipient_filter ?? 'all',
+    recipient_member_ids: body.recipient_member_ids ?? null,
   }
 
   const { data, error } = await supabaseAdmin()

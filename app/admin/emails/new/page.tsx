@@ -26,7 +26,7 @@ export default async function NewEmailPage() {
 
   // Load upcoming Thursday run dates + site settings defaults
   const today = new Date().toISOString().split('T')[0]
-  const [{ data: runs }, { data: settings }] = await Promise.all([
+  const [{ data: runs }, { data: settings }, { data: memberRows }] = await Promise.all([
     db.from('runs')
       .select('date, distance_km')
       .gte('date', today)
@@ -36,7 +36,18 @@ export default async function NewEmailPage() {
     db.from('site_settings')
       .select('email_default_subject, email_default_opening, email_default_closing')
       .single(),
+    db.from('members')
+      .select('id, first_name, last_name, email')
+      .eq('status', 'active')
+      .eq('email_opt_out', false)
+      .order('first_name', { ascending: true }),
   ])
+
+  const members = (memberRows ?? []).map(m => ({
+    id: m.id,
+    name: `${m.first_name} ${m.last_name}`.trim(),
+    email: m.email,
+  }))
 
   // Group by date for the dropdown
   const dateMap = new Map<string, { distance_km: number | null }[]>()
@@ -61,11 +72,12 @@ export default async function NewEmailPage() {
     show_closing:     true,
     closing_text:     settings?.email_default_closing ?? '',
     recipient_filter: 'all',
+    recipient_member_ids: [],
   }
 
   return (
     <AdminShell userEmail={user.email ?? ''}>
-      <EmailComposer draft={blankDraft} runOptions={runOptions} isNew={true} />
+      <EmailComposer draft={blankDraft} runOptions={runOptions} members={members} isNew={true} />
     </AdminShell>
   )
 }

@@ -26,7 +26,7 @@ export default async function EditEmailPage({ params }: { params: Promise<{ id: 
   const db = supabaseAdmin()
 
   const today = new Date().toISOString().split('T')[0]
-  const [{ data: email }, { data: runs }] = await Promise.all([
+  const [{ data: email }, { data: runs }, { data: memberRows }] = await Promise.all([
     db.from('scheduled_emails').select('*').eq('id', id).single(),
     db.from('runs')
       .select('date, distance_km')
@@ -34,9 +34,20 @@ export default async function EditEmailPage({ params }: { params: Promise<{ id: 
       .neq('run_type', 'social')
       .eq('cancelled', false)
       .order('date', { ascending: true }),
+    db.from('members')
+      .select('id, first_name, last_name, email')
+      .eq('status', 'active')
+      .eq('email_opt_out', false)
+      .order('first_name', { ascending: true }),
   ])
 
   if (!email) notFound()
+
+  const members = (memberRows ?? []).map(m => ({
+    id: m.id,
+    name: `${m.first_name} ${m.last_name}`.trim(),
+    email: m.email,
+  }))
 
   // Also include the thursday_date of this email even if it's in the past
   const pastRuns: typeof runs = []
@@ -71,13 +82,14 @@ export default async function EditEmailPage({ params }: { params: Promise<{ id: 
     show_closing:     email.show_closing ?? true,
     closing_text:     email.closing_text ?? '',
     recipient_filter: email.recipient_filter ?? 'all',
+    recipient_member_ids: email.recipient_member_ids ?? [],
     recipient_count:  email.recipient_count,
     sent_at:          email.sent_at,
   }
 
   return (
     <AdminShell userEmail={user.email ?? ''}>
-      <EmailComposer draft={draft} runOptions={runOptions} isNew={false} />
+      <EmailComposer draft={draft} runOptions={runOptions} members={members} isNew={false} />
     </AdminShell>
   )
 }

@@ -134,7 +134,7 @@ export default async function PrivacyPage({ searchParams }: Props) {
               <tbody>
                 {[
                   ['Supabase', 'Database and authentication — stores all member data on servers in the EU'],
-                  ['Resend', 'Email delivery — your email address is passed to Resend when we send you club emails'],
+                  ['Brevo', 'Email delivery: your email address is passed to Brevo, an EU-based provider, when we send you club emails'],
                   ['Vercel', 'Website hosting — processes requests to serve the site'],
                 ].map(([service, purpose], i, arr) => (
                   <tr key={i} style={i < arr.length - 1 ? tableRowStyle : {}}>

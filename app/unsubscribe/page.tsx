@@ -1,24 +1,9 @@
-import { createHmac, timingSafeEqual } from 'crypto'
-import { supabaseAdmin } from '@/lib/supabase'
 import Nav from '@/components/layout/Nav'
 import Footer from '@/components/layout/Footer'
 import Link from 'next/link'
+import { optOutMember, type OptOutResult } from '@/lib/unsubscribe'
 
-export const metadata = { title: 'Unsubscribed — radcliffe.run' }
-
-/** Verify the HMAC token from the unsubscribe URL */
-function verifyToken(memberId: string, token: string): boolean {
-  const secret = process.env.UNSUBSCRIBE_SECRET
-  if (!secret) return false
-  try {
-    const expected = createHmac('sha256', secret).update(memberId).digest()
-    const provided  = Buffer.from(token, 'hex')
-    if (expected.length !== provided.length) return false
-    return timingSafeEqual(expected, provided)
-  } catch {
-    return false
-  }
-}
+export const metadata = { title: 'Unsubscribed - radcliffe.run' }
 
 export default async function UnsubscribePage({
   searchParams,
@@ -27,28 +12,7 @@ export default async function UnsubscribePage({
 }) {
   const { id, token } = await searchParams
 
-  let status: 'ok' | 'already' | 'invalid' | 'error' = 'invalid'
-
-  if (id && token && verifyToken(id, token)) {
-    // Token verified — safe to look up and act
-    const { data: member } = await supabaseAdmin()
-      .from('members')
-      .select('email_opt_out')
-      .eq('id', id)
-      .single()
-
-    if (!member) {
-      status = 'invalid'
-    } else if (member.email_opt_out) {
-      status = 'already'
-    } else {
-      const { error } = await supabaseAdmin()
-        .from('members')
-        .update({ email_opt_out: true })
-        .eq('id', id)
-      status = error ? 'error' : 'ok'
-    }
-  }
+  const status: OptOutResult = (id && token) ? await optOutMember(id, token) : 'invalid'
 
   return (
     <>

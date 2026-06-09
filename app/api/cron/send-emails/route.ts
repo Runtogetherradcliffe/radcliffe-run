@@ -8,6 +8,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { sendScheduledEmail } from '@/lib/sendScheduledEmail'
 
+// Brevo sends are one request per member, so a full newsletter is many
+// sequential calls. Allow up to the Hobby maximum so a large send cannot time
+// out mid-loop (which would leave the email unmarked and risk a duplicate
+// resend on the next run).
+export const maxDuration = 60
+
 const CRON_SECRET = process.env.CRON_SECRET
 
 export async function GET(req: NextRequest) {

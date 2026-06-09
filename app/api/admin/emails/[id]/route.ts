@@ -5,7 +5,7 @@ import { supabaseAdmin } from '@/lib/supabase'
 const EMAIL_ALLOWED_FIELDS = [
   'thursday_date', 'scheduled_for', 'status', 'subject',
   'show_opening', 'opening_text', 'show_route_block', 'custom_text',
-  'show_closing', 'closing_text', 'recipient_filter',
+  'show_closing', 'closing_text', 'recipient_filter', 'recipient_member_ids',
 ]
 
 // GET /api/admin/emails/[id]

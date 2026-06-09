@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/admin'
 import { sendScheduledEmail } from '@/lib/sendScheduledEmail'
 
+// Manual "Send now" runs the same per-member Brevo loop as the cron, so it
+// needs the same headroom to avoid timing out on a full-size send.
+export const maxDuration = 60
+
 const CRON_SECRET = process.env.CRON_SECRET
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

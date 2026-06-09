@@ -1,6 +1,7 @@
 'use client'
 import { useState, useCallback, useEffect, useRef, ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 interface Snippet {
   id: string
@@ -12,6 +13,12 @@ interface Snippet {
 interface RunOption {
   date: string      // ISO date
   label: string     // display label e.g. "Thu 1 May — 5K & 8K"
+}
+
+interface MemberOption {
+  id:    string
+  name:  string
+  email: string
 }
 
 interface EmailDraft {
@@ -27,6 +34,7 @@ interface EmailDraft {
   show_closing:     boolean
   closing_text:     string
   recipient_filter: string
+  recipient_member_ids: string[]
   recipient_count?: number | null
   sent_at?:         string | null
 }
@@ -34,6 +42,7 @@ interface EmailDraft {
 interface Props {
   draft:      EmailDraft
   runOptions: RunOption[]
+  members:    MemberOption[]
   isNew:      boolean
 }
 
@@ -77,7 +86,71 @@ function Toggle({ checked, onChange, label }: { checked: boolean; onChange: (v: 
   )
 }
 
-export default function EmailComposer({ draft: initial, runOptions, isNew }: Props) {
+function MemberPicker({ members, selected, onChange, disabled }: {
+  members: MemberOption[]
+  selected: string[]
+  onChange: (ids: string[]) => void
+  disabled: boolean
+}) {
+  const [q, setQ] = useState('')
+  const sel = new Set(selected)
+  const needle = q.trim().toLowerCase()
+  const filtered = needle
+    ? members.filter(m => `${m.name} ${m.email}`.toLowerCase().includes(needle))
+    : members
+
+  const toggle = (id: string) => {
+    const next = new Set(sel)
+    if (next.has(id)) next.delete(id)
+    else next.add(id)
+    onChange([...next])
+  }
+
+  return (
+    <div style={{ marginTop: 12 }}>
+      <input
+        type="text"
+        value={q}
+        onChange={e => setQ(e.target.value)}
+        disabled={disabled}
+        placeholder="Search members by name or email…"
+        style={{ ...INPUT, marginBottom: 8 }}
+      />
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+        <span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)' }}>
+          {selected.length} selected{needle ? ` · ${filtered.length} shown` : ''}
+        </span>
+        {selected.length > 0 && !disabled && (
+          <button
+            onClick={() => onChange([])}
+            style={{ background: 'none', border: 'none', color: 'var(--muted)', fontSize: 12, cursor: 'pointer', textDecoration: 'underline' }}
+          >
+            Clear all
+          </button>
+        )}
+      </div>
+      <div style={{ maxHeight: 260, overflowY: 'auto', border: '1px solid var(--border)', borderRadius: 8 }}>
+        {filtered.length === 0 ? (
+          <p style={{ padding: 14, fontSize: 'var(--text-sm)', color: 'var(--muted)' }}>No members match.</p>
+        ) : filtered.map(m => (
+          <label
+            key={m.id}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px',
+              borderBottom: '1px solid var(--border)', cursor: disabled ? 'default' : 'pointer',
+            }}
+          >
+            <input type="checkbox" checked={sel.has(m.id)} onChange={() => toggle(m.id)} disabled={disabled} />
+            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--dim)' }}>{m.name}</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--faint)', marginLeft: 'auto' }}>{m.email}</span>
+          </label>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export default function EmailComposer({ draft: initial, runOptions, members, isNew }: Props) {
   const router = useRouter()
   const isSent = initial.status === 'sent'
 
@@ -142,6 +215,7 @@ export default function EmailComposer({ draft: initial, runOptions, isNew }: Pro
         show_closing:     draft.show_closing,
         closing_text:     draft.closing_text,
         recipient_filter: draft.recipient_filter,
+        recipient_member_ids: draft.recipient_member_ids,
       }
 
       let savedId = draft.id
@@ -206,6 +280,8 @@ export default function EmailComposer({ draft: initial, runOptions, isNew }: Pro
   }, [draft])
 
   useEffect(() => {
+    // loadPreview fetches async then setState; not a synchronous cascading render.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (previewOpen) loadPreview()
   }, [previewOpen, loadPreview])
 
@@ -260,7 +336,7 @@ export default function EmailComposer({ draft: initial, runOptions, isNew }: Pro
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28, gap: 12 }}>
           <div>
-            <a href="/admin/emails" style={{ fontSize: 12, color: 'var(--muted)', textDecoration: 'none' }}>← All emails</a>
+            <Link href="/admin/emails" style={{ fontSize: 12, color: 'var(--muted)', textDecoration: 'none' }}>← All emails</Link>
             <h1 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.02em', marginTop: 6 }}>
               {isNew ? 'Compose email' : isSent ? 'Sent email' : 'Edit draft'}
             </h1>
@@ -435,8 +511,16 @@ export default function EmailComposer({ draft: initial, runOptions, isNew }: Pro
             style={{ ...INPUT, appearance: 'none' as const }}
           >
             <option value="all">All registered runners</option>
-            <option value="c25k" disabled>C25K cohort (coming soon)</option>
+            <option value="selected">Specific members…</option>
           </select>
+          {draft.recipient_filter === 'selected' && (
+            <MemberPicker
+              members={members}
+              selected={draft.recipient_member_ids}
+              onChange={ids => set('recipient_member_ids', ids)}
+              disabled={isSent}
+            />
+          )}
         </Section>
 
         {/* ── Actions ── */}
@@ -466,7 +550,15 @@ export default function EmailComposer({ draft: initial, runOptions, isNew }: Pro
             )}
             <button
               onClick={() => {
-                if (confirm('Send this email to all registered runners now?')) save(true, false)
+                const n = draft.recipient_member_ids.length
+                if (draft.recipient_filter === 'selected' && n === 0) {
+                  showToast('Select at least one member first', 'err')
+                  return
+                }
+                const who = draft.recipient_filter === 'selected'
+                  ? `${n} selected member${n !== 1 ? 's' : ''}`
+                  : 'all registered runners'
+                if (confirm(`Send this email to ${who} now?`)) save(true, false)
               }}
               disabled={sending || saving}
               style={{ padding: '10px 20px', borderRadius: 8, background: '#f5a623', border: 'none', color: '#0a0a0a', fontSize: 'var(--text-sm)', fontWeight: 700, cursor: 'pointer' }}

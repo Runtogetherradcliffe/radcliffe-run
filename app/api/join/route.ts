@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
+import { sendBrevoEmail } from '@/lib/brevo'
 
 const DAYS   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December']
@@ -14,7 +15,7 @@ function escapeHtml(str: string) {
 }
 
 async function sendWelcomeEmail(firstName: string, email: string, cohort?: string, c25kSession?: string) {
-  const apiKey = process.env.RESEND_API_KEY
+  const apiKey = process.env.BREVO_API_KEY
   const from   = process.env.EMAIL_FROM
   const fromName = process.env.EMAIL_FROM_NAME ?? 'Run Together Radcliffe'
   const siteUrl  = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://radcliffe.run'
@@ -38,12 +39,12 @@ async function sendWelcomeEmail(firstName: string, email: string, cohort?: strin
     : 'Tuesday and Thursday evenings'
 
   const introText = isC25K
-    ? `You&rsquo;re signed up for our Couch to 5K programme. Sessions run on ${sessionText} at 7pm &mdash; just turn up in comfortable clothes and trainers.`
-    : `You&rsquo;re now registered with Run Together Radcliffe. We meet every Thursday at 7pm &mdash; no need to book, just turn up.`
+    ? `You&rsquo;re signed up for our Couch to 5K programme. Sessions run on ${sessionText} at 7pm. Just turn up in comfortable clothes and trainers.`
+    : `You&rsquo;re now registered with Run Together Radcliffe. We meet every Thursday at 7pm, no need to book, just turn up.`
 
   const introPlain = isC25K
-    ? `You're signed up for our Couch to 5K programme. Sessions run on ${sessionText} at 7pm — just turn up in comfortable clothes and trainers.`
-    : `You're now registered with Run Together Radcliffe. We meet every Thursday at 7pm — no need to book, just turn up.`
+    ? `You're signed up for our Couch to 5K programme. Sessions run on ${sessionText} at 7pm. Just turn up in comfortable clothes and trainers.`
+    : `You're now registered with Run Together Radcliffe. We meet every Thursday at 7pm, no need to book, just turn up.`
 
   const c25kProgrammeBlock = isC25K ? `
     <tr><td style="padding:0 0 24px">
@@ -96,16 +97,12 @@ async function sendWelcomeEmail(firstName: string, email: string, cohort?: strin
 
   const text = `Welcome to Run Together Radcliffe, ${firstName}!\n\n${introPlain}\n\n${isC25K ? `View your full programme at: ${siteUrl}/c25k/programme\n\n` : ''}${run && !isC25K ? `Next run: ${run.title} on ${fmtDate(run.date)} at 7pm, ${run.meeting_point}\n\n` : ''}Sign in to your profile: ${siteUrl}/signin\n\nRun Together Radcliffe · Radcliffe Market, Blackburn Street, M26 1PN`
 
-  await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      from: `${fromName} <${from}>`,
-      to: [email],
-      subject: `Welcome to Run Together Radcliffe, ${firstName}!`,
-      html,
-      text,
-    }),
+  await sendBrevoEmail({
+    sender:      { name: fromName, email: from },
+    to:          [{ email, name: firstName }],
+    subject:     `Welcome to Run Together Radcliffe, ${firstName}!`,
+    htmlContent: html,
+    textContent: text,
   })
 }
 
