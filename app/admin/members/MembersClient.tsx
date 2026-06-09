@@ -285,7 +285,7 @@ export default function MembersClient({ members: initial }: { members: Member[] 
   )
 }
 
-function UkaInput({ memberId, initialValue, onSave }: { memberId: string; initialValue: string; onSave: (v: string) => void }) {
+function UkaInput({ initialValue, onSave }: { memberId: string; initialValue: string; onSave: (v: string) => void }) {
   const [value, setValue] = useState(initialValue)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)

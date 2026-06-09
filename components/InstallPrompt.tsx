@@ -8,9 +8,15 @@ const VISITS_NEEDED  = 2   // show after this many page loads
 
 type Platform = 'android' | 'ios' | null
 
+/** Chrome's install prompt event - not yet in the standard TS DOM lib. */
+interface BeforeInstallPromptEvent extends Event {
+  prompt(): Promise<void>
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
+}
+
 export default function InstallPrompt() {
   const [platform, setPlatform]       = useState<Platform>(null)
-  const [deferredPrompt, setPrompt]   = useState<any>(null)
+  const [deferredPrompt, setPrompt]   = useState<BeforeInstallPromptEvent | null>(null)
   const [visible, setVisible]         = useState(false)
   const [installing, setInstalling]   = useState(false)
 
@@ -32,9 +38,10 @@ export default function InstallPrompt() {
 
     // Detect platform
     const ua = navigator.userAgent
-    const isIOS = /iPhone|iPad|iPod/.test(ua) && !(window as any).MSStream
+    const isIOS = /iPhone|iPad|iPod/.test(ua) && !(window as Window & { MSStream?: unknown }).MSStream
     const isAndroidChrome = /Android/.test(ua) && /Chrome/.test(ua) && !/Edge|OPR/.test(ua)
 
+    /* eslint-disable react-hooks/set-state-in-effect -- one-time platform detection on mount; browser APIs are unavailable during SSR render */
     if (isIOS) {
       // iOS Safari — only show if not already in standalone
       const isSafari = /Safari/.test(ua) && !/CriOS|FxiOS/.test(ua)
@@ -48,10 +55,11 @@ export default function InstallPrompt() {
     if (isAndroidChrome) {
       // Android Chrome — wait for beforeinstallprompt
       setPlatform('android')
+      /* eslint-enable react-hooks/set-state-in-effect */
       // It may already have fired; listen for it
       const handler = (e: Event) => {
         e.preventDefault()
-        setPrompt(e)
+        setPrompt(e as BeforeInstallPromptEvent)
         setVisible(true)
       }
       window.addEventListener('beforeinstallprompt', handler)

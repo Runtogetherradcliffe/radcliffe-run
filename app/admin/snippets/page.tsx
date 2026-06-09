@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, CSSProperties } from 'react'
+import Link from 'next/link'
 import AdminShell from '@/components/AdminShell'
 
 interface Snippet {
@@ -40,6 +41,7 @@ export default function SnippetsPage() {
     setLoading(false)
   }
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- initial data fetch on mount; load() flips the loading flag synchronously before fetching
   useEffect(() => { load() }, [])
 
   const startCreate = () => {
@@ -123,7 +125,7 @@ export default function SnippetsPage() {
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 32, gap: 16 }}>
           <div>
-            <a href="/admin/emails" style={{ fontSize: 12, color: 'var(--muted)', textDecoration: 'none' }}>← Back to emails</a>
+            <Link href="/admin/emails" style={{ fontSize: 12, color: 'var(--muted)', textDecoration: 'none' }}>← Back to emails</Link>
             <h1 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em', marginTop: 6 }}>Message snippets</h1>
             <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)', marginTop: 4 }}>
               Pre-written messages you can insert into the custom message field when composing an email.

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { loadLeaflet, type Leaflet, type LeafletContainer } from '@/lib/leaflet'
 
 function haversine(a: [number, number], b: [number, number]): number {
   const R = 6371000
@@ -11,7 +12,7 @@ function haversine(a: [number, number], b: [number, number]): number {
   return R * 2 * Math.atan2(Math.sqrt(s), Math.sqrt(1 - s))
 }
 
-function arrowIcon(L: any, deg: number) {
+function arrowIcon(L: typeof Leaflet, deg: number) {
   return L.divIcon({
     className: '',
     html: `<div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:10px solid #f5a623;transform:rotate(${deg}deg);transform-origin:center center;filter:drop-shadow(0 0 2px rgba(0,0,0,0.8))"></div>`,
@@ -41,18 +42,14 @@ const MARKET_COORDS: [number, number] = [53.5609, -2.3265]
 
 export default function RunMap({ gpxFile, center, onTour = false, meetingLabel = 'Radcliffe Market' }: RunMapProps) {
   const mapRef    = useRef<HTMLDivElement>(null)
-  const mapObjRef = useRef<any>(null)
+  const mapObjRef = useRef<Leaflet.Map | null>(null)
 
   useEffect(() => {
     if (typeof window === 'undefined' || mapObjRef.current) return
     let cancelled = false
 
-    Promise.all([
-      import('leaflet'),
-      import('leaflet/dist/leaflet.css' as any),
-    ]).then(async ([L]) => {
+    loadLeaflet().then(async (Lx) => {
       if (cancelled || mapObjRef.current || !mapRef.current) return
-      const Lx = L.default || L
 
       const map = Lx.map(mapRef.current, { center, zoom: 14, zoomControl: true })
       mapObjRef.current = map
@@ -95,7 +92,7 @@ export default function RunMap({ gpxFile, center, onTour = false, meetingLabel =
         // Direction arrows every 800m
         const ARROW_INTERVAL = 800
         let distAcc = 0
-        const arrowMarkers: any[] = []
+        const arrowMarkers: Leaflet.Marker[] = []
         for (let i = 1; i < coords.length; i++) {
           distAcc += haversine(coords[i - 1], coords[i])
           if (distAcc >= ARROW_INTERVAL) {
@@ -116,7 +113,7 @@ export default function RunMap({ gpxFile, center, onTour = false, meetingLabel =
       cancelled = true
       mapObjRef.current?.remove()
       mapObjRef.current = null
-      if (mapRef.current) delete (mapRef.current as any)._leaflet_id
+      if (mapRef.current) delete (mapRef.current as LeafletContainer)._leaflet_id
     }
   }, [gpxFile, center, onTour, meetingLabel])
 

@@ -123,6 +123,7 @@ export default function ProfileClient({ member: initial }: { member: Member }) {
 
   // ── Check push subscription state on mount ──────────────────────
   useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect -- one-time read of browser push capability on mount; unavailable during SSR render */
     if (typeof Notification === 'undefined' || !('serviceWorker' in navigator)) {
       setPushState('unsupported')
       return
@@ -131,6 +132,7 @@ export default function ProfileClient({ member: initial }: { member: Member }) {
       setPushState('denied')
       return
     }
+    /* eslint-enable react-hooks/set-state-in-effect */
     navigator.serviceWorker.ready.then(reg =>
       reg.pushManager.getSubscription()
     ).then(sub => {

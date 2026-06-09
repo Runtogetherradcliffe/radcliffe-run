@@ -238,12 +238,6 @@ export default function RunsClient({ runs: initial }: { runs: Run[] }) {
     }
   }
 
-  function formatDate(d: string) {
-    const { day, month, weekday } = fmtDate(d)
-    const year = new Date(d + 'T00:00:00').getFullYear()
-    return `${weekday} ${day} ${month} ${year}`
-  }
-
   return (
     <div>
       {/* Controls */}

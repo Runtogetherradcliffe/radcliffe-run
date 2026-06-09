@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import Nav from '@/components/layout/Nav'
 import Footer from '@/components/layout/Footer'
 import FaqAccordion from './FaqAccordion'
@@ -53,7 +54,7 @@ export default async function AboutPage() {
             Running together<br />since 2022.
           </h1>
           <p style={{ fontSize: 17, color: 'var(--muted)', lineHeight: 1.8, maxWidth: 620 }}>
-            We're a free, friendly running group meeting every Thursday evening in Radcliffe, Greater Manchester. We're part of the England Athletics Run Together programme — open to everyone, no membership fees, no pressure, no minimum pace.
+            We&apos;re a free, friendly running group meeting every Thursday evening in Radcliffe, Greater Manchester. We&apos;re part of the England Athletics Run Together programme — open to everyone, no membership fees, no pressure, no minimum pace.
           </p>
         </section>
 
@@ -82,7 +83,7 @@ export default async function AboutPage() {
                   The group has a strong trail running side alongside the road runs, and members organise social runs on weekends fairly regularly — longer distances, off-road, and usually finishing somewhere scenic.
                 </p>
                 <p style={{ fontSize: 'var(--text-md)', color: 'var(--muted)', lineHeight: 1.8 }}>
-                  Beyond the running, there's a real community here. Members support each other at parkruns and races across the country — you'll find our runners at everything from local 5ks to mountain ultras.
+                  Beyond the running, there&apos;s a real community here. Members support each other at parkruns and races across the country — you&apos;ll find our runners at everything from local 5ks to mountain ultras.
                 </p>
               </div>
             </div>
@@ -127,7 +128,7 @@ export default async function AboutPage() {
             <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--purple)', marginBottom: 16 }}>Ready to run?</p>
             <h2 style={{ fontSize: 32, fontWeight: 800, letterSpacing: '-0.02em', marginBottom: 16 }}>Come and join us</h2>
             <p style={{ fontSize: 16, color: 'var(--muted)', marginBottom: 32, maxWidth: 460, margin: '0 auto 32px' }}>
-              Register takes two minutes. Turn up Thursday at 7pm and we'll do the rest.
+              Register takes two minutes. Turn up Thursday at 7pm and we&apos;ll do the rest.
             </p>
             <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
               <a href="/join" style={{
@@ -137,13 +138,13 @@ export default async function AboutPage() {
               }}>
                 Register now
               </a>
-              <a href="/routes" style={{
+              <Link href="/routes" style={{
                 display: 'inline-block', padding: '14px 32px', borderRadius: 8,
                 background: 'transparent', color: 'var(--muted)', fontSize: 'var(--text-md)', fontWeight: 600,
                 textDecoration: 'none', border: '1px solid var(--border-2)', letterSpacing: '-0.01em',
               }}>
                 Explore routes
-              </a>
+              </Link>
             </div>
           </div>
         </section>

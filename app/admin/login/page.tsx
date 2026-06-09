@@ -1,7 +1,7 @@
 'use client'
 import { useState, useRef } from 'react'
 import { createClient } from '@/utils/supabase/client'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 const INPUT_STYLE = {
   width: '100%', background: 'var(--bg)', border: '1px solid var(--border)',
@@ -20,7 +20,6 @@ const BTN_STYLE = (disabled: boolean) => ({
 })
 
 export default function AdminLoginPage() {
-  const router  = useRouter()
   const [email,   setEmail]   = useState('')
   const [step,    setStep]    = useState<'email' | 'code'>('email')
   const [code,    setCode]    = useState('')
@@ -80,11 +79,11 @@ export default function AdminLoginPage() {
       <div style={{ width: '100%', maxWidth: 400 }}>
 
         {/* Wordmark */}
-        <a href="/" style={{ textDecoration: 'none', display: 'block', textAlign: 'center', marginBottom: 40 }}>
+        <Link href="/" style={{ textDecoration: 'none', display: 'block', textAlign: 'center', marginBottom: 40 }}>
           <p style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em', fontFamily: 'Inter, sans-serif' }}>
             <span style={{ color: 'var(--white)' }}>radcliffe.</span><span style={{ color: '#f5a623' }}>run</span>
           </p>
-        </a>
+        </Link>
 
         <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 16, padding: 36 }}>
 

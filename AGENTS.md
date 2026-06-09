@@ -62,9 +62,9 @@ Full background in `docs/ARCHITECTURE.md`. Read this whole file before changing 
 - **Every change becomes a real git commit on a branch cut from fresh `origin/main`.**
   Past breakage came from branches cut from stale main reverting already-deployed fixes.
 - Run `npm run typecheck`, `npm run lint`, and `npm test` before pushing. GitHub
-  Actions CI enforces typecheck + tests on every push to staging and main (lint is
-  advisory until the pre-existing lint debt is cleared). Note: Next 16 no longer
-  runs ESLint during `next build`, so a green Vercel build does NOT mean lint-clean.
+  Actions CI enforces all three on every push to staging and main. Note: Next 16 no
+  longer runs ESLint during `next build`, so a green Vercel build does NOT mean
+  lint-clean - CI is the lint gate.
 - **Vercel Hobby plan: max one cron schedule per day.** A more frequent schedule fails
   the entire deployment. Current crons: send-emails 8am, gdpr-cleanup 3am.
 - Do NOT run `npm audit fix --force` - it downgrades Next.js to an ancient version.

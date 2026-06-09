@@ -34,6 +34,10 @@ export default function RoundupBody({ content }: { content: string }) {
 
   let currentSection: Section = 'other'
   const elements: React.ReactNode[] = []
+  // Indices of paragraph tokens already rendered inside a card, so the
+  // paragraph pass below skips them (kept outside the tokens themselves -
+  // marked's token objects must not be mutated).
+  const consumed = new Set<number>()
 
   tokens.forEach((token: Token, i: number) => {
     if (token.type === 'heading' && token.depth === 2) {
@@ -86,13 +90,13 @@ export default function RoundupBody({ content }: { content: string }) {
 
       // Mark the consumed paragraphs so we skip them below
       for (let k = i + 1; k < j; k++) {
-        (tokens[k] as any).__consumed = true
+        consumed.add(k)
       }
       return
     }
 
     // Skip paragraphs already consumed by a card above
-    if (token.type === 'paragraph' && (token as any).__consumed) return
+    if (token.type === 'paragraph' && consumed.has(i)) return
 
     if (token.type === 'paragraph') {
       const text = token.text.trim()

@@ -387,7 +387,7 @@ export default async function HomePage() {
               <div className="rtr-cards-grid">
                 {cards.length === 0 ? (
                   <p style={{ color: 'var(--faint)', fontSize: 'var(--text-base)' }}>No upcoming runs scheduled yet.</p>
-                ) : cards.map(({ primary: run, companion }, cardIndex) => {
+                ) : cards.map(({ primary: run, companion }) => {
                   const linkedRoute = run.route_slug ? ROUTES.find(r => r.slug === run.route_slug) : null
                   const companionRoute = companion?.route_slug ? ROUTES.find(r => r.slug === companion.route_slug) : null
 

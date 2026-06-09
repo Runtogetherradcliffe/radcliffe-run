@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useRef, ReactNode } from 'react'
+import { loadLeaflet, type Leaflet, type LeafletContainer } from '@/lib/leaflet'
 
 const MAP_HEIGHT = 300
 
@@ -64,7 +65,7 @@ function haversine(a: [number, number], b: [number, number]): number {
 }
 
 /* -- Arrow marker */
-function arrowIcon(L: any, deg: number, color: string) {
+function arrowIcon(L: typeof Leaflet, deg: number, color: string) {
   return L.divIcon({
     className: '',
     html: `<div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:10px solid ${color};transform:rotate(${deg}deg);transform-origin:center center;filter:drop-shadow(0 0 2px rgba(0,0,0,0.8))"></div>`,
@@ -74,7 +75,7 @@ function arrowIcon(L: any, deg: number, color: string) {
 }
 
 /* -- Pulsing location dot marker */
-function locationDotIcon(L: any) {
+function locationDotIcon(L: typeof Leaflet) {
   return L.divIcon({
     className: '',
     html: `<div style="position:relative;width:20px;height:20px">
@@ -109,11 +110,11 @@ export default function RunMapExpand({ file, terrain, accentColor = '#f5a623', r
   const [locating, setLocating]     = useState(false)
 
   const mapRef           = useRef<HTMLDivElement>(null)
-  const mapObjRef        = useRef<any>(null)
-  const leafletRef       = useRef<any>(null)      // Leaflet instance after load
+  const mapObjRef        = useRef<Leaflet.Map | null>(null)
+  const leafletRef       = useRef<typeof Leaflet | null>(null)  // Leaflet instance after load
   const watchIdRef       = useRef<number | null>(null)
-  const locationLayerRef = useRef<any>(null)      // pulsing dot + accuracy circle
-  const breadcrumbRef    = useRef<any>(null)      // purple dashed trail polyline
+  const locationLayerRef = useRef<Leaflet.LayerGroup | null>(null)  // pulsing dot + accuracy circle
+  const breadcrumbRef    = useRef<Leaflet.Polyline | null>(null)    // purple dashed trail polyline
   const trailCoordsRef   = useRef<[number, number][]>([])  // recorded positions
   const firstFixRef      = useRef(true)           // pan on first GPS fix always
   const fullscreenRef    = useRef(fullscreen)     // stable ref for watchPosition callback
@@ -136,17 +137,13 @@ export default function RunMapExpand({ file, terrain, accentColor = '#f5a623', r
       if (cancelled || !mapRef.current) return
       try {
         ensurePulseStyle()
-        const [L] = await Promise.all([
-          import('leaflet'),
-          import('leaflet/dist/leaflet.css' as any),
-        ])
+        const Lm = await loadLeaflet()
         if (cancelled || !mapRef.current || mapObjRef.current) return
 
-        if ((mapRef.current as any)._leaflet_id) {
-          delete (mapRef.current as any)._leaflet_id
+        if ((mapRef.current as LeafletContainer)._leaflet_id) {
+          delete (mapRef.current as LeafletContainer)._leaflet_id
         }
 
-        const Lm = L.default || L
         leafletRef.current = Lm
 
         const map = Lm.map(mapRef.current, { center: [53.5609, -2.3265] as [number, number], zoom: 13 })
@@ -165,7 +162,7 @@ export default function RunMapExpand({ file, terrain, accentColor = '#f5a623', r
           Lm.polyline(coords, { color: accentColor, weight: 3, opacity: 1 }).addTo(map)
 
           // Direction arrows every ~800 m
-          const arrowMarkers: any[] = []
+          const arrowMarkers: Leaflet.Marker[] = []
           let distAcc = 0, nextArrow = 400
           for (let i = 1; i < coords.length; i++) {
             distAcc += haversine(coords[i - 1], coords[i])
@@ -211,7 +208,7 @@ export default function RunMapExpand({ file, terrain, accentColor = '#f5a623', r
       stopLocate()
       mapObjRef.current?.remove()
       mapObjRef.current = null
-      if (mapRef.current) delete (mapRef.current as any)._leaflet_id
+      if (mapRef.current) delete (mapRef.current as LeafletContainer)._leaflet_id
     }
   }, [])
 
@@ -219,6 +216,7 @@ export default function RunMapExpand({ file, terrain, accentColor = '#f5a623', r
   function startLocate() {
     if (!navigator.geolocation || !leafletRef.current || !mapObjRef.current) return
     const Lm = leafletRef.current
+    const map = mapObjRef.current
     firstFixRef.current = true
 
     watchIdRef.current = navigator.geolocation.watchPosition(
@@ -239,7 +237,7 @@ export default function RunMapExpand({ file, terrain, accentColor = '#f5a623', r
             opacity: 0.85,
             dashArray: '6 8',
             lineCap: 'round',
-          }).addTo(mapObjRef.current)
+          }).addTo(map)
         }
 
         // Update location dot + accuracy circle
@@ -257,7 +255,7 @@ export default function RunMapExpand({ file, terrain, accentColor = '#f5a623', r
           weight: 1,
           opacity: 0.25,
         })
-        locationLayerRef.current = Lm.layerGroup([circle, dot]).addTo(mapObjRef.current)
+        locationLayerRef.current = Lm.layerGroup([circle, dot]).addTo(map)
 
         // Pan on first fix always; subsequent fixes follow only in fullscreen
         if (firstFixRef.current || fullscreenRef.current) {

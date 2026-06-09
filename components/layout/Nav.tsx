@@ -65,6 +65,7 @@ export default function Nav() {
   }, [])
 
   // Close menu on route change
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- standard close-menu-on-navigation pattern; also covers browser back/forward where no link onClick fires
   useEffect(() => { setOpen(false) }, [path])
 
   const active = (href: string) => href === '/' ? path === '/' : path.startsWith(href)

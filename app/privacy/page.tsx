@@ -14,10 +14,6 @@ const sectionHeadStyle: React.CSSProperties = {
   letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12, marginTop: 40,
 }
 
-const headStyle: React.CSSProperties = {
-  fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 12, marginTop: 40, color: 'var(--white)',
-}
-
 const paraStyle: React.CSSProperties = {
   fontSize: 'var(--text-md)', fontWeight: 300, color: 'var(--dim)', lineHeight: 1.8, marginBottom: 12,
 }

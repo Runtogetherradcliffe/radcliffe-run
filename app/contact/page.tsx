@@ -41,13 +41,13 @@ export default function ContactPage() {
           <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#f5a623', marginBottom: 12 }}>Get in touch</p>
           <h1 style={{ fontSize: 36, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: 12 }}>Contact us</h1>
           <p style={{ fontSize: 16, color: 'var(--muted)', lineHeight: 1.7, marginBottom: 40 }}>
-            Have a question or want to know more? Drop us a message and we'll get back to you.
+            Have a question or want to know more? Drop us a message and we&apos;ll get back to you.
           </p>
 
           {status === 'sent' ? (
             <div style={{ background: '#0d2a0d', border: '1px solid #1a3a1a', borderRadius: 12, padding: '32px 28px', textAlign: 'center' }}>
               <p style={{ fontSize: 22, fontWeight: 700, marginBottom: 8 }}>Message sent!</p>
-              <p style={{ fontSize: 'var(--text-md)', color: 'var(--muted)' }}>Thanks {name.split(' ')[0]} — we'll be in touch soon.</p>
+              <p style={{ fontSize: 'var(--text-md)', color: 'var(--muted)' }}>Thanks {name.split(' ')[0]} — we&apos;ll be in touch soon.</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>

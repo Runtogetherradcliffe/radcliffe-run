@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect, ReactNode } from 'react'
 
@@ -26,6 +27,7 @@ export default function AdminShell({ userEmail, children }: { userEmail: string;
     return () => window.removeEventListener('resize', check)
   }, [])
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- standard close-menu-on-navigation pattern; also covers browser back/forward where no link onClick fires
   useEffect(() => { setMenuOpen(false) }, [pathname])
 
   function isActive(href: string) {
@@ -57,13 +59,13 @@ export default function AdminShell({ userEmail, children }: { userEmail: string;
         )
       })}
       <div style={{ borderTop: '1px solid var(--border)', marginTop: 24, paddingTop: 16 }}>
-        <a
+        <Link
           href="/"
           onClick={() => setMenuOpen(false)}
           style={{ display: 'block', padding: '9px 14px', borderRadius: 8, textDecoration: 'none', color: 'var(--muted)', fontSize: 'var(--text-base)', fontWeight: 500 }}
         >
           View site
-        </a>
+        </Link>
       </div>
     </nav>
   )

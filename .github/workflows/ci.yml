@@ -23,12 +23,8 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
-      # Non-blocking until the pre-existing lint debt (~57 errors, mostly
-      # no-explicit-any) is cleared. Next 16 stopped linting during build,
-      # so these accumulated ungated. Make this blocking once fixed.
-      - name: Lint (advisory)
+      - name: Lint
         run: npm run lint
-        continue-on-error: true
 
       - name: Tests
         run: npm test

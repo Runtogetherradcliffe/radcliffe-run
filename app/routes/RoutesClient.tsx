@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { loadLeaflet, type Leaflet, type LeafletContainer } from '@/lib/leaflet'
 import { ROUTES, TERRAIN_LABELS, type Route, type Terrain, type Category } from '@/lib/routes'
 import type { RouteOverrides } from '@/lib/routeDescriptions'
 import GpxButton from '@/app/runs/[id]/GpxButton'
@@ -61,7 +62,7 @@ function haversine(a: [number, number], b: [number, number]): number {
 }
 
 /* ── Arrow icon ── */
-function arrowIcon(L: any, deg: number) {
+function arrowIcon(L: typeof Leaflet, deg: number) {
   return L.divIcon({
     className: '',
     html: `<div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:10px solid #f5a623;transform:rotate(${deg}deg);transform-origin:center center;filter:drop-shadow(0 0 2px rgba(0,0,0,0.8))"></div>`,
@@ -100,12 +101,12 @@ export default function RoutesClient({ nameOverrides = {} }: { nameOverrides?: R
   const [mapReady, setMapReady] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const mapRef          = useRef<HTMLDivElement>(null)
-  const leafletRef      = useRef<any>(null)
-  const mapObjRef       = useRef<any>(null)
-  const polyRef         = useRef<any>(null)
-  const arrowsRef       = useRef<any>(null)
-  const markerRef       = useRef<any>(null)
-  const tileLayerRef    = useRef<any>(null)
+  const leafletRef      = useRef<typeof Leaflet | null>(null)
+  const mapObjRef       = useRef<Leaflet.Map | null>(null)
+  const polyRef         = useRef<Leaflet.LayerGroup | null>(null)
+  const arrowsRef       = useRef<Leaflet.LayerGroup | null>(null)
+  const markerRef       = useRef<Leaflet.Marker | null>(null)
+  const tileLayerRef    = useRef<Leaflet.TileLayer | null>(null)
   const currentTerrain  = useRef<string>('road')
 
   useEffect(() => {
@@ -129,18 +130,15 @@ export default function RoutesClient({ nameOverrides = {} }: { nameOverrides?: R
     if (typeof window === 'undefined' || mapObjRef.current) return
     let cancelled = false
 
-    Promise.all([
-      import('leaflet'),
-      import('leaflet/dist/leaflet.css' as any),
-    ]).then(([L]) => {
+    loadLeaflet().then((L) => {
       if (cancelled || mapObjRef.current) return
 
       // Defensive: clear any stale Leaflet state that survived a previous unmount
-      if (mapRef.current && (mapRef.current as any)._leaflet_id) {
-        delete (mapRef.current as any)._leaflet_id
+      if (mapRef.current && (mapRef.current as LeafletContainer)._leaflet_id) {
+        delete (mapRef.current as LeafletContainer)._leaflet_id
       }
 
-      leafletRef.current = L.default || L
+      leafletRef.current = L
 
       const map = leafletRef.current.map(mapRef.current!, {
         center: [53.5609, -2.3265],
@@ -173,7 +171,7 @@ export default function RoutesClient({ nameOverrides = {} }: { nameOverrides?: R
       setMapReady(false)
       mapObjRef.current?.remove()
       mapObjRef.current = null
-      if (mapRef.current) delete (mapRef.current as any)._leaflet_id
+      if (mapRef.current) delete (mapRef.current as LeafletContainer)._leaflet_id
     }
   }, [])
 
@@ -209,7 +207,7 @@ export default function RoutesClient({ nameOverrides = {} }: { nameOverrides?: R
       polyRef.current = group
 
       // Direction arrows every ~800 m
-      const arrowMarkers: any[] = []
+      const arrowMarkers: Leaflet.Marker[] = []
       let distAcc = 0
       let nextArrow = 400 // first arrow at 400 m, then every 800 m
       for (let i = 1; i < coords.length; i++) {
@@ -242,6 +240,7 @@ export default function RoutesClient({ nameOverrides = {} }: { nameOverrides?: R
     if (!hash) return
     const route = ROUTES.find(r => r.slug === hash)
     if (route) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time sync of selection from the URL hash once the map is ready; emails deep-link to /routes#<slug>
       setSelected(route)
       drawRoute(route)
     }

@@ -20,10 +20,12 @@ export default function NotificationOptIn() {
 
   useEffect(() => {
     if (typeof Notification === 'undefined') return
+    /* eslint-disable react-hooks/set-state-in-effect -- one-time read of browser notification state on mount; unavailable during SSR render */
     setPermission(Notification.permission)
 
     // Don't re-show if they previously dismissed without choosing
     if (localStorage.getItem('rtr-notif-dismissed')) setDismissed(true)
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [])
 
   // Don't render on server, or if not supported, or if already decided

@@ -94,8 +94,8 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
       if (!saveRes.ok) throw new Error('Image uploaded but failed to save — click Save settings to retry')
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
-    } catch (e: any) {
-      setError(e.message ?? 'Upload failed')
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Upload failed')
       setPreview(initial.hero_image_url)
     } finally {
       setUploading(false)
@@ -127,8 +127,8 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
       if (!res.ok) throw new Error((await res.json()).error)
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
-    } catch (e: any) {
-      setError(e.message)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Save failed')
     } finally {
       setSaving(false)
     }
