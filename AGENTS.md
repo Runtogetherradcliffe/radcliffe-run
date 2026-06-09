@@ -61,8 +61,10 @@ Full background in `docs/ARCHITECTURE.md`. Read this whole file before changing 
   then merge `staging` into `main`. Never push directly to `main`.
 - **Every change becomes a real git commit on a branch cut from fresh `origin/main`.**
   Past breakage came from branches cut from stale main reverting already-deployed fixes.
-- ESLint runs on the Vercel build and unused imports/variables FAIL it. Run
-  `npm run lint` and `npx tsc --noEmit` before pushing.
+- Run `npm run typecheck`, `npm run lint`, and `npm test` before pushing. GitHub
+  Actions CI enforces typecheck + tests on every push to staging and main (lint is
+  advisory until the pre-existing lint debt is cleared). Note: Next 16 no longer
+  runs ESLint during `next build`, so a green Vercel build does NOT mean lint-clean.
 - **Vercel Hobby plan: max one cron schedule per day.** A more frequent schedule fails
   the entire deployment. Current crons: send-emails 8am, gdpr-cleanup 3am.
 - Do NOT run `npm audit fix --force` - it downgrades Next.js to an ancient version.
