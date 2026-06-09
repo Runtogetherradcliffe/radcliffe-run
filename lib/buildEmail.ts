@@ -78,7 +78,7 @@ function runBlock(run: RunInfo, siteUrl: string, showTerrain = false): string {
   const distance  = run.distance_km ? `${run.distance_km}km` : ''
   const location  = escapeHtml(run.meeting_point || 'Radcliffe Market')
   const routeUrl  = safeUrl(
-    run.route_slug ? `${siteUrl}/routes/${encodeURIComponent(run.route_slug)}` : `${siteUrl}/routes`,
+    run.route_slug ? `${siteUrl}/routes#${encodeURIComponent(run.route_slug)}` : `${siteUrl}/routes`,
     `${siteUrl}/routes`,
   )
 
@@ -239,7 +239,7 @@ export function buildEmailText(data: EmailData): string {
       const tourNote = run.on_tour ? ' (On Tour)' : ''
       lines.push(`📍 ${run.meeting_point}${tourNote}`)
       if (run.on_tour && run.meeting_map_url) lines.push(`Map: ${run.meeting_map_url}`)
-      if (run.route_slug) lines.push(`Route: ${siteUrl}/routes/${run.route_slug}`)
+      if (run.route_slug) lines.push(`Route: ${siteUrl}/routes#${run.route_slug}`)
       lines.push('')
     }
     lines.push('─'.repeat(40), '')
