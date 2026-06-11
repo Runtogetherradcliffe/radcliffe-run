@@ -26,5 +26,8 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Em dash guard
+        run: npm run check:no-em-dash
+
       - name: Tests
         run: npm test
