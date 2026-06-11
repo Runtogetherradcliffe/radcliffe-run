@@ -430,6 +430,15 @@ export default async function HomePage() {
                 </a>
               </div>
 
+              {/* Plain-English key: demystify the "Jeffing" tag for newcomers landing here */}
+              {cards.length > 0 && (
+                <div style={{ marginBottom: 28, padding: '12px 16px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 10 }}>
+                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)', lineHeight: 1.6, margin: 0 }}>
+                    New to running? Look for the <strong style={{ color: 'var(--orange)', fontWeight: 600 }}>Jeffing (run/walk)</strong> tag - you walk a bit and run a bit at a pace that suits you, so nobody gets left behind.
+                  </p>
+                </div>
+              )}
+
               <div className="rtr-cards-grid">
                 {cards.length === 0 ? (
                   <p style={{ color: 'var(--faint)', fontSize: 'var(--text-base)' }}>No upcoming runs scheduled yet.</p>
