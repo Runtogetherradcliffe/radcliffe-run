@@ -151,9 +151,13 @@ export default async function HomePage() {
     name: 'Run Together Radcliffe',
     alternateName: 'radcliffe.run',
     url: 'https://radcliffe.run',
+    logo: 'https://radcliffe.run/logo.png',
+    image: 'https://radcliffe.run/og-image.png',
+    email: 'hello@radcliffe.run',
     description: 'A free, friendly running group in Radcliffe, Bury (Greater Manchester), open to everyone. No memberships, no minimum pace - good routes and good people, every Thursday.',
     foundingDate: '2022',
     isAccessibleForFree: true,
+    priceRange: 'Free',
     areaServed: { '@type': 'City', name: 'Radcliffe, Bury, Greater Manchester' },
     address: {
       '@type': 'PostalAddress',
