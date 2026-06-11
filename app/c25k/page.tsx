@@ -5,7 +5,7 @@ import { supabaseAdmin } from '@/lib/supabase'
 import { createClient } from '@/utils/supabase/server'
 
 export const metadata = {
-  title: 'Couch to 5K - radcliffe.run',
+  title: 'Couch to 5K in Radcliffe, Bury | radcliffe.run',
   description: 'The NHS Couch to 5K programme with Run Together Radcliffe. 10 weeks, two group sessions a week, and a 5K finish line ahead.',
 }
 

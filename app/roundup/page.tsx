@@ -3,8 +3,8 @@ import Footer from '@/components/layout/Footer'
 import { ROUNDUPS, formatWeekend, type Roundup, type ParkrunResult, type RaceResult, type SocialRun, type RoundupPhoto } from '@/lib/roundup'
 
 export const metadata = {
-  title: 'Weekend Roundup — radcliffe.run',
-  description: 'RTR members\' weekend running highlights — parkrun results, races and social runs.',
+  title: 'Weekend Roundup | radcliffe.run',
+  description: 'RTR members\' weekend running highlights - parkrun results, races and social runs.',
 }
 
 /* ── Terrain badge ── */

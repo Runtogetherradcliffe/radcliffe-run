@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const cleanedTitle = run.title.replace(/^RTR\s+[58]k\s*/i, '').trim()
   const d = new Date(run.date + 'T00:00:00')
   const dateStr = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
-  const title = `${cleanedTitle} — ${dateStr} — radcliffe.run`
+  const title = `${cleanedTitle} - ${dateStr} | radcliffe.run`
   const description = `${run.distance_km ? `${run.distance_km}km ` : ''}${run.terrain ?? ''} run with radcliffe.run on ${dateStr}.`.trim()
 
   return {
@@ -77,8 +77,43 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
     ? shortMeetingPoint(run.meeting_point)
     : 'Radcliffe Market'
 
+  // Default Thursday runs meet at Radcliffe Market at 7pm; social/on-tour runs vary
+  const atMarket = !run.on_tour && !isSocial
+  const eventJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Event',
+    name: `${title} - Run Together Radcliffe`,
+    startDate: isSocial ? run.date : `${run.date}T19:00`,
+    eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+    eventStatus: run.cancelled ? 'https://schema.org/EventCancelled' : 'https://schema.org/EventScheduled',
+    isAccessibleForFree: true,
+    ...(run.distance_km ? { description: `${run.distance_km}km ${run.terrain ?? ''} run with Run Together Radcliffe.`.replace(/\s+/g, ' ').trim() } : {}),
+    location: {
+      '@type': 'Place',
+      name: meetingPoint,
+      address: {
+        '@type': 'PostalAddress',
+        ...(atMarket ? { streetAddress: 'Radcliffe Market, 11 Blackburn Street' } : {}),
+        addressLocality: 'Radcliffe',
+        addressRegion: 'Greater Manchester',
+        ...(atMarket ? { postalCode: 'M26 1PN' } : {}),
+        addressCountry: 'GB',
+      },
+      ...(atMarket ? { geo: { '@type': 'GeoCoordinates', latitude: 53.5609, longitude: -2.3265 } } : {}),
+    },
+    organizer: {
+      '@type': 'SportsClub',
+      name: 'Run Together Radcliffe',
+      url: 'https://radcliffe.run',
+    },
+  }
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(eventJsonLd).replace(/</g, '\\u003c') }}
+      />
       <Nav />
       <main style={{ minHeight: '100vh' }}>
         <section style={{ maxWidth: 680, margin: '0 auto', padding: '32px 24px 80px' }}>

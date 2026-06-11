@@ -4,23 +4,26 @@ import NotificationOptIn from '@/components/NotificationOptIn'
 import InstallPrompt from '@/components/InstallPrompt'
 import ThemeProvider from '@/components/ThemeProvider'
 
+const SITE_TITLE = 'Free Running Group in Radcliffe, Bury | radcliffe.run'
+const SITE_DESCRIPTION = 'A free, friendly running group in Radcliffe, Bury (Greater Manchester), open to everyone. No memberships, no minimum pace - just good routes and good people, every Thursday.'
+
 export const metadata: Metadata = {
-  title: "radcliffe.run — Radcliffe's Running Group",
-  description: 'A free, friendly running group open to everyone. No memberships, no minimum pace — just good routes and good people, every Thursday in Radcliffe, Greater Manchester.',
+  title: SITE_TITLE,
+  description: SITE_DESCRIPTION,
   metadataBase: new URL('https://radcliffe.run'),
   openGraph: {
-    title: "radcliffe.run — Radcliffe's Running Group",
-    description: 'A free, friendly running group open to everyone. No memberships, no minimum pace — just good routes and good people, every Thursday in Radcliffe, Greater Manchester.',
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     url: 'https://radcliffe.run',
     siteName: 'radcliffe.run',
     locale: 'en_GB',
     type: 'website',
-    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: "radcliffe.run — Radcliffe's Running Group" }],
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: "radcliffe.run - Radcliffe's free running group" }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: "radcliffe.run — Radcliffe's Running Group",
-    description: 'A free, friendly running group open to everyone. No memberships, no minimum pace — just good routes and good people, every Thursday in Radcliffe, Greater Manchester.',
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
   },
   manifest: '/manifest.json',
   icons: {

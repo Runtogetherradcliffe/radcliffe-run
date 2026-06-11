@@ -9,8 +9,8 @@ import { ROUTES } from '@/lib/routes'
 export const dynamic = 'force-dynamic'
 
 export const metadata = {
-  title: 'About — radcliffe.run',
-  description: 'Find out about Run Together Radcliffe — who we are, when we meet, and how to get involved.',
+  title: 'About Run Together Radcliffe | radcliffe.run',
+  description: 'Find out about Run Together Radcliffe - who we are, when we meet, and how to get involved with our free running group in Radcliffe, Bury.',
 }
 
 /* ── Stat card ── */

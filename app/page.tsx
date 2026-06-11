@@ -144,8 +144,50 @@ export default async function HomePage() {
     allSlugs.filter(slug => existsSync(join(process.cwd(), 'public', 'route-maps', `${slug}.webp`)))
   )
 
+  // Structured data: a free, weekly running club based at Radcliffe Market.
+  const orgJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'SportsClub',
+    name: 'Run Together Radcliffe',
+    alternateName: 'radcliffe.run',
+    url: 'https://radcliffe.run',
+    description: 'A free, friendly running group in Radcliffe, Bury (Greater Manchester), open to everyone. No memberships, no minimum pace - good routes and good people, every Thursday.',
+    foundingDate: '2022',
+    isAccessibleForFree: true,
+    areaServed: { '@type': 'City', name: 'Radcliffe, Bury, Greater Manchester' },
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: 'Radcliffe Market, 11 Blackburn Street',
+      addressLocality: 'Radcliffe',
+      addressRegion: 'Greater Manchester',
+      postalCode: 'M26 1PN',
+      addressCountry: 'GB',
+    },
+    location: {
+      '@type': 'Place',
+      name: 'Radcliffe Market',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'Radcliffe Market, 11 Blackburn Street',
+        addressLocality: 'Radcliffe',
+        addressRegion: 'Greater Manchester',
+        postalCode: 'M26 1PN',
+        addressCountry: 'GB',
+      },
+      geo: { '@type': 'GeoCoordinates', latitude: 53.5609, longitude: -2.3265 },
+    },
+    sameAs: [
+      'https://www.facebook.com/runtogetherradcliffe',
+      'https://www.instagram.com/runtogetherradcliffe',
+    ],
+  }
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd).replace(/</g, '\\u003c') }}
+      />
       <Nav />
       <main>
 
@@ -418,6 +460,10 @@ export default async function HomePage() {
                     : run.route_slug
                   const hasMap = !!mapSlug && slugsWithMap.has(mapSlug)
                   const headerHeight = hasMap ? 160 : 100
+                  const mapRoute = mapSlug ? ROUTES.find(r => r.slug === mapSlug) : null
+                  const mapAlt = mapRoute
+                    ? `Map of ${mapRoute.name}, a ${mapRoute.distance_km}km ${mapRoute.terrain} running route in Radcliffe`
+                    : `Route map for ${cleanTitle(run.title)} in Radcliffe`
 
                   // Card border colour keyed on group
                   const cardBorder = primaryGroup === '5K'
@@ -439,6 +485,7 @@ export default async function HomePage() {
                             <>
                               <ThemeMapImage
                                 slug={mapSlug}
+                                alt={mapAlt}
                                 style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                               />
                             </>
@@ -605,6 +652,10 @@ export default async function HomePage() {
                 {socialRuns.map(run => {
                   const socialHasMap = !!run.route_slug && slugsWithMap.has(run.route_slug)
                   const socialHeaderHeight = socialHasMap ? 160 : 80
+                  const socialRoute = run.route_slug ? ROUTES.find(r => r.slug === run.route_slug) : null
+                  const socialMapAlt = socialRoute
+                    ? `Map of ${socialRoute.name}, a ${socialRoute.distance_km}km ${socialRoute.terrain} running route in Radcliffe`
+                    : `Route map for ${cleanTitle(run.title)} in Radcliffe`
                   return (
                   <div key={run.id} style={{ background: 'var(--card)', border: '1px solid rgba(196,168,232,0.15)', borderRadius: 12, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                     <div style={{ height: socialHeaderHeight, position: 'relative', background: 'linear-gradient(160deg,#100a20,#1c1030,#120a1c)', overflow: 'hidden' }}>
@@ -612,6 +663,7 @@ export default async function HomePage() {
                         <>
                           <ThemeMapImage
                             slug={run.route_slug!}
+                            alt={socialMapAlt}
                             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                           />
                         </>

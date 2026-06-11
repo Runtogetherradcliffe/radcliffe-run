@@ -4,8 +4,8 @@ import Footer from '@/components/layout/Footer'
 import { supabaseAdmin } from '@/lib/supabase'
 
 export const metadata = {
-  title: 'News & Roundups — radcliffe.run',
-  description: 'Weekly run roundups, race results, and news from radcliffe.run — Radcliffe\'s free community running group.',
+  title: 'News & Roundups | radcliffe.run',
+  description: 'Weekly run roundups, race results, and news from radcliffe.run - Radcliffe\'s free community running group in Bury, Greater Manchester.',
 }
 export const dynamic = 'force-dynamic'
 
