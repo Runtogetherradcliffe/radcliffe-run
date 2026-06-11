@@ -3,6 +3,7 @@ import './globals.css'
 import NotificationOptIn from '@/components/NotificationOptIn'
 import InstallPrompt from '@/components/InstallPrompt'
 import ThemeProvider from '@/components/ThemeProvider'
+import { Analytics } from '@vercel/analytics/next'
 
 const SITE_TITLE = 'Free Running Group in Radcliffe, Bury | radcliffe.run'
 const SITE_DESCRIPTION = 'A free, friendly running group in Radcliffe, Bury (Greater Manchester), open to everyone. No memberships, no minimum pace - just good routes and good people, every Thursday.'
@@ -76,6 +77,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen">
         <ThemeProvider />
         {children}
+        <Analytics />
         <InstallPrompt />
         <NotificationOptIn />
         <script dangerouslySetInnerHTML={{ __html: `
