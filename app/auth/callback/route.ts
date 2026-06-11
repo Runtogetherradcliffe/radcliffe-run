@@ -27,13 +27,13 @@ export async function GET(request: NextRequest) {
     }
   )
 
-  // Magic link flow — token_hash + type
+  // Magic link flow - token_hash + type
   if (token_hash && type) {
     const { error } = await supabase.auth.verifyOtp({ token_hash, type })
     if (!error) return NextResponse.redirect(`${origin}${next}`)
   }
 
-  // PKCE flow — code exchange
+  // PKCE flow - code exchange
   if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) return NextResponse.redirect(`${origin}${next}`)

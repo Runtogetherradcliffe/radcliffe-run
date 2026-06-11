@@ -3,7 +3,7 @@ import { createClient } from '@/utils/supabase/server'
 import RoutesAdminClient from './RoutesAdminClient'
 import AdminShell from '@/components/AdminShell'
 
-export const metadata = { title: 'Routes — radcliffe.run Admin' }
+export const metadata = { title: 'Routes - radcliffe.run Admin' }
 
 export default async function RoutesAdminPage() {
   const supabase = await createClient()

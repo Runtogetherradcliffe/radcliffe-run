@@ -3,7 +3,7 @@ import { createClient } from '@/utils/supabase/server'
 import AdminShell from '@/components/AdminShell'
 import PostEditor from '../PostEditor'
 
-export const metadata = { title: 'New post — radcliffe.run admin' }
+export const metadata = { title: 'New post - radcliffe.run admin' }
 
 export default async function NewPostPage() {
   const supabase = await createClient()

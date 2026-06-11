@@ -270,7 +270,7 @@ export default function ProfileClient({ member: initial }: { member: Member }) {
     try {
       const res = await fetch('/api/profile', { method: 'DELETE' })
       if (!res.ok) throw new Error((await res.json()).error)
-      // Redirect to home — session is gone, auth user deleted
+      // Redirect to home - session is gone, auth user deleted
       window.location.href = '/'
     } catch (e: unknown) {
       showToast(e instanceof Error ? e.message : 'Failed to delete account', 'err')
@@ -486,7 +486,7 @@ export default function ProfileClient({ member: initial }: { member: Member }) {
             <p style={{ fontSize: 'var(--text-base)', fontWeight: 600, color: 'var(--dim)', marginBottom: 3 }}>App notifications</p>
             <p style={{ fontSize: 12, color: 'var(--muted)' }}>
               {pushState === 'denied'
-                ? 'Blocked in browser settings — enable in your device settings'
+                ? 'Blocked in browser settings - enable in your device settings'
                 : pushState === 'unsupported'
                 ? 'Not supported on this browser or device'
                 : 'Run reminders and group updates'}

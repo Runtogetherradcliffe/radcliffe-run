@@ -24,7 +24,7 @@ export default function LeaderLoginPage() {
     })
 
     if (error) {
-      setError('Could not send login link — check your email address is registered with RTR.')
+      setError('Could not send login link - check your email address is registered with RTR.')
     } else {
       setSent(true)
     }

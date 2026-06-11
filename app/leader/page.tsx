@@ -3,7 +3,7 @@ import { createClient } from '@/utils/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import LeaderLookup from './LeaderLookup'
 
-export const metadata = { title: 'Emergency Contacts — radcliffe.run' }
+export const metadata = { title: 'Emergency Contacts - radcliffe.run' }
 
 export default async function LeaderPage() {
   // Auth check

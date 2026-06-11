@@ -8,7 +8,7 @@ type GroupKey = 'jeffing' | 'keepMeGoing' | 'challengeMe'
 const GROUP_TEXT: Record<GroupKey, { name: string; desc: string }> = {
   jeffing: {
     name: 'Get Me Started',
-    desc: "Perfect if you're new to running or getting back into it after a break. We use jeffing — run/walk intervals — to build fitness at a sustainable pace without overdoing it.",
+    desc: "Perfect if you're new to running or getting back into it after a break. We use jeffing - run/walk intervals - to build fitness at a sustainable pace without overdoing it.",
   },
   keepMeGoing: {
     name: 'Keep Me Going',
@@ -69,7 +69,7 @@ function InfoBadge({
   )
 }
 
-// Pace values sourced from lib/groups.ts — edit there, not here
+// Pace values sourced from lib/groups.ts - edit there, not here
 const keepMeGoingGroup = RUN_GROUPS.find(g => g.name === 'Keep Me Going')!
 const challengeMeGroup  = RUN_GROUPS.find(g => g.name === 'Challenge Me')!
 const PACE = {
@@ -151,7 +151,7 @@ export default function RunBadges({ group, hasJeffing, groupColor, terrain, onTo
           </span>
         )}
 
-        {/* Style + pace — interactive */}
+        {/* Style + pace - interactive */}
         {hasJeffing ? (
           <>
             <InfoBadge

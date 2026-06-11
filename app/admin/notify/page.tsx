@@ -3,7 +3,7 @@ import { createClient } from '@/utils/supabase/server'
 import NotifyClient from './NotifyClient'
 import AdminShell from '@/components/AdminShell'
 
-export const metadata = { title: 'Notifications — radcliffe.run Admin' }
+export const metadata = { title: 'Notifications - radcliffe.run Admin' }
 
 export default async function AdminNotifyPage() {
   const supabase = await createClient()

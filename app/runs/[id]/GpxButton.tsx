@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * GPX download button — PWA-safe.
+ * GPX download button - PWA-safe.
  *
  * In Safari (browser):      blob anchor click triggers download/Quick Look overlay
  * In iOS PWA (standalone):  shows an in-app bottom sheet so Quick Look never opens
@@ -46,7 +46,7 @@ export default function GpxButton({ file, accentColor = '#f5a623' }: { file: str
       document.body.removeChild(a)
       URL.revokeObjectURL(url)
     } catch {
-      // Blob failed — fall back to same-window navigation so Quick Look opens
+      // Blob failed - fall back to same-window navigation so Quick Look opens
       // as an overlay (Done returns to this page) rather than navigating away permanently
       window.location.href = absoluteUrl
     }
@@ -66,7 +66,7 @@ export default function GpxButton({ file, accentColor = '#f5a623' }: { file: str
         GPX
       </button>
 
-      {/* In-app panel — shown in PWA mode instead of navigating away */}
+      {/* In-app panel - shown in PWA mode instead of navigating away */}
       {showPanel && (
         <div
           onClick={() => setShowPanel(false)}
@@ -90,9 +90,9 @@ export default function GpxButton({ file, accentColor = '#f5a623' }: { file: str
               Tap <strong style={{ color: 'var(--dim)' }}>Save to Files</strong> in the sheet below, then open the file from the Files app to import into WorkOutDoors or any GPS app.
             </p>
 
-            {/* Share the file — iOS shows "Save to Files" which lets users open with WorkOutDoors.
+            {/* Share the file - iOS shows "Save to Files" which lets users open with WorkOutDoors.
                 GPS apps are document handlers, not share extensions, so they won't appear
-                in this sheet directly — the Save to Files → open in app workflow is the
+                in this sheet directly - the Save to Files → open in app workflow is the
                 best achievable from a PWA on iOS. */}
             {typeof navigator !== 'undefined' && typeof navigator.share === 'function' && (
               <button

@@ -47,7 +47,7 @@ export default function ContactPage() {
           {status === 'sent' ? (
             <div style={{ background: '#0d2a0d', border: '1px solid #1a3a1a', borderRadius: 12, padding: '32px 28px', textAlign: 'center' }}>
               <p style={{ fontSize: 22, fontWeight: 700, marginBottom: 8 }}>Message sent!</p>
-              <p style={{ fontSize: 'var(--text-md)', color: 'var(--muted)' }}>Thanks {name.split(' ')[0]} — we&apos;ll be in touch soon.</p>
+              <p style={{ fontSize: 'var(--text-md)', color: 'var(--muted)' }}>Thanks {name.split(' ')[0]} - we&apos;ll be in touch soon.</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -74,7 +74,7 @@ export default function ContactPage() {
                 />
               </div>
               {status === 'error' && (
-                <p style={{ fontSize: 'var(--text-base)', color: '#e05c5c' }}>Something went wrong — please try again or email us directly at hello@radcliffe.run.</p>
+                <p style={{ fontSize: 'var(--text-base)', color: '#e05c5c' }}>Something went wrong - please try again or email us directly at hello@radcliffe.run.</p>
               )}
               <button
                 type="submit" disabled={status === 'sending'}

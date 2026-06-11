@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   if (!post) return {}
 
-  const title = `${post.title} — radcliffe.run`
+  const title = `${post.title} - radcliffe.run`
   const description = post.summary ?? undefined
 
   return {
@@ -123,7 +123,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
             </div>
           )}
 
-          {/* Body — roundups get the styled card renderer, news gets plain paragraphs */}
+          {/* Body - roundups get the styled card renderer, news gets plain paragraphs */}
           {post.type === 'roundup'
             ? <RoundupBody content={post.content ?? ''} />
             : <PlainBody content={post.content ?? ''} />

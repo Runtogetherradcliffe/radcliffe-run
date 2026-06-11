@@ -59,7 +59,7 @@ export default function RunMap({ gpxFile, center, onTour = false, meetingLabel =
         { attribution: '© OpenStreetMap © CARTO', maxZoom: 19 }
       ).addTo(map)
 
-      // Meeting point marker — will be placed after GPX loads for on-tour runs
+      // Meeting point marker - will be placed after GPX loads for on-tour runs
       const meetIcon = Lx.divIcon({
         className: '',
         html: `<div style="width:14px;height:14px;border-radius:50%;background:#f5a623;border:2.5px solid #fff;box-shadow:0 0 0 4px rgba(245,166,35,0.3)"></div>`,

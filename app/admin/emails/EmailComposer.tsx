@@ -12,7 +12,7 @@ interface Snippet {
 
 interface RunOption {
   date: string      // ISO date
-  label: string     // display label e.g. "Thu 1 May — 5K & 8K"
+  label: string     // display label e.g. "Thu 1 May - 5K & 8K"
 }
 
 interface MemberOption {
@@ -362,7 +362,7 @@ export default function EmailComposer({ draft: initial, runOptions, members, isN
                 disabled={isSent}
                 style={{ ...INPUT, appearance: 'none' as const }}
               >
-                <option value="">— No run attached —</option>
+                <option value="">- No run attached -</option>
                 {runOptions.map(r => (
                   <option key={r.date} value={r.date}>{r.label}</option>
                 ))}
@@ -474,7 +474,7 @@ export default function EmailComposer({ draft: initial, runOptions, members, isN
             value={draft.custom_text}
             onChange={e => set('custom_text', e.target.value)}
             disabled={isSent}
-            placeholder="Any extra info — kit nights, race shoutouts, announcements..."
+            placeholder="Any extra info - kit nights, race shoutouts, announcements..."
             rows={4}
             style={TEXTAREA}
           />

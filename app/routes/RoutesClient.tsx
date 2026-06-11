@@ -32,7 +32,7 @@ async function loadGPXCoords(file: string): Promise<[number, number][]> {
   const text = await res.text()
   const parser = new DOMParser()
   const doc = parser.parseFromString(text, 'text/xml')
-  // Prefer track points, then route points — only fall back to waypoints if neither exists.
+  // Prefer track points, then route points - only fall back to waypoints if neither exists.
   // Mixing selectors in one querySelectorAll returns elements in document order, which
   // causes waypoints (POIs) to be prepended to track points, creating a broken path.
   const trkpts = Array.from(doc.querySelectorAll('trkpt'))
@@ -357,7 +357,7 @@ export default function RoutesClient({ nameOverrides = {} }: { nameOverrides?: R
           </div>
         )}
 
-        {/* Route info overlay — bottom on mobile (map is below sidebar), top-right on desktop */}
+        {/* Route info overlay - bottom on mobile (map is below sidebar), top-right on desktop */}
         {selected && (
           <div style={{
             position: 'absolute',

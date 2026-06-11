@@ -54,7 +54,7 @@ export default async function AboutPage() {
             Running together<br />since 2022.
           </h1>
           <p style={{ fontSize: 17, color: 'var(--muted)', lineHeight: 1.8, maxWidth: 620 }}>
-            We&apos;re a free, friendly running group meeting every Thursday evening in Radcliffe, Greater Manchester. We&apos;re part of the England Athletics Run Together programme — open to everyone, no membership fees, no pressure, no minimum pace.
+            We&apos;re a free, friendly running group meeting every Thursday evening in Radcliffe, Greater Manchester. We&apos;re part of the England Athletics Run Together programme - open to everyone, no membership fees, no pressure, no minimum pace.
           </p>
         </section>
 
@@ -77,13 +77,13 @@ export default async function AboutPage() {
               <h2 style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 20 }}>What to expect</h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <p style={{ fontSize: 'var(--text-md)', color: 'var(--muted)', lineHeight: 1.8 }}>
-                  We meet at Radcliffe Market at 7pm every Thursday. Routes go out at 5k and 8k most weeks, so you pick what suits you. Runs are led by qualified run leaders and nobody gets left behind — we regroup at junctions and make sure everyone gets back together.
+                  We meet at Radcliffe Market at 7pm every Thursday. Routes go out at 5k and 8k most weeks, so you pick what suits you. Runs are led by qualified run leaders and nobody gets left behind - we regroup at junctions and make sure everyone gets back together.
                 </p>
                 <p style={{ fontSize: 'var(--text-md)', color: 'var(--muted)', lineHeight: 1.8 }}>
-                  The group has a strong trail running side alongside the road runs, and members organise social runs on weekends fairly regularly — longer distances, off-road, and usually finishing somewhere scenic.
+                  The group has a strong trail running side alongside the road runs, and members organise social runs on weekends fairly regularly - longer distances, off-road, and usually finishing somewhere scenic.
                 </p>
                 <p style={{ fontSize: 'var(--text-md)', color: 'var(--muted)', lineHeight: 1.8 }}>
-                  Beyond the running, there&apos;s a real community here. Members support each other at parkruns and races across the country — you&apos;ll find our runners at everything from local 5ks to mountain ultras.
+                  Beyond the running, there&apos;s a real community here. Members support each other at parkruns and races across the country - you&apos;ll find our runners at everything from local 5ks to mountain ultras.
                 </p>
               </div>
             </div>
@@ -94,9 +94,9 @@ export default async function AboutPage() {
               <div>
                 <InfoRow label="When" value="Every Thursday, 7:00pm" />
                 <InfoRow label="Where" value="Radcliffe Market, 11 Blackburn Street, M26 1PN" href="https://maps.app.goo.gl/d1FUYuqmNVpsWUs99" />
-                <InfoRow label="Cost" value="Free — always" />
+                <InfoRow label="Cost" value="Free - always" />
                 <InfoRow label="Distances" value="5–6k and 8–10k offered most weeks" />
-                <InfoRow label="Ability" value="All levels welcome — run/walk to experienced" />
+                <InfoRow label="Ability" value="All levels welcome - run/walk to experienced" />
                 <InfoRow label="Programme" value="England Athletics Run Together" />
               </div>
             </div>

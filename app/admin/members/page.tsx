@@ -4,7 +4,7 @@ import { supabaseAdmin } from '@/lib/supabase'
 import MembersClient from './MembersClient'
 import AdminShell from '@/components/AdminShell'
 
-export const metadata = { title: 'Members — radcliffe.run Admin' }
+export const metadata = { title: 'Members - radcliffe.run Admin' }
 
 export default async function MembersPage() {
   const supabase = await createClient()

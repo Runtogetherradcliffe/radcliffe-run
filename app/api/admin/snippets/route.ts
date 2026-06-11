@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase'
 
-// GET /api/admin/snippets — list all snippets
+// GET /api/admin/snippets - list all snippets
 export async function GET() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -17,7 +17,7 @@ export async function GET() {
   return NextResponse.json(data)
 }
 
-// POST /api/admin/snippets — create a snippet
+// POST /api/admin/snippets - create a snippet
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()

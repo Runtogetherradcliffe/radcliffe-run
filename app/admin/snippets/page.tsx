@@ -104,7 +104,7 @@ export default function SnippetsPage() {
     await load()
   }
 
-  const userEmail = '' // fetched client-side — AdminShell handles display
+  const userEmail = '' // fetched client-side - AdminShell handles display
 
   return (
     <AdminShell userEmail={userEmail}>
@@ -129,7 +129,7 @@ export default function SnippetsPage() {
             <h1 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em', marginTop: 6 }}>Message snippets</h1>
             <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)', marginTop: 4 }}>
               Pre-written messages you can insert into the custom message field when composing an email.
-              Toggle active/inactive to control which appear in the composer — useful for seasonal messages like lights reminders.
+              Toggle active/inactive to control which appear in the composer - useful for seasonal messages like lights reminders.
             </p>
           </div>
           {!creating && !editing && (
@@ -177,7 +177,7 @@ export default function SnippetsPage() {
                 style={{ accentColor: '#f5a623', width: 16, height: 16 }}
               />
               <label htmlFor="active" style={{ fontSize: 'var(--text-sm)', color: 'var(--dim)', cursor: 'pointer' }}>
-                Active — show in email composer
+                Active - show in email composer
               </label>
             </div>
             <div style={{ display: 'flex', gap: 10 }}>

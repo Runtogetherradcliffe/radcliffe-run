@@ -6,7 +6,7 @@ export default function BackLink() {
   const router = useRouter()
 
   function handleBack() {
-    // If there's browser history, go back — otherwise fall back to the join form
+    // If there's browser history, go back - otherwise fall back to the join form
     if (window.history.length > 1) {
       router.back()
     } else {

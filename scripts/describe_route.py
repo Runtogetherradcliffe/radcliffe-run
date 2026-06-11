@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-describe_route.py — Generate route description data from a local GPX file.
+describe_route.py - Generate route description data from a local GPX file.
 
 Usage:
     python3 scripts/describe_route.py <slug>

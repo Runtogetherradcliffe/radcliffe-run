@@ -139,7 +139,7 @@ export default function NotifyClient({ subscriberCount }: { subscriberCount: num
           <div style={{ background: '#0d2a0d', border: '1px solid #1a3d1a', borderRadius: 8, padding: '12px 16px' }}>
             <p style={{ fontSize: 'var(--text-base)', color: '#4caf76', fontWeight: 600 }}>
               Sent to {result.sent} of {result.total} subscriber{result.total !== 1 ? 's' : ''}
-              {result.failed > 0 ? ` (${result.failed} failed — expired subscriptions removed)` : ''}
+              {result.failed > 0 ? ` (${result.failed} failed - expired subscriptions removed)` : ''}
             </p>
           </div>
         )}

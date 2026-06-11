@@ -8,7 +8,7 @@ const supabaseAdmin = createAdmin(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-// POST /api/admin/notify — send a push notification to all subscribers
+// POST /api/admin/notify - send a push notification to all subscribers
 export async function POST(request: NextRequest) {
   // Verify admin session
   const supabase = await createClient()

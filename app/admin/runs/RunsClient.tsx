@@ -282,8 +282,8 @@ export default function RunsClient({ runs: initial }: { runs: Run[] }) {
         }}>
           <span>
             {syncResult.errors > 0
-              ? `Sync done — ${syncResult.inserted} added, ${syncResult.updated} updated, ${syncResult.errors} errors`
-              : `Sync complete — ${syncResult.inserted} added, ${syncResult.updated} updated`}
+              ? `Sync done - ${syncResult.inserted} added, ${syncResult.updated} updated, ${syncResult.errors} errors`
+              : `Sync complete - ${syncResult.inserted} added, ${syncResult.updated} updated`}
           </span>
           <button onClick={() => setSyncResult(null)} style={{ background: 'none', border: 'none', color: 'var(--faint)', cursor: 'pointer', fontSize: 16, lineHeight: 1 }}>×</button>
         </div>
@@ -322,7 +322,7 @@ export default function RunsClient({ runs: initial }: { runs: Run[] }) {
               <div>
                 <label style={labelStyle()}>Terrain</label>
                 <select value={form.terrain} onChange={e => set('terrain', e.target.value)} style={inputStyle()}>
-                  <option value="">— unset —</option>
+                  <option value="">- unset -</option>
                   <option value="road">Road</option>
                   <option value="trail">Trail</option>
                   <option value="mixed">Mixed</option>
@@ -335,7 +335,7 @@ export default function RunsClient({ runs: initial }: { runs: Run[] }) {
               <div>
                 <label style={labelStyle()}>Route</label>
                 <select value={form.route_slug} onChange={e => set('route_slug', e.target.value)} style={inputStyle()}>
-                  <option value="">— no route linked —</option>
+                  <option value="">- no route linked -</option>
                   <optgroup label="Trail 5k">
                     {ROUTES.filter(r => r.category === 'trail-5k').map(r => (
                       <option key={r.slug} value={r.slug}>{r.name} ({r.distance_km} km)</option>
@@ -383,7 +383,7 @@ export default function RunsClient({ runs: initial }: { runs: Run[] }) {
                   {RUN_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
                 </select>
               </div>
-              {/* Jeffing toggle — only relevant for regular trail/road runs */}
+              {/* Jeffing toggle - only relevant for regular trail/road runs */}
               <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', paddingBottom: 10, whiteSpace: 'nowrap' }}>
                 <span style={{ position: 'relative', display: 'inline-block', width: 40, height: 22 }}>
                   <input

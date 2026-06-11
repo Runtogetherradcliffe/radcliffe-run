@@ -200,7 +200,7 @@ html[data-fontsize="large"] body {
 .rtr-section      { max-width: 1200px; margin: 0 auto; padding: 80px 32px; }
 .rtr-cta-section  { max-width: 1200px; margin: 0 auto; padding: 80px 32px; }
 
-/* Nav — visibility is now JS-driven (no CSS needed for show/hide) */
+/* Nav - visibility is now JS-driven (no CSS needed for show/hide) */
 
 /* Hero image panel */
 .rtr-hero-image-panel { display: block; }

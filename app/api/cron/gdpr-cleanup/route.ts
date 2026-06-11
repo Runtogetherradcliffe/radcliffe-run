@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
 
     membersDeleted = ids.length
 
-    // Delete auth users (best-effort — member data already gone)
+    // Delete auth users (best-effort - member data already gone)
     for (const member of staleMembers) {
       const { data: authUsers } = await db.auth.admin.listUsers()
       const authUser = authUsers?.users?.find(u => u.email === member.email)

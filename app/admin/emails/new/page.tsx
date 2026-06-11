@@ -4,7 +4,7 @@ import { supabaseAdmin } from '@/lib/supabase'
 import AdminShell from '@/components/AdminShell'
 import EmailComposer from '../EmailComposer'
 
-export const metadata = { title: 'Compose email — radcliffe.run admin' }
+export const metadata = { title: 'Compose email - radcliffe.run admin' }
 export const dynamic = 'force-dynamic'
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
@@ -14,7 +14,7 @@ function fmtRunOption(date: string, runs: { distance_km: number | null }[]) {
   const d = new Date(date + 'T00:00:00')
   const dateStr = `${DAYS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]}`
   const distances = runs.map(r => r.distance_km ? `${r.distance_km}km` : '?').join(' & ')
-  return `${dateStr}${distances ? ` — ${distances}` : ''}`
+  return `${dateStr}${distances ? ` - ${distances}` : ''}`
 }
 
 export default async function NewEmailPage() {

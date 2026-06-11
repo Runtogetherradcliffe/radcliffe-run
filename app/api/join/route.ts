@@ -51,7 +51,7 @@ async function sendWelcomeEmail(firstName: string, email: string, cohort?: strin
       <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8f8f8;border-radius:8px;border-left:4px solid #f5a623">
         <tr><td style="padding:16px 20px">
           <p style="margin:0 0 6px;font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#f5a623">Your programme</p>
-          <p style="margin:0 0 12px;font-size:14px;color:#444;line-height:1.6">View your full week-by-week session breakdown — including which run to do on Tuesdays, Thursdays, and your solo session. Log in with this email address to access it.</p>
+          <p style="margin:0 0 12px;font-size:14px;color:#444;line-height:1.6">View your full week-by-week session breakdown - including which run to do on Tuesdays, Thursdays, and your solo session. Log in with this email address to access it.</p>
           <a href="${siteUrl}/c25k/programme" style="display:inline-block;background:#f5a623;color:#0a0a0a;font-size:13px;font-weight:700;padding:10px 20px;border-radius:6px;text-decoration:none">View your programme &rarr;</a>
         </td></tr>
       </table>
@@ -148,7 +148,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Check for existing registration before inserting — match on email + name
+    // Check for existing registration before inserting - match on email + name
     // (email alone is not unique: family members may share an email address)
     const { data: existing } = await db
       .from('members')
@@ -159,7 +159,7 @@ export async function POST(req: NextRequest) {
       .maybeSingle()
 
     if (existing) {
-      // Already registered — fire an OTP so they can sign in, then tell the frontend
+      // Already registered - fire an OTP so they can sign in, then tell the frontend
       await supabaseAdmin().auth.signInWithOtp({ email: normalEmail })
         .catch(() => {/* best-effort */})
       return NextResponse.json({ alreadyRegistered: true })
@@ -194,7 +194,7 @@ export async function POST(req: NextRequest) {
       email_confirm: true,
     }).catch(err => console.error('Auth user creation failed (may already exist):', err))
 
-    // Send welcome email (fire and forget — don't block the response)
+    // Send welcome email (fire and forget - don't block the response)
     sendWelcomeEmail(firstName, normalEmail, cohort, c25kSession).catch(err =>
       console.error('Welcome email failed:', err)
     )

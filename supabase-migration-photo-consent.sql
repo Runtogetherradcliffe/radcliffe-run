@@ -1,5 +1,5 @@
 -- ================================================================
--- radcliffe.run — Photo consent migration
+-- radcliffe.run - Photo consent migration
 -- Run in Supabase SQL Editor before deploying this code change.
 -- ================================================================
 

@@ -33,7 +33,7 @@ export interface BrevoSendResult {
   error?: string
 }
 
-/** Send a single transactional email via Brevo. Never throws — returns a result. */
+/** Send a single transactional email via Brevo. Never throws - returns a result. */
 export async function sendBrevoEmail(email: BrevoEmail): Promise<BrevoSendResult> {
   if (!BREVO_API_KEY) {
     return { ok: false, status: 0, error: 'BREVO_API_KEY is not set' }

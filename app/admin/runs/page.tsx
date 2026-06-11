@@ -3,7 +3,7 @@ import { createClient } from '@/utils/supabase/server'
 import RunsClient from './RunsClient'
 import AdminShell from '@/components/AdminShell'
 
-export const metadata = { title: 'Runs — radcliffe.run Admin' }
+export const metadata = { title: 'Runs - radcliffe.run Admin' }
 
 export default async function RunsPage() {
   const supabase = await createClient()

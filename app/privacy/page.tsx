@@ -3,7 +3,7 @@ import Footer from '@/components/layout/Footer'
 import BackLink from './BackLink'
 
 export const metadata = {
-  title: 'Privacy Policy — radcliffe.run',
+  title: 'Privacy Policy - radcliffe.run',
   description: 'How Run Together Radcliffe collects, uses, and protects your personal data.',
 }
 
@@ -108,7 +108,7 @@ export default async function PrivacyPage({ searchParams }: Props) {
           {/* 3. Emergency contacts */}
           <p style={sectionHeadStyle}>3. Emergency contact data</p>
           <p style={paraStyle}>
-            When you register, you provide the name and phone number of an emergency contact. This person&rsquo;s details are held in our database and are only accessible to verified run leaders — never used for marketing, and never shared with third parties.
+            When you register, you provide the name and phone number of an emergency contact. This person&rsquo;s details are held in our database and are only accessible to verified run leaders - never used for marketing, and never shared with third parties.
           </p>
           <p style={paraStyle}>
             We hold this data on the basis of legitimate interests: the safety benefit of being able to contact a next of kin in an emergency clearly outweighs any privacy impact given the limited access and protective purpose. We recommend you let your emergency contact know their details are held.
@@ -129,9 +129,9 @@ export default async function PrivacyPage({ searchParams }: Props) {
               </thead>
               <tbody>
                 {[
-                  ['Supabase', 'Database and authentication — stores all member data on servers in the EU'],
+                  ['Supabase', 'Database and authentication - stores all member data on servers in the EU'],
                   ['Brevo', 'Email delivery: your email address is passed to Brevo, an EU-based provider, when we send you club emails'],
-                  ['Vercel', 'Website hosting — processes requests to serve the site'],
+                  ['Vercel', 'Website hosting - processes requests to serve the site'],
                 ].map(([service, purpose], i, arr) => (
                   <tr key={i} style={i < arr.length - 1 ? tableRowStyle : {}}>
                     <td style={tdLabelStyle}>{service}</td>
@@ -189,7 +189,7 @@ export default async function PrivacyPage({ searchParams }: Props) {
               ['Right to erasure', 'Ask us to delete your data. We will action this within 30 days.'],
               ['Right to restriction', 'Ask us to limit how we use your data while a dispute is resolved.'],
               ['Right to object', 'Object to processing based on legitimate interests.'],
-              ['Right to withdraw consent', 'Where we rely on consent (emails, photos, health data), you can withdraw it at any time — this does not affect the lawfulness of prior processing.'],
+              ['Right to withdraw consent', 'Where we rely on consent (emails, photos, health data), you can withdraw it at any time - this does not affect the lawfulness of prior processing.'],
             ].map(([right, desc], i, arr) => (
               <div key={i} style={{ padding: '14px 16px', borderBottom: i < arr.length - 1 ? '1px solid #1a1a1a' : 'none' }}>
                 <p style={{ fontSize: 'var(--text-base)', fontWeight: 600, color: 'var(--dim)', marginBottom: 4 }}>{right}</p>

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 
-// Simple in-memory rate limiter — max 10 requests per 60 s per IP.
+// Simple in-memory rate limiter - max 10 requests per 60 s per IP.
 // Resets on cold start (fine for serverless; protects within a warm instance).
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
 const RATE_LIMIT = 10

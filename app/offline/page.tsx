@@ -58,7 +58,7 @@ export default function OfflinePage() {
         <p style={{
           fontSize: 16, color: 'var(--muted)', lineHeight: 1.7, marginBottom: 36,
         }}>
-          No internet connection right now. Check your signal and try again —
+          No internet connection right now. Check your signal and try again -
           we&apos;ll take you straight back to the site when you&apos;re reconnected.
         </p>
 

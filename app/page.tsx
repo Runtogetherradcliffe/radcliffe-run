@@ -79,7 +79,7 @@ export default async function HomePage() {
   fourWeeksOut.setDate(fourWeeksOut.getDate() + 28)
   const fourWeeksOutStr = fourWeeksOut.toISOString().split('T')[0]
 
-  // Parallelise independent queries — auth, settings, runs, and posts fire at the same time
+  // Parallelise independent queries - auth, settings, runs, and posts fire at the same time
   const [
     { data: { user } },
     { data: siteSettings },
@@ -135,7 +135,7 @@ export default async function HomePage() {
   const runCards     = thursdayRuns ?? []
   const socialRuns   = socialRunsData ?? []
 
-  // Pre-compute which route slugs have map images once — avoids existsSync inside render loop
+  // Pre-compute which route slugs have map images once - avoids existsSync inside render loop
   const allSlugs = [
     ...runCards.map(r => r.route_slug),
     ...socialRuns.map(r => r.route_slug),
@@ -256,7 +256,7 @@ export default async function HomePage() {
               ) : (
                 <PhotoPlaceholder mood="golden" style={{ height: '100%' }} />
               )}
-              {/* Gradient overlay — bottom fade for card legibility */}
+              {/* Gradient overlay - bottom fade for card legibility */}
               <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(10,10,10,0) 40%, rgba(10,10,10,0.75) 100%)', pointerEvents: 'none' }} />
             </div>
 
@@ -347,7 +347,7 @@ export default async function HomePage() {
                     New to running? Start here.
                   </h2>
                   <p style={{ fontSize: 'var(--text-base)', fontWeight: 300, color: 'var(--dim)', lineHeight: 1.7, margin: 0 }}>
-                    Our 10-week programme takes you from your sofa to running 5K — with the group beside you every step of the way.
+                    Our 10-week programme takes you from your sofa to running 5K - with the group beside you every step of the way.
                     {c25kStartDate && (() => {
                       const d = new Date(c25kStartDate + 'T00:00:00')
                       const label = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -481,7 +481,7 @@ export default async function HomePage() {
                         <div style={{ height: headerHeight, position: 'relative', overflow: 'hidden', background: cardStyle.bg }}>
 
                           {hasMap ? (
-                            /* Map image — full cover */
+                            /* Map image - full cover */
                             <>
                               <ThemeMapImage
                                 slug={mapSlug}
@@ -513,7 +513,7 @@ export default async function HomePage() {
                             </>
                           )}
 
-                          {/* Badges — always on top */}
+                          {/* Badges - always on top */}
                           {run.on_tour && (
                             <span style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(10,10,10,0.75)', border: '1px solid rgba(245,166,35,0.5)', borderRadius: 4, padding: '3px 8px', fontSize: 10, fontWeight: 700, color: '#f5a623', letterSpacing: '0.06em' }}>
                               ON TOUR
@@ -561,11 +561,11 @@ export default async function HomePage() {
                             </div>
                           </div>
 
-                          {/* Group links — pinned to bottom */}
+                          {/* Group links - pinned to bottom */}
                           <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 6 }}>
                           {isTwoGroups ? (
                             <>
-                              {/* 5K group (primary / shorter) — always first */}
+                              {/* 5K group (primary / shorter) - always first */}
                               {primaryGroup && (
                                 <Link href={`/runs/${run.id}`} style={{ display: 'flex', flexWrap: 'wrap', gap: 3, alignItems: 'center', padding: '8px 10px', borderRadius: 6, textDecoration: 'none', ...(GROUP_BADGE[primaryGroup] ?? {}) }}>
                                   <span style={{ fontSize: 9, fontWeight: 700, background: 'rgba(76,175,118,0.2)', border: '1px solid rgba(76,175,118,0.4)', borderRadius: 3, padding: '1px 5px', color: '#4caf76' }}>5–6k</span>
@@ -576,7 +576,7 @@ export default async function HomePage() {
                                   <span style={{ marginLeft: 'auto', fontSize: 'var(--text-xs)', fontWeight: 700 }}>→</span>
                                 </Link>
                               )}
-                              {/* 8K group (companion / longer) — always second */}
+                              {/* 8K group (companion / longer) - always second */}
                               {companionGroup && companion && (
                                 <Link href={`/runs/${companion.id}`} style={{ display: 'flex', flexWrap: 'wrap', gap: 3, alignItems: 'center', padding: '8px 10px', borderRadius: 6, textDecoration: 'none', ...(GROUP_BADGE[companionGroup] ?? {}) }}>
                                   <span style={{ fontSize: 9, fontWeight: 700, background: 'rgba(91,155,213,0.2)', border: '1px solid rgba(91,155,213,0.4)', borderRadius: 3, padding: '1px 5px', color: '#5b9bd5' }}>8–10k</span>
@@ -752,13 +752,13 @@ export default async function HomePage() {
             <div style={{ background: 'linear-gradient(135deg, #061408, #0a1a0e)', border: '1px solid rgba(124,184,124,0.2)', borderRadius: 16, padding: '64px 48px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
               <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 60% 80% at 50% 0%, rgba(124,184,124,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
               <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#7cb87c', marginBottom: 16, position: 'relative' }}>Come and run with us</p>
-              <h2 style={{ fontSize: 36, fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 16, position: 'relative' }}>Register &mdash; it&apos;s free</h2>
+              <h2 style={{ fontSize: 36, fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 16, position: 'relative' }}>Register - it&apos;s free</h2>
               <p style={{ fontSize: 16, fontWeight: 300, color: 'var(--dim)', marginBottom: 32, maxWidth: 480, margin: '0 auto 32px', position: 'relative', lineHeight: 1.7 }}>
                 Join hundreds of Radcliffe runners. We only keep what we need to keep you safe on runs.
               </p>
               <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
                 <Link href="/join" style={{ display: 'inline-flex', alignItems: 'center', background: '#f5a623', color: '#0a0a0a', fontSize: 'var(--text-md)', fontWeight: 700, padding: '14px 36px', borderRadius: 8, textDecoration: 'none' }}>
-                  Register &mdash; it&apos;s free
+                  Register - it&apos;s free
                 </Link>
                 <Link href="/signin" style={{ display: 'inline-flex', alignItems: 'center', background: 'transparent', color: '#7cb87c', fontSize: 'var(--text-base)', fontWeight: 500, padding: '14px 24px', borderRadius: 8, textDecoration: 'none', border: '1px solid rgba(124,184,124,0.3)' }}>
                   Already registered? Sign in

@@ -52,7 +52,7 @@ export default async function NewsPage() {
           </div>
 
           {(posts ?? []).length === 0 ? (
-            <p style={{ color: 'var(--faint)', fontSize: 'var(--text-md)' }}>Nothing published yet — check back soon.</p>
+            <p style={{ color: 'var(--faint)', fontSize: 'var(--text-md)' }}>Nothing published yet - check back soon.</p>
           ) : (
             years.map(year => (
               <section key={year} style={{ marginBottom: 48 }}>

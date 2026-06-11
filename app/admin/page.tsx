@@ -4,7 +4,7 @@ import { supabaseAdmin } from '@/lib/supabase'
 import SettingsClient from './SettingsClient'
 import AdminShell from '@/components/AdminShell'
 
-export const metadata = { title: 'Admin — radcliffe.run' }
+export const metadata = { title: 'Admin - radcliffe.run' }
 
 /* ── Stat card ── */
 function StatCard({ value, label, sub }: { value: string | number; label: string; sub?: string }) {

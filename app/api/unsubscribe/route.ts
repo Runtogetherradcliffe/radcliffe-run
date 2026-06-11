@@ -1,5 +1,5 @@
 /**
- * /api/unsubscribe — the target of the `List-Unsubscribe` header.
+ * /api/unsubscribe - the target of the `List-Unsubscribe` header.
  *
  * POST: RFC 8058 one-click unsubscribe. Mail clients (Gmail, Apple Mail) send
  *       a POST here when the user taps the native "Unsubscribe" button. We opt
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
   if (result === 'invalid') return new NextResponse('Invalid link', { status: 400 })
   if (result === 'error')   return new NextResponse('Server error', { status: 500 })
 
-  // 'ok' or 'already' — both are a success from the client's perspective.
+  // 'ok' or 'already' - both are a success from the client's perspective.
   return new NextResponse(null, { status: 200 })
 }
 

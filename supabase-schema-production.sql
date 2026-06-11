@@ -1,5 +1,5 @@
 -- ================================================================
--- radcliffe.run — Production schema
+-- radcliffe.run - Production schema
 -- Single file consolidating all migrations for a fresh Supabase project.
 --
 -- Run this in the Supabase SQL Editor on a brand-new project.
@@ -147,12 +147,12 @@ CREATE TABLE IF NOT EXISTS public.site_settings (
   email_default_subject  text    NOT NULL DEFAULT 'This Thursday with RTR 🏃',
   email_default_opening  text    NOT NULL DEFAULT 'Hi everyone,
 
-Here''s what''s on this Thursday — hope to see you there. As always, we meet at 7pm and everyone is welcome regardless of pace or experience.',
+Here''s what''s on this Thursday - hope to see you there. As always, we meet at 7pm and everyone is welcome regardless of pace or experience.',
   email_default_closing  text    NOT NULL DEFAULT 'See you Thursday!
 
 The RTR team
 
-—
+-
 Run Together Radcliffe meets every Thursday at 7pm at Radcliffe Market. Free to join, open to all.',
   CONSTRAINT single_row CHECK (id = 1)
 );
@@ -475,7 +475,7 @@ CREATE POLICY "Authenticated full access to roundup photos"
 -- ── DATA API GRANTS ───────────────────────────────────────────────
 -- From May 30 2026, new Supabase projects no longer auto-grant public schema
 -- tables to the Data API roles. From October 30 2026, this applies to ALL
--- projects (new tables only — existing tables keep their current grants).
+-- projects (new tables only - existing tables keep their current grants).
 -- These explicit GRANTs are required for supabase-js / PostgREST / GraphQL.
 -- RLS policies above control what each role can actually read/write.
 -- service_role bypasses RLS but still needs table-level GRANT to use REST API.

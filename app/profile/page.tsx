@@ -5,7 +5,7 @@ import Nav from '@/components/layout/Nav'
 import Footer from '@/components/layout/Footer'
 import ProfileClient from './ProfileClient'
 
-export const metadata = { title: 'My profile — radcliffe.run' }
+export const metadata = { title: 'My profile - radcliffe.run' }
 
 export default async function ProfilePage() {
   const supabase = await createClient()

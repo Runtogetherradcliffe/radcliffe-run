@@ -9,7 +9,7 @@ const ALLOWED_FIELDS = [
   'theme', 'font_size',
 ]
 
-// PATCH /api/profile — update the authenticated member's own record
+// PATCH /api/profile - update the authenticated member's own record
 export async function PATCH(req: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -38,7 +38,7 @@ export async function PATCH(req: NextRequest) {
   return NextResponse.json(data)
 }
 
-// DELETE /api/profile — permanently delete the authenticated member's account
+// DELETE /api/profile - permanently delete the authenticated member's account
 export async function DELETE() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()

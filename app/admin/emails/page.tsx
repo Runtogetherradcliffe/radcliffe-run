@@ -4,7 +4,7 @@ import { createClient } from '@/utils/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import AdminShell from '@/components/AdminShell'
 
-export const metadata = { title: 'Emails — radcliffe.run admin' }
+export const metadata = { title: 'Emails - radcliffe.run admin' }
 export const dynamic = 'force-dynamic'
 
 const STATUS_CHIP: Record<string, { bg: string; color: string; label: string }> = {
@@ -18,13 +18,13 @@ const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov
 const DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
 
 function fmtDate(iso: string | null) {
-  if (!iso) return '—'
+  if (!iso) return '-'
   const d = new Date(iso)
   return `${DAYS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`
 }
 
 function fmtDatetime(iso: string | null) {
-  if (!iso) return '—'
+  if (!iso) return '-'
   const d = new Date(iso)
   return `${DAYS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]} · ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`
 }

@@ -1,7 +1,7 @@
 /**
  * GET /api/cron/send-emails
  * Called by Vercel Cron (daily at 8am UTC). Finds any scheduled emails
- * whose scheduled_for time has passed and sends them directly —
+ * whose scheduled_for time has passed and sends them directly -
  * no internal HTTP call, avoiding double-timeout issues on Hobby plan.
  * Protected by CRON_SECRET (Vercel injects this as Authorization: Bearer <secret>).
  */
@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   if (!due || due.length === 0) return NextResponse.json({ ok: true, sent: 0 })
 
-  // Send each email directly — no internal HTTP fetch
+  // Send each email directly - no internal HTTP fetch
   const results = await Promise.allSettled(
     due.map(e => sendScheduledEmail(e.id))
   )

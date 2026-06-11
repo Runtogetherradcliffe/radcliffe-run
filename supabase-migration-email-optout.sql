@@ -1,5 +1,5 @@
 -- ================================================================
--- radcliffe.run — Email opt-out migration
+-- radcliffe.run - Email opt-out migration
 -- Run in Supabase SQL Editor
 -- ================================================================
 

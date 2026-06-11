@@ -16,9 +16,9 @@ const TC = {
   r2Name: 12, r2Terrain: 14, r2Distance: 15,
   r2StravaUrl: 17, // "Route 2 - Route Link (Source URL)"
   notes: 22, meetingMapUrl: 33,
-  r1RtrPage: 34, // AI — "8k RTR page" — maps to r1Name
-  r2RtrPage: 35, // AJ — "5k RTR page" — maps to r2Name
-  eventId: 28,   // AC — Google Calendar Event ID (stable across title/route changes)
+  r1RtrPage: 34, // AI - "8k RTR page" - maps to r1Name
+  r2RtrPage: 35, // AJ - "5k RTR page" - maps to r2Name
+  eventId: 28,   // AC - Google Calendar Event ID (stable across title/route changes)
 }
 
 /* ── Social sheet columns ── */
@@ -187,7 +187,7 @@ function parseThursdayRows(rows: string[][]): RunRow[] {
       })
     }
 
-    // Route 2 (longer route — separate card)
+    // Route 2 (longer route - separate card)
     if (r2Name) {
       out.push({
         ...sharedBase,
@@ -277,7 +277,7 @@ export async function POST() {
     return NextResponse.json({ inserted: 0, updated: 0, errors: 0, message: 'No upcoming runs found' })
   }
 
-  // Fetch existing runs in range — include google_event_id for stable matching
+  // Fetch existing runs in range - include google_event_id for stable matching
   const dates = [...new Set(allRuns.map(r => r.date))]
   const { data: existing } = await supabaseAdmin()
     .from('runs')

@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
-export const metadata = { title: 'Preview — radcliffe.run', robots: 'noindex' }
+export const metadata = { title: 'Preview - radcliffe.run', robots: 'noindex' }
 
 const PREVIEW_COOKIE = 'rtr-preview'
 
@@ -64,7 +64,7 @@ export default async function PreviewLoginPage({
               }}
             />
             {error && (
-              <p style={{ fontSize: 'var(--text-sm)', color: '#c0392b', marginBottom: 16 }}>Incorrect password — try again.</p>
+              <p style={{ fontSize: 'var(--text-sm)', color: '#c0392b', marginBottom: 16 }}>Incorrect password - try again.</p>
             )}
             <button type="submit" style={{
               width: '100%', padding: '12px', borderRadius: 8, border: 'none',
@@ -77,7 +77,7 @@ export default async function PreviewLoginPage({
         </div>
 
         <p style={{ textAlign: 'center', fontSize: 12, color: 'var(--muted)', marginTop: 20 }}>
-          This site is in preview — not yet public.
+          This site is in preview - not yet public.
         </p>
       </div>
     </div>

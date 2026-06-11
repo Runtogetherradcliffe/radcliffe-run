@@ -173,7 +173,7 @@ export default function MembersClient({ members: initial }: { members: Member[] 
                   )}
                 </div>
                 <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)' }}>{m.email}</p>
-                <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)' }}>{m.mobile ?? '—'}</p>
+                <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)' }}>{m.mobile ?? '-'}</p>
                 <p style={{ fontSize: 12, color: 'var(--muted)' }}>
                   {new Date(m.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' })}
                 </p>

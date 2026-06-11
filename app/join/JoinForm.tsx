@@ -371,7 +371,7 @@ function StepLastBits({ data, onChange, onToggle }: {
           <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 10 }}>
             <ConsentItem checked={data.consentMedical} onChange={v => onToggle('consentMedical', v)}>
               I consent to radcliffe.run storing any health information I share below. This is used only for runner safety and is only accessible to run leaders.{' '}
-              <span style={{ color: 'var(--faint)', fontSize: 'var(--text-sm)' }}>(Optional — only tick if you want to share health details.)</span>
+              <span style={{ color: 'var(--faint)', fontSize: 'var(--text-sm)' }}>(Optional - only tick if you want to share health details.)</span>
             </ConsentItem>
             {data.consentMedical && (
               <div>
@@ -434,7 +434,7 @@ function StepAlreadyRegistered({ email }: { email: string }) {
     const supabase = createClient()
     const { error: otpError } = await supabase.auth.verifyOtp({ email, token: code.trim(), type: 'email' })
     if (otpError) {
-      setError('Invalid or expired code — check your email and try again.')
+      setError('Invalid or expired code - check your email and try again.')
       setLoading(false)
     } else {
       window.location.href = '/profile'
@@ -449,7 +449,7 @@ function StepAlreadyRegistered({ email }: { email: string }) {
       </h2>
       <p style={{ fontSize: 'var(--text-md)', fontWeight: 300, color: 'var(--dim)', lineHeight: 1.7, marginBottom: 28, maxWidth: 360, margin: '0 auto 28px' }}>
         There&apos;s already an account registered to <strong style={{ color: 'var(--dim)' }}>{email}</strong>.
-        We&apos;ve sent a sign-in code to that address &mdash; enter it below to go straight to your profile.
+        We&apos;ve sent a sign-in code to that address - enter it below to go straight to your profile.
       </p>
       <div style={{ background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 12, padding: '20px 24px', textAlign: 'left' }}>
         <form onSubmit={handleVerify} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -499,7 +499,7 @@ function StepWelcome({ name, email, nextRun, onReset, isC25K, c25kSession }: {
     const supabase = createClient()
     const { error: otpError } = await supabase.auth.verifyOtp({ email, token: code.trim(), type: 'email' })
     if (otpError) {
-      setError('Invalid or expired code — check your email and try again.')
+      setError('Invalid or expired code - check your email and try again.')
       setLoading(false)
     } else {
       window.location.href = '/profile'
@@ -515,7 +515,7 @@ function StepWelcome({ name, email, nextRun, onReset, isC25K, c25kSession }: {
       <p style={{ fontSize: 16, fontWeight: 300, color: 'var(--dim)', lineHeight: 1.7, marginBottom: 32, maxWidth: 360, margin: '0 auto 32px' }}>
         {isC25K
           ? <>You&apos;re signed up for Couch to 5K! We&apos;ll see you on {sessionText} at 7pm.</>
-          : <>You&apos;re all registered &mdash; we&apos;ll see you on Thursday!</>
+          : <>You&apos;re all registered - we&apos;ll see you on Thursday!</>
         }
       </p>
 
@@ -704,7 +704,7 @@ export default function JoinForm({ isC25K }: { isC25K: boolean }) {
           {!done && (
             <div style={{ textAlign: 'center', marginBottom: 40 }}>
               <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#f5a623', marginBottom: 10 }}>
-                {isC25K ? 'Couch to 5K — Register' : 'Join radcliffe.run'}
+                {isC25K ? 'Couch to 5K - Register' : 'Join radcliffe.run'}
               </p>
               <h1 style={{ fontSize: 32, fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 8 }}>
                 {STEPS[step].label}

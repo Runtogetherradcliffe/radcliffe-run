@@ -24,7 +24,7 @@ export async function PATCH(req: Request) {
     if (key in body) update[key] = body[key]
   }
 
-  // Upsert — creates row if it doesn't exist, updates if it does
+  // Upsert - creates row if it doesn't exist, updates if it does
   const { data, error } = await supabaseAdmin()
     .from('site_settings')
     .upsert({ id: 1, ...update }, { onConflict: 'id' })

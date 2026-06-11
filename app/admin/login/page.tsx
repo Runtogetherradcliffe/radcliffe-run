@@ -42,7 +42,7 @@ export default function AdminLoginPage() {
     })
 
     if (error) {
-      setError('Could not send code — check your email address is registered as an admin.')
+      setError('Could not send code - check your email address is registered as an admin.')
     } else {
       setStep('code')
       setTimeout(() => codeRef.current?.focus(), 100)
@@ -64,7 +64,7 @@ export default function AdminLoginPage() {
     })
 
     if (error) {
-      setError('Invalid or expired code — check your email and try again.')
+      setError('Invalid or expired code - check your email and try again.')
     } else {
       window.location.href = '/admin'
     }
@@ -121,7 +121,7 @@ export default function AdminLoginPage() {
               <h1 style={{ fontSize: 20, fontWeight: 700, marginBottom: 6, fontFamily: 'Inter, sans-serif' }}>Enter your code</h1>
               <p style={{ fontSize: 'var(--text-base)', color: 'var(--muted)', marginBottom: 28, fontFamily: 'Inter, sans-serif', lineHeight: 1.6 }}>
                 We&apos;ve sent a code to <strong style={{ color: 'var(--dim)' }}>{email}</strong>.
-                Enter it below — check your spam if it doesn&apos;t arrive.
+                Enter it below - check your spam if it doesn&apos;t arrive.
               </p>
 
               <form onSubmit={handleVerifyCode} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>

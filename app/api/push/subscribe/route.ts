@@ -8,7 +8,7 @@ const supabaseAdminDirect = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-// POST /api/push/subscribe — save a push subscription
+// POST /api/push/subscribe - save a push subscription
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// DELETE /api/push/subscribe — remove a push subscription
+// DELETE /api/push/subscribe - remove a push subscription
 export async function DELETE(request: NextRequest) {
   try {
     const { endpoint } = await request.json()

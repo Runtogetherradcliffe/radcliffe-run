@@ -253,7 +253,7 @@ export function buildEmailText(data: EmailData): string {
     lines.push(closingText, '')
   }
 
-  lines.push('—', 'radcliffe.run · Every Thursday, 7pm · Radcliffe Market')
+  lines.push('-', 'radcliffe.run · Every Thursday, 7pm · Radcliffe Market')
   lines.push('Unsubscribe: {{UNSUBSCRIBE_URL}}')
   return lines.join('\n')
 }

@@ -1,5 +1,5 @@
 /**
- * RTR run group definitions — single source of truth.
+ * RTR run group definitions - single source of truth.
  * Update paces, distances, descriptions here and they apply everywhere.
  */
 
@@ -24,7 +24,7 @@ export const RUN_GROUPS: RunGroup[] = [
     style: 'Jeffing (run/walk)',
     paceKm: null,
     paceMi: null,
-    desc: "Perfect if you're new to running or getting back into it after a break. We use jeffing — run/walk intervals — to build fitness at a sustainable pace without overdoing it.",
+    desc: "Perfect if you're new to running or getting back into it after a break. We use jeffing - run/walk intervals - to build fitness at a sustainable pace without overdoing it.",
     color: 'var(--green)',
     bg: 'var(--group-green-bg)',
     border: 'var(--group-green-border)',

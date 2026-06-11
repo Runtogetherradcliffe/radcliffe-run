@@ -122,7 +122,7 @@ export default function LeaderLookup({
           />
         </div>
         <p style={{ fontSize: 12, color: 'var(--muted)', marginTop: 8 }}>
-          {members.length} active members — start typing to find someone
+          {members.length} active members - start typing to find someone
         </p>
       </div>
 

@@ -25,19 +25,19 @@ type Settings = {
 // Canonical session descriptions for the two varying weeks
 const VARYING_WEEKS: { n: number; title: string; sessions: { label: string; short: string }[] }[] = [
   {
-    n: 6, title: 'Week 6 — 20-min milestone',
+    n: 6, title: 'Week 6 - 20-min milestone',
     sessions: [
-      { label: 'Run 1 — 5+5+5 min intervals',  short: '5+5+5 (15 min)' },
-      { label: 'Run 2 — 8+8 min intervals',     short: '8+8 (16 min)' },
-      { label: 'Run 3 — 20 min non-stop',       short: '20 min non-stop' },
+      { label: 'Run 1 - 5+5+5 min intervals',  short: '5+5+5 (15 min)' },
+      { label: 'Run 2 - 8+8 min intervals',     short: '8+8 (16 min)' },
+      { label: 'Run 3 - 20 min non-stop',       short: '20 min non-stop' },
     ],
   },
   {
-    n: 7, title: 'Week 7 — Stretch to 25 min',
+    n: 7, title: 'Week 7 - Stretch to 25 min',
     sessions: [
-      { label: 'Run 1 — 5+8+5 min intervals',  short: '5+8+5 (18 min)' },
-      { label: 'Run 2 — 10+10 min intervals',   short: '10+10 (20 min)' },
-      { label: 'Run 3 — 25 min non-stop',       short: '25 min non-stop' },
+      { label: 'Run 1 - 5+8+5 min intervals',  short: '5+8+5 (18 min)' },
+      { label: 'Run 2 - 10+10 min intervals',   short: '10+10 (20 min)' },
+      { label: 'Run 3 - 25 min non-stop',       short: '25 min non-stop' },
     ],
   },
 ]
@@ -91,7 +91,7 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ hero_image_url: url }),
       })
-      if (!saveRes.ok) throw new Error('Image uploaded but failed to save — click Save settings to retry')
+      if (!saveRes.ok) throw new Error('Image uploaded but failed to save - click Save settings to retry')
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
     } catch (e) {
@@ -205,7 +205,7 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
           Sync sources
         </p>
         {toggleRow('Thursday runs sheet', 'Syncs weekly 8k/5k groups from Google Sheets', syncThursday, setSyncThursday)}
-        {toggleRow('Social & bank holiday sheet', 'Syncs social runs — disable if not yet published on Clubspark', syncSocial, setSyncSocial)}
+        {toggleRow('Social & bank holiday sheet', 'Syncs social runs - disable if not yet published on Clubspark', syncSocial, setSyncSocial)}
         {toggleRow('Social runs calendar button', 'Shows the "Social runs →" calendar subscription button on the homepage', showSocialCalendar, setShowSocialCalendar)}
       </div>
 
@@ -218,7 +218,7 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
           Pre-filled when composing a new email. Can be overridden per-email in the composer.
         </p>
         {[
-          { label: 'Default subject', value: emailSubject, set: setEmailSubject, placeholder: "This Thursday — radcliffe.run 🏃", rows: 1 },
+          { label: 'Default subject', value: emailSubject, set: setEmailSubject, placeholder: "This Thursday - radcliffe.run 🏃", rows: 1 },
           { label: 'Default opening', value: emailOpening, set: setEmailOpening, placeholder: "Hi everyone,\n\nHere's what's happening this Thursday…", rows: 4 },
           { label: 'Default closing', value: emailClosing, set: setEmailClosing, placeholder: "See you out there!\n\nradcliffe.run", rows: 4 },
         ].map(({ label, value, set, placeholder, rows }) => (
@@ -263,7 +263,7 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
             />
           </div>
           <div>
-            <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--muted)', marginBottom: 6 }}>Start date <span style={{ color: 'var(--muted)', fontWeight: 400 }}>(optional — shown on /c25k page)</span></p>
+            <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--muted)', marginBottom: 6 }}>Start date <span style={{ color: 'var(--muted)', fontWeight: 400 }}>(optional - shown on /c25k page)</span></p>
             <input
               type="date"
               value={c25kStartDate}
@@ -276,7 +276,7 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
             />
           </div>
           <div>
-            <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--muted)', marginBottom: 6 }}>Max registrations <span style={{ color: 'var(--muted)', fontWeight: 400 }}>(optional — leave blank for no limit)</span></p>
+            <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--muted)', marginBottom: 6 }}>Max registrations <span style={{ color: 'var(--muted)', fontWeight: 400 }}>(optional - leave blank for no limit)</span></p>
             <input
               type="number"
               min={1}

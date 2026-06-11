@@ -1,5 +1,5 @@
 // radcliffe.run service worker
-// Vanilla JS — no build tools required, Turbopack compatible
+// Vanilla JS - no build tools required, Turbopack compatible
 
 const CACHE_VERSION = 'rtr-v3';
 const OFFLINE_URL = '/offline';
@@ -38,12 +38,12 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET') return;
   if (!url.protocol.startsWith('http')) return;
 
-  // Supabase API — network only (always fresh data)
+  // Supabase API - network only (always fresh data)
   if (url.hostname.includes('supabase.co')) {
     return;
   }
 
-  // Navigation requests — network first, offline page fallback
+  // Navigation requests - network first, offline page fallback
   if (request.mode === 'navigate') {
     event.respondWith(
       fetch(request)
@@ -52,37 +52,37 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Fonts — cache first (permanent)
+  // Fonts - cache first (permanent)
   if (url.pathname.startsWith('/fonts/')) {
     event.respondWith(cacheFirst(request, 'rtr-fonts'));
     return;
   }
 
-  // Icons & manifest — cache first
+  // Icons & manifest - cache first
   if (url.pathname.match(/\.(png|svg|ico|json)$/) && url.hostname === location.hostname) {
     event.respondWith(cacheFirst(request, 'rtr-static'));
     return;
   }
 
-  // Route map images — cache first, 30 days
+  // Route map images - cache first, 30 days
   if (url.pathname.startsWith('/route-maps/')) {
     event.respondWith(cacheFirst(request, 'rtr-route-maps'));
     return;
   }
 
-  // GPX files — stale while revalidate
+  // GPX files - stale while revalidate
   if (url.pathname.startsWith('/gpx/')) {
     event.respondWith(staleWhileRevalidate(request, 'rtr-gpx'));
     return;
   }
 
-  // Map tiles (CartoDB) — stale while revalidate
+  // Map tiles (CartoDB) - stale while revalidate
   if (url.hostname.includes('cartocdn.com')) {
     event.respondWith(staleWhileRevalidate(request, 'rtr-tiles'));
     return;
   }
 
-  // Everything else — network first
+  // Everything else - network first
   event.respondWith(
     fetch(request).catch(() => caches.match(request))
   );

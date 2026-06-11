@@ -49,13 +49,13 @@ export default function SignInPage() {
       const data = await res.json()
       found = data.found ?? false
     } catch {
-      setError('Something went wrong — please try again.')
+      setError('Something went wrong - please try again.')
       setLoading(false)
       return
     }
 
     if (!found) {
-      setError('No account found for that email — have you registered yet?')
+      setError('No account found for that email - have you registered yet?')
       setLoading(false)
       return
     }
@@ -68,7 +68,7 @@ export default function SignInPage() {
     })
 
     if (error) {
-      setError(error.message || 'Something went wrong — please try again.')
+      setError(error.message || 'Something went wrong - please try again.')
     } else {
       setStep('code')
       setTimeout(() => codeRef.current?.focus(), 100)
@@ -90,7 +90,7 @@ export default function SignInPage() {
     })
 
     if (error) {
-      setError('Invalid or expired code — check your email and try again.')
+      setError('Invalid or expired code - check your email and try again.')
     } else {
       router.push('/profile')
     }
@@ -152,7 +152,7 @@ export default function SignInPage() {
               <h1 style={{ fontSize: 20, fontWeight: 700, marginBottom: 6 }}>Enter your code</h1>
               <p style={{ fontSize: 'var(--text-base)', color: 'var(--muted)', marginBottom: 28, lineHeight: 1.6 }}>
                 We&apos;ve sent an 8-digit code to <strong style={{ color: 'var(--dim)' }}>{email}</strong>.
-                Enter it below — check your spam if it doesn&apos;t arrive.
+                Enter it below - check your spam if it doesn&apos;t arrive.
               </p>
 
               <form onSubmit={handleVerifyCode} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>

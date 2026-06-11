@@ -3,7 +3,7 @@ import { createClient } from '@/utils/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase'
 
 export async function POST(req: Request) {
-  // Auth check — must be signed in as admin
+  // Auth check - must be signed in as admin
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -22,7 +22,7 @@ export async function POST(req: Request) {
   const upsert   = !folder // only upsert for hero
   const buffer   = Buffer.from(await file.arrayBuffer())
 
-  // Upload via service role — bypasses storage RLS
+  // Upload via service role - bypasses storage RLS
   const admin = supabaseAdmin()
   const { error } = await admin.storage
     .from(bucket)

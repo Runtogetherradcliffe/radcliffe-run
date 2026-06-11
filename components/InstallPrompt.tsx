@@ -43,7 +43,7 @@ export default function InstallPrompt() {
 
     /* eslint-disable react-hooks/set-state-in-effect -- one-time platform detection on mount; browser APIs are unavailable during SSR render */
     if (isIOS) {
-      // iOS Safari — only show if not already in standalone
+      // iOS Safari - only show if not already in standalone
       const isSafari = /Safari/.test(ua) && !/CriOS|FxiOS/.test(ua)
       if (isSafari) {
         setPlatform('ios')
@@ -53,7 +53,7 @@ export default function InstallPrompt() {
     }
 
     if (isAndroidChrome) {
-      // Android Chrome — wait for beforeinstallprompt
+      // Android Chrome - wait for beforeinstallprompt
       setPlatform('android')
       /* eslint-enable react-hooks/set-state-in-effect */
       // It may already have fired; listen for it

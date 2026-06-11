@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Push files to GitHub via the API — use instead of 'git push' from Cowork sessions
+Push files to GitHub via the API - use instead of 'git push' from Cowork sessions
 where FUSE mounts cause git lock file errors (Operation not permitted on HEAD.lock).
 
 Creates a SINGLE commit for all files (one Vercel build, not one per file).
@@ -17,7 +17,7 @@ Why this exists:
     Git uses atomic rename() internally to create lock files (.git/HEAD.lock, .git/index.lock).
     macOS FUSE mounts (used by Cowork) do not support rename() across filesystem boundaries,
     so git always fails with "Operation not permitted". The GitHub Git Trees API is the
-    correct workaround — it bypasses git entirely and creates one commit for all files.
+    correct workaround - it bypasses git entirely and creates one commit for all files.
 """
 
 import base64
@@ -39,7 +39,7 @@ REPO     = "Runtogetherradcliffe/radcliffe-run"
 BRANCH   = "main"
 SITE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Token is stored in the RTR site repo's git config — check both Cowork mount path
+# Token is stored in the RTR site repo's git config - check both Cowork mount path
 # and the local Mac path (Downloads/code for claude/RTR site)
 _CONFIG_CANDIDATES = [
     os.path.join(SITE_DIR, "..", "..", "RTR site", ".git", "config"),

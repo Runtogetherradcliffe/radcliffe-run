@@ -1,5 +1,5 @@
 /**
- * Core email send logic — used by both the API route (manual send)
+ * Core email send logic - used by both the API route (manual send)
  * and the cron (auto-send). Extracted so the cron doesn't need to
  * make an internal HTTP call to itself, avoiding double-timeout issues.
  */
@@ -152,7 +152,7 @@ export async function sendScheduledEmail(emailId: string): Promise<SendResult> {
     else failures.push(`${m.email}: ${result.error ?? 'unknown error'}`)
   }
 
-  // Bounded concurrency — process SEND_CONCURRENCY members at a time.
+  // Bounded concurrency - process SEND_CONCURRENCY members at a time.
   for (let i = 0; i < members.length; i += SEND_CONCURRENCY) {
     await Promise.all(members.slice(i, i + SEND_CONCURRENCY).map(sendToMember))
   }

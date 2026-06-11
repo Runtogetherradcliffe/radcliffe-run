@@ -1,5 +1,5 @@
 -- ================================================================
--- radcliffe.run — Email snippets migration
+-- radcliffe.run - Email snippets migration
 -- Run in Supabase SQL Editor
 -- ================================================================
 

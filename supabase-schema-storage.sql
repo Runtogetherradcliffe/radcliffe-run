@@ -1,5 +1,5 @@
 -- ================================================================
--- radcliffe.run — Storage bucket policies
+-- radcliffe.run - Storage bucket policies
 --
 -- Prerequisites:
 --   1. Create a bucket named 'site-images' in the Supabase dashboard

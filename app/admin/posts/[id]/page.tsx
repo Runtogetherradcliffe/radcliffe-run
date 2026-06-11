@@ -4,12 +4,12 @@ import { supabaseAdmin } from '@/lib/supabase'
 import AdminShell from '@/components/AdminShell'
 import PostEditor from '../PostEditor'
 
-export const metadata = { title: 'Edit post — radcliffe.run admin' }
+export const metadata = { title: 'Edit post - radcliffe.run admin' }
 export const dynamic = 'force-dynamic'
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 function fmtDate(iso: string | null) {
-  if (!iso) return '—'
+  if (!iso) return '-'
   const d = new Date(iso + 'T00:00:00Z')
   return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`
 }

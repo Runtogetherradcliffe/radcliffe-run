@@ -1,5 +1,5 @@
 -- ================================================================
--- radcliffe.run — Email system migration
+-- radcliffe.run - Email system migration
 -- Run in Supabase SQL Editor
 -- ================================================================
 
@@ -8,12 +8,12 @@ ALTER TABLE site_settings
   ADD COLUMN IF NOT EXISTS email_default_subject  text NOT NULL DEFAULT 'This Thursday with RTR 🏃',
   ADD COLUMN IF NOT EXISTS email_default_opening  text NOT NULL DEFAULT 'Hi everyone,
 
-Here''s what''s on this Thursday — hope to see you there. As always, we meet at 7pm and everyone is welcome regardless of pace or experience.',
+Here''s what''s on this Thursday - hope to see you there. As always, we meet at 7pm and everyone is welcome regardless of pace or experience.',
   ADD COLUMN IF NOT EXISTS email_default_closing  text NOT NULL DEFAULT 'See you Thursday!
 
 The RTR team
 
-—
+-
 Run Together Radcliffe meets every Thursday at 7pm at Radcliffe Market. Free to join, open to all.';
 
 

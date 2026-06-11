@@ -5,7 +5,7 @@
 
 export interface ParkrunResult {
   venue: string
-  /** e.g. "Muncaster Castle, Cumbria" — shown when not a local venue */
+  /** e.g. "Muncaster Castle, Cumbria" - shown when not a local venue */
   location?: string
   narrative: string
   /** milestone run number, e.g. 50, 100, 250 */
@@ -57,14 +57,14 @@ export interface Roundup {
 }
 
 /* ─────────────────────────────────────────────
-   Sample data — replace with Supabase fetch
+   Sample data - replace with Supabase fetch
 ───────────────────────────────────────────── */
 
 export const ROUNDUPS: Roundup[] = [
   {
     id: 'weekend-2025-04-12',
     weekendOf: '2025-04-12',
-    intro: 'Another fantastic weekend of running from RTR members across parkruns, trails and roads. Snow, hail and stunning scenery — this lot don\'t do anything by halves.',
+    intro: 'Another fantastic weekend of running from RTR members across parkruns, trails and roads. Snow, hail and stunning scenery - this lot don\'t do anything by halves.',
     parkrun: [
       {
         venue: 'Clarence',
@@ -74,7 +74,7 @@ export const ROUNDUPS: Roundup[] = [
       {
         venue: 'Crosby',
         location: 'Sefton',
-        narrative: 'Andrew and Alison Whitehead made the trip to Crosby for a breezy coastal parkrun — always a brilliant venue with the iron men looking on.',
+        narrative: 'Andrew and Alison Whitehead made the trip to Crosby for a breezy coastal parkrun - always a brilliant venue with the iron men looking on.',
       },
       {
         venue: 'Heaton Park',
@@ -83,7 +83,7 @@ export const ROUNDUPS: Roundup[] = [
       {
         venue: 'Muncaster Castle',
         location: 'Cumbria',
-        narrative: 'Andrea Booth took on the notoriously hilly Muncaster Castle course — all castle grounds, woodland and stunning Lakeland views. Worth every climb.',
+        narrative: 'Andrea Booth took on the notoriously hilly Muncaster Castle course - all castle grounds, woodland and stunning Lakeland views. Worth every climb.',
       },
       {
         venue: 'Newborough Forest',
@@ -94,12 +94,12 @@ export const ROUNDUPS: Roundup[] = [
       {
         venue: 'Peel',
         location: 'Isle of Man',
-        narrative: 'Tracy Wroe made the most of a trip to the Isle of Man with a run at Peel parkrun — a lovely flat course along the harbour front.',
+        narrative: 'Tracy Wroe made the most of a trip to the Isle of Man with a run at Peel parkrun - a lovely flat course along the harbour front.',
       },
       {
         venue: 'Pendle',
         location: 'Lancashire',
-        narrative: 'Angela Pradena took on Pendle — always a character-builder with those hills looming over proceedings.',
+        narrative: 'Angela Pradena took on Pendle - always a character-builder with those hills looming over proceedings.',
       },
       {
         venue: 'Sewerby',
@@ -114,7 +114,7 @@ export const ROUNDUPS: Roundup[] = [
         terrain: 'trail',
         date: '2025-04-12',
         location: 'Keswick, Cumbria',
-        narrative: 'Julie Smith, Neil Naisbitt, Delphine Bugarel and Clive Koffman tackled the Lake District 23k, taking in the stunning scenery around Derwent Water and through the valleys below the fells — though this year\'s runners had to contend with snow and hail along the way. Incredible effort from all four.',
+        narrative: 'Julie Smith, Neil Naisbitt, Delphine Bugarel and Clive Koffman tackled the Lake District 23k, taking in the stunning scenery around Derwent Water and through the valleys below the fells - though this year\'s runners had to contend with snow and hail along the way. Incredible effort from all four.',
       },
       {
         name: 'She Ultra',
@@ -122,7 +122,7 @@ export const ROUNDUPS: Roundup[] = [
         terrain: 'trail',
         date: '2025-04-12',
         location: 'Peak District',
-        narrative: 'Kath Biddle completed the She Ultra — a 50k trail race through the Peak District. An incredible achievement, especially in the conditions. Massive congratulations, Kath.',
+        narrative: 'Kath Biddle completed the She Ultra - a 50k trail race through the Peak District. An incredible achievement, especially in the conditions. Massive congratulations, Kath.',
       },
       {
         name: 'Montane Howgills Trail',
@@ -130,7 +130,7 @@ export const ROUNDUPS: Roundup[] = [
         terrain: 'trail',
         date: '2025-04-13',
         location: 'Sedbergh, Cumbria',
-        narrative: 'Chris Mihalyi took on the Howgills on Sunday — relentlessly hilly terrain in the Cumbrian hills with no shortage of bogs and beautiful views. Superb running.',
+        narrative: 'Chris Mihalyi took on the Howgills on Sunday - relentlessly hilly terrain in the Cumbrian hills with no shortage of bogs and beautiful views. Superb running.',
       },
       {
         name: 'Mersey Tunnel 10k',
@@ -138,7 +138,7 @@ export const ROUNDUPS: Roundup[] = [
         terrain: 'road',
         date: '2025-04-13',
         location: 'Liverpool',
-        narrative: 'Sarah Wilson ran the iconic Mersey Tunnel 10k — one of the most unusual road races in the country, taking runners through the tunnel under the Mersey. Great result, Sarah.',
+        narrative: 'Sarah Wilson ran the iconic Mersey Tunnel 10k - one of the most unusual road races in the country, taking runners through the tunnel under the Mersey. Great result, Sarah.',
       },
     ],
     photos: [
@@ -170,7 +170,7 @@ export const ROUNDUPS: Roundup[] = [
   {
     id: 'weekend-2025-04-05',
     weekendOf: '2025-04-05',
-    intro: 'Easter weekend and RTR members were out in force — parkruns, roads and a brilliant social run to boot.',
+    intro: 'Easter weekend and RTR members were out in force - parkruns, roads and a brilliant social run to boot.',
     parkrun: [
       {
         venue: 'Heaton Park',
@@ -188,7 +188,7 @@ export const ROUNDUPS: Roundup[] = [
         terrain: 'road',
         date: '2025-04-06',
         location: 'Manchester',
-        narrative: 'Three RTR members lined up for Manchester Marathon on Easter Sunday — a brilliant day with great conditions and massive crowd support all the way round. Huge congratulations to everyone who ran.',
+        narrative: 'Three RTR members lined up for Manchester Marathon on Easter Sunday - a brilliant day with great conditions and massive crowd support all the way round. Huge congratulations to everyone who ran.',
       },
     ],
     social: [
@@ -196,7 +196,7 @@ export const ROUNDUPS: Roundup[] = [
         name: 'Easter Sunday Social Run',
         date: '2025-04-06',
         location: 'Radcliffe & Clifton',
-        narrative: 'A group of around 15 members joined the Easter Sunday social run, taking in the towpath and looping back through Clifton Country Park. Perfect Easter morning — hot cross buns at the end, naturally.',
+        narrative: 'A group of around 15 members joined the Easter Sunday social run, taking in the towpath and looping back through Clifton Country Park. Perfect Easter morning - hot cross buns at the end, naturally.',
       },
     ],
   },

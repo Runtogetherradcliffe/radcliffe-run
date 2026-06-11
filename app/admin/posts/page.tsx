@@ -4,7 +4,7 @@ import { createClient } from '@/utils/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import AdminShell from '@/components/AdminShell'
 
-export const metadata = { title: 'Posts — radcliffe.run admin' }
+export const metadata = { title: 'Posts - radcliffe.run admin' }
 export const dynamic = 'force-dynamic'
 
 const STATUS_CHIP: Record<string, { bg: string; color: string; label: string }> = {
@@ -21,7 +21,7 @@ const TYPE_LABEL: Record<string, string> = {
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 
 function fmtDate(iso: string | null) {
-  if (!iso) return '—'
+  if (!iso) return '-'
   const d = new Date(iso + 'T00:00:00Z')
   return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`
 }
@@ -122,7 +122,7 @@ export default async function AdminPostsPage() {
                         {p.title}
                       </p>
                       <p style={{ fontSize: 12, color: 'var(--muted)' }}>
-                        {p.published_at ? fmtDate(p.published_at) : '—'}
+                        {p.published_at ? fmtDate(p.published_at) : '-'}
                       </p>
                     </div>
                     <span style={{ fontSize: 'var(--text-xs)', fontWeight: 600, padding: '3px 9px', borderRadius: 20, background: chip.bg, color: chip.color, border: `1px solid ${chip.color}33` }}>
