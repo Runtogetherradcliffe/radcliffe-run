@@ -163,7 +163,7 @@ export const WALKS: Walk[] = [
     description: 'A longer, very gentle day out, heading south from Outwood Country Park onto the canal towpath and the wooded Outwood and Irwell Sculpture Trails, following the Irwell valley down towards Molyneux Brow. The return mirrors the way out, so you can stop and turn back at any point.',
     stages: [
       { fraction: 0.0,  title: 'Radcliffe Market', blurb: BLURB_MARKET },
-      { fraction: 0.25, title: 'Manchester, Bolton & Bury Canal', blurb: BLURB_CANAL },
+      { fraction: 0.25, title: 'The Outwood Trail', blurb: 'The Outwood Trail you are walking follows the course of a former railway line, once part of the route running on towards Accrington and Colne. The line closed in 1966, and its level track-bed now makes for easy going underfoot.' },
       { at: [53.53569, -2.32970], title: 'Fat Hurst Wood', blurb: 'Fat Hurst Wood, a pocket of ancient woodland on the valley side, visible from the trail and marked on the historic map. Ancient woods like this have been continuously wooded for centuries and are among our richest habitats for wildlife.' },
       { at: [53.53107, -2.31745], title: 'Molyneux Brow Station', blurb: 'Near here once stood Molyneux Brow Station, a stop on the railway through the Irwell valley. It was swept away when the motorway was driven through.' },
     ],
