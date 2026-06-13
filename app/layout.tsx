@@ -63,7 +63,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             var h = document.documentElement;
             if (t === 'light') {
               h.setAttribute('data-theme','light');
-              var lv = {'--bg':'#f4f4f4','--card':'#ffffff','--card-hi':'#f0f0f0','--border':'#e0e0e0','--border-2':'#d0d0d0','--orange':'#c47d0e','--orange-lt':'#e09010','--orange-dk':'#9a5f08','--white':'#0a0a0a','--dim':'#1a1a1a','--muted':'#444444','--faint':'#555555','--purple':'#7c3db0','--purple-bg':'#f0e8f8','--green':'#2e7d2e','--green-bg':'#edf7ed','--blue':'#2d6ca6','--group-green-bg':'#edf7ed','--group-green-border':'#b8deb8','--group-blue-bg':'#e8f0f8','--group-blue-border':'#b3cceb','--group-amber-bg':'#fdf3e0','--group-amber-border':'#f0d090'};
+              var lv = {'--bg':'#f4f4f4','--card':'#ffffff','--card-hi':'#f0f0f0','--border':'#e0e0e0','--border-2':'#d0d0d0','--orange':'#c47d0e','--orange-lt':'#e09010','--orange-dk':'#9a5f08','--white':'#0a0a0a','--dim':'#1a1a1a','--muted':'#444444','--faint':'#555555','--purple':'#7c3db0','--purple-bg':'#f0e8f8','--green':'#2e7d2e','--green-bg':'#edf7ed','--blue':'#2d6ca6','--group-green-bg':'#edf7ed','--group-green-border':'#b8deb8','--group-blue-bg':'#e8f0f8','--group-blue-border':'#b3cceb','--group-amber-bg':'#fdf3e0','--group-amber-border':'#f0d090','--overlay':'rgba(255,255,255,0.94)'};
               Object.keys(lv).forEach(function(k){h.style.setProperty(k,lv[k]);});
             }
             if (f === 'large') {

@@ -1,6 +1,8 @@
 'use client'
 import { useState, useEffect, useRef, ReactNode } from 'react'
 import { loadLeaflet, type Leaflet, type LeafletContainer } from '@/lib/leaflet'
+import { resolveLayer } from '@/lib/mapLayers'
+import MapLayersControl from '@/components/MapLayersControl'
 
 const MAP_HEIGHT = 300
 
@@ -98,20 +100,17 @@ async function loadGPXCoords(file: string): Promise<[number, number][]> {
   return pts.map(p => [parseFloat(p.getAttribute('lat')!), parseFloat(p.getAttribute('lon')!)])
 }
 
-const TILE_ROAD  = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
-const TILE_TRAIL = `https://api.thunderforest.com/outdoors/{z}/{x}/{y}.png?apikey=${process.env.NEXT_PUBLIC_THUNDERFOREST_API_KEY}`
-const ATTR_ROAD  = '© OpenStreetMap © CARTO'
-const ATTR_TRAIL = '© <a href="https://www.thunderforest.com">Thunderforest</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-
 export default function RunMapExpand({ file, terrain, accentColor = '#f5a623', rightButton }: { file: string; terrain?: string; accentColor?: string; rightButton?: ReactNode }) {
   const [open, setOpen]             = useState(false)
   const [fullscreen, setFullscreen] = useState(false)
   const [status, setStatus]         = useState<'idle' | 'loading' | 'ready' | 'error'>('idle')
   const [locating, setLocating]     = useState(false)
+  const [activeLayerId, setActiveLayerId] = useState('auto')
 
   const mapRef           = useRef<HTMLDivElement>(null)
   const mapObjRef        = useRef<Leaflet.Map | null>(null)
   const leafletRef       = useRef<typeof Leaflet | null>(null)  // Leaflet instance after load
+  const tileLayerRef     = useRef<Leaflet.TileLayer | null>(null)  // current base map tiles
   const watchIdRef       = useRef<number | null>(null)
   const locationLayerRef = useRef<Leaflet.LayerGroup | null>(null)  // pulsing dot + accuracy circle
   const breadcrumbRef    = useRef<Leaflet.Polyline | null>(null)    // purple dashed trail polyline
@@ -149,10 +148,8 @@ export default function RunMapExpand({ file, terrain, accentColor = '#f5a623', r
         const map = Lm.map(mapRef.current, { center: [53.5609, -2.3265] as [number, number], zoom: 13 })
         mapObjRef.current = map
 
-        const isTrail = terrain === 'trail'
-        Lm.tileLayer(isTrail ? TILE_TRAIL : TILE_ROAD, {
-          attribution: isTrail ? ATTR_TRAIL : ATTR_ROAD, maxZoom: 19,
-        }).addTo(map)
+        const def = resolveLayer(activeLayerId, terrain)
+        tileLayerRef.current = Lm.tileLayer(def.url, { attribution: def.attr, maxZoom: def.maxZoom }).addTo(map)
 
         const coords = await loadGPXCoords(file)
         if (cancelled) return
@@ -187,6 +184,9 @@ export default function RunMapExpand({ file, terrain, accentColor = '#f5a623', r
     }, 80)
 
     return () => { cancelled = true; clearTimeout(timer) }
+    // activeLayerId/terrain read only for the initial tile; later layer changes
+    // are applied imperatively by changeLayer, so they must not re-run init.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, file, accentColor])
 
   // Invalidate map size when fullscreen toggles
@@ -294,6 +294,16 @@ export default function RunMapExpand({ file, terrain, accentColor = '#f5a623', r
     else startLocate()
   }
 
+  /* -- Swap the base map layer (route line + markers stay on top via panes) */
+  function changeLayer(id: string) {
+    setActiveLayerId(id)
+    const map = mapObjRef.current, L = leafletRef.current
+    if (!map || !L) return
+    const def = resolveLayer(id, terrain)
+    tileLayerRef.current?.remove()
+    tileLayerRef.current = L.tileLayer(def.url, { attribution: def.attr, maxZoom: def.maxZoom }).addTo(map)
+  }
+
   return (
     <div>
       {/* Toggle + optional right-slot on one row */}
@@ -347,6 +357,16 @@ export default function RunMapExpand({ file, terrain, accentColor = '#f5a623', r
 
         {status === 'ready' && (
           <>
+            {/* Map layers dialog - only in fullscreen; the inline map is too
+                small for the dialog, and defaults to the terrain base map. */}
+            {fullscreen && (
+              <MapLayersControl
+                activeLayerId={activeLayerId}
+                terrain={terrain}
+                onChange={changeLayer}
+              />
+            )}
+
             {/* Locate me button - bottom left */}
             <button
               onClick={toggleLocate}
@@ -356,12 +376,12 @@ export default function RunMapExpand({ file, terrain, accentColor = '#f5a623', r
                 bottom: fullscreen ? 24 : 10,
                 left: fullscreen ? 16 : 10,
                 zIndex: 1000,
-                background: locating ? 'rgba(74,158,255,0.18)' : 'rgba(17,17,17,0.88)',
-                border: locating ? '1px solid #4a9eff' : '1px solid #333',
+                background: locating ? 'rgba(74,158,255,0.18)' : 'var(--overlay)',
+                border: locating ? '1px solid #4a9eff' : '1px solid var(--border-2)',
                 borderRadius: 8,
                 padding: fullscreen ? '10px 14px' : '7px 8px',
                 cursor: 'pointer',
-                color: locating ? '#4a9eff' : '#aaa',
+                color: locating ? '#4a9eff' : 'var(--dim)',
                 display: 'flex', alignItems: 'center', gap: fullscreen ? 8 : 0,
                 fontSize: 'var(--text-sm)', fontWeight: 600, fontFamily: 'Inter, sans-serif',
               }}
@@ -379,12 +399,12 @@ export default function RunMapExpand({ file, terrain, accentColor = '#f5a623', r
                 bottom: fullscreen ? 24 : 10,
                 right: fullscreen ? 16 : 10,
                 zIndex: 1000,
-                background: 'rgba(17,17,17,0.88)',
-                border: '1px solid #333',
+                background: 'var(--overlay)',
+                border: '1px solid var(--border-2)',
                 borderRadius: 8,
                 padding: fullscreen ? '10px 14px' : '7px 8px',
                 cursor: 'pointer',
-                color: fullscreen ? '#fff' : '#aaa',
+                color: fullscreen ? 'var(--white)' : 'var(--dim)',
                 display: 'flex', alignItems: 'center', gap: fullscreen ? 8 : 0,
                 fontSize: 'var(--text-sm)', fontWeight: 600, fontFamily: 'Inter, sans-serif',
               }}
