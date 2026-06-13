@@ -366,7 +366,7 @@ export default function WalksClient() {
 
       {/* ── SIDEBAR ── */}
       <aside style={{
-        width: isMobile ? '100%' : 380, height: isMobile ? 260 : 'auto', flexShrink: 0,
+        width: isMobile ? '100%' : 380, height: isMobile ? '44vh' : 'auto', flexShrink: 0,
         background: 'var(--bg)', borderRight: isMobile ? 'none' : '1px solid var(--border)',
         borderBottom: isMobile ? '1px solid var(--border)' : 'none',
         display: 'flex', flexDirection: 'column', overflow: 'hidden',
@@ -426,7 +426,8 @@ export default function WalksClient() {
                   </span>
                   {!isMobile && <DifficultyBadge difficulty={walk.difficulty} />}
                 </div>
-                <div style={{ display: 'flex', gap: 12, marginTop: 5, flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: 10, marginTop: 5, flexWrap: 'wrap', alignItems: 'center' }}>
+                  {isMobile && <DifficultyBadge difficulty={walk.difficulty} />}
                   <span style={{ fontSize: 12, color: isSelected ? 'var(--orange)' : 'var(--muted)' }}>{walk.distance_km} km</span>
                   <span style={{ fontSize: 12, color: 'var(--muted)' }}>~{time(walk)}</span>
                 </div>
