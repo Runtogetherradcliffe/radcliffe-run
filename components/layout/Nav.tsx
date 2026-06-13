@@ -74,6 +74,7 @@ export default function Nav() {
     { href: '/',         label: 'Home'    },
     { href: '/about',    label: 'About'   },
     { href: '/routes',   label: 'Routes'  },
+    { href: '/walks',    label: 'Walks'   },
     { href: '/news',     label: 'Roundup' },
     { href: '/contact',  label: 'Contact' },
   ]
