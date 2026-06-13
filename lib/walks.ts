@@ -160,7 +160,7 @@ export const WALKS: Walk[] = [
     distance_km: 9.7, elevation_m: 53, center: [53.54472, -2.32944],
     difficulty: 'moderate',
     accessibility: 'Long but very gentle (53m). Woodland trails and towpath with some natural surfaces.',
-    description: 'A longer, very gentle day out - through Outwood Country Park to the canal towpath, then south on the Outwood and Irwell Sculpture Trails through Giant\'s Seat Wood into Clifton Country Park, woodland on both sides. The return mirrors the way out, so you can stop and head back at any point.',
+    description: 'A longer, very gentle day out, heading south from Outwood Country Park onto the canal towpath and the wooded Outwood and Irwell Sculpture Trails, following the Irwell valley down towards Molyneux Brow. The return mirrors the way out, so you can stop and turn back at any point.',
     stages: [
       { fraction: 0.0,  title: 'Radcliffe Market', blurb: BLURB_MARKET },
       { fraction: 0.25, title: 'Manchester, Bolton & Bury Canal', blurb: BLURB_CANAL },
