@@ -3,13 +3,9 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { loadLeaflet, type Leaflet, type LeafletContainer } from '@/lib/leaflet'
 import { ROUTES, TERRAIN_LABELS, type Route, type Terrain, type Category } from '@/lib/routes'
 import type { RouteOverrides } from '@/lib/routeDescriptions'
+import { resolveLayer } from '@/lib/mapLayers'
+import MapLayersControl from '@/components/MapLayersControl'
 import GpxButton from '@/app/runs/[id]/GpxButton'
-
-/* ── Map tile sources ── */
-const TILE_ROAD  = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
-const TILE_TRAIL = `https://api.thunderforest.com/outdoors/{z}/{x}/{y}.png?apikey=${process.env.NEXT_PUBLIC_THUNDERFOREST_API_KEY}`
-const ATTR_ROAD  = '© OpenStreetMap © CARTO'
-const ATTR_TRAIL = '© <a href="https://www.thunderforest.com">Thunderforest</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 
 /* ── Terrain colours ── */
 const TERRAIN_STYLE: Record<Terrain, { bg: string; color: string; border: string }> = {
@@ -100,6 +96,7 @@ export default function RoutesClient({ nameOverrides = {} }: { nameOverrides?: R
   const [loading,  setLoading]  = useState(false)
   const [mapReady, setMapReady] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  const [activeLayerId, setActiveLayerId] = useState<string>('auto')
   const mapRef          = useRef<HTMLDivElement>(null)
   const leafletRef      = useRef<typeof Leaflet | null>(null)
   const mapObjRef       = useRef<Leaflet.Map | null>(null)
@@ -107,7 +104,6 @@ export default function RoutesClient({ nameOverrides = {} }: { nameOverrides?: R
   const arrowsRef       = useRef<Leaflet.LayerGroup | null>(null)
   const markerRef       = useRef<Leaflet.Marker | null>(null)
   const tileLayerRef    = useRef<Leaflet.TileLayer | null>(null)
-  const currentTerrain  = useRef<string>('road')
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 768px)')
@@ -147,12 +143,7 @@ export default function RoutesClient({ nameOverrides = {} }: { nameOverrides?: R
       })
       mapObjRef.current = map
 
-      tileLayerRef.current = leafletRef.current.tileLayer(
-        TILE_ROAD,
-        { attribution: ATTR_ROAD, maxZoom: 19 }
-      ).addTo(map)
-      currentTerrain.current = 'road'
-
+      // The base tile layer is applied by the activeLayer effect once mapReady flips.
       const MEETING: [number, number] = [53.5609, -2.3265]
       const meetIcon = leafletRef.current.divIcon({
         className: '',
@@ -183,17 +174,6 @@ export default function RoutesClient({ nameOverrides = {} }: { nameOverrides?: R
       const coords = await loadGPXCoords(route.file)
       if (!coords.length) return
       const L = leafletRef.current
-
-      // Swap tile layer if terrain changed
-      const targetTerrain = route.terrain === 'trail' ? 'trail' : 'road'
-      if (currentTerrain.current !== targetTerrain) {
-        tileLayerRef.current?.remove()
-        tileLayerRef.current = L.tileLayer(
-          targetTerrain === 'trail' ? TILE_TRAIL : TILE_ROAD,
-          { attribution: targetTerrain === 'trail' ? ATTR_TRAIL : ATTR_ROAD, maxZoom: 19 }
-        ).addTo(mapObjRef.current)
-        currentTerrain.current = targetTerrain
-      }
 
       // Remove previous route layers
       polyRef.current?.remove()
@@ -232,6 +212,18 @@ export default function RoutesClient({ nameOverrides = {} }: { nameOverrides?: R
       setLoading(false)
     }
   }, [])
+
+  /* ── Apply the active base map layer ── */
+  useEffect(() => {
+    if (!mapReady || !mapObjRef.current || !leafletRef.current) return
+    const def = resolveLayer(activeLayerId, selected?.terrain)
+    tileLayerRef.current?.remove()
+    tileLayerRef.current = leafletRef.current
+      .tileLayer(def.url, { attribution: def.attr, maxZoom: def.maxZoom })
+      .addTo(mapObjRef.current)
+    // Tiles live in the tilePane (below the overlayPane), so the route polyline
+    // and arrows stay visible on top regardless of add order.
+  }, [activeLayerId, selected, mapReady])
 
   /* ── Auto-select route from URL hash ── */
   useEffect(() => {
@@ -341,6 +333,15 @@ export default function RoutesClient({ nameOverrides = {} }: { nameOverrides?: R
       {/* ── MAP ── */}
       <div style={{ flex: 1, position: 'relative', minHeight: 0 }}>
         <div ref={mapRef} style={{ width: '100%', height: '100%' }} />
+
+        {/* ── Layers control (map options dialog) ── */}
+        {mapReady && (
+          <MapLayersControl
+            activeLayerId={activeLayerId}
+            terrain={selected?.terrain}
+            onChange={setActiveLayerId}
+          />
+        )}
 
         {/* Loading spinner */}
         {loading && (

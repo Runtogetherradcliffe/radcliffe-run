@@ -14,6 +14,7 @@ const LIGHT_VARS: Record<string, string> = {
   '--group-green-bg': '#edf7ed', '--group-green-border': '#b8deb8',
   '--group-blue-bg': '#e8f0f8', '--group-blue-border': '#b3cceb',
   '--group-amber-bg': '#fdf3e0', '--group-amber-border': '#f0d090',
+  '--overlay': 'rgba(255,255,255,0.94)',
 }
 
 const LARGE_VARS: Record<string, string> = {

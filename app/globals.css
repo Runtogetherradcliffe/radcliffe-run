@@ -27,6 +27,7 @@
   --green-bg:    #0a120a;
   --blue:        #6b9fd4;
   --amber-col:   #d4a84b;
+  --overlay:     rgba(10,10,10,0.92);
   --radius-card: 12px;
   --radius-btn:  8px;
 
@@ -139,6 +140,7 @@ html[data-theme="light"] {
   --green-bg:  #edf7ed;
   --blue:      #2d6ca6;
   --amber-col: #8a6010;
+  --overlay:   rgba(255,255,255,0.94);
 }
 html[data-theme="light"] body {
   background: var(--bg);
