@@ -459,24 +459,28 @@ export default function WalksClient() {
                 ...(isMobile ? { top: 10, right: 10 } : { bottom: 10, left: 10 }),
                 background: locating ? 'rgba(74,158,255,0.18)' : 'var(--overlay)',
                 border: locating ? '1px solid #4a9eff' : '1px solid var(--border-2)',
-                borderRadius: 8, padding: '7px 8px', cursor: 'pointer',
-                color: locating ? '#4a9eff' : 'var(--dim)', display: 'flex', alignItems: 'center',
-                backdropFilter: 'blur(8px)',
+                borderRadius: 8, padding: '8px 12px', cursor: 'pointer',
+                color: locating ? '#4a9eff' : 'var(--white)', display: 'flex', alignItems: 'center', gap: 7,
+                fontFamily: 'Inter, sans-serif', fontSize: 'var(--text-sm)', fontWeight: 600,
+                backdropFilter: 'blur(8px)', boxShadow: '0 2px 8px rgba(0,0,0,0.4)',
               }}>
               <LocateIcon active={locating} />
+              {locating ? 'Tracking' : 'Locate me'}
             </button>
             <button
               onClick={() => setFullscreen(f => !f)}
               aria-label={fullscreen ? 'Exit fullscreen' : 'Expand map'}
               style={{
                 position: 'absolute', zIndex: 1000,
-                ...(isMobile ? { top: 54, right: 10 } : { bottom: 10, right: 10 }),
+                ...(isMobile ? { top: 56, right: 10 } : { bottom: 10, right: 10 }),
                 background: 'var(--overlay)', border: '1px solid var(--border-2)',
-                borderRadius: 8, padding: '7px 8px', cursor: 'pointer',
-                color: fullscreen ? 'var(--white)' : 'var(--dim)', display: 'flex', alignItems: 'center',
-                backdropFilter: 'blur(8px)',
+                borderRadius: 8, padding: '8px 12px', cursor: 'pointer',
+                color: 'var(--white)', display: 'flex', alignItems: 'center', gap: 7,
+                fontFamily: 'Inter, sans-serif', fontSize: 'var(--text-sm)', fontWeight: 600,
+                backdropFilter: 'blur(8px)', boxShadow: '0 2px 8px rgba(0,0,0,0.4)',
               }}>
               <ExpandIcon fullscreen={fullscreen} />
+              {fullscreen ? 'Exit' : 'Full screen'}
             </button>
           </>
         )}
