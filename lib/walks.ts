@@ -128,13 +128,13 @@ export const WALKS: Walk[] = [
     routeSlug: 'trail-5k--outwood-ringley-lake',
     distance_km: 5.1, elevation_m: 62, center: [53.55333, -2.33278],
     difficulty: 'moderate',
-    accessibility: 'Park trails with a steady 39m climb, then a descent to the water and towpath. Uneven in places.',
-    description: 'Climbs steadily through Outwood Country Park on the Outwood Trail and Irwell Sculpture Trail before descending to King George V Lodge, a reservoir on the edge of the park, and the canal towpath. A satisfying short loop with a little climbing to earn the views and the water for company on the way home.',
+    accessibility: 'Park trails with a steady 39m climb, then a descent to the lodge. Uneven in places.',
+    description: 'Climbs steadily through Outwood Country Park on the Outwood Trail and Irwell Sculpture Trail before descending to King George V Lodge, a reservoir on the edge of the park. A satisfying short loop with a little climbing to earn the views.',
     stages: [
       { fraction: 0.0, title: 'Radcliffe Market', blurb: BLURB_MARKET },
       { fraction: 0.3, title: 'Outwood Country Park', blurb: BLURB_PARK },
       { at: [53.54866, -2.33877], title: 'Outwood Colliery', blurb: 'The pithead of Outwood Colliery once stood here. Opened in 1840, it employed around 2,000 people at its peak and sent its coal by tramway to barges on the canal. An underground fire forced its closure in 1931, with coal washing continuing until 1956.' },
-      { fraction: 0.6, title: 'King George V Lodge', blurb: 'King George V Lodge, a reservoir on the edge of the country park and the turning point of this loop, with the water for company on the way home.' },
+      { fraction: 0.6, title: 'King George V Lodge', blurb: 'King George V Lodge, a reservoir on the edge of the country park and the turning point of this loop.' },
     ],
   },
   {
