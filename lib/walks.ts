@@ -97,8 +97,8 @@ export const WALKS: Walk[] = [
     routeSlug: 'road-5k--banana-path-one-loop',
     distance_km: 5.1, elevation_m: 47, center: [53.56508, -2.33544],
     difficulty: 'easy',
-    accessibility: 'Tarmac path and canal towpath throughout with one gentle climb. Suitable for buggies.',
-    description: 'A short loop on the tarmac Banana Path that runs above the canal between Radcliffe and Ainsworth. One gentle climb, a relaxed stretch above the water and an easy drop back to the towpath. A simple, well-surfaced local favourite.',
+    accessibility: 'Tarmac path throughout with one gentle climb. Suitable for buggies.',
+    description: 'A short loop on the tarmac Banana Path, which follows the embankment of a former railway line between Radcliffe and Ainsworth. One gentle climb, a relaxed stretch along the top and an easy return. A simple, well-surfaced local favourite.',
     stages: [
       { fraction: 0.0, title: 'Radcliffe Market', blurb: BLURB_MARKET },
       { at: [53.56576, -2.32578], title: 'The Banana Path', blurb: 'The smooth, curving tarmac path that gives this walk its name. It follows the embankment of a dismantled railway, which is why it stays so level underfoot.' },
@@ -144,8 +144,8 @@ export const WALKS: Walk[] = [
     routeSlug: 'trail-5k--outwood-to-scout-camp-and-back',
     distance_km: 5.2, elevation_m: 40, center: [53.55083, -2.33553],
     difficulty: 'easy',
-    accessibility: 'Country park trails through Ringley Wood; gentle gradients with some natural surfaces.',
-    description: 'A gentle out-and-back through Outwood Country Park and Ringley Wood to the Scout Camp, then the same friendly ground home. Easy to shorten - simply turn around whenever suits.',
+    accessibility: 'Country park trails with gentle gradients and some natural surfaces.',
+    description: 'A gentle out-and-back through Outwood Country Park to the Scout Camp, with views across the valley to Ringley Wood, then the same friendly ground home. Easy to shorten - simply turn around whenever suits.',
     stages: [
       { fraction: 0.0,  title: 'Radcliffe Market', blurb: BLURB_MARKET },
       { fraction: 0.35, title: 'Outwood Country Park', blurb: BLURB_PARK },
@@ -159,8 +159,8 @@ export const WALKS: Walk[] = [
     routeSlug: 'trail-5k--outwood-oab',
     distance_km: 9.7, elevation_m: 53, center: [53.54472, -2.32944],
     difficulty: 'moderate',
-    accessibility: 'Long but very gentle (53m). Woodland trails and towpath with some natural surfaces.',
-    description: 'A longer, very gentle day out, heading south from Outwood Country Park onto the canal towpath and the wooded Outwood and Irwell Sculpture Trails, following the Irwell valley down towards Molyneux Brow. The return mirrors the way out, so you can stop and turn back at any point.',
+    accessibility: 'Long but very gentle (53m). Woodland trails with some natural surfaces.',
+    description: 'A longer, very gentle day out, heading south from Outwood Country Park along the wooded Outwood and Irwell Sculpture Trails, following the Irwell valley down towards Molyneux Brow. The return mirrors the way out, so you can stop and turn back at any point.',
     stages: [
       { fraction: 0.0,  title: 'Radcliffe Market', blurb: BLURB_MARKET },
       { fraction: 0.25, title: 'The Outwood Trail', blurb: 'The Outwood Trail you are walking follows the course of a former railway line, once part of the route running on towards Accrington and Colne. The line closed in 1966, and its level track-bed now makes for easy going underfoot.' },
