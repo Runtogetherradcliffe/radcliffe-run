@@ -132,6 +132,7 @@ export default async function PrivacyPage({ searchParams }: Props) {
                   ['Supabase', 'Database and authentication - stores all member data on servers in the EU'],
                   ['Brevo', 'Email delivery: your email address is passed to Brevo, an EU-based provider, when we send you club emails'],
                   ['Vercel', 'Website hosting - processes requests to serve the site'],
+                  ['Map providers', 'Map display: when you view a route or walk map, your browser loads map tiles directly from MapTiler, Thunderforest, Esri, CartoDB and OpenTopoMap, which receive your IP address in order to deliver the imagery'],
                 ].map(([service, purpose], i, arr) => (
                   <tr key={i} style={i < arr.length - 1 ? tableRowStyle : {}}>
                     <td style={tdLabelStyle}>{service}</td>

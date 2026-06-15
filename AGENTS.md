@@ -70,6 +70,22 @@ Full background in `docs/ARCHITECTURE.md`. Read this whole file before changing 
 - Do NOT run `npm audit fix --force` - it downgrades Next.js to an ancient version.
 - Tailwind v4: `@import "tailwindcss"` in globals.css, not `@tailwind base/components`.
 
+## When adding a page or a third-party service
+
+- **New public page:** add it to `app/sitemap.ts` (discoverability) and, if user-facing,
+  to the nav (`components/layout/Nav.tsx`); give it a `metadata` export with a localised
+  title and description ("... in Radcliffe / Bury"). The /walks page shipped without a
+  sitemap entry once - do not repeat that.
+- **Any UI change:** use the CSS variables (see Styling and theming) and test BOTH light and
+  dark mode and BOTH mobile and desktop before shipping - several walks-page issues were
+  dark-mode-only or mobile-only.
+- **New third-party service** (tile provider, API, embed, analytics): if it receives visitor
+  data, disclose it in the privacy policy services table (`app/privacy/page.tsx`) - e.g. map
+  tile providers receive visitor IPs, so they belong there. `NEXT_PUBLIC_` keys must be set
+  in Vercel before the build and must NOT be marked "Sensitive" (or they will not inline into
+  the client bundle); they are exposed in the bundle, so restrict them by origin where the
+  provider allows it.
+
 ## Environments
 
 - `.env.local` points at the DEV Supabase project. Production credentials live in
