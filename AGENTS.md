@@ -39,6 +39,15 @@ Full background in `docs/ARCHITECTURE.md`. Read this whole file before changing 
   Brevo's batch `messageVersions` cannot vary HTML or headers per recipient and each
   member needs a personalised unsubscribe link. Keep `maxDuration = 60` on the cron and
   send routes, and keep mark-sent-only-on-success behaviour.
+- **The send is claim-locked** so two triggers (the Vercel cron and the external cron
+  backstop) cannot both deliver the same email: `sendScheduledEmail` atomically stamps
+  `sent_at` while status is still `scheduled` and only the winner proceeds; a claim older
+  than 10 minutes counts as stale and is reclaimable. `sent_at` doubles as that lease - do
+  NOT "tidy" it away. On all-fail it clears `sent_at` and leaves the email `scheduled` to retry.
+- **New Brevo accounts throttle the first bulk sends.** Brevo accepts every message via the
+  API (200) but drip-releases delivery over ~an hour for a young account; this is normal and
+  eases as the account warms up. "Accepted" in our logs is not "delivered" - check Brevo's
+  own transactional log for delivery status.
 
 ## Styling and theming
 
@@ -82,7 +91,18 @@ Full background in `docs/ARCHITECTURE.md`. Read this whole file before changing 
   longer runs ESLint during `next build`, so a green Vercel build does NOT mean
   lint-clean - CI is the lint gate.
 - **Vercel Hobby plan: max one cron schedule per day.** A more frequent schedule fails
-  the entire deployment. Current crons: send-emails 8am, gdpr-cleanup 3am.
+  the entire deployment. Current crons: send-emails 8am, gdpr-cleanup 3am. Hobby crons are
+  best-effort and CAN silently skip a run (a weekly send was missed this way). A cron-job.org
+  job therefore also triggers send-emails daily as a backstop; the claim-lock makes the
+  overlap safe, so keep both.
+- **Off-Vercel callers (cron-job.org etc.) must use `https://www.radcliffe.run/...`**, not
+  the apex. `radcliffe.run` 307-redirects to `www`, and external callers do not follow the
+  redirect and drop the `Authorization` header across it. The cron routes authenticate via
+  `Authorization: Bearer <CRON_SECRET>`.
+- **`CRON_SECRET` is marked Sensitive in Vercel (write-only)** - you cannot read it back, and
+  it is not in `.env.local`. If it is needed and not recorded, rotate it (set a new value in
+  Vercel, redeploy, update every caller). Record the current value in the credentials
+  document so next time is a copy-paste.
 - Do NOT run `npm audit fix --force` - it downgrades Next.js to an ancient version.
 - Tailwind v4: `@import "tailwindcss"` in globals.css, not `@tailwind base/components`.
 
