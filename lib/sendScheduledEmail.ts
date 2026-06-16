@@ -123,6 +123,23 @@ export async function sendScheduledEmail(emailId: string): Promise<SendResult> {
     return { ok: false, sent: 0, failed: 0, error: 'No recipients found', status: 400 }
   }
 
+  // Claim this send so two triggers (e.g. the Vercel cron and an external cron
+  // backstop) cannot both deliver it. Atomically stamp sent_at while the status
+  // is still its current value: whoever wins proceeds, the loser gets zero rows
+  // back and stops. A claim older than 10 minutes is treated as stale (a crashed
+  // run) and may be reclaimed. No new status value is used, so no DB migration.
+  const staleBefore = new Date(Date.now() - 10 * 60 * 1000).toISOString()
+  const { data: claimed } = await db
+    .from('scheduled_emails')
+    .update({ sent_at: new Date().toISOString() })
+    .eq('id', emailId)
+    .eq('status', email.status)
+    .or(`sent_at.is.null,sent_at.lt.${staleBefore}`)
+    .select('id')
+  if (!claimed || claimed.length === 0) {
+    return { ok: false, sent: 0, failed: 0, error: 'Email is already being sent by another run', status: 409 }
+  }
+
   // Send one personalised email per member. Each gets a unique unsubscribe URL
   // baked into the body and a List-Unsubscribe header pointing at our own
   // /unsubscribe endpoint, so opting out (in-body link or the mail client's
@@ -163,6 +180,9 @@ export async function sendScheduledEmail(emailId: string): Promise<SendResult> {
   // A partial failure still marks sent: the members who received it must not be
   // re-emailed on the next run.
   if (successCount === 0) {
+    // Release the claim (clear sent_at) so the next run can retry promptly,
+    // rather than waiting for the 10-minute stale-claim window.
+    await db.from('scheduled_emails').update({ sent_at: null }).eq('id', emailId)
     return {
       ok: false,
       sent: 0,
