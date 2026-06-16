@@ -45,3 +45,6 @@ next-env.d.ts
 
 # python cache
 __pycache__/
+
+# claude code (local config, caches, worktrees)
+.claude/
