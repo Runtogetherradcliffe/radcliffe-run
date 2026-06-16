@@ -73,6 +73,10 @@ Full background in `docs/ARCHITECTURE.md`. Read this whole file before changing 
   `https://github.com/Runtogetherradcliffe/radcliffe-run.git`. The repo is public, so reads
   (fetch/pull/clone) need no auth and never prompt; only push uses the token. A new PAT needs
   scopes `repo` + `workflow` (CI workflow files under `.github/workflows/` get pushed).
+- **The assistant performs the push itself** using normal git once the user authorises it -
+  `staging` on request, `main` only after explicit approval of the staging build. The keychain
+  supplies the token, so there is no manual token entry or terminal step for the user; never
+  fall back to the API-push script.
 - Run `npm run typecheck`, `npm run lint`, and `npm test` before pushing. GitHub
   Actions CI enforces all three on every push to staging and main. Note: Next 16 no
   longer runs ESLint during `next build`, so a green Vercel build does NOT mean
