@@ -61,6 +61,18 @@ Full background in `docs/ARCHITECTURE.md`. Read this whole file before changing 
   then merge `staging` into `main`. Never push directly to `main`.
 - **Every change becomes a real git commit on a branch cut from fresh `origin/main`.**
   Past breakage came from branches cut from stale main reverting already-deployed fixes.
+- **One canonical working copy: `/Users/paulcox/Dev for radcliffe run/radcliffe-run`.**
+  Do not create or work from other clones, FUSE mounts, or stray worktrees. `git pull`
+  (fast-forward) before starting work so local `main` always tracks live. This folder once
+  drifted 21 commits behind live because deploys were made elsewhere and it was never pulled.
+- **Commit and push with normal git from that folder**, authenticating via the macOS
+  keychain (`git config --global credential.helper osxkeychain`). Do NOT use API-push
+  scripts that write commits straight to GitHub (they show committer `GitHub
+  <noreply@github.com>`, bypass local `main`, and cause it to drift). NEVER embed a personal
+  access token in the remote URL - it leaks via `git remote -v`; keep the remote as the clean
+  `https://github.com/Runtogetherradcliffe/radcliffe-run.git`. The repo is public, so reads
+  (fetch/pull/clone) need no auth and never prompt; only push uses the token. A new PAT needs
+  scopes `repo` + `workflow` (CI workflow files under `.github/workflows/` get pushed).
 - Run `npm run typecheck`, `npm run lint`, and `npm test` before pushing. GitHub
   Actions CI enforces all three on every push to staging and main. Note: Next 16 no
   longer runs ESLint during `next build`, so a green Vercel build does NOT mean
