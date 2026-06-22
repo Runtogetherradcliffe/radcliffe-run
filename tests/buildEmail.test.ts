@@ -90,6 +90,72 @@ describe('HTML escaping of sheet-sourced content', () => {
   })
 })
 
+describe('same-route merge (mirrors the homepage)', () => {
+  // The 5k and 8k groups sometimes run the same named route. The homepage
+  // collapses them into one card; the email used to print the description
+  // twice. These runs share a title but differ in slug/distance.
+  const fivek = makeRun({
+    title: 'Outwood OAB',
+    distance_km: 5,
+    route_slug: 'trail-5k--outwood-oab',
+    description: 'Head out through Outwood Country Park.',
+    has_jeffing: true,
+  })
+  const eightk = makeRun({
+    title: 'Outwood OAB',
+    distance_km: 8,
+    route_slug: 'trail-8k--outwood-oab',
+    description: 'Head out through Outwood Country Park.',
+  })
+
+  it('prints the shared description only once in HTML', () => {
+    const html = buildEmailHtml(makeEmail({ runs: [fivek, eightk] }))
+    const count = html.split('Head out through Outwood Country Park.').length - 1
+    expect(count).toBe(1)
+  })
+
+  it('prints the shared description only once in plain text', () => {
+    const text = buildEmailText(makeEmail({ runs: [fivek, eightk] }))
+    const count = text.split('Head out through Outwood Country Park.').length - 1
+    expect(count).toBe(1)
+  })
+
+  it('shows both distances in the merged header', () => {
+    const html = buildEmailHtml(makeEmail({ runs: [fivek, eightk] }))
+    expect(html).toContain('5km &amp; 8km')
+  })
+
+  it('renders a single merged card, not two blocks', () => {
+    const html = buildEmailHtml(makeEmail({ runs: [fivek, eightk] }))
+    // The classic block is wrapped in a left-bordered cell; merged = one of them.
+    const blocks = html.split('border-left:3px solid #f5a623').length - 1
+    expect(blocks).toBe(1)
+  })
+
+  it('links the merged card to the longest run route', () => {
+    const html = buildEmailHtml(makeEmail({ runs: [fivek, eightk] }))
+    expect(html).toContain(`${SITE}/routes#trail-8k--outwood-oab`)
+  })
+
+  it('keeps the Run or Jeff badge on the merged card', () => {
+    const html = buildEmailHtml(makeEmail({ runs: [fivek, eightk] }))
+    expect(html).toContain('Run or Jeff')
+  })
+
+  it('does NOT merge two different routes on the same date', () => {
+    const other = makeRun({
+      title: 'Riverside 8k',
+      route_slug: 'trail-8k--riverside',
+      description: 'A different route entirely.',
+    })
+    const html = buildEmailHtml(makeEmail({ runs: [fivek, other] }))
+    expect(html).toContain('Head out through Outwood Country Park.')
+    expect(html).toContain('A different route entirely.')
+    const blocks = html.split('border-left:3px solid #f5a623').length - 1
+    expect(blocks).toBe(2)
+  })
+})
+
 describe('unsubscribe placeholder', () => {
   it('is present in both HTML and text so the sender can personalise it', () => {
     expect(buildEmailHtml(makeEmail())).toContain('{{UNSUBSCRIBE_URL}}')

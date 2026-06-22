@@ -72,51 +72,108 @@ function nl2p(text: string): string {
     .join('\n')
 }
 
-function runBlock(run: RunInfo, siteUrl: string, showTerrain = false): string {
-  const dateStr   = fmtDate(run.date)
-  const title     = escapeHtml(cleanTitle(run.title))
-  const distance  = run.distance_km ? `${run.distance_km}km` : ''
-  const location  = escapeHtml(run.meeting_point || 'Radcliffe Market')
-  const routeUrl  = safeUrl(
+const FONT = "Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif"
+
+/** Build the route URL for a run, falling back to the routes index. */
+function routeUrlFor(run: RunInfo, siteUrl: string): string {
+  return safeUrl(
     run.route_slug ? `${siteUrl}/routes#${encodeURIComponent(run.route_slug)}` : `${siteUrl}/routes`,
     `${siteUrl}/routes`,
   )
+}
+
+/**
+ * Render one card for a group of runs that share a date and route/title.
+ * Layout is identical to the classic single-run block; when two or more runs
+ * share the same route (e.g. the 5k and 8k running the same loop) they collapse
+ * into one card whose header lists both distances (e.g. "5km & 8km") and whose
+ * single description appears once, instead of duplicating the whole block.
+ */
+function runBlock(group: RunInfo[], siteUrl: string, showTerrain = false): string {
+  // Shortest run first, so the 5k leads the distance list; the longest carries
+  // the route link (the fuller route to show).
+  const runs = [...group].sort((a, b) => (a.distance_km ?? 0) - (b.distance_km ?? 0))
+  const lead = runs[0]
+  const longest = runs[runs.length - 1]
+
+  const dateStr  = fmtDate(lead.date)
+  const title    = escapeHtml(cleanTitle(lead.title))
+  const location = escapeHtml(lead.meeting_point || 'Radcliffe Market')
+
+  // Join every distance in the group: "5km" for one run, "5km & 8km" for two.
+  const distance = runs
+    .map(r => r.distance_km)
+    .filter((d): d is number => d != null)
+    .map(d => `${d}km`)
+    .join(' &amp; ')
 
   const terrainMap: Record<string, string> = { trail: '🌿 Trail', road: '🏙️ Road', mixed: '🔀 Mixed' }
-  const terrainLabel = (showTerrain && run.terrain) ? terrainMap[run.terrain] ?? '' : ''
+  const terrainLabel = (showTerrain && lead.terrain) ? terrainMap[lead.terrain] ?? '' : ''
 
-  const jeffingBadge = run.has_jeffing
+  // Show the Jeffing badge if any run in the group offers it (the 5k usually does).
+  const jeffingBadge = runs.some(r => r.has_jeffing)
     ? `<span style="display:inline-block;margin-left:8px;padding:2px 8px;background:#fff3d6;border:1px solid #f5a623;border-radius:4px;font-size:10px;font-weight:700;color:#c47f00;letter-spacing:0.05em;text-transform:uppercase;vertical-align:middle;">Run or Jeff</span>`
     : ''
 
-  const safeMapUrl = run.on_tour && run.meeting_map_url ? safeUrl(run.meeting_map_url, '') : ''
-  const meetingLine = run.on_tour && safeMapUrl
+  // A shared route means a shared description: print the first one available, once.
+  const description = runs.map(r => r.description).find(d => d && d.trim()) ?? null
+
+  const safeMapUrl = lead.on_tour && lead.meeting_map_url ? safeUrl(lead.meeting_map_url, '') : ''
+  const meetingLine = lead.on_tour && safeMapUrl
     ? `📍 ${location} <strong style="color:#f5a623;">(On Tour)</strong> &nbsp;·&nbsp; <a href="${safeMapUrl}" style="color:#f5a623;font-weight:600;text-decoration:none;">View on map &rarr;</a>`
-    : run.on_tour
+    : lead.on_tour
     ? `📍 ${location} <strong style="color:#f5a623;">(On Tour)</strong>`
     : `📍 ${location}`
+
+  const routeUrl = routeUrlFor(longest, siteUrl)
 
   return `
 <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
   <tr>
     <td style="background:#f9f9f9;border-left:3px solid #f5a623;border-radius:0 6px 6px 0;padding:20px 24px;">
-      <p style="margin:0 0 6px;font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#f5a623;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-        ${dateStr} &bull; 7pm${distance ? ` &bull; ${distance}` : ''}${terrainLabel ? ` &bull; ${terrainLabel}` : ''}
+      <p style="margin:0 0 6px;font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#f5a623;font-family:${FONT};">
+        ${dateStr} &bull; 7pm${distance ? ` &bull; <span style="text-transform:none;">${distance}</span>` : ''}${terrainLabel ? ` &bull; ${terrainLabel}` : ''}
       </p>
-      <p style="margin:0 0 10px;font-size:18px;font-weight:700;color:#0a0a0a;letter-spacing:-0.02em;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+      <p style="margin:0 0 10px;font-size:18px;font-weight:700;color:#0a0a0a;letter-spacing:-0.02em;font-family:${FONT};">
         ${title}${jeffingBadge}
       </p>
-      ${run.description ? `<p style="margin:0 0 14px;font-size:14px;color:#555555;line-height:1.7;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">${escapeHtml(run.description)}</p>` : ''}
-      <p style="margin:0 0 14px;font-size:13px;color:#777777;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+      ${description ? `<p style="margin:0 0 14px;font-size:14px;color:#555555;line-height:1.7;font-family:${FONT};">${escapeHtml(description)}</p>` : ''}
+      <p style="margin:0 0 14px;font-size:13px;color:#777777;font-family:${FONT};">
         ${meetingLine}
       </p>
       <a href="${routeUrl}"
-         style="display:inline-block;padding:10px 20px;background:#f5a623;color:#0a0a0a;font-size:13px;font-weight:700;text-decoration:none;border-radius:6px;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+         style="display:inline-block;padding:10px 20px;background:#f5a623;color:#0a0a0a;font-size:13px;font-weight:700;text-decoration:none;border-radius:6px;font-family:${FONT};">
         View route details &rarr;
       </a>
     </td>
   </tr>
 </table>`
+}
+
+/**
+ * Collapse runs that share a date and the same route_slug OR title into one
+ * group, mirroring the homepage's same-route merge. Order is preserved.
+ */
+function groupRuns(runs: RunInfo[]): RunInfo[][] {
+  const groups: RunInfo[][] = []
+  const used = new Set<number>()
+  for (let i = 0; i < runs.length; i++) {
+    if (used.has(i)) continue
+    const run = runs[i]
+    const group = [run]
+    used.add(i)
+    for (let j = i + 1; j < runs.length; j++) {
+      if (used.has(j)) continue
+      const other = runs[j]
+      const sameRoute = !!run.route_slug && !!other.route_slug && run.route_slug === other.route_slug
+      if (other.date === run.date && (sameRoute || run.title === other.title)) {
+        group.push(other)
+        used.add(j)
+      }
+    }
+    groups.push(group)
+  }
+  return groups
 }
 
 export function buildEmailHtml(data: EmailData): string {
@@ -126,7 +183,7 @@ export function buildEmailHtml(data: EmailData): string {
   } = data
 
   const runBlocks = (showRouteBlock && runs.length > 0)
-    ? runs.map(r => runBlock(r, siteUrl, runs.length > 1)).join('\n')
+    ? groupRuns(runs).map(g => runBlock(g, siteUrl, runs.length > 1)).join('\n')
     : ''
 
   const openingSection = showOpening && openingText ? `
@@ -230,19 +287,29 @@ export function buildEmailText(data: EmailData): string {
   }
 
   if (showRouteBlock && runs.length > 0) {
-    lines.push('─'.repeat(40))
-    for (const run of runs) {
-      const dateStr = fmtDate(run.date)
-      lines.push(`${dateStr} · 7pm · ${run.distance_km ?? '?'}km${run.has_jeffing ? ' · Run or Jeff' : ''}`)
-      lines.push(cleanTitle(run.title))
-      if (run.description) lines.push('', run.description)
-      const tourNote = run.on_tour ? ' (On Tour)' : ''
-      lines.push(`📍 ${run.meeting_point}${tourNote}`)
-      if (run.on_tour && run.meeting_map_url) lines.push(`Map: ${run.meeting_map_url}`)
-      if (run.route_slug) lines.push(`Route: ${siteUrl}/routes#${run.route_slug}`)
+    lines.push('-'.repeat(40))
+    for (const group of groupRuns(runs)) {
+      const sorted = [...group].sort((a, b) => (a.distance_km ?? 0) - (b.distance_km ?? 0))
+      const lead = sorted[0]
+      const longest = sorted[sorted.length - 1]
+      const dateStr = fmtDate(lead.date)
+      const distances = sorted
+        .map(r => r.distance_km)
+        .filter(d => d != null)
+        .map(d => `${d}km`)
+        .join(' & ') || '?km'
+      const anyJeffing = sorted.some(r => r.has_jeffing)
+      lines.push(`${dateStr} · 7pm · ${distances}${anyJeffing ? ' · Run or Jeff' : ''}`)
+      lines.push(cleanTitle(lead.title))
+      const description = sorted.map(r => r.description).find(d => d && d.trim())
+      if (description) lines.push('', description)
+      const tourNote = lead.on_tour ? ' (On Tour)' : ''
+      lines.push(`📍 ${lead.meeting_point}${tourNote}`)
+      if (lead.on_tour && lead.meeting_map_url) lines.push(`Map: ${lead.meeting_map_url}`)
+      if (longest.route_slug) lines.push(`Route: ${siteUrl}/routes#${longest.route_slug}`)
       lines.push('')
     }
-    lines.push('─'.repeat(40), '')
+    lines.push('-'.repeat(40), '')
   }
 
   if (customText) {
