@@ -173,6 +173,12 @@ unsubscribe URL and `List-Unsubscribe` header. The send and cron routes set
 - Run titles/descriptions are HTML-escaped (they originate from Google Sheets).
 - Route links must be `/routes#<slug>` (see AGENTS.md - path-style links 404).
 - The `{{UNSUBSCRIBE_URL}}` placeholder is replaced per member at send time.
+- Same-route merge (mirrors the homepage): when two runs on the same Thursday share a
+  `route_slug` OR a `title` (e.g. the 5k and 8k running the same loop), `buildEmail.ts`
+  collapses them into ONE block - header lists both distances (`5km & 8km`), one
+  description, one route link (to the longer run). Keep this rule in step with the
+  homepage's merge in `app/page.tsx` if either changes. Genuinely different routes on the
+  same date still render as separate blocks.
 
 ### Unsubscribe
 
