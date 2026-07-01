@@ -239,6 +239,16 @@ Route map imagery: every route has a dark webp and a light webp;
 - `POST /api/admin/runs/sync` upserts upcoming runs from two Google Sheets (Thursday
   schedule + social calendar), preserving `cancelled` and `has_jeffing`, and upserts
   route names into `route_descriptions`.
+- **On-tour meeting map links.** The Thursday sheet's "On tour meeting location map"
+  column holds a Google Maps share URL (also read by an external calendar Apps Script
+  and the Abingdon app - see `AGENTS.md`, do not change its format). At sync time,
+  `lib/mapLink.ts`'s `resolveMapCoords()` follows short-link redirects and extracts the
+  lat/lng pin, cached on the run row as `meeting_lat`/`meeting_lng`. The run detail page
+  (`app/runs/[id]/page.tsx`) passes those coordinates plus the original URL to
+  `components/DirectionsLink.tsx`, which opens Apple Maps on iOS (`maps.apple.com`,
+  exact pin via `ll=`) and the Google Maps URL everywhere else - a plain click-time
+  user-agent check, since Apple Maps can't parse a Google Maps URL and free-text
+  address search can geocode to the wrong nearby place.
 - Homepage merges the two Thursday group rows into one card when they share date and
   slug/title. Route card images are checked with `existsSync` against
   `public/route-maps/<slug>.webp` (webp, not png).

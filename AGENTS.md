@@ -24,6 +24,19 @@ Full background in `docs/ARCHITECTURE.md`. Read this whole file before changing 
   change to this file, verify every column in the INSERT exists on production.
 - Schema changes go to production Supabase BEFORE the code that uses them is deployed.
 
+## Runs sync (Google Sheet)
+
+- **The Thursday sheet's "On tour meeting location map" column (AH) is shared with
+  other systems** - a Google Apps Script builds a public calendar from the same sheet,
+  and it's also read by the separate Abingdon app project. Both expect a plain Google
+  Maps share URL there. Do NOT repurpose that column's format (e.g. storing raw
+  coordinates instead of a URL) - doing so once broke the calendar event descriptions
+  and needed a manual fix on production data. `app/api/admin/runs/sync/route.ts`
+  resolves the URL to lat/lng itself at sync time (`lib/mapLink.ts`, follows
+  short-link redirects) and caches the result in `runs.meeting_lat`/`meeting_lng` -
+  keep any future map-precision work internal to this DB, never by changing what goes
+  in the sheet.
+
 ## Email
 
 - **Two separate email systems.** Content email (newsletter, welcome, contact form) goes
