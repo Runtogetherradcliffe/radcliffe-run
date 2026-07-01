@@ -5,8 +5,8 @@ import InstallPrompt from '@/components/InstallPrompt'
 import ThemeProvider from '@/components/ThemeProvider'
 import { Analytics } from '@vercel/analytics/next'
 
-const SITE_TITLE = 'Free Running Group in Radcliffe, Bury | radcliffe.run'
-const SITE_DESCRIPTION = 'A free, friendly running group in Radcliffe, Bury (Greater Manchester), open to everyone. No memberships, no minimum pace - just good routes and good people, every Thursday.'
+const SITE_TITLE = 'Free Running Club & Group in Radcliffe, Bury | radcliffe.run'
+const SITE_DESCRIPTION = 'A free, friendly running club and group in Radcliffe, Bury (Greater Manchester), open to everyone. No memberships, no minimum pace - just good routes and good people, every Thursday.'
 
 export const metadata: Metadata = {
   title: SITE_TITLE,
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     siteName: 'radcliffe.run',
     locale: 'en_GB',
     type: 'website',
-    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: "radcliffe.run - Radcliffe's free running group" }],
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: "radcliffe.run - Radcliffe's free running club" }],
   },
   twitter: {
     card: 'summary_large_image',

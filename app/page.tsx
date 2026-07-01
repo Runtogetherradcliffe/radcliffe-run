@@ -154,7 +154,7 @@ export default async function HomePage() {
     logo: 'https://radcliffe.run/logo.png',
     image: 'https://radcliffe.run/og-image.png',
     email: 'hello@radcliffe.run',
-    description: 'A free, friendly running group in Radcliffe, Bury (Greater Manchester), open to everyone. No memberships, no minimum pace - good routes and good people, every Thursday.',
+    description: 'A free, friendly running club and group in Radcliffe, Bury (Greater Manchester), open to everyone. No memberships, no minimum pace - good routes and good people, every Thursday.',
     foundingDate: '2022',
     isAccessibleForFree: true,
     priceRange: 'Free',
@@ -210,7 +210,7 @@ export default async function HomePage() {
             </h1>
 
             <p style={{ fontSize: 17, fontWeight: 300, color: 'var(--dim)', lineHeight: 1.8, maxWidth: 420, marginBottom: 28 }}>
-              Good routes. Good people. A run for every level. Every week in Radcliffe.
+              Radcliffe&apos;s free running club. Good routes, good people, a run for every level - every week.
             </p>
 
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 36 }}>

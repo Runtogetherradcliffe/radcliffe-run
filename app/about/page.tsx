@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic'
 
 export const metadata = {
   title: 'About Run Together Radcliffe | radcliffe.run',
-  description: 'Find out about Run Together Radcliffe - who we are, when we meet, and how to get involved with our free running group in Radcliffe, Bury.',
+  description: 'Find out about Run Together Radcliffe - who we are, when we meet, and how to get involved with our free running club and group in Radcliffe, Bury.',
 }
 
 /* ── Stat card ── */
@@ -54,7 +54,7 @@ export default async function AboutPage() {
             Running together<br />since 2022.
           </h1>
           <p style={{ fontSize: 17, color: 'var(--muted)', lineHeight: 1.8, maxWidth: 620 }}>
-            We&apos;re a free, friendly running group meeting every Thursday evening in Radcliffe, Greater Manchester. We&apos;re part of the England Athletics Run Together programme - open to everyone, no membership fees, no pressure, no minimum pace.
+            We&apos;re a free, friendly running club and group meeting every Thursday evening in Radcliffe, Greater Manchester. We&apos;re part of the England Athletics Run Together programme - open to everyone, no membership fees, no pressure, no minimum pace.
           </p>
         </section>
 

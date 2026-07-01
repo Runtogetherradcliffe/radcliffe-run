@@ -11,7 +11,7 @@ export default function Footer() {
               radcliffe.<span style={{ color: '#f5a623' }}>run</span>
             </div>
             <p style={{ fontSize: 'var(--text-base)', color: 'var(--faint)', lineHeight: 1.7 }}>
-              Radcliffe&rsquo;s free running group. Open to everyone, every Thursday.
+              Radcliffe&rsquo;s free running club and group. Open to everyone, every Thursday.
             </p>
           </div>
 
