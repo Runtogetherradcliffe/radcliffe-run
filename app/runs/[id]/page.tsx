@@ -8,6 +8,8 @@ import { getRouteOverrides } from '@/lib/routeDescriptions'
 import RunMapExpand from './RunMapExpand'
 import RunBadges from './RunBadges'
 import GpxButton from './GpxButton'
+import DirectionsLink from '@/components/DirectionsLink'
+import { parseCoords, googleMapsHref } from '@/lib/mapLink'
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 const DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
@@ -76,6 +78,8 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
   const meetingPoint = run.on_tour || isSocial
     ? shortMeetingPoint(run.meeting_point)
     : 'Radcliffe Market'
+
+  const mapCoords = run.meeting_map_url ? parseCoords(run.meeting_map_url) : null
 
   // Default Thursday runs meet at Radcliffe Market at 7pm; social/on-tour runs vary
   const atMarket = !run.on_tour && !isSocial
@@ -159,14 +163,15 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
                 : meetingPoint}
             </p>
             {run.meeting_map_url && (
-              <a
-                href={run.meeting_map_url}
-                target="_blank"
-                rel="noopener noreferrer"
+              <DirectionsLink
+                googleMapsUrl={googleMapsHref(run.meeting_map_url)}
+                address={run.meeting_point}
+                lat={mapCoords?.lat}
+                lng={mapCoords?.lng}
                 style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: accentColor, textDecoration: 'none' }}
               >
                 Open in maps →
-              </a>
+              </DirectionsLink>
             )}
           </div>
 
