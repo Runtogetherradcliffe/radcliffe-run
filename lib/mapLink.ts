@@ -1,21 +1,46 @@
 /**
- * meeting_map_url normally holds a pasted Google Maps share link, but it may
- * instead hold a "lat, lng" pair (e.g. long-pressed off the Google Maps pin).
- * Coordinates let us build an exact link for both Google and Apple Maps -
- * a pasted share URL only reliably opens Google Maps, since Apple Maps has
- * no way to read a Google URL and has to fall back to geocoding free text.
+ * Extract the lat/lng pin behind a Google Maps link. Short links
+ * (maps.app.goo.gl) redirect to a URL that has the coordinates in it -
+ * resolved once at sync time and cached on the run row, so run pages never
+ * need a live network call, and the sheet keeps holding a normal Google
+ * Maps URL that the calendar script and other consumers still understand.
  */
-export function parseCoords(value: string): { lat: number; lng: number } | null {
-  const m = value.trim().match(/^(-?\d{1,3}(?:\.\d+)?)\s*,\s*(-?\d{1,3}(?:\.\d+)?)$/)
-  if (!m) return null
-  const lat = parseFloat(m[1])
-  const lng = parseFloat(m[2])
-  if (Number.isNaN(lat) || Number.isNaN(lng)) return null
-  return { lat, lng }
+
+const COORD_PATTERNS = [
+  /maps\/search\/(-?\d+\.\d+),\+?(-?\d+\.\d+)/,  // .../maps/search/<lat>,+<lng>
+  /@(-?\d+\.\d+),(-?\d+\.\d+)/,                   // .../@<lat>,<lng>,<zoom>z
+  /!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/,               // place link data blob
+]
+
+function extractCoords(text: string): { lat: number; lng: number } | null {
+  for (const pattern of COORD_PATTERNS) {
+    const m = text.match(pattern)
+    if (m) {
+      const lat = parseFloat(m[1])
+      const lng = parseFloat(m[2])
+      if (!Number.isNaN(lat) && !Number.isNaN(lng)) return { lat, lng }
+    }
+  }
+  try {
+    const q = new URL(text).searchParams.get('q')
+    const qm = q?.match(/^(-?\d+\.\d+),\s*(-?\d+\.\d+)$/)
+    if (qm) return { lat: parseFloat(qm[1]), lng: parseFloat(qm[2]) }
+  } catch {
+    // not a URL - fall through
+  }
+  return null
 }
 
-/** A clickable Google Maps URL for whatever meeting_map_url holds - a coordinate pair or a URL already. */
-export function googleMapsHref(value: string): string {
-  const coords = parseCoords(value)
-  return coords ? `https://www.google.com/maps?q=${coords.lat},${coords.lng}` : value
+/** Resolve the lat/lng pin behind a Google Maps URL, following a short-link redirect if needed. */
+export async function resolveMapCoords(mapUrl: string): Promise<{ lat: number; lng: number } | null> {
+  const direct = extractCoords(mapUrl)
+  if (direct) return direct
+
+  try {
+    const res = await fetch(mapUrl, { redirect: 'manual' })
+    const location = res.headers.get('location')
+    return location ? extractCoords(location) : null
+  } catch {
+    return null
+  }
 }

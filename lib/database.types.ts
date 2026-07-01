@@ -52,6 +52,8 @@ export interface Database {
           on_tour: boolean
           has_jeffing: boolean
           meeting_map_url: string | null
+          meeting_lat: number | null
+          meeting_lng: number | null
           run_type: string
         }
         Insert: {
@@ -69,6 +71,8 @@ export interface Database {
           on_tour?: boolean
           has_jeffing?: boolean
           meeting_map_url?: string | null
+          meeting_lat?: number | null
+          meeting_lng?: number | null
           run_type?: string
         }
         Update: Partial<Database['public']['Tables']['runs']['Insert']>

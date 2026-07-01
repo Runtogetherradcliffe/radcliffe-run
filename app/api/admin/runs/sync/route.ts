@@ -1,6 +1,7 @@
 import { requireAdmin } from '@/lib/admin'
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
+import { resolveMapCoords } from '@/lib/mapLink'
 
 /* ── Sheet URLs ── */
 const THURSDAY_SHEET =
@@ -122,6 +123,8 @@ type RunRow = {
   strava_url: string | null
   meeting_point: string
   meeting_map_url: string | null
+  meeting_lat: number | null
+  meeting_lng: number | null
   leader_name: null
   cancelled: boolean
   on_tour: boolean
@@ -165,6 +168,8 @@ function parseThursdayRows(rows: string[][]): RunRow[] {
     const sharedBase = {
       meeting_point:   meetingPoint,
       meeting_map_url: mapUrl || null,
+      meeting_lat:     null as number | null,
+      meeting_lng:     null as number | null,
       leader_name:     null,
       cancelled:       false,
       on_tour:         onTour,
@@ -235,6 +240,8 @@ function parseSocialRows(rows: string[][]): RunRow[] {
       strava_url:       null, // social run route links are not Strava URLs
       meeting_point:    location || 'Radcliffe Market, Blackburn Street, M26 1PN',
       meeting_map_url:  null,
+      meeting_lat:      null,
+      meeting_lng:      null,
       leader_name:      null,
       cancelled,
       on_tour:          false,
@@ -277,6 +284,18 @@ export async function POST() {
     return NextResponse.json({ inserted: 0, updated: 0, errors: 0, message: 'No upcoming runs found' })
   }
 
+  // Resolve each distinct meeting_map_url to lat/lng once (r1/r2 rows for the
+  // same on-tour run share the same URL) so run pages never need a live fetch.
+  const mapUrls = [...new Set(allRuns.map(r => r.meeting_map_url).filter((u): u is string => !!u))]
+  const coordsByUrl = new Map(await Promise.all(
+    mapUrls.map(async url => [url, await resolveMapCoords(url)] as const)
+  ))
+  for (const run of allRuns) {
+    const coords = run.meeting_map_url ? coordsByUrl.get(run.meeting_map_url) : null
+    run.meeting_lat = coords?.lat ?? null
+    run.meeting_lng = coords?.lng ?? null
+  }
+
   // Fetch existing runs in range - include google_event_id for stable matching
   const dates = [...new Set(allRuns.map(r => r.date))]
   const { data: existing } = await supabaseAdmin()
@@ -317,6 +336,8 @@ export async function POST() {
           distance_km:      run.distance_km,
           meeting_point:    run.meeting_point,
           meeting_map_url:  run.meeting_map_url,
+          meeting_lat:      run.meeting_lat,
+          meeting_lng:      run.meeting_lng,
           on_tour:          run.on_tour,
           run_type:         run.run_type,
           google_event_id:  run.google_event_id,
