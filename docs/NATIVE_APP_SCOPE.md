@@ -1,0 +1,709 @@
+# radcliffe.run native iOS app - scoping document
+
+Status: **proposed** (drafted 5 Jul 2026; revised same day after Paul's steer:
+leaders are the first users, so leader emergency contacts and local-only
+breadcrumb route tracking move into v1, and the membership numbers are
+corrected - ~100 currently registered, 30-40 weekly attendees; the ~600 figure
+was the old site's all-time register). Analysis only - no build has started and
+no site code changes accompany this document.
+
+This is Phase N4 of the native roadmap
+(`/Users/paulcox/Abingdon app/docs/NATIVE_ROADMAP.md`), pulled forward now that the
+Expo/EAS workflow exists (two apps built in `/Users/paulcox/native-apps`). RTR is a
+different beast from those two: public, multi-user, other runners' expectations, and
+external TestFlight distribution means Beta App Review. This document makes every
+question explicit before any build starts. Decisions belong to Paul - the final
+section lists them.
+
+Everything below was verified against the codebase and the production Supabase
+project (`qpdymxagloeghypntpct`) on 5 Jul 2026.
+
+---
+
+## 1. The v1 cut
+
+### What the site does today (full inventory)
+
+| Area | Pages / routes | Notes |
+|---|---|---|
+| Run schedule | `/` (run cards), `/runs/[id]` (detail: map, GPX, directions) | Synced from Google Sheets; anon-readable in DB |
+| Routes library | `/routes` (+ hash-selected detail), 71+ routes | Static catalogue `lib/routes.ts` + `route_descriptions` DB overrides; GPX + dark/light webp per route; layer picker incl. historic maps |
+| Walks | `/walks` | Curated self-guided walks, static data `lib/walks.ts` |
+| News / roundups | `/news`, `/news/[slug]` | `posts` table, admin-published, photo galleries |
+| Registration | `/join` (multi-step, GDPR consents), `/c25k/join` | INSERTs into `members`; welcome email via Brevo |
+| Sign-in | `/signin` (8-digit email OTP), `/auth/callback` | Supabase Auth; no passwords, no social login |
+| Profile | `/profile` | Edit details, theme/font prefs, web-push toggle, **delete account** |
+| C25K | `/c25k`, `/c25k/programme` | 10-week programme, auth-gated programme page |
+| Leader area | `/leader` (emergency contacts), `/leader/c25k` (roster) | Gated on `is_run_leader` |
+| Admin | `/admin/*` (members, runs, routes, emails, posts, snippets, notify, settings) | Gated on `ADMIN_EMAILS` via middleware |
+| Email | Newsletter composer + Brevo pipeline + cron | Entirely server-side |
+| PWA | manifest, `public/sw.js`, offline page, **web push already part-built** | See section 2 |
+
+### Working hypothesis: native v1 = schedule + routes + push
+
+**The audit supports the hypothesis, and suggests sharpening it further: v1 can ship
+with no sign-in at all.**
+
+What a member (not Paul) actually gains from an app over the website:
+
+1. **Push on the lock screen - the killer feature, and the framing holds up.**
+   The site already has web push built (opt-in banner, `push_subscriptions` table,
+   admin send UI at `/admin/notify`). But web push on iOS only works when the PWA
+   has been added to the home screen (iOS 16.4+), which almost no member will have
+   done - so for the iOS-majority membership, "Thursday is On Tour - Ainsworth,
+   7pm" on the lock screen is effectively **impossible today and trivial with a
+   native app**. This is the one thing the website categorically cannot do for
+   them. Cancellation alerts are the highest-value single case: a run called off
+   at 5pm currently relies on Facebook/WhatsApp reach.
+2. **Faster weekly glance.** Open app, see Thursday's run(s), route map, meeting
+   point, one tap to Apple Maps directions (the site already resolves exact
+   coordinates for on-tour runs - `meeting_lat`/`meeting_lng`). An app icon beats
+   typing a URL, and cached data beats a page load on a poor connection.
+3. **Routes in the pocket.** The GPX library with offline-cached maps is genuinely
+   useful mid-run or when route-planning, and the app can cache what the browser
+   re-fetches.
+
+What members do NOT need natively: registration (once, ever), profile edits (rare),
+C25K programme reading (10 weeks then done), news reading (fine in browser), and
+all admin tooling (that is Paul, and the web admin is good).
+
+### Leaders are the first users - and that reshapes the cut
+
+The rollout Paul envisages is rings: himself first, then a handful of run
+leaders, then the wider membership. That makes leaders the app's first real
+audience, and the leader job contains the single most app-shaped task on the
+site: **emergency contact lookup during an incident**. A leader standing on a
+towpath with one hand on a phone needs a member's emergency contact and medical
+notes in seconds - today that means finding radcliffe.run/leader in Safari,
+re-authenticating if the session lapsed, and hoping for signal. Native fixes all
+three: an icon, a session that persists indefinitely, and (optionally) a
+contacts cache on the device. One-tap dialling of the emergency number is the
+kind of detail that matters in the moment.
+
+The second leader-shaped gain is **mapping that survives the screen turning
+off**. The PWA already shows a live "you are here" dot on the route map; what
+it cannot do is keep tracking once the screen is off, so there is no trail - a
+leader who pockets the phone re-orients from scratch at every glance. The
+native win is a **breadcrumb trail**: a "track this run" control on the route
+map starts background location updates, the phone records with the screen off,
+and every glance shows the planned GPX line, the path actually run, and current
+position. Two design choices keep it cheap and clean:
+
+- **Local-only.** The trail never leaves the device - no upload, no sharing,
+  no server. That removes the member-consent question entirely (a leader's own
+  phone recording the leader's own location for their own map) and keeps the
+  App Privacy label clean (Apple counts data as "collected" only when it is
+  transmitted off the device).
+- **Session-scoped, not "Always".** iOS lets background location continue from
+  a foreground start under the standard While-Using permission plus the
+  location background mode, with the visible blue indicator - the Strava
+  pattern. No "Always" permission request, no silent-tracking optics.
+
+It is still the most involved single feature in v1 (expo-location background
+task via TaskManager, start/stop/auto-stop lifecycle, battery testing) rather
+than a freebie, so it is sequenced as internal-TestFlight-ring work (section 7),
+where no Apple review exists while it is iterated. Review risk is low even
+after that: Beta App Review of a run-tracking feature in a running club app,
+with a clear purpose string and the local-only design, is routine fitness-app
+territory. What stays OUT is *sharing* the trail - live leader-to-leader
+position needs a backend and a consent story (see the OUT list).
+
+For everyone else, the three member surfaces (schedule, routes, push) still work
+**without any account**:
+
+- `runs`, `route_descriptions`, `site_settings` are anon-readable in production
+  RLS today (verified 5 Jul 2026).
+- Push tokens do not need a member identity - the existing web
+  `push_subscriptions` table already treats the member link as optional
+  (`member_id` nullable).
+- The route catalogue, GPX files and map images are served publicly by the site.
+
+**Recommendation: v1 = schedule + routes + push for everyone (no login wall),
+plus optional sign-in that unlocks a leader area (emergency contact lookup) for
+`is_run_leader` members.**
+
+A regular member never sees a login screen, which keeps the review surface small
+and the value immediate; sign-in lives quietly in the Club tab. What including
+the leader mode costs:
+
+- The OTP sign-in flow moves from v1.1 into v1 (section 3 - a small, known
+  quantity; native OTP auto-fill actually beats the web experience).
+- A Bearer-token path for a leader-contacts endpoint - the app must NEVER hold
+  the service-role key, and this should NOT be an RLS grant on `members`
+  (section 5 has the access pattern).
+- The in-app account-deletion obligation arguably triggers once sign-in exists;
+  the capability is already built on web and the native screen is cheap
+  (sections 3 and 4).
+- Beta App Review eventually needs review notes + a demo account - but the
+  staged rollout defers that entirely: Paul and the first leaders fit inside
+  internal TestFlight, which has NO Beta App Review. Apple first sees the app at
+  the external-tester stage, by which time the leader mode is mature (sections
+  4 and 7).
+
+Push value arrives with the widest ring; leader value arrives with the first
+ring. Each rollout stage gets its own killer feature, which is a healthier shape
+than an app whose payoff only appears at full distribution.
+
+### Explicitly OUT of v1
+
+- Registration / join (deep-link to `radcliffe.run/join` in Safari)
+- Profile editing and account management screens (v1.1 candidate - sign-in
+  itself is IN v1 for the leader area; account deletion excepted, see section 3)
+- C25K (programme page stays web; C25K runs still appear in the schedule feed)
+- News / roundups (v1.1 candidate - it is anon-readable content, cheap to add)
+- Walks
+- Leader C25K roster (seasonal) and the designed-but-unbuilt run-leader signup
+  feature - the leader area in v1 is emergency contact lookup only
+- Admin (everything)
+- Email management
+- Shared live location (leader-to-leader position, any member tracking) and
+  off-route alerts. The local-only breadcrumb trail IS in scope (section 1);
+  transmitting anyone's position off the device is not - that needs a location
+  pub/sub backend, a real consent story, and it is the version that draws
+  App Review and GDPR scrutiny
+- HealthKit, widgets, Strava integration, run *recording* as a product (splits,
+  uploads, history - RTR is not a tracking app; Strava owns that. The
+  breadcrumb is navigation aid, not a recorded artefact: it is discarded, not
+  kept)
+- Android (same posture as the other apps: Expo keeps the door open)
+
+---
+
+## 2. Push architecture
+
+### What exists today (more than the docs said)
+
+The skill/docs say "push notifications unbuilt", but the codebase has a working
+**web-push** layer:
+
+- `components/NotificationOptIn.tsx` - opt-in banner, subscribes via the service
+  worker, VAPID keys (`NEXT_PUBLIC_VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY`, in
+  Vercel, not `.env.local`).
+- `POST /api/push/subscribe` - upserts into `push_subscriptions` (endpoint,
+  p256dh, auth, nullable `member_id`), delete on unsubscribe.
+- `POST /api/admin/notify` + `/admin/notify` UI - manual broadcast via the
+  `web-push` npm package, with 404/410 cleanup.
+- `/profile` has a push toggle; `DELETE /api/profile` cleans up the member's
+  subscriptions.
+
+So the *product* pattern (opt in, store token, admin sends broadcast) is already
+established; the native work is a second token type and real triggers, not a
+green-field system. Note: `/api/admin/notify` currently gates on "any signed-in
+user", not admin - see section 5, this must be fixed regardless.
+
+### Expo Push vs raw APNs
+
+**Recommendation: Expo Push.**
+
+| | Expo Push | Raw APNs |
+|---|---|---|
+| Server work | One HTTPS POST to `exp.host`, batch 100 tokens per request | JWT signing with an APNs key, HTTP/2, per-device sends |
+| Credentials | None in our code (EAS manages APNs certs) | APNs .p8 key stored + rotated by us |
+| Fits the stack | Plain `fetch` from a Next.js route, same shape as `lib/brevo.ts` | New dependency + key management on Vercel |
+| Receipts | Ticket/receipt API tells us about dead tokens | 410 handling similar |
+| Lock-in | Mild (token format); swap-out path exists via `getDevicePushTokenAsync` | None |
+
+At ~100 registered members (30-40 weekly attendees), a full broadcast is one or
+two HTTP requests - comfortably inside a Vercel route with `maxDuration = 60` (the email
+pipeline already uses this pattern). Raw APNs buys nothing at this scale and costs
+key management. The old note "push needs a Supabase Edge Function because Vercel
+10s is too short" was written about per-subscriber web-push loops; it does not
+apply to batched Expo sends, and web-push delivery already runs on Vercel today.
+
+### Where triggers live
+
+**Recommendation: everything in the Next.js app on Vercel** - same place as the
+email pipeline, sharing `supabaseAdmin()` and the claim-lock/cron patterns. A
+Supabase Edge Function adds a second deploy surface for no gain. A new
+`lib/push.ts` mirrors `lib/brevo.ts` (never throws, returns per-token outcomes,
+prunes dead tokens).
+
+Trigger paths, by event:
+
+| Event | Trigger | Timing |
+|---|---|---|
+| Weekly run announcement ("Tonight: Outwood Trail, 5k & 8k, 7pm Radcliffe Market" / on-tour variant with location) | Cron route reading `runs` for today | Thursday afternoon (see below) |
+| Cancellation ("Tonight's run is CANCELLED") | Fired from the admin runs UI when `cancelled` is toggled (explicit confirm, not silent side-effect) | Immediate |
+| On-tour reminder (could be folded into the weekly announcement) | Same cron | Same |
+| Ad-hoc broadcast | `/admin/notify`, extended to send to both web-push and Expo tokens | Manual |
+| Later: news roundup published, C25K session reminders | Post-publish hook / cron | v1.1+ |
+
+**The cron timing problem:** a "tonight" push wants to land Thursday afternoon
+(~4pm), but Vercel Hobby is already at its cron budget (8am send-emails, 3am
+gdpr-cleanup) and Hobby crons can silently skip. The established answer already
+exists in this repo: **cron-job.org calls a new
+`https://www.radcliffe.run/api/cron/send-push` route** (Bearer `CRON_SECRET`, www
+host - both rules from AGENTS.md) at the chosen time on Thursdays. The route is
+idempotent (stamps a sent-marker per run/date, claim-lock style) so a second
+trigger cannot double-send. No new Vercel cron needed.
+
+### Token storage
+
+**Recommendation: a new `push_tokens` table**, not overloading `push_subscriptions`
+(whose columns are web-push-shaped: endpoint/p256dh/auth):
+
+```sql
+CREATE TABLE push_tokens (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  token text UNIQUE NOT NULL,          -- ExponentPushToken[...]
+  platform text NOT NULL,             -- 'ios' (android-ready)
+  member_id uuid REFERENCES members(id) ON DELETE CASCADE,  -- null until sign-in exists
+  prefs jsonb NOT NULL DEFAULT '{"weekly": true, "alerts": true}',
+  created_at timestamptz DEFAULT now(),
+  last_seen_at timestamptz DEFAULT now()
+);
+```
+
+Registration goes through a Next.js API route (`POST /api/push/register`, mirroring
+`/api/push/subscribe`), not direct PostgREST writes - keeps validation server-side
+and avoids adding INSERT policies. The GDPR cron gains a clause pruning tokens not
+seen for ~12 months; the delete-account path already cleans up web subscriptions
+and gains the same for `push_tokens` (the FK cascade covers linked rows anyway).
+
+### Opt-in and preferences
+
+- iOS permission must be requested in context: a primer screen ("Get a heads-up
+  about Thursday's run and any cancellations") before the system prompt, since a
+  declined system prompt cannot be re-shown.
+- v1 preferences: two toggles - **weekly announcement** and **alerts**
+  (cancellations / on-tour changes) - stored in `push_tokens.prefs`, per device.
+  Deliberately no finer grain until someone asks.
+- The send route filters on prefs per event type.
+
+### How a run leader sends one (admin tooling)
+
+v1: **only Paul/admins send**, via the existing `/admin/notify` page extended to
+(a) send to web + Expo tokens together, (b) offer templates (cancellation,
+on-tour, custom), (c) show reach counts per channel. The weekly announcement is
+automatic, so the manual path is only for exceptions.
+
+The question that needs Paul's decision: should run leaders (not just admins) be
+able to send a cancellation push from their phone at 6:30pm? If yes, that is a new
+leader-gated page (`/leader/notify`, checking `is_run_leader`) with a
+cancellation-only template - deliberately not free-text broadcast. Web-first
+either way; it does not block the app.
+
+---
+
+## 3. Auth + accounts in native
+
+### How site auth works today
+
+- Members: `/signin` sends an **8-digit email OTP** via `signInWithOtp` (after a
+  server-side membership check at `/api/check-member`); `verifyOtp` completes it.
+  No passwords. No social logins. Magic-link and OTP both supported by the
+  callback, but the member UX is the code flow.
+- Admin: same OTP mechanic at `/admin/login`; identity = `ADMIN_EMAILS` env var.
+- OTP delivery: Supabase Auth -> Resend SMTP (dashboard config, invisible to the
+  codebase - the AGENTS.md invariant about not touching Resend stands).
+- Sessions: cookie-based on web via `@supabase/ssr`.
+
+### What that becomes in-app (v1, for the leader area)
+
+- `supabase-js` works in React Native; sessions persist in `expo-secure-store`
+  (same pattern as the other apps' token storage) and refresh silently -
+  effectively sign-in-once, which is *better* UX than the website.
+- The UX is the same two-step: email -> code. Native niceties: `textContentType="oneTimeCode"`
+  gives auto-fill from the Mail app.
+- The membership pre-check (`/api/check-member`) is a public endpoint and works
+  unchanged.
+
+### Sign in with Apple: NOT required
+
+App Review Guideline 4.8 (Login Services) requires an equivalent-privacy login
+option **only when the app uses a third-party or social login service** (Google,
+Facebook, etc.). First-party email OTP does not trigger it. As long as RTR never
+adds "Sign in with Google", no Apple sign-in work is needed. Worth stating in the
+doc because adding a social login later would drag this requirement in.
+
+### In-app account deletion (Guideline 5.1.1(v))
+
+The obligation applies to apps that support **account creation**. With the v1
+cut, sign-in is in the app but account creation stays web-only - strictly the
+guideline is not triggered, but reviewers apply it broadly and arguing is not
+worth it, especially since **the capability already exists**: `/profile` has
+delete-account calling `DELETE /api/profile` (removes the member row, push
+subscriptions, and the Supabase auth user). The native work is a small settings
+screen calling the same logic - include it in v1 rather than debating it.
+
+Plumbing note: that endpoint authenticates via session cookies. A native client
+authenticates with a Bearer JWT, so v1 needs the handful of app-called API
+routes (leader contacts, delete account) to also accept
+`Authorization: Bearer` - a small change to the server client factory, and the
+same plumbing the leader area needs anyway. A Supabase Edge Function is the
+alternative, but keeping it in one codebase is the recommendation.
+
+---
+
+## 4. Beta App Review readiness
+
+External TestFlight testing = Beta App Review on the first build (and after
+significant changes). Lighter than full App Store review, but it checks the same
+basics: it must not crash, login must be reviewable, privacy policy must exist,
+metadata must be sane.
+
+| Item | Status | Action needed |
+|---|---|---|
+| Privacy policy | **Exists and is good** - `radcliffe.run/privacy` with a sub-processor table (GDPR commitment per ARCHITECTURE.md) | Add app-specific rows before beta: push tokens as a data category; Expo (push relay) and Apple/APNs as processors. Add the app to the policy's scope wording |
+| App Privacy "nutrition label" (App Store Connect questionnaire) | Not started | For the v1 cut: push token = device identifier (not linked to identity for anonymous users); sign-in means email/name declared as "linked to you"; leader access to contacts is server-held data viewed in-app, but declare honestly (contact info, health info categories, linked, not used for tracking). Location for the breadcrumb trail is processed on-device only and never transmitted, so it is NOT declared as collected - revisit if trail sharing ever ships. No tracking, no third-party ads - the label stays clean |
+| Demo account for review | Not needed for the first rollout rings: internal TestFlight (Paul + first leaders) has NO Beta App Review | At the external stage: all member-facing content is browsable without sign-in, but the gated leader area means App Review notes + demo credentials. OTP-by-email is painful for reviewers, so plan a dedicated review member whose inbox Paul controls, or an env-gated fixed code for one review address. Work item at the external-TestFlight milestone, not before |
+| In-app account deletion | Already built on web (`DELETE /api/profile`) | Native settings screen calling the same logic, in v1 (see section 3) |
+| UGC / moderation | **None** - members cannot post content in the app (news is admin-published, no comments) | Nothing. Keep it that way in v1; adding any member-visible UGC drags in Guideline 1.2 (moderation, reporting, blocking) |
+| Beta metadata | Not started | Beta app description, feedback email (hello@radcliffe.run forwards to the group Gmail - fine), marketing URL (radcliffe.run), support URL |
+| App metadata (carries to any future App Store release) | Not started | Name (see below), subtitle, category (Sports or Health & Fitness), age rating questionnaire (4+; no health data collected), screenshots for 6.7" and 6.1" |
+| Push notification entitlement | Standard | Declared via EAS config; no special review issue since push is opt-in and not marketing-only |
+
+### The publisher-name decision (flag for Paul)
+
+TestFlight and any eventual App Store listing show the **developer account name**.
+Paul's account is individual, so it ships as **"Paul Cox"**, not "Run Together
+Radcliffe". Options:
+
+1. **Ship under "Paul Cox"** (zero cost, honest - it is a volunteer-built club
+   app). Fine for TestFlight beta; slightly odd on a public App Store listing.
+2. **Apple Developer organisation account** - requires a legal entity with a
+   D-U-N-S number. RTR is (presumably) an unincorporated association, which
+   generally cannot get one; this path realistically means incorporating or using
+   a CIC/charity vehicle. £79/yr on top. Not worth it for a beta.
+3. Publish under a Paul-owned limited company if one ever exists.
+
+Recommendation: option 1 for TestFlight, revisit only if/when a public App Store
+release is wanted. Related naming note: the England Athletics "RunTogether" brand
+is in the club's name - if the App Store name is "Run Together Radcliffe", it may
+be worth a courtesy check against the RunTogether programme's branding guidance;
+"radcliffe.run" as the app name sidesteps it and matches the site identity.
+
+---
+
+## 5. Data / API readiness (the backend-first work)
+
+Supabase is already the API - a native client talks PostgREST directly with the
+anon key (public by design; it ships in the site's JS bundle today). That makes
+RLS the entire security model for the app. The audit of production policies
+(5 Jul 2026) found the read side ready and the write side in need of a cleanup
+**that matters today, before any app exists**.
+
+### Reads the app needs: already safe
+
+| Data | Policy (production) | Verdict |
+|---|---|---|
+| `runs` | anon SELECT, unqualified | Ready. Includes `cancelled`, `on_tour`, `meeting_lat/lng`, `strava_url` - everything the schedule feed needs |
+| `route_descriptions` | public SELECT | Ready |
+| `site_settings` | anon SELECT | Ready (needed for C25K flags if ever surfaced; mildly over-shares email defaults - harmless, note only) |
+| `posts` (news, v1.1) | anon SELECT where `status = 'published'` | Ready |
+| Route catalogue | **Not in the DB** - `lib/routes.ts` is a static TS file; GPX + webps are static site files | Gap - see below |
+| `members` self-row (v1 sign-in) | authenticated, `auth.email() = email` | Ready; correct pattern (members.id is NOT the auth UUID - AGENTS.md) |
+
+**The routes-catalogue gap:** the app cannot import `lib/routes.ts`. Options:
+(a) a public read-only endpoint on the site (`GET /api/routes`) returning the
+merged catalogue (static file + DB overrides) - recommended, ~30 lines, cacheable,
+and the site remains the single source of truth; (b) bundle a snapshot in the app
+(goes stale); (c) migrate the catalogue into the DB (bigger job, real benefits,
+not needed for this). GPX files and both webp themes are already served over HTTPS
+from radcliffe.run and need nothing.
+
+### Writes: one new path
+
+Push token registration via `POST /api/push/register` (section 2). No PostgREST
+write policies needed for v1. Sign-in reuses the existing self-row RLS; the
+leader area and delete-account go through Bearer-authenticated API routes (next
+subsection), not new policies.
+
+### Leader emergency contacts from a native client
+
+The web leader page reads all members server-side with `supabaseAdmin()`. Two
+things must stay true natively: the app never holds the service-role key, and
+leader access to the full register should NOT become an RLS policy on `members`
+(a policy like "leaders may SELECT all rows" means one flipped `is_run_leader`
+flag exposes every emergency contact and medical note to that member's JWT via
+raw PostgREST - too blunt for the most sensitive table in the system).
+
+The right shape: the app calls the existing Next.js server - a
+`/api/leader/contacts` route accepting `Authorization: Bearer <access token>`.
+The server validates the JWT, checks `is_run_leader` via the service role
+(exactly what `app/api/leader/member/[id]/route.ts` and the leader pages do
+today), and returns the contact set. Same trust model as the web, one new
+auth-header path in the server client factory, zero new RLS.
+
+On-device caching - the offline case is real (trail routes and the towpath have
+poor signal, and an incident is precisely when the lookup must not depend on
+connectivity): cache the last-fetched contact list in `expo-secure-store`
+(encrypted at rest), refresh on every app foreground, wipe on sign-out and when
+`is_run_leader` is revoked. Online-only is the more conservative option; the
+cache is what actually helps at an incident. Paul's call - decision list.
+
+### The security finding: over-broad `authenticated` grants (fix regardless of the app)
+
+Production RLS currently gives ANY authenticated user - i.e. **any of the ~100
+registered members who completes the OTP sign-in** - blanket access via PostgREST
+with the public anon key:
+
+| Table | Policy | Exposure |
+|---|---|---|
+| `runs` | ALL for authenticated, `qual: true` | Any member could UPDATE/DELETE the schedule |
+| `posts` | ALL for authenticated | Any member could publish/edit news |
+| `site_settings` | UPDATE for authenticated | Any member could change site config |
+| `scheduled_emails` | ALL for authenticated | Any member could read/edit/cancel newsletters |
+| `email_send_log` | ALL for authenticated | Any member could read recipient emails (personal data) |
+| `email_snippets` | ALL for authenticated | Same class |
+| `push_subscriptions` | ALL for authenticated (+ public INSERT/DELETE) | Any member could dump all push endpoints |
+| `route_descriptions` | INSERT/UPDATE for authenticated | Any member could rewrite route descriptions |
+
+These look like vestiges of an era before `supabaseAdmin()` - **every admin and
+leader page now uses the service role**, which bypasses RLS entirely, so narrowing
+these policies should break nothing. But AGENTS.md records that a past RLS
+narrowing broke admin pages, so the fix must verify each policy is truly unused
+(grep for browser-client table access; the browser client is only used in
+join/login/nav/theme/leader-lookup components) and go through staging like
+anything else.
+
+The same gap exists at the API-route layer: **8 of the `/api/admin/*` routes check
+only that a session exists, not that it is an admin** (`notify`, `posts`,
+`posts/[id]`, `settings`, `snippets`, `snippets/[id]`, `upload`, `members/[id]`) -
+the middleware admin gate matches `/admin/*` pages but not `/api/admin/*` paths.
+The other admin routes already use `lib/admin.ts`'s `requireAdmin()`; these eight
+need the same one-line fix. `members/[id]` (PATCH/DELETE any member) and `notify`
+(broadcast push) are the worst of them.
+
+**This is the single genuinely blocking backend work item, and it is worth doing
+this month whether or not the app ever ships.** Today the risk is only masked by
+the fact that no member knows the endpoints exist; the native app increases
+exposure (more members holding fresh authenticated JWTs, more eyes on the API
+surface) but does not create it.
+
+### RLS work list for the app itself
+
+1. Fix the 8 admin routes (`requireAdmin()`), narrow/drop the 8 over-broad
+   policies after verification. (Pre-existing debt, now urgent.)
+2. Create `push_tokens` table + register/prune endpoints. (New, small.)
+3. `GET /api/routes` catalogue endpoint. (New, small.)
+4. Bearer-token support in the server auth path + `/api/leader/contacts` +
+   Bearer variant of delete-account. (New, small - and it must land AFTER item 1,
+   since Bearer support widens how authenticated requests reach the server.)
+5. Nothing else - reads are ready as-is.
+
+---
+
+## 6. Design brief for the Pencil session
+
+### Sources - RTR brand, not Calm Coach
+
+The design language is **RTR's existing identity**, not the native-apps "Calm
+Coach, neutral ink" system. Sources, in order:
+
+1. The live site's CSS variables - the definitive token set, with dark AND light
+   values already worked out (dark `--bg #0a0a0a` / card `#111` / border `#1e1e1e`
+   / orange `#f5a623`; light equivalents; full table in `docs/ARCHITECTURE.md` and
+   the ThemeProvider). Dark is the brand-default.
+2. The rtr-branding assets (`/Users/paulcox/Documents/RTR branding` + the
+   rtr-branding skill): logo, fonts, the carousel/overlay visual language.
+3. Font: **Inter** (300-800, already licensed and in use), not Manrope. Same
+   custom-font gotcha as the other apps: per-weight family names, `fontWeight`
+   is ignored.
+
+Established visual vocabulary to carry in: terrain colour-coding (road blue
+`#5b9bd5` on `#0d1a2a`, trail green `#4caf76` on `#0d2a0d`), C25K purple, the
+on-tour amber badge, orange as THE accent, card-on-dark with hairline borders,
+the route map webps (dark + light variants exist for every route and can be
+fetched straight from the site).
+
+### What ports from native-apps (architecture, not paint)
+
+- **Tab grammar + drill-ins**: few tabs, stack screens for depth, reading screens
+  without the tab bar. Straight port.
+- **`useCached` fail-soft**: cache-first, background refresh, stale-data banner.
+  The failure message changes meaning ("offline - showing last week's schedule"
+  instead of "mini unreachable") but the mechanic is identical and the schedule
+  is exactly the kind of data that should never show a spinner.
+- **expo-router, SDK 57, EAS profiles, browser-preview verification loop** - all
+  proven. Verification is actually *easier* here: Supabase accepts browser CORS
+  calls, so the preview can read the production anon endpoints live rather than
+  seeding a localStorage cache from a snapshot.
+- **packages/ui: partial.** The primitives (Card, Pill, DrillCard shapes, the
+  theme mechanic) are reusable; the *tokens are not* - Calm Coach's warm neutrals
+  and single-state-colour rule do not describe RTR. Decision needed on mechanics
+  (see section 7): either `packages/ui` learns to take an injected token set, or
+  `apps/rtr` gets its own small `ui/` and copies the component patterns. Do NOT
+  blend the palettes.
+
+### What is decided fresh in Pencil
+
+- The RTR token set as Pencil variables (from the site's CSS vars, both themes).
+- Tab bar style (the finance floating pill vs something RTR-flavoured).
+- Card composition for a run (the site's homepage run card is the reference:
+  route map image, terrain badge, distance chips, meeting point, on-tour banner,
+  cancelled state).
+- The notification primer screen (the one screen with persuasion in it).
+- Iconography and the app icon (RTR logo treatment on dark; light/dark/tinted
+  variants per the process already walked for Abingdon/Finance).
+
+### Proposed tab structure (to react to, not decided)
+
+**Three tabs: Runs · Routes · Club**
+
+- **Runs** - next run hero card (the Thursday answer: what, where, when, on-tour
+  banner, cancelled state) + upcoming feed below (today-anchored, like the
+  Abingdon schedule). Drill-in: run detail - full map with GPX polyline, live
+  position dot, the "track this run" breadcrumb control (section 1), keep-awake
+  toggle, meeting point with Apple Maps directions (exact lat/lng where
+  resolved), leader, description, link to Strava route.
+- **Routes** - the library: searchable/filterable card list using the existing
+  webp map images. Drill-in: route detail - interactive map (GPX polyline, live
+  position, same tracking control), distance/terrain/elevation, description.
+- **Club** - v1: notification preferences (the two toggles), sign-in (email ->
+  OTP code), about/contact links, "Join RTR" and "News" links out to the site,
+  privacy policy link, account deletion (when signed in), version. When the
+  signed-in member has `is_run_leader`, a **Leaders** section appears with the
+  emergency-contacts drill-in: search-as-you-type, member card (emergency
+  contact with one-tap call, medical notes, NO PHOTOS badge - mirroring the web
+  `LeaderLookup`). The tab bar itself never changes with role; leader access is
+  depth within Club. v1.1: profile editing + C25K awareness grow here; news
+  could become in-app content.
+
+Alternative considered: two tabs + a settings modal (closer to a utility). The
+third tab earns its place as the home for sign-in and news later without a
+restructure - but this is exactly the kind of call the Pencil session is for.
+
+Map rendering choice for detail screens (flag for the session):
+`react-native-maps` with Apple Maps tiles (free, native feel) vs MapLibre with
+the site's tile styles (visual continuity, incl. the historic-map layer party
+trick). Recommendation: react-native-maps for v1 (simpler, free); the webp cards
+carry the RTR look regardless.
+
+---
+
+## 7. Repo location + build sequence
+
+### Where the code lives
+
+**Recommendation: `apps/rtr` in the native-apps monorepo.**
+
+For the monorepo:
+
+- Inherits everything proven: EAS config shape, expo-router scaffolding, the
+  browser-preview verification loop, `useCached`, the delegation agents
+  (`screen-builder` / `mechanic`), typecheck/test wiring. The roadmap's own
+  argument - "the second app inherits ~all plumbing" - held true for Finance and
+  applies triple here.
+- One `npm install`, one toolchain to keep current across three apps.
+- `packages/api-client` is irrelevant to RTR (Supabase client instead), but that
+  is omission, not friction.
+
+For a separate repo (the public-project argument):
+
+- The site repo is public and club-owned in spirit; native-apps is Paul's
+  personal monorepo mixing in his private Finance/health apps. If the club ever
+  wanted the app code public, or another volunteer wanted to contribute, it
+  would need extracting.
+- Separate repo keeps RTR's staging-first discipline cleanly distinct from the
+  monorepo's propose-commit convention.
+
+The extraction cost later is low (Expo apps are self-contained under `apps/`),
+and no second contributor exists today. Start in the monorepo; extract if the
+club-ownership question ever becomes real. The tokens question folds in here:
+recommendation is `apps/rtr/src/ui/` with its own `tokens.ts` (RTR values, same
+shape as `packages/ui`'s) and copied component patterns - parametrising
+`packages/ui` for multiple brands is speculative generality until a third
+brand appears.
+
+One convention note: RTR *site* changes arising from this project (RLS fixes,
+push endpoints, `/api/routes`) follow THIS repo's rules - staging-first, real
+branches from fresh origin/main, schema-to-production-before-code. App-side work
+follows the monorepo's conventions. Neither leaks into the other.
+
+### Build sequence (gated)
+
+**Gate 0: the Abingdon TestFlight pipeline is proven end-to-end** (Apple ID
+review -> dev build -> device -> TestFlight). RTR starts nothing app-side until a
+build of an existing app has been installed and run from TestFlight, because
+that pipeline is the riskiest unproven step and Abingdon is the cheap place to
+debug it.
+
+Then, in order (each milestone = a verified, committed state per the established
+workflow):
+
+- **M0 - site-side hardening + API prep** (this repo, web-only, ships value even
+  if the app never happens): `requireAdmin()` on the 8 routes; narrow the
+  over-broad RLS policies (with the verification pass section 5 describes);
+  `push_tokens` table + `POST /api/push/register`; `GET /api/routes`;
+  Bearer-token support + `/api/leader/contacts` (after the hardening, per
+  section 5). Schema to production Supabase first, then code via staging.
+  Independent of Gate 0.
+- **M1 - Pencil design session**: RTR tokens as variables, then renders for the
+  screens (Runs feed, run detail, Routes library, route detail, Club, sign-in,
+  leader lookup + member card, notification primer), light + dark. Output:
+  `design/` renders + tokens extracted to `apps/rtr/src/ui/tokens.ts`, per the
+  Abingdon process.
+- **M2 - scaffold + read-only screens**: `apps/rtr` (Expo SDK 57, expo-router),
+  Runs + Routes tabs against production anon reads, `useCached` wired,
+  browser-preview verified against live data, typecheck/tests green. Delegation
+  per the established tiers (screens to `screen-builder` once tokens and data
+  shapes are pinned).
+- **M3 - sign-in + leader mode**: OTP flow with secure-store session, Club tab,
+  leader contacts drill-in against `/api/leader/contacts`, the caching decision
+  applied, account-deletion screen. Verified with Paul's own leader account.
+  This is the milestone that makes the app worth having on Paul's phone.
+- **M4 - push end-to-end**: permission primer + registration in-app;
+  `lib/push.ts` + `/api/cron/send-push` + admin `/admin/notify` extension on the
+  site (staging-first); cron-job.org Thursday trigger; verified with a real
+  push to Paul's phone via a dev build.
+- **M5 - internal TestFlight**: Paul first, then 2-3 leaders added as internal
+  testers (App Store Connect team members - clunky but fine at this count, and
+  it means NO Beta App Review while the leader mode is exercised on real
+  Thursdays). App icon, splash, empty/error states polished; weekly announcement
+  copy tuned. **The breadcrumb tracking feature is built and battle-tested
+  inside this ring** - background location is exactly the thing to iterate
+  (battery, task lifecycle, auto-stop) with zero review exposure before Apple
+  first sees the app. This ring matches Paul's stated rollout exactly.
+- **M6 - external TestFlight (Beta App Review)**: privacy label, beta metadata,
+  review notes + demo credentials for the gated leader area, the
+  background-location purpose strings + a note on the local-only design, policy
+  updates from section 4, then invite the wider membership. First contact with
+  Apple review happens here, with everything member-facing browsable without
+  sign-in.
+- **M7 (explicitly unscoped)**: public App Store release, v1.1 features
+  (profile, news in-app, C25K awareness), Android. Each is its own decision
+  later.
+
+---
+
+## 8. Decision list for Paul
+
+The doc frames these; none are made yet.
+
+1. **The v1 cut** - confirm: schedule + routes + push with no login wall for
+   members, plus optional sign-in unlocking the leader emergency-contacts area
+   (recommended, reflecting the Paul -> leaders -> members rollout). The leader
+   area is contacts lookup only - C25K roster and run-leader signup stay web.
+2. **Leader contacts on-device caching** - cache the last-fetched contacts in
+   encrypted secure-store so the lookup works with no signal (recommended - the
+   incident case is exactly when connectivity fails), or online-only as the
+   more conservative posture?
+3. **Push events for v1** - weekly Thursday announcement + cancellation +
+   on-tour: confirm the set, and pick the announcement time (recommendation:
+   Thursday ~4pm via cron-job.org, not the 8am Vercel cron).
+4. **Who can send a manual push** - admins only in v1 (recommended), or build
+   the leader-facing cancellation-push page too?
+5. **Publisher name** - ship TestFlight under "Paul Cox" (recommended;
+   organisation account needs a legal entity RTR does not have)? And the app
+   display name: "radcliffe.run" (recommended, sidesteps RunTogether branding)
+   vs "Run Together Radcliffe"?
+6. **Repo location** - `apps/rtr` in the native-apps monorepo (recommended) vs
+   its own repo for public-project separation?
+7. **M0 security hardening timing** - the 8 unguarded admin API routes and the
+   over-broad RLS policies should be fixed soon regardless of the app
+   (recommended: next site session). Confirm doing this ahead of and independent
+   of any app work.
+8. **Expo Push vs raw APNs** - Expo recommended; confirm the mild vendor
+   dependency is acceptable.
+9. **Map rendering** - react-native-maps/Apple Maps in v1 (recommended) vs
+   MapLibre for tile-style continuity with the site?
+10. **Tab structure** - react to Runs · Routes · Club (with Leaders as depth
+    inside Club) in the Pencil session.
+11. **v1.1 candidates ranking** (later, non-blocking) - profile editing, news
+    in-app, C25K awareness: which first, if any?
+12. **Breadcrumb route tracking** - confirm the local-only, session-scoped
+    design (no upload, no sharing, While-Using permission + blue indicator,
+    trail discarded after the run) and its sequencing inside the
+    internal-TestFlight ring. Shared live location stays out until someone
+    makes the case for it.
