@@ -9,6 +9,13 @@ This version has breaking changes — APIs, conventions, and file structure may 
 These rules exist because breaking them has taken down live functionality before.
 Full background in `docs/ARCHITECTURE.md`. Read this whole file before changing code.
 
+**Keep the docs current as you go.** Before ending a turn that changed any of: an
+`/api/**` route's auth or contract, the DB schema (a `supabase-migration*.sql`, a table,
+column, index, or RLS policy), an env var, a cron, or one of the invariants below - update
+`AGENTS.md` and/or `docs/ARCHITECTURE.md` in the SAME change so they never lag reality. A
+`Stop` hook (`scripts/docs-freshness-check.sh`) flags this if code changed without a
+matching doc edit; treat that reminder as a blocking checklist item, not a suggestion.
+
 ## Database and auth
 
 - **`members.id` is NOT the Supabase auth UUID.** It is `gen_random_uuid()` assigned at

@@ -47,4 +47,6 @@ next-env.d.ts
 __pycache__/
 
 # claude code (local config, caches, worktrees)
-.claude/
+.claude/*
+# ...but keep the shared project settings (Stop hook that guards doc freshness)
+!.claude/settings.json

@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/docs-freshness-check.sh\"",
+            "timeout": 15,
+            "statusMessage": "Checking docs are current"
+          }
+        ]
+      }
+    ]
+  }
+}
