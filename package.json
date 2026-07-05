@@ -9,6 +9,7 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "test:access": "vitest run --config vitest.access.config.ts",
     "check:no-em-dash": "bash scripts/check-no-em-dash.sh"
   },
   "dependencies": {
