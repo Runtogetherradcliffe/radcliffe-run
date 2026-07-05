@@ -385,28 +385,44 @@ suite('access matrix', () => {
   })
 
   describe('RLS: authenticated member must NOT have admin-grade table access', () => {
+    /**
+     * Verify a write-hole by whether the row ACTUALLY changed (read back with
+     * the service role), never by the count the member's own client returns.
+     * A policy can grant UPDATE but not SELECT (site_settings does), so the
+     * write lands while PostgREST returns count 0 - trusting that count would
+     * be a false "blocked". Restores the column afterwards regardless.
+     * Returns true if the member managed to mutate the row (i.e. hole open).
+     */
+    const memberCanMutate = async (
+      table: string,
+      id: string,
+      column: string,
+      original: unknown,
+    ): Promise<boolean> => {
+      const sentinel = `ACCESS-AUDIT ${table} ${Date.now()}`
+      await restClients.member!.from(table).update({ [column]: sentinel }).eq('id', id)
+      const { data } = await svc.from(table).select(column).eq('id', id).single()
+      const mutated = (data as Record<string, unknown> | null)?.[column] === sentinel
+      if (mutated) await svc.from(table).update({ [column]: original }).eq('id', id)
+      return mutated
+    }
+
     it('[HOLE] member cannot UPDATE a run', async () => {
-      const { count } = await restClients.member!
-        .from('runs')
-        .update({ title: 'ACCESS-AUDIT probe run' }, { count: 'exact' })
-        .eq('id', probeRunId)
-      expect(count ?? 0).toBe(0)
+      expect(await memberCanMutate('runs', probeRunId, 'title', 'ACCESS-AUDIT probe run')).toBe(false)
     })
 
     it('[HOLE] member cannot UPDATE a post', async () => {
-      const { count } = await restClients.member!
-        .from('posts')
-        .update({ title: 'ACCESS-AUDIT probe post' }, { count: 'exact' })
-        .eq('id', probePostId)
-      expect(count ?? 0).toBe(0)
+      expect(await memberCanMutate('posts', probePostId, 'title', 'ACCESS-AUDIT probe post')).toBe(false)
     })
 
-    it('[HOLE] member cannot UPDATE site_settings', async () => {
-      const { count } = await restClients.member!
-        .from('site_settings')
-        .update({ email_default_subject: settingsSubject }, { count: 'exact' })
-        .eq('id', settingsRowId)
-      expect(count ?? 0).toBe(0)
+    // NOT a [HOLE]: already secure at the RLS layer. site_settings grants
+    // authenticated UPDATE but no authenticated SELECT, so a member's update
+    // locates 0 rows and silently no-ops (verified empirically - 204, row
+    // unchanged). The audit originally listed this as a write-hole; it is not
+    // exploitable via PostgREST. The only settings-write path that still needs
+    // hardening is the /api/admin/settings route (requireAdmin), asserted below.
+    it('member cannot UPDATE site_settings directly (no authenticated SELECT policy)', async () => {
+      expect(await memberCanMutate('site_settings', settingsRowId, 'email_default_subject', settingsSubject)).toBe(false)
     })
 
     it('[HOLE] member cannot read scheduled_emails', async () => {

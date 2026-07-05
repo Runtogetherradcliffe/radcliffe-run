@@ -54,17 +54,24 @@ Tests fall into two groups:
   site** - that red baseline proves the harness can see the holes. Each flips to
   green when its fix lands. The hardening is done when the whole suite is green.
 
-## Known environment caveat (dev vs production drift)
+## Dev/production RLS drift - found here, now reconciled
 
 First run (5 Jul 2026) surfaced a real drift: the **DEV** project's `members`
-self-access policy is `auth.uid() = id` - the stale, broken form the top-level
+self-access policy was `auth.uid() = id` - the stale, broken form the top-level
 `AGENTS.md` invariant forbids (it never matches, because `members.id` is a random
-UUID, not the auth UUID). **Production** correctly uses `(auth.email()) = email`.
+UUID, not the auth UUID), while **production** correctly used
+`(auth.email()) = email`. The three member/leader self-access tests failed on dev
+for that reason alone (a member genuinely could not read their own row there).
 
-Consequence: the three member/leader self-access tests fail on DEV for that
-reason alone (a member genuinely cannot read their own row there), and would pass
-on production. So **dev is not a faithful rehearsal environment for the
-members-policy work** until that drift is fixed (a dev-only one-line policy swap
-to match production). Run the before/after RLS verification against a
-production-faithful target - either dev-after-alignment or a Supabase branch cut
-from production.
+RLS policies had never been version-controlled, so dev, production, and the old
+`supabase-schema-production.sql` snapshot had drifted to three different states.
+This was reconciled the same day: `supabase-rls-baseline.sql` captures
+production's actual live policies as the source of truth, and dev was aligned to
+match it (the 9 shared tables are now byte-for-byte identical). After alignment
+the harness's legitimate-path tests are green on dev, so **dev is now a faithful
+rehearsal environment** for the admin-API / RLS hardening.
+
+Note: the dev project additionally carries 5 unreleased roundup tables
+(`parkrun_results`, `race_results`, `roundup_posts`, `roundup_photos`,
+`social_run_results`) that do not exist on production; the baseline does not
+touch them.

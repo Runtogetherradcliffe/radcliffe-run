@@ -94,6 +94,22 @@ published roundup_posts and runs; authenticated members may read their own row b
 email. Everything else - admin pages, leader lookup, email sending - uses
 `supabaseAdmin()` (service role key, `lib/supabase.ts`), which bypasses RLS entirely.
 
+**RLS is version-controlled in `supabase-rls-baseline.sql`** (added 5 Jul 2026).
+Policies live inside each Supabase project, not in code, and had never been
+migrated - dev, production, and the old `supabase-schema-production.sql` snapshot
+had drifted to three different `members` self-access policies (dev was on the
+broken `auth.uid() = id` form). `supabase-rls-baseline.sql` captures production's
+actual live policies verbatim as the single source of truth; it is idempotent and
+convergent (safe to apply to any project) and dev has been aligned to it, so the
+9 shared tables now match production byte-for-byte. It deliberately preserves the
+current over-broad `authenticated` grants - narrowing them is the separate
+hardening step, gated on the `tests/access` audit harness. Any future RLS change
+edits this file and is applied to both projects.
+
+The `tests/access` harness (`npm run test:access`) is the regression net for all
+of this: it signs in as anon/member/leader/admin and asserts access at both the
+RLS and API-route layers. Not part of `npm test`/CI. See `tests/access/README.md`.
+
 Which client to use:
 
 | Context | Client |
