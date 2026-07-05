@@ -7,6 +7,12 @@
 -- NOTE: Storage bucket policies are in supabase-schema-storage.sql.
 --       Create the 'site-images' bucket in the Supabase dashboard first,
 --       then run that file.
+--
+-- RLS: supabase-rls-baseline.sql is the AUTHORITATIVE, version-controlled
+--      source of truth for Row Level Security (it captures the live production
+--      policies and is applied to both dev and production). The policies inline
+--      below are kept in step with it for a from-scratch bootstrap; if they ever
+--      disagree, the baseline wins - reconcile against it.
 -- ================================================================
 
 
@@ -84,9 +90,14 @@ CREATE POLICY "Anon can register"
   ON public.members FOR INSERT TO anon
   WITH CHECK (true);
 
-CREATE POLICY "Authenticated full access to members"
+-- Member self-access is matched by EMAIL, not id: members.id is a random UUID,
+-- NOT the Supabase auth UUID, so auth.uid() = id would never match (see AGENTS.md).
+CREATE POLICY "Members can access own data"
   ON public.members FOR ALL TO authenticated
-  USING (true) WITH CHECK (true);
+  USING ((SELECT auth.email()) = email)
+  WITH CHECK ((SELECT auth.email()) = email);
+
+CREATE INDEX IF NOT EXISTS members_email_idx ON public.members (email);
 
 -- Public member count (anon-callable, no PII exposed)
 -- Defined after members table so the relation exists
@@ -335,143 +346,6 @@ CREATE POLICY "Authenticated can manage subscriptions"
   USING (true);
 
 
--- ── ROUNDUP TABLES ───────────────────────────────────────────────
-
--- Roundup posts (weekly weekend summaries)
-CREATE TABLE IF NOT EXISTS public.roundup_posts (
-  id            uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
-  created_at    timestamptz NOT NULL DEFAULT now(),
-  weekend_of    date        NOT NULL UNIQUE,
-  intro         text,
-  published     boolean     NOT NULL DEFAULT false,
-  published_at  timestamptz
-);
-
-ALTER TABLE public.roundup_posts ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Anon can read published roundups"
-  ON public.roundup_posts FOR SELECT TO anon
-  USING (published = true);
-
-CREATE POLICY "Authenticated full access to roundups"
-  ON public.roundup_posts FOR ALL TO authenticated
-  USING (true) WITH CHECK (true);
-
-
--- Parkrun results (linked to a roundup)
-CREATE TABLE IF NOT EXISTS public.parkrun_results (
-  id          uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
-  roundup_id  uuid        NOT NULL REFERENCES public.roundup_posts(id) ON DELETE CASCADE,
-  venue       text        NOT NULL,
-  location    text,
-  narrative   text        NOT NULL,
-  milestone   integer,
-  pb          boolean     NOT NULL DEFAULT false,
-  podium      text,
-  sort_order  integer     NOT NULL DEFAULT 0
-);
-
-ALTER TABLE public.parkrun_results ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Anon can read published parkrun results"
-  ON public.parkrun_results FOR SELECT TO anon
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.roundup_posts
-      WHERE id = parkrun_results.roundup_id AND published = true
-    )
-  );
-
-CREATE POLICY "Authenticated full access to parkrun results"
-  ON public.parkrun_results FOR ALL TO authenticated
-  USING (true) WITH CHECK (true);
-
-
--- Race results (linked to a roundup)
-CREATE TABLE IF NOT EXISTS public.race_results (
-  id          uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
-  roundup_id  uuid        NOT NULL REFERENCES public.roundup_posts(id) ON DELETE CASCADE,
-  name        text        NOT NULL,
-  distance    text        NOT NULL,
-  terrain     text        NOT NULL CHECK (terrain IN ('road', 'trail', 'mixed')),
-  date        date        NOT NULL,
-  location    text        NOT NULL,
-  narrative   text        NOT NULL,
-  podium      text,
-  sort_order  integer     NOT NULL DEFAULT 0
-);
-
-ALTER TABLE public.race_results ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Anon can read published race results"
-  ON public.race_results FOR SELECT TO anon
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.roundup_posts
-      WHERE id = race_results.roundup_id AND published = true
-    )
-  );
-
-CREATE POLICY "Authenticated full access to race results"
-  ON public.race_results FOR ALL TO authenticated
-  USING (true) WITH CHECK (true);
-
-
--- Social run results (linked to a roundup)
-CREATE TABLE IF NOT EXISTS public.social_run_results (
-  id          uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
-  roundup_id  uuid        NOT NULL REFERENCES public.roundup_posts(id) ON DELETE CASCADE,
-  name        text        NOT NULL,
-  date        date        NOT NULL,
-  location    text        NOT NULL,
-  narrative   text        NOT NULL,
-  sort_order  integer     NOT NULL DEFAULT 0
-);
-
-ALTER TABLE public.social_run_results ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Anon can read published social run results"
-  ON public.social_run_results FOR SELECT TO anon
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.roundup_posts
-      WHERE id = social_run_results.roundup_id AND published = true
-    )
-  );
-
-CREATE POLICY "Authenticated full access to social run results"
-  ON public.social_run_results FOR ALL TO authenticated
-  USING (true) WITH CHECK (true);
-
-
--- Roundup photos (linked to a roundup)
-CREATE TABLE IF NOT EXISTS public.roundup_photos (
-  id          uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
-  roundup_id  uuid        NOT NULL REFERENCES public.roundup_posts(id) ON DELETE CASCADE,
-  url         text        NOT NULL,
-  alt         text        NOT NULL,
-  caption     text,
-  credit      text,
-  tall        boolean     NOT NULL DEFAULT false,
-  sort_order  integer     NOT NULL DEFAULT 0
-);
-
-ALTER TABLE public.roundup_photos ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Anon can read published roundup photos"
-  ON public.roundup_photos FOR SELECT TO anon
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.roundup_posts
-      WHERE id = roundup_photos.roundup_id AND published = true
-    )
-  );
-
-CREATE POLICY "Authenticated full access to roundup photos"
-  ON public.roundup_photos FOR ALL TO authenticated
-  USING (true) WITH CHECK (true);
-
-
 -- ── DATA API GRANTS ───────────────────────────────────────────────
 -- From May 30 2026, new Supabase projects no longer auto-grant public schema
 -- tables to the Data API roles. From October 30 2026, this applies to ALL
@@ -512,23 +386,3 @@ GRANT ALL                           ON public.posts                TO service_ro
 GRANT INSERT, DELETE                ON public.push_subscriptions   TO anon;
 GRANT ALL                           ON public.push_subscriptions   TO authenticated;
 GRANT ALL                           ON public.push_subscriptions   TO service_role;
-
-GRANT SELECT                        ON public.roundup_posts        TO anon;
-GRANT ALL                           ON public.roundup_posts        TO authenticated;
-GRANT ALL                           ON public.roundup_posts        TO service_role;
-
-GRANT SELECT                        ON public.parkrun_results      TO anon;
-GRANT ALL                           ON public.parkrun_results      TO authenticated;
-GRANT ALL                           ON public.parkrun_results      TO service_role;
-
-GRANT SELECT                        ON public.race_results         TO anon;
-GRANT ALL                           ON public.race_results         TO authenticated;
-GRANT ALL                           ON public.race_results         TO service_role;
-
-GRANT SELECT                        ON public.social_run_results   TO anon;
-GRANT ALL                           ON public.social_run_results   TO authenticated;
-GRANT ALL                           ON public.social_run_results   TO service_role;
-
-GRANT SELECT                        ON public.roundup_photos       TO anon;
-GRANT ALL                           ON public.roundup_photos       TO authenticated;
-GRANT ALL                           ON public.roundup_photos       TO service_role;
