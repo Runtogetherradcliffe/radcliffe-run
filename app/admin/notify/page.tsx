@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
+import { supabaseAdmin } from '@/lib/supabase'
 import NotifyClient from './NotifyClient'
 import AdminShell from '@/components/AdminShell'
 
@@ -10,8 +11,9 @@ export default async function AdminNotifyPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/admin/login')
 
-  // Count subscribers
-  const { count } = await supabase
+  // Count subscribers via service role - push_subscriptions is not readable by
+  // the member-JWT client (no authenticated RLS policy; admin uses service role)
+  const { count } = await supabaseAdmin()
     .from('push_subscriptions')
     .select('*', { count: 'exact', head: true })
 

@@ -11,17 +11,19 @@
 -- the same" becomes provable for the database layer, not just the code.
 --
 -- WHAT IT IS / ISN'T
---   * It is the canonical, current PRODUCTION state (verified against project
---     qpdymxagloeghypntpct on 5 Jul 2026). Applying it to a fresh project
---     reproduces production. Applying it to dev ALIGNS dev to production.
---   * It is idempotent and atomic: it drops every known policy name (both the
---     production names and the legacy dev snake_case names) then recreates the
---     canonical set inside one transaction.
---   * It is NOT the security hardening. It deliberately preserves the CURRENT,
---     still-over-broad "Authenticated full access ..." grants exactly as
---     production has them today. Narrowing those is a SEPARATE later migration,
---     verified with the access-matrix harness (tests/access). Do not fold the
---     two together - this step must be a behaviour-preserving snapshot.
+--   * It is the canonical desired RLS state. Applying it to any project
+--     converges that project to this exact set of policies.
+--   * It is idempotent and atomic: it drops every known policy name (current
+--     names, pre-hardening names, and legacy dev snake_case names) then recreates
+--     the canonical set inside one transaction.
+--   * HISTORY: this file was first created (5 Jul 2026) by capturing production's
+--     then-live policies verbatim to reconcile a dev/prod drift, deliberately
+--     preserving the over-broad "Authenticated full access ..." grants. It was
+--     then updated (same day) with the SECURITY HARDENING - those blanket
+--     authenticated grants are now narrowed (runs = read-only; posts/emails/
+--     send-log/snippets/push = service-role only; route_descriptions writes =
+--     service-role only). The access-matrix harness (tests/access) verifies the
+--     result: members retain only their own-row access and public reads.
 --
 -- HOW TO USE
 --   * Production already matches this file (it was captured FROM production), so
@@ -61,9 +63,13 @@ CREATE POLICY "Members can access own data"
 CREATE INDEX IF NOT EXISTS members_email_idx ON public.members (email);
 
 -- ── runs ───────────────────────────────────────────────────────────────────
+-- Reads only for authenticated: the homepage and join flow SELECT runs with the
+-- member JWT (server + browser clients). All writes go through the admin API on
+-- the service role, so authenticated needs no write grant.
 ALTER TABLE public.runs ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Anon can read runs"              ON public.runs;
-DROP POLICY IF EXISTS "Authenticated full access to runs" ON public.runs;
+DROP POLICY IF EXISTS "Authenticated can read runs"     ON public.runs;
+DROP POLICY IF EXISTS "Authenticated full access to runs" ON public.runs;  -- pre-hardening
 DROP POLICY IF EXISTS "runs_select_anon"                ON public.runs;  -- legacy (dev)
 DROP POLICY IF EXISTS "runs_all_authenticated"          ON public.runs;  -- legacy (dev)
 
@@ -71,9 +77,9 @@ CREATE POLICY "Anon can read runs"
   ON public.runs FOR SELECT TO anon
   USING (true);
 
-CREATE POLICY "Authenticated full access to runs"
-  ON public.runs FOR ALL TO authenticated
-  USING (true) WITH CHECK (true);
+CREATE POLICY "Authenticated can read runs"
+  ON public.runs FOR SELECT TO authenticated
+  USING (true);
 
 -- ── route_descriptions ─────────────────────────────────────────────────────
 ALTER TABLE public.route_descriptions ENABLE ROW LEVEL SECURITY;
@@ -85,13 +91,9 @@ CREATE POLICY "Anyone can read route descriptions"
   ON public.route_descriptions FOR SELECT TO public
   USING (true);
 
-CREATE POLICY "Authenticated users can insert route descriptions"
-  ON public.route_descriptions FOR INSERT TO authenticated
-  WITH CHECK (true);
-
-CREATE POLICY "Authenticated users can update route descriptions"
-  ON public.route_descriptions FOR UPDATE TO authenticated
-  USING (true);
+-- Writes (name/description overrides) happen only in the runs sync and the
+-- routes admin API, both on the service role. No authenticated write grant.
+-- (public SELECT above is intentional - the catalogue is public data.)
 
 -- ── site_settings ──────────────────────────────────────────────────────────
 -- (Dev had an extra "Authenticated can read settings" SELECT policy that
@@ -110,45 +112,36 @@ CREATE POLICY "Authenticated can update settings"
   USING (true);
 
 -- ── posts ──────────────────────────────────────────────────────────────────
+-- Public reads published posts (anon); every app read is server-side on the
+-- service role. No authenticated grant - members do not read posts by JWT.
 ALTER TABLE public.posts ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Anon can read published posts"     ON public.posts;
-DROP POLICY IF EXISTS "Authenticated full access to posts" ON public.posts;
+DROP POLICY IF EXISTS "Authenticated full access to posts" ON public.posts; -- pre-hardening
 DROP POLICY IF EXISTS "Public can read published posts"   ON public.posts; -- legacy (dev)
 
 CREATE POLICY "Anon can read published posts"
   ON public.posts FOR SELECT TO anon
   USING (status = 'published');
 
-CREATE POLICY "Authenticated full access to posts"
-  ON public.posts FOR ALL TO authenticated
-  USING (true) WITH CHECK (true);
-
 -- ── scheduled_emails ───────────────────────────────────────────────────────
+-- Admin-only table. Admin identity is an env-var allowlist, NOT a database role,
+-- so RLS cannot express "admins only" - admin pages/routes read it on the
+-- service role (which bypasses RLS). No authenticated policy, by design.
 ALTER TABLE public.scheduled_emails ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "Authenticated full access to emails" ON public.scheduled_emails;
+DROP POLICY IF EXISTS "Authenticated full access to emails" ON public.scheduled_emails; -- pre-hardening
 DROP POLICY IF EXISTS "emails_all_authenticated"            ON public.scheduled_emails; -- legacy (dev)
 
-CREATE POLICY "Authenticated full access to emails"
-  ON public.scheduled_emails FOR ALL TO authenticated
-  USING (true) WITH CHECK (true);
-
 -- ── email_send_log ─────────────────────────────────────────────────────────
+-- Admin-only (holds recipient email addresses). Service role only - see above.
 ALTER TABLE public.email_send_log ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "Authenticated full access to email log" ON public.email_send_log;
+DROP POLICY IF EXISTS "Authenticated full access to email log" ON public.email_send_log; -- pre-hardening
 DROP POLICY IF EXISTS "email_log_all_authenticated"           ON public.email_send_log; -- legacy (dev)
 
-CREATE POLICY "Authenticated full access to email log"
-  ON public.email_send_log FOR ALL TO authenticated
-  USING (true) WITH CHECK (true);
-
 -- ── email_snippets ─────────────────────────────────────────────────────────
+-- Admin-only (email templates). Service role only - see above.
 ALTER TABLE public.email_snippets ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "Authenticated full access to snippets" ON public.email_snippets;
+DROP POLICY IF EXISTS "Authenticated full access to snippets" ON public.email_snippets; -- pre-hardening
 DROP POLICY IF EXISTS "snippets_all_authenticated"           ON public.email_snippets; -- legacy (dev)
-
-CREATE POLICY "Authenticated full access to snippets"
-  ON public.email_snippets FOR ALL TO authenticated
-  USING (true) WITH CHECK (true);
 
 -- ── push_subscriptions ─────────────────────────────────────────────────────
 -- (Dev restricted the manage policy to auth.role()='authenticated'; production
@@ -166,8 +159,7 @@ CREATE POLICY "Anyone can unsubscribe by endpoint"
   ON public.push_subscriptions FOR DELETE TO public
   USING (true);
 
-CREATE POLICY "Authenticated can manage subscriptions"
-  ON public.push_subscriptions FOR ALL TO public
-  USING (true);
+-- No "manage" policy: it granted ALL (incl. SELECT of every endpoint) to any
+-- authenticated member. Admin reads/writes go through the service role.
 
 COMMIT;

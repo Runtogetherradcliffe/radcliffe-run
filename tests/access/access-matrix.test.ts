@@ -55,6 +55,7 @@ const VICTIM_EMAIL = 'access-test-victim@radcliffe.run'
 const ANON_INSERT_EMAIL = 'access-test-anon-insert@radcliffe.run'
 const PROBE_SLUG = 'access-audit--probe'
 const PROBE_ENDPOINT = 'https://example.com/access-audit-probe'
+const PROBE_SNIPPET = 'ACCESS-AUDIT probe snippet'
 
 function loadEnvLocal(): Record<string, string> {
   const out: Record<string, string> = {}
@@ -266,6 +267,12 @@ suite('access matrix', () => {
       if (error) throw new Error(`probe subscription: ${error.message}`)
     }
     {
+      const { error } = await svc
+        .from('email_snippets')
+        .insert({ title: PROBE_SNIPPET, body: 'ACCESS-AUDIT probe snippet', active: false })
+      if (error) throw new Error(`probe snippet: ${error.message}`)
+    }
+    {
       const { data, error } = await svc.from('site_settings').select('id, email_default_subject').limit(1).single()
       if (error) throw new Error(`read site_settings: ${error.message}`)
       settingsRowId = data.id
@@ -282,6 +289,7 @@ suite('access matrix', () => {
       await svc.from('scheduled_emails').delete().eq('id', probeEmailId)
     }
     await svc.from('push_subscriptions').delete().eq('endpoint', PROBE_ENDPOINT)
+    await svc.from('email_snippets').delete().eq('title', PROBE_SNIPPET)
     await svc.from('route_descriptions').delete().eq('slug', PROBE_SLUG)
     await svc.from('members').delete().eq('email', ANON_INSERT_EMAIL)
     await svc.from('members').delete().eq('email', VICTIM_EMAIL)
@@ -382,6 +390,19 @@ suite('access matrix', () => {
       const { data } = await restClients.leader!.from('members').select('id').eq('email', MEMBER_EMAIL)
       expect(data ?? []).toHaveLength(0)
     })
+
+    it('member CAN read runs (the homepage and join flow read runs with the member JWT)', async () => {
+      const { data, error } = await restClients.member!.from('runs').select('id').eq('id', probeRunId)
+      expect(error).toBeNull()
+      expect(data?.length).toBe(1)
+    })
+
+    it('member cannot read a draft post via their JWT (no authenticated posts grant)', async () => {
+      // App code reads posts on the service role; nothing reads posts by member
+      // JWT, so authenticated has no posts policy. The draft must not leak.
+      const { data } = await restClients.member!.from('posts').select('id').eq('id', probePostId)
+      expect(data ?? []).toHaveLength(0)
+    })
   })
 
   describe('RLS: authenticated member must NOT have admin-grade table access', () => {
@@ -432,6 +453,11 @@ suite('access matrix', () => {
 
     it('[HOLE] member cannot read email_send_log (recipient addresses)', async () => {
       const { data } = await restClients.member!.from('email_send_log').select('id').eq('email_id', probeEmailId)
+      expect(data ?? []).toHaveLength(0)
+    })
+
+    it('[HOLE] member cannot read email_snippets', async () => {
+      const { data } = await restClients.member!.from('email_snippets').select('id').limit(1)
       expect(data ?? []).toHaveLength(0)
     })
 
