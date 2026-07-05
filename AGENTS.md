@@ -23,6 +23,23 @@ Full background in `docs/ARCHITECTURE.md`. Read this whole file before changing 
   the production `members` table breaks registration for ALL users. Before deploying any
   change to this file, verify every column in the INSERT exists on production.
 - Schema changes go to production Supabase BEFORE the code that uses them is deployed.
+- **Every `/api/admin/*` route must call `requireAdmin()`** (`lib/admin.ts`) - a bare
+  `getUser()` check is NOT enough. `middleware.ts` gates `/admin/*` *pages* but does NOT
+  cover `/api/admin/*` API paths, so a route that only checks "is there a session" is
+  callable by any signed-in member. Eight routes shipped this way and were fixed (Jul
+  2026); do not reintroduce the pattern in a new admin route.
+- **Admin-only tables are service-role only - never grant them an `authenticated` RLS
+  policy.** Admin identity is the `ADMIN_EMAILS` env allowlist, NOT a Postgres role, so
+  RLS cannot express "admins only": an `authenticated` grant exposes the table to every
+  member. Admin pages/routes read these tables with `supabaseAdmin()` (bypasses RLS).
+  This applies to `scheduled_emails`, `email_send_log`, `email_snippets`,
+  `push_subscriptions` (manage), and the write side of `runs`/`posts`/`route_descriptions`.
+- **RLS is version-controlled in `supabase-rls-baseline.sql`** - the single source of
+  truth for every policy. Policies live in the Supabase projects (not code) and once
+  drifted between dev and prod. Any RLS change edits that file, is applied to BOTH the
+  dev and production projects, and is verified with the `tests/access` harness
+  (`npm run test:access`) before merge. Dev now mirrors production exactly - keep it that
+  way.
 
 ## Runs sync (Google Sheet)
 

@@ -75,8 +75,10 @@ Full DDL in `supabase-schema-production.sql`. Tables:
   ('draft'|'scheduled'|'sent'|'cancelled'), content fields, `recipient_filter`
   ('all' | 'selected' | a cohort), `recipient_member_ids uuid[]`.
 - **email_send_log** - per-recipient send outcomes.
-- **roundup_posts**, **push_subscriptions** - news posts and PWA push (push delivery
-  not yet built).
+- **push_subscriptions** - PWA web-push subscriptions (endpoint + keys, nullable
+  `member_id`). News and roundups live in the **posts** table (`type` = 'news' |
+  'roundup'); the standalone roundup_* tables were scaffolded on dev, never deployed to
+  production, and dropped Jul 2026.
 
 ### RLS model
 
@@ -89,22 +91,35 @@ USING ((SELECT auth.email()) = email)
 
 with a supporting index on `members(email)`.
 
-Active policies (production): anon may INSERT members (registration) and SELECT
-published roundup_posts and runs; authenticated members may read their own row by
-email. Everything else - admin pages, leader lookup, email sending - uses
-`supabaseAdmin()` (service role key, `lib/supabase.ts`), which bypasses RLS entirely.
+Active policies (production, hardened Jul 2026):
 
-**RLS is version-controlled in `supabase-rls-baseline.sql`** (added 5 Jul 2026).
-Policies live inside each Supabase project, not in code, and had never been
-migrated - dev, production, and the old `supabase-schema-production.sql` snapshot
-had drifted to three different `members` self-access policies (dev was on the
-broken `auth.uid() = id` form). `supabase-rls-baseline.sql` captures production's
-actual live policies verbatim as the single source of truth; it is idempotent and
-convergent (safe to apply to any project) and dev has been aligned to it, so the
-9 shared tables now match production byte-for-byte. It deliberately preserves the
-current over-broad `authenticated` grants - narrowing them is the separate
-hardening step, gated on the `tests/access` audit harness. Any future RLS change
-edits this file and is applied to both projects.
+- **members**: anon INSERT (registration); authenticated read/write own row by email.
+- **runs**: anon SELECT and authenticated SELECT (the homepage and join flow read runs
+  with the member JWT). Writes are service-role only.
+- **posts**: anon SELECT of published posts only. No authenticated grant (the app reads
+  posts on the service role).
+- **route_descriptions**: public SELECT only (writes are service-role).
+- **site_settings**: anon SELECT; authenticated UPDATE. **push_subscriptions**: public
+  INSERT/DELETE for the subscribe/unsubscribe flow.
+- **scheduled_emails, email_send_log, email_snippets**: no policies at all - admin-only,
+  read/written exclusively via `supabaseAdmin()`.
+
+Everything else - admin pages, leader lookup, email sending - uses `supabaseAdmin()`
+(service role key, `lib/supabase.ts`), which bypasses RLS entirely. See AGENTS.md for the
+two invariants this enforces: `/api/admin/*` routes must call `requireAdmin()`, and
+admin-only tables never get an `authenticated` policy (admin is an env allowlist, not a
+DB role).
+
+**RLS is version-controlled in `supabase-rls-baseline.sql`** (added 5 Jul 2026, hardened
+same day). Policies live inside each Supabase project, not in code, and had never been
+migrated - dev, production, and the old `supabase-schema-production.sql` snapshot had
+drifted to three different `members` self-access policies (dev was on the broken
+`auth.uid() = id` form). The baseline was created by capturing production's live policies
+verbatim to reconcile that drift, then updated with the security hardening that narrowed
+the over-broad `authenticated` grants (the state listed above). It is idempotent and
+convergent (safe to apply to any project); dev and production now match byte-for-byte on
+the 9 tables. Any future RLS change edits this file, is applied to BOTH projects, and is
+verified with the `tests/access` harness.
 
 The `tests/access` harness (`npm run test:access`) is the regression net for all
 of this: it signs in as anon/member/leader/admin and asserts access at both the
