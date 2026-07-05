@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/utils/supabase/server'
 import { createClient as createAdmin } from '@supabase/supabase-js'
+import { requireAdmin } from '@/lib/admin'
 import webpush from 'web-push'
 
 const supabaseAdmin = createAdmin(
@@ -11,8 +11,7 @@ const supabaseAdmin = createAdmin(
 // POST /api/admin/notify - send a push notification to all subscribers
 export async function POST(request: NextRequest) {
   // Verify admin session
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await requireAdmin()
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }

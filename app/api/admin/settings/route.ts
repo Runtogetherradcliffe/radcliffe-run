@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/utils/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase'
+import { requireAdmin } from '@/lib/admin'
 
 export async function GET() {
-  // Debug: read current settings via service role
+  // Debug: read current settings via service role - admin only
+  const user = await requireAdmin()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
   const { data, error } = await supabaseAdmin()
     .from('site_settings')
     .select('*')
@@ -12,9 +15,8 @@ export async function GET() {
 }
 
 export async function PATCH(req: Request) {
-  // Auth check using session client
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  // Auth check - admin only
+  const user = await requireAdmin()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await req.json()
