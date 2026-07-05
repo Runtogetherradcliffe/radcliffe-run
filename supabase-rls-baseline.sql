@@ -28,10 +28,11 @@
 --     running it against production is a safe no-op-equivalent but unnecessary.
 --   * Apply to the DEV project to fix the drift (see
 --     supabase-migration-dev-rls-align notes in ARCHITECTURE.md).
---   * Scope: the 9 tables that exist on production. The dev project also carries
---     5 unreleased roundup tables (parkrun_results, race_results, roundup_posts,
---     roundup_photos, social_run_results) that do NOT exist on production; this
---     file does not touch them.
+--   * Scope: the 9 tables that exist on production. The dev project used to
+--     carry 5 empty, abandoned roundup tables (parkrun_results, race_results,
+--     roundup_posts, roundup_photos, social_run_results) that never existed on
+--     production; they were dropped from dev on 5 Jul 2026, so both projects now
+--     have exactly these 9 tables.
 -- ============================================================================
 
 BEGIN;

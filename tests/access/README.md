@@ -71,7 +71,9 @@ match it (the 9 shared tables are now byte-for-byte identical). After alignment
 the harness's legitimate-path tests are green on dev, so **dev is now a faithful
 rehearsal environment** for the admin-API / RLS hardening.
 
-Note: the dev project additionally carries 5 unreleased roundup tables
-(`parkrun_results`, `race_results`, `roundup_posts`, `roundup_photos`,
-`social_run_results`) that do not exist on production; the baseline does not
-touch them.
+The reconciliation also removed a second drift: the dev project carried 5 empty,
+abandoned roundup tables (`parkrun_results`, `race_results`, `roundup_posts`,
+`roundup_photos`, `social_run_results`) that never existed on production and are
+no longer used. They were dropped from dev (and their dead type blocks removed
+from `lib/database.types.ts`), so both projects now have exactly the same 9
+tables.
