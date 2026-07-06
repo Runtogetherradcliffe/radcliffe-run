@@ -574,15 +574,22 @@ the check-in process should be live and proven well before the cohort arrives.
   with correction, walk-up handling) is the starting wireframe for the autumn
   build; its booking flow is dropped.
 
-**Still open (small)**
-- Retroactive credit: recommendation is counts start at first captured session
-  (no memory backfill) - not explicitly decided.
-- Cohort history modelling (`members.cohort` is single-valued; multi-cohort
-  award history and graduate identity need a `cohorts` table + join) - build
-  detail, needed before January.
-- Per-day badge threshold (the ~7 of 10) - tune when real data exists.
-- Whether the Thursday-pilot register also surfaces "we missed you" style
-  re-engagement for club regulars, or that waits for the C25K cohort.
+**Formerly open - settled at the 6 Jul 2026 decision workshop** (full settled
+list with rationales: `docs/NATIVE_APP_SCOPE.md` section 8):
+- Retroactive credit: **backfill YES** - against the first-captured-session
+  recommendation, because Paul holds real attendance records for regulars from
+  before radcliffe.run launched. Lifetime counts are seeded from that data;
+  only the unrecorded last couple of months stay uncounted. Import path
+  (historical run + attendance rows vs a per-member seed offset) is a
+  build-time detail. Some regulars will land on a Ladder B milestone at
+  launch - a launch moment, not a problem.
+- Cohort history modelling: confirmed as a build detail needed before January
+  (`cohorts` table + member join, so graduates keep C25K identity).
+- Per-day badge threshold (the ~7 of 10): stays a calibration, tuned when real
+  autumn data exists - deliberately not fixed now.
+- "We missed you" re-engagement: **waits for the C25K cohort** - the autumn
+  Thursday pilot records only. Regulars missing a Thursday is life, not
+  dropout, and unwanted nudges are the documented opt-out driver.
 
 ---
 

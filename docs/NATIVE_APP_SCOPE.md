@@ -18,8 +18,9 @@ This is Phase N4 of the native roadmap
 Expo/EAS workflow exists (two apps built in `/Users/paulcox/native-apps`). RTR is a
 different beast from those two: public, multi-user, other runners' expectations, and
 external TestFlight distribution means Beta App Review. This document makes every
-question explicit before any build starts. Decisions belong to Paul - the final
-section lists them.
+question explicit before any build starts. Decisions belong to Paul - and as of the
+6 Jul 2026 decision workshop they are ALL made: section 8 is now the settled record,
+with no open questions remaining anywhere in this document or the research doc.
 
 Everything below was verified against the codebase and the production Supabase
 project (`qpdymxagloeghypntpct`) on 5 Jul 2026.
@@ -518,6 +519,13 @@ surface) but does not create it.
 
 ## 6. Design brief for the Pencil session
 
+> **Superseded in part (6 Jul 2026):** the standalone, self-contained brief for
+> the Pencil session is `docs/PENCIL_DESIGN_BRIEF.md`, which folds in the
+> workshop decisions (section 8): registration + check-in screens join the
+> set, MapLibre is the decided map renderer, and the tab structure question is
+> now "fourth leader tab vs Club depth". The brand-source and
+> what-ports-from-native-apps material below remains accurate.
+
 ### Sources - RTR brand, not Calm Coach
 
 The design language is **RTR's existing identity**, not the native-apps "Calm
@@ -595,12 +603,16 @@ fetched straight from the site).
 Alternative considered: two tabs + a settings modal (closer to a utility). The
 third tab earns its place as the home for sign-in and news later without a
 restructure - but this is exactly the kind of call the Pencil session is for.
+**Workshop update (6 Jul 2026):** with check-in now in v1, the Pencil session
+explores a fourth leader tab against this shape - see section 8 item 22 and
+`docs/PENCIL_DESIGN_BRIEF.md`.
 
-Map rendering choice for detail screens (flag for the session):
-`react-native-maps` with Apple Maps tiles (free, native feel) vs MapLibre with
-the site's tile styles (visual continuity, incl. the historic-map layer party
-trick). Recommendation: react-native-maps for v1 (simpler, free); the webp cards
-carry the RTR look regardless.
+Map rendering choice for detail screens: **DECIDED 6 Jul 2026 - MapLibre**
+(section 8 item 16), for tile-style continuity with the site including the
+historic-map layer. The original recommendation (react-native-maps: simpler,
+free) was declined in favour of one map language across web and app. Build
+task: a MapTiler key restricted by app bundle ID - the site's
+domain-restricted key cannot be used from a mobile app.
 
 ---
 
@@ -709,50 +721,140 @@ workflow):
 
 ---
 
-## 8. Decision list for Paul
+## 8. Settled decisions (workshop with Paul, 6 Jul 2026)
 
-The doc frames these. Update 6 Jul 2026: the workshop amended item 1's v1 cut
-(registration and attendance check-in added - section 1 amendment, section 9)
-and settled the platform question (Android in); item 7's hardening is done and
-verified on production. The rest remain open.
+Every open question from the 5 Jul draft and from
+`docs/C25K_ENGAGEMENT_RESEARCH.md` was decided at the 6 Jul decision workshop.
+Nothing here is open: the Pencil session (`docs/PENCIL_DESIGN_BRIEF.md`) and
+the build prompts inherit zero open questions. Where Paul's call went against
+the doc's recommendation it is flagged.
 
-1. **The v1 cut** - confirm: schedule + routes + push with no login wall for
-   members, plus optional sign-in unlocking the leader emergency-contacts area
-   (recommended, reflecting the Paul -> leaders -> members rollout). The leader
-   area is contacts lookup only - C25K roster and run-leader signup stay web.
-2. **Leader contacts on-device caching** - cache the last-fetched contacts in
-   encrypted secure-store so the lookup works with no signal (recommended - the
-   incident case is exactly when connectivity fails), or online-only as the
-   more conservative posture?
-3. **Push events for v1** - weekly Thursday announcement + cancellation +
-   on-tour: confirm the set, and pick the announcement time (recommendation:
-   Thursday ~4pm via cron-job.org, not the 8am Vercel cron).
-4. **Who can send a manual push** - admins only in v1 (recommended), or build
-   the leader-facing cancellation-push page too?
-5. **Publisher name** - ship TestFlight under "Paul Cox" (recommended;
-   organisation account needs a legal entity RTR does not have)? And the app
-   display name: "radcliffe.run" (recommended, sidesteps RunTogether branding)
-   vs "Run Together Radcliffe"?
-6. **Repo location** - `apps/rtr` in the native-apps monorepo (recommended) vs
-   its own repo for public-project separation?
-7. **M0 security hardening timing** - the 8 unguarded admin API routes and the
-   over-broad RLS policies should be fixed soon regardless of the app
-   (recommended: next site session). Confirm doing this ahead of and independent
-   of any app work. **Resolved: DONE Jul 2026**, ahead of any app work and
-   verified on production (section 5).
-8. **Expo Push vs raw APNs** - Expo recommended; confirm the mild vendor
-   dependency is acceptable.
-9. **Map rendering** - react-native-maps/Apple Maps in v1 (recommended) vs
-   MapLibre for tile-style continuity with the site?
-10. **Tab structure** - react to Runs · Routes · Club (with Leaders as depth
-    inside Club) in the Pencil session.
-11. **v1.1 candidates ranking** (later, non-blocking) - profile editing, news
-    in-app, C25K awareness: which first, if any?
-12. **Breadcrumb route tracking** - confirm the local-only, session-scoped
-    design (no upload, no sharing, While-Using permission + blue indicator,
-    trail discarded after the run) and its sequencing inside the
-    internal-TestFlight ring. Shared live location stays out until someone
-    makes the case for it.
+**Scope and platform**
+
+1. **v1 cut - confirmed as amended**: schedule + routes + push (no login wall)
+   + registration + attendance check-in + leader area (emergency contacts,
+   breadcrumb tracking). Awards/gamification deferred to v1.1 (Nov-Dec).
+   *Rationale: measure before mechanising - the attendance data should exist
+   before the first badge does.*
+2. **Android** - first-class alongside iOS (settled earlier on 6 Jul,
+   section 9). *Rationale: the club cannot depend on a check-in system that
+   excludes Android leaders and members.*
+3. **Android test device** - buy a cheap handset (~£80-120) for development;
+   leaders' phones join at the Play closed-test stage anyway. *Rationale: push
+   and background location need a real device, and the August window is too
+   tight to remote-debug someone else's phone.*
+
+**Attendance and awards** (mechanics per `docs/C25K_ENGAGEMENT_RESEARCH.md`)
+
+4. **Capture** - leader one-tap register is the system of record; any
+   `is_run_leader` member can record; member self-report only for solo weekend
+   C25K sessions. *Rationale: the only zero-member-friction option, and
+   leaders are the app's first users.*
+5. **Historic backfill - YES** (against the first-captured-session
+   recommendation): Paul holds real attendance records for regulars from
+   before radcliffe.run launched, so lifetime counts are seeded from that
+   data; only the last couple of months (unrecorded) stay uncounted. Import
+   path (historical run + attendance rows vs a per-member seed offset) is a
+   build-time detail. *Rationale: it is actual records, not memory - the
+   guesswork objection does not apply, and long-standing regulars start with
+   their real history (some will land on a Ladder B milestone at launch - a
+   feature, not a bug).*
+6. **Award structure - confirmed**: C25K programme ladder First Step /
+   Off the Couch / 4 / 8 / 12 / 16 / Graduate (event-based); per-day
+   "Tuesday Regular" / "Thursday Regular" badges (~7 of 10, tuned on real
+   data); lifetime Ladder B 10/25/50/100 **club-wide** - existing regulars
+   earn it too, seeded by the backfill. Attendance-only, never performance.
+   Digital rungs, physical at Graduate (certificate + consent-aware photo).
+   *Rationale: attendance-contingent recognition is the strongest finding in
+   the research; Ladder B club-wide is the C25K-to-club conversion bridge.*
+7. **Forgiveness - no streaks, ever**: cumulative counts that only go up; no
+   decay, no expiry; missing sessions does nothing except not increment.
+   *Rationale: broken streaks drive quit-entirely churn, and the programme
+   itself prescribes repeating weeks.*
+8. **Celebration - private by default**, per-member opt-in public flag (the
+   `photo_consent` mould); cohort collective totals shown; milestones fed to
+   leaders so a human says it out loud at the session. No leaderboards, no
+   member-vs-member comparison. *Rationale: embarrassment is a documented
+   dropout emotion; verbal unexpected recognition enhances intrinsic
+   motivation.*
+9. **"We missed you" nudges** - wait for the C25K cohort; the autumn Thursday
+   pilot records only. *Rationale: regulars missing a Thursday is life, not
+   dropout, and unwanted nudges are the documented opt-out driver.*
+
+**Registration**
+
+10. **Form stays as-is** - all current fields, nothing deferred. *Rationale:
+    every required field is a justified safety requirement; the form is not
+    the drop-off problem, the silence after it is.*
+11. **Session-zero package - confirmed in full**: First Step award at submit,
+    named-leader welcome (written once per cohort by that leader), concrete
+    first-session details + add-to-calendar, night-before session-1 nudge,
+    registration-to-session-1 conversion instrumented. *Rationale: endowed
+    progress, relatedness, and implementation intentions are the evidence's
+    strongest cards.*
+
+**Push**
+
+12. **Event set** - weekly Thursday announcement + cancellation + on-tour
+    change; two per-device toggles (weekly / alerts). Announcement fires
+    **Thursday ~4pm via cron-job.org** (claim-locked, idempotent).
+    *Rationale: few, event-anchored, high-value pushes; 4pm lands when people
+    decide about tonight.*
+13. **Senders** - admins only in v1; the `/leader/notify` cancellation page is
+    deferred until a real gap shows. *Rationale: the weekly send is automatic,
+    manual sends are exceptions, and July is tight.*
+14. **Expo Push over raw APNs** - the mild vendor dependency is accepted.
+    *Rationale: one fetch call, EAS manages certs, one API covers iOS and
+    Android; raw APNs buys nothing at ~100 members.*
+
+**Technical**
+
+15. **Leader contacts cached on-device** - encrypted secure-store, refreshed
+    each foreground, wiped on sign-out and on `is_run_leader` revocation.
+    *Rationale: the incident case is exactly when connectivity fails.*
+16. **Map rendering - MapLibre** (against the react-native-maps
+    recommendation): tile-style continuity with the site, including the
+    historic-map layer. **New build task: a MapTiler API key restricted by
+    app bundle ID** - the site's domain-restricted key cannot be used from a
+    mobile app. *Rationale: one map language across web and app outweighs the
+    extra setup.*
+17. **Breadcrumb tracking - confirmed as designed**: local-only,
+    session-scoped, While-Using permission + visible indicator, trail
+    discarded after the run, built inside the internal-TestFlight ring.
+    Shared live location stays out. *Rationale: all the navigation value,
+    none of the consent or App Privacy burden.*
+
+**Shipping**
+
+18. **Publisher** - Paul Cox personal accounts on both stores. *Rationale: an
+    organisation account needs a legal entity RTR does not have; honest for a
+    volunteer-built club app.*
+19. **App display name** - "radcliffe.run". *Rationale: matches the site
+    identity and sidesteps the England Athletics RunTogether branding
+    question.*
+20. **Repo** - `apps/rtr` in the native-apps monorepo, with its own
+    `src/ui/tokens.ts` (RTR values, no palette blending). Site-side work
+    stays in THIS repo under its staging-first rules. *Rationale: inherits
+    all proven plumbing; extraction later is cheap if club ownership ever
+    becomes real.*
+21. **M0 security hardening** - DONE Jul 2026, ahead of any app work,
+    verified on production (section 5).
+
+**Design and v1.1**
+
+22. **Tab structure** - the Pencil session explores a **fourth leader tab**
+    (check-in prominence for `is_run_leader` members) against the original
+    leader-depth-in-Club shape; Paul's steer is toward the fourth tab.
+    *Rationale: check-in moving into v1 made it a leader's weekly core task -
+    two levels deep is friction at exactly the wrong moment. This is the one
+    deliberate divergence from the role-stable tab bar proposed in section 6.*
+23. **v1.1 order after gamification** - news/roundups in-app first, then
+    profile editing. *Rationale: anon-readable content that gives members a
+    weekly reason to open the app; profile edits are rare events served fine
+    by the web.*
+24. **Cohort history modelling** - confirmed as a build detail needed before
+    January: `members.cohort` is single-valued, so multi-cohort award history
+    and graduate identity need a `cohorts` table + join.
 
 ---
 
