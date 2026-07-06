@@ -109,8 +109,12 @@ from the leader flow.
    (C25K session zero / regular-member welcome, branched on cohort)
 10. Notification primer
 11. Settings / account deletion
-12. App icon (RTR logo treatment on dark; light/dark/tinted variants per the
-    established process)
+12. App icon: the established PWA mark - white R + orange slash on dark
+    (`public/icon-512.png`), NOT a new lettermark, since the app name is
+    radcliffe.run and PWA users already know this tile. Dark/light/tinted
+    variants designed. Build note: the PWA png has baked rounded corners;
+    EAS/App Store needs a square 1024 source with no baked corners or alpha -
+    regenerate from the master artwork
 
 ## 6. Platform notes
 
