@@ -32,11 +32,15 @@ Android is first-class alongside iOS.
   signal).
 - **Registration**: same multi-step form as web `/join` (all fields kept -
   about you, emergency contact, health declaration + consents), submitting to
-  the same `/api/join` backend. Ends on the **session zero** screen: "that was
-  session zero - you have already started" (endowed progress bar), the First
-  Step award, a welcome from the named cohort leader, the concrete first
-  session ("Tuesday 9 Sep, 7pm, Aldi Higher Lane") with add-to-calendar, and a
-  what-to-expect note pre-empting the embarrassment barrier.
+  the same `/api/join` backend. **The finish screen branches on cohort**
+  (raised by Paul at the session): C25K joiners get the **session zero**
+  screen - "that was session zero - you have already started" (endowed
+  progress bar), the First Step award, a welcome from the named cohort
+  leader, the concrete first session with add-to-calendar; everyone else gets
+  the **regular-member welcome** - same psychology (concrete first Thursday
+  run, add-to-calendar, group explainer, "nobody left behind") with no
+  programme furniture and no award, since Ladder B starts at the first
+  attended run. Both variants are designed in the .pen file.
 - **Awards (v1.1 surfaces, design space reserved now)**: cumulative counts
   only - no streaks, no decay. C25K ladder: First Step / Off the Couch /
   4 / 8 / 12 / 16 / Graduate. Per-day Regular badges. Lifetime ladder
@@ -101,7 +105,8 @@ from the leader flow.
 6. Sign-in (email -> OTP code)
 7. Leader: check-in register (roster checklist, counter, groups, walk-up)
 8. Leader: contacts lookup + member card (one-tap call, medical, NO PHOTOS)
-9. Registration flow (multi-step) + session zero finish screen
+9. Registration flow (multi-step) + finish screen in both variants
+   (C25K session zero / regular-member welcome, branched on cohort)
 10. Notification primer
 11. Settings / account deletion
 12. App icon (RTR logo treatment on dark; light/dark/tinted variants per the
