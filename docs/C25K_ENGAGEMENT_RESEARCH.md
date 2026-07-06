@@ -485,7 +485,80 @@ than a product with an endpoint.
 
 ---
 
-## Open questions for the user-story workshop with Paul
+## Workshop decisions (6 Jul 2026)
+
+The workshop was held with Paul on 6 Jul 2026; the open-questions list below is
+retained for the record, with outcomes here. Context set at the workshop: the
+next C25K cohort starts **January 2027**, so there is no build urgency - but
+the check-in process should be live and proven well before the cohort arrives.
+
+**Attendance capture**
+- Leader one-tap register is the system of record. Any `is_run_leader` member
+  can record any session (`recorded_by` tracks who); the unique constraint
+  handles double entry.
+- **Pilot on Thursday club runs in autumn 2026** (build Sep-Oct, pilot
+  Oct-Dec). Leaders form the habit and offline sync gets tested before it
+  matters; C25K inherits a proven process in January. Lifetime (Ladder B)
+  counting starts at the pilot.
+- Solo weekend C25K sessions COUNT, via member self-report
+  (`source = 'self_report'`). Implication: this is the one decision that
+  creates a member-facing flow (OTP sign-in required), and solo sessions need
+  run records to attach to - likely auto-generated per cohort week.
+
+**Award design (supersedes the straw-man Ladder A above)**
+- One **combined programme ladder** counting all sessions (Tue + Thu + solo):
+  First Step (registration) - Off the Couch (session 1) - **4 / 8 / 12 / 16
+  sessions** - Graduate (week-10 parkrun, event-based, not a count).
+- Plus single **per-day badges**: "Tuesday Regular" / "Thursday Regular"
+  (threshold ~7 of 10 group sessions, group-verified only) - day-level
+  recognition without three ladders to explain.
+- **Ladder B adopted as proposed** (10/25/50/100 lifetime sessions, C25K and
+  club runs alike), counting from the autumn pilot.
+- Awards are digital on the rungs; **physical at Graduate** (printed
+  certificate + consent-aware cohort photo at the parkrun).
+- **Private by default, opt-in public** celebration, via a consent flag in the
+  photo_consent mould.
+- **Cohort collective totals** shown (programme page + cohort emails);
+  comparison-free by construction.
+
+**Graduation**
+- Structured handover: certificate + photo at week 10, an explicit "your first
+  Thursday club run is <date>" invitation (implementation intention), the
+  lifetime ladder continuing seamlessly, and a follow-up email on the Monday
+  after (fresh-start landmark).
+
+**Registration and onboarding**
+- Form stays as-is; effort goes into what follows submit.
+- Welcome email gains a **named-leader section, written once per cohort by
+  that leader** (semi-automated relatedness at zero marginal effort).
+- **Night-before nudge for session 1** (email first, push when the app is
+  there), and the registration-to-session-1 conversion is instrumented from
+  the first captured cohort.
+
+**Platform and timeline (the big one)**
+- **The native app must be in place before the programme starts (January
+  2027)** - member progress is seen in the app, not web-first. This pulls the
+  app roadmap forward and amends the scope doc's v1 cut: either v1 ships early
+  enough in autumn 2026 that the v1.1 member features (progress display, solo
+  self-report, session nudge push) land by December, or those features fold
+  into v1. Gate 0 (proving the TestFlight pipeline on the Abingdon app) is now
+  time-sensitive. Sequence implied: site-side capture + schema (Sep-Oct, the
+  web leader register works on phones regardless), Thursday pilot (Oct-Dec)
+  overlapping the app's leader ring, member-facing app features by December.
+
+**Still open (small)**
+- Retroactive credit: recommendation is counts start at first captured session
+  (no memory backfill) - not explicitly decided.
+- Cohort history modelling (`members.cohort` is single-valued; multi-cohort
+  award history and graduate identity need a `cohorts` table + join) - build
+  detail, needed before January.
+- Per-day badge threshold (the ~7 of 10) - tune when real data exists.
+- Whether the Thursday-pilot register also surfaces "we missed you" style
+  re-engagement for club regulars, or that waits for the C25K cohort.
+
+---
+
+## Open questions for the user-story workshop with Paul (as tabled - see decisions above)
 
 **Attendance capture (decides everything else)**
 1. Leader one-tap register as system of record - agreed? Who taps when the
