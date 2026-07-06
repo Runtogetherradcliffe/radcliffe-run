@@ -456,6 +456,15 @@ cache is what actually helps at an incident. Paul's call - decision list.
 
 ### The security finding: over-broad `authenticated` grants (fix regardless of the app)
 
+**RESOLVED Jul 2026 (verified on production 6 Jul 2026).** The 8 admin routes
+now call `requireAdmin()` (commit 2883602) and the over-broad policies are
+narrowed in `supabase-rls-baseline.sql` (commit a923d87), applied to dev and
+production and covered by the `tests/access` harness. One deliberate leftover:
+`site_settings` keeps an authenticated UPDATE grant that is inert (no
+authenticated SELECT policy exists, so it is unusable via PostgREST) - the
+harness documents and tests this. The finding below is retained as written,
+for the record.
+
 Production RLS currently gives ANY authenticated user - i.e. **any of the ~100
 registered members who completes the OTP sign-in** - blanket access via PostgREST
 with the public anon key:
@@ -496,7 +505,8 @@ surface) but does not create it.
 ### RLS work list for the app itself
 
 1. Fix the 8 admin routes (`requireAdmin()`), narrow/drop the 8 over-broad
-   policies after verification. (Pre-existing debt, now urgent.)
+   policies after verification. **DONE Jul 2026** (commits 2883602 / a923d87,
+   verified on production 6 Jul 2026).
 2. Create `push_tokens` table + register/prune endpoints. (New, small.)
 3. `GET /api/routes` catalogue endpoint. (New, small.)
 4. Bearer-token support in the server auth path + `/api/leader/contacts` +
@@ -657,7 +667,10 @@ workflow):
   `push_tokens` table + `POST /api/push/register`; `GET /api/routes`;
   Bearer-token support + `/api/leader/contacts` (after the hardening, per
   section 5). Schema to production Supabase first, then code via staging.
-  Independent of Gate 0.
+  Independent of Gate 0. **Hardening half DONE Jul 2026** - the
+  `requireAdmin()` fixes and RLS narrowing are live on production (section 5);
+  the API-prep half (`push_tokens`, `GET /api/routes`, Bearer support +
+  `/api/leader/contacts`) remains.
 - **M1 - Pencil design session**: RTR tokens as variables, then renders for the
   screens (Runs feed, run detail, Routes library, route detail, Club, sign-in,
   leader lookup + member card, notification primer), light + dark. Output:
@@ -700,7 +713,8 @@ workflow):
 
 The doc frames these. Update 6 Jul 2026: the workshop amended item 1's v1 cut
 (registration and attendance check-in added - section 1 amendment, section 9)
-and settled the platform question (Android in). The rest remain open.
+and settled the platform question (Android in); item 7's hardening is done and
+verified on production. The rest remain open.
 
 1. **The v1 cut** - confirm: schedule + routes + push with no login wall for
    members, plus optional sign-in unlocking the leader emergency-contacts area
@@ -724,7 +738,8 @@ and settled the platform question (Android in). The rest remain open.
 7. **M0 security hardening timing** - the 8 unguarded admin API routes and the
    over-broad RLS policies should be fixed soon regardless of the app
    (recommended: next site session). Confirm doing this ahead of and independent
-   of any app work.
+   of any app work. **Resolved: DONE Jul 2026**, ahead of any app work and
+   verified on production (section 5).
 8. **Expo Push vs raw APNs** - Expo recommended; confirm the mild vendor
    dependency is acceptable.
 9. **Map rendering** - react-native-maps/Apple Maps in v1 (recommended) vs
