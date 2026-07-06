@@ -842,12 +842,13 @@ the doc's recommendation it is flagged.
 
 **Design and v1.1**
 
-22. **Tab structure** - the Pencil session explores a **fourth leader tab**
-    (check-in prominence for `is_run_leader` members) against the original
-    leader-depth-in-Club shape; Paul's steer is toward the fourth tab.
-    *Rationale: check-in moving into v1 made it a leader's weekly core task -
-    two levels deep is friction at exactly the wrong moment. This is the one
-    deliberate divergence from the role-stable tab bar proposed in section 6.*
+22. **Tab structure - DECIDED at the Pencil session (6 Jul 2026): the fourth
+    leader tab ships.** Both shapes were designed and compared on the
+    Thursday-night flow; leaders get Runs / Routes / Check-in / Club (the
+    Check-in tab exists only for `is_run_leader` members), everyone else sees
+    the role-stable three tabs. *Rationale: check-in is a leader's weekly core
+    task - one tap beats a two-level drill-in every Thursday, and non-leaders
+    never see the difference.*
 23. **v1.1 order after gamification** - news/roundups in-app first, then
     profile editing. *Rationale: anon-readable content that gives members a
     weekly reason to open the app; profile edits are rare events served fine

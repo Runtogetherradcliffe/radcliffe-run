@@ -77,18 +77,17 @@ Output convention: tokens land in `apps/rtr/src/ui/tokens.ts` (same shape as
 `packages/ui`'s, RTR values - do NOT blend the Calm Coach palette); renders in
 `design/` per the Abingdon process.
 
-## 4. Tab structure - the session's one exploration
+## 4. Tab structure - RESOLVED at the session (6 Jul 2026)
 
-Baseline proposal: **Runs / Routes / Club** (run feed + detail with map and
-breadcrumb control; route library + detail; Club holding sign-in, prefs,
-Join RTR/registration, about, and leader tools as depth).
-
-**Explore against it: a fourth leader tab** (appears only for `is_run_leader`
-members) giving check-in and contacts top-level prominence. Paul's steer is
-toward the fourth tab: check-in is a leader's weekly core task (~20 taps every
-Thursday) and two levels deep in Club is friction at the wrong moment. Design
-both shapes, compare on the Thursday-night flow, pick in the session. The tab
-bar stays role-stable for non-leaders either way.
+Both shapes were designed in the .pen file and compared on the Thursday-night
+flow. **Decision: the fourth leader tab ships.** Leaders see
+**Runs / Routes / Check-in / Club** (the Check-in tab renders only for
+`is_run_leader` members); everyone else sees the role-stable
+**Runs / Routes / Club**. Rationale: check-in is a leader's weekly core task -
+one tap beats a two-level drill-in every Thursday, and non-leaders never see
+the difference. The 3-tab Club screen (leader tools as depth) remains in the
+file for reference; emergency contacts stay reachable from Club as well as
+from the leader flow.
 
 ## 5. Screens to design (light + dark, iOS + Android)
 
