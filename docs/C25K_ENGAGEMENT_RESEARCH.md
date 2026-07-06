@@ -305,11 +305,50 @@ member self-report as an optional backfill that the leader tap confirms. Reasons
 4. The same table works for Thursday club runs later (`runs.run_type` already
    distinguishes them), which is where the post-graduation ladder lives.
 
-Schema sketch (workshop input, not a migration): an `attendance` table keyed
-`(run_id, member_id)` with `recorded_by` and `recorded_at`, RLS service-role
-only (admin-only table rule from AGENTS.md applies), written via a
-leader-gated API route. C25K sessions become `runs` rows (run_type='c25k'),
-which the sync/admin tooling already half-supports.
+Proposed schema (workshop input - NOT applied to any environment, and per repo
+convention it would go to production Supabase before any code that uses it):
+
+```sql
+CREATE TABLE attendance (
+  id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  run_id       uuid NOT NULL REFERENCES runs(id) ON DELETE CASCADE,
+  member_id    uuid NOT NULL REFERENCES members(id) ON DELETE CASCADE,
+  recorded_by  uuid REFERENCES members(id) ON DELETE SET NULL,  -- the leader who tapped
+  recorded_at  timestamptz NOT NULL DEFAULT now(),
+  source       text NOT NULL DEFAULT 'leader',  -- 'leader' | 'self_report' (backfill path, leader-confirmed)
+  UNIQUE (run_id, member_id)   -- one record per member per session; re-tap is idempotent
+);
+
+CREATE INDEX attendance_member_idx ON attendance(member_id);  -- milestone counts
+CREATE INDEX attendance_run_idx    ON attendance(run_id);     -- session registers
+
+ALTER TABLE attendance ENABLE ROW LEVEL SECURITY;
+-- Deliberately NO policies: service-role only, per the AGENTS.md admin-table
+-- rule (leader identity is is_run_leader checked server-side, not a Postgres
+-- role, so RLS cannot express "leaders only"). All writes go through a
+-- leader-gated API route (mirroring /api/leader/* patterns); a member reading
+-- their own count goes through an API route or a narrow self-read policy
+-- using (SELECT auth.email()) = email via a join - decide at build time.
+```
+
+Design notes baked into the shape:
+
+- `member_id ... ON DELETE CASCADE` keeps the GDPR cleanup cron working
+  unchanged - deleting a member erases their attendance trail.
+- `recorded_by ... ON DELETE SET NULL` preserves the attendance record if the
+  recording leader is ever deleted.
+- Sessions are `runs` rows (`run_type = 'c25k'`), so Thursday club runs get the
+  same mechanism for free when Ladder B starts (question 2 below), and
+  `UNIQUE (run_id, member_id)` makes the leader's one-tap idempotent - a double
+  tap or an offline-queue replay cannot double-count.
+- `source` keeps leader-verified and self-reported rows distinguishable so the
+  verification story (section 6 table) stays honest in the data.
+- Milestone counts are then one query:
+  `SELECT count(*) FROM attendance WHERE member_id = $1` (optionally joined to
+  `runs.run_type` to split Ladder A from Ladder B).
+
+C25K sessions become `runs` rows (run_type='c25k'), which the sync/admin
+tooling already half-supports.
 
 **Measure before mechanising:** the first cohort with attendance data tells us
 where RTR's actual dropout curve is (section 1 is other people's populations).
