@@ -77,3 +77,73 @@ abandoned roundup tables (`parkrun_results`, `race_results`, `roundup_posts`,
 no longer used. They were dropped from dev (and their dead type blocks removed
 from `lib/database.types.ts`), so both projects now have exactly the same 9
 tables.
+
+## Preventing future drift - `npm run db-diff`
+
+The access harness only checks *authz behaviour* on *one* environment at a time;
+it does not see schema, index or constraint drift, and it cannot compare the two
+projects. `scripts/db-diff.mjs` (run with `npm run db-diff`) fills that gap: it
+connects to **both** Supabase projects read-only, introspects the `public`
+schema from `pg_catalog` / `information_schema` / `pg_policies`, and reports every
+difference in:
+
+- tables
+- columns (name, type, nullability, default)
+- indexes (full `indexdef`)
+- constraints (primary key, unique, check, foreign key)
+- RLS policies (name, cmd, roles, permissive, `qual`, `with_check`)
+- whether RLS is enabled per table
+
+It is the automated detector for exactly the class of drift found on 5 Jul 2026
+(the broken dev `members` policy, the extra roundup tables, the missing unique
+constraint). `supabase-rls-baseline.sql` is the canonical *desired* RLS state and
+the thing you reconcile drift *back to*; `db-diff` is what tells you the two live
+projects have wandered apart in the first place.
+
+It prints a `present-in-dev-only / present-in-prod-only / differing-definition`
+report and **exits non-zero when any drift is found**, so it can gate a scheduled
+run or CI.
+
+### Running it
+
+```bash
+# Both connection strings must be set (env var or .env.local, which is gitignored):
+export DBDIFF_DEV_DB_URL='postgresql://postgres.rnbiqxhlqjbahgiwabuv:...@...pooler.supabase.com:5432/postgres'
+export DBDIFF_PROD_DB_URL='postgresql://postgres.qpdymxagloeghypntpct:...@...pooler.supabase.com:5432/postgres'
+npm run db-diff
+```
+
+Get each string from the Supabase dashboard: **Project settings -> Database ->
+Connection string -> Session pooler** (it embeds the database password). The prod
+string is read from an env var and is **never** committed - store it in the
+gitignored `.env.local` alongside the dev one if you want `npm run db-diff` to
+just work. A real shell env var always wins over `.env.local`.
+
+Why a Postgres connection string and not the service-role key + Supabase client:
+the JS client can only read `public` tables via PostgREST - it cannot query the
+catalogs (`pg_catalog` etc.) at all. The script opens a `read only` session and
+creates/writes nothing.
+
+| Env var | Purpose |
+|---|---|
+| `DBDIFF_DEV_DB_URL` | dev project connection string (ref `rnbiqxhlqjbahgiwabuv`) |
+| `DBDIFF_PROD_DB_URL` | prod project connection string (ref `qpdymxagloeghypntpct`) |
+| `DBDIFF_JSON=1` | emit a JSON report instead of text (for the scheduled alert) |
+| `DBDIFF_NO_SSL=1` | disable TLS (local Postgres only; Supabase needs TLS) |
+
+The pure diff/format logic has unit tests (no DB, no credentials):
+`npm run db-diff:test`. Those live in `scripts/`, deliberately outside the
+`tests/**` glob, so they stay out of the default `npm test` / CI - like the
+access harness, the real run needs live credentials.
+
+### Scheduling a drift alert (stretch)
+
+`npm run db-diff` is a plain exit-code gate, so any scheduler that can run a node
+command and act on a non-zero exit will do. The project already keeps a
+cron-job.org job as a backstop for the email cron (Vercel Hobby allows only one
+cron schedule per day - see `AGENTS.md`), so the natural home is either a
+scheduled task on Paul's machine or a small CI workflow that runs `DBDIFF_JSON=1
+npm run db-diff` on a schedule with the two connection strings in its secrets and
+pings Paul (email / push) when the exit code is `1`. Keep the credentials out of
+the public repo: they belong in the scheduler's secret store, never a committed
+file.

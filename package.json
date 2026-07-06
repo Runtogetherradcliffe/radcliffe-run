@@ -10,6 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:access": "vitest run --config vitest.access.config.ts",
+    "db-diff": "node scripts/db-diff.mjs",
+    "db-diff:test": "node --test scripts/db-diff.test.mjs",
     "check:no-em-dash": "bash scripts/check-no-em-dash.sh"
   },
   "dependencies": {
@@ -32,6 +34,7 @@
     "@types/web-push": "^3.6.4",
     "eslint": "^9",
     "eslint-config-next": "16.2.4",
+    "pg": "^8.22.0",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.8"

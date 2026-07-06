@@ -125,6 +125,17 @@ The `tests/access` harness (`npm run test:access`) is the regression net for all
 of this: it signs in as anon/member/leader/admin and asserts access at both the
 RLS and API-route layers. Not part of `npm test`/CI. See `tests/access/README.md`.
 
+Because the two Supabase projects are still edited by hand (no migration
+pipeline), schema and RLS can drift again. `npm run db-diff`
+(`scripts/db-diff.mjs`) is the automated detector: it connects to BOTH projects
+read-only, introspects the `public` schema (tables, columns, indexes,
+constraints, RLS policies, per-table RLS-enabled) and exits non-zero on any
+difference, so it can gate a scheduled run. It needs a Postgres connection string
+per project (`DBDIFF_DEV_DB_URL` / `DBDIFF_PROD_DB_URL`) because the service-role
+key + JS client cannot read the catalogs. `supabase-rls-baseline.sql` remains the
+canonical desired RLS state you reconcile back to; `db-diff` is what surfaces the
+drift. See `tests/access/README.md`.
+
 Which client to use:
 
 | Context | Client |
