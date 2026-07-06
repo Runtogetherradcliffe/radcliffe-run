@@ -817,7 +817,10 @@ the doc's recommendation it is flagged.
     historic-map layer. **New build task: a MapTiler API key restricted by
     app bundle ID** - the site's domain-restricted key cannot be used from a
     mobile app. *Rationale: one map language across web and app outweighs the
-    extra setup.*
+    extra setup.* **Amended at the Pencil session: map imagery is LIGHT in
+    both themes** - the site's dark tint is too dark at app sizes, so card
+    images use only the light webp set and the live map is a single light
+    tile style. App-only; the site keeps its dark cards.
 17. **Breadcrumb tracking - confirmed as designed**: local-only,
     session-scoped, While-Using permission + visible indicator, trail
     discarded after the run, built inside the internal-TestFlight ring.

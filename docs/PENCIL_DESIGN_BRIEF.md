@@ -122,6 +122,12 @@ from the leader flow.
   continuity, including the historic-map layer. Build task flagged: a
   MapTiler key restricted by app bundle ID (the site's domain-restricted key
   cannot be used from a mobile app).
+- **Map imagery is LIGHT in both themes** (decided at the session - Paul: the
+  site's dark tint is too dark at app sizes). Card images use ONLY the light
+  webp set (`public/route-maps/light/`, no per-theme swap in the app), and
+  the live MapLibre map is a single light tile style in both themes. Overlay
+  controls on maps keep the dark scrim. App-only decision - the site keeps
+  its dark cards.
 - **expo-blur has partial Android support**: every blur treatment in the
   renders must specify a solid/translucent Android equivalent up front - do
   not discover the gap on a device in August.
