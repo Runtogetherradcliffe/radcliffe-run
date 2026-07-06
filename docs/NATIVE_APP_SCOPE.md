@@ -788,3 +788,7 @@ cannot be excluded from a check-in system the club depends on.
 verification has a lead time of days to weeks, and the 12-tester/14-day
 closed-test clock cannot start until the account exists. It is the longest
 external dependency in the August plan.
+
+**DONE 6 Jul 2026** - account registered the day the timeline was agreed;
+identity verification in progress. Once verified, nothing external blocks the
+August closed track.
