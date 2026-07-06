@@ -687,7 +687,13 @@ workflow):
   screens (Runs feed, run detail, Routes library, route detail, Club, sign-in,
   leader lookup + member card, notification primer), light + dark. Output:
   `design/` renders + tokens extracted to `apps/rtr/src/ui/tokens.ts`, per the
-  Abingdon process.
+  Abingdon process. **DONE 6 Jul 2026** - design file is the Pencil document at
+  `/Users/paulcox/Documents/RTR app`: all 12 screens (incl. registration,
+  check-in, both registration-finish variants) in both themes, tokens on a
+  dark/light mode axis, components, PWA-mark icon variants, and build-note
+  annotations. Tokens extraction to `apps/rtr/src/ui/tokens.ts` happens at
+  M2 scaffold time. In-session decisions recorded in section 8 (items 16 and
+  22) and `docs/PENCIL_DESIGN_BRIEF.md`.
 - **M2 - scaffold + read-only screens**: `apps/rtr` (Expo SDK 57, expo-router),
   Runs + Routes tabs against production anon reads, `useCached` wired,
   browser-preview verified against live data, typecheck/tests green. Delegation
@@ -871,7 +877,7 @@ else backs out from those three dates.
 
 | When | Work |
 |---|---|
-| **Jul 2026** | Decision workshop (held 6 Jul). Pencil design session. Build starts. v1 must include **registration + attendance check-in**; normal-runner check-in launches first so C25K inherits a proven mechanic. Gate 0 (TestFlight pipeline proven via Abingdon) clears early in the month |
+| **Jul 2026** | Decision workshop (held 6 Jul). Pencil design session (held 6 Jul - M1 done, section 7). Build starts. v1 must include **registration + attendance check-in**; normal-runner check-in launches first so C25K inherits a proven mechanic. Gate 0 (TestFlight pipeline proven via Abingdon) clears early in the month |
 | **Aug 2026** | Compliance: privacy-policy updates (section 4), in-app account deletion, Google Play Data safety form. Distribution: TestFlight **Beta App Review** (external testing) and the **Google Play closed track**. A personal Play account needs 12 testers over 14 continuous days before production access - the club beta satisfies this on its own. Tester rings: leaders first, then club runners |
 | **Early Sep 2026** | **Check-in live for regular club runs** - hard deadline 19 Sep |
 | **Oct 2026** | No planned work (Abingdon Marathon) |

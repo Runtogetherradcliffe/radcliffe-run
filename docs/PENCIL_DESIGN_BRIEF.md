@@ -1,11 +1,15 @@
 # Pencil design brief - radcliffe.run native app (iOS + Android)
 
-Status: brief for the M1 Pencil design session (written 6 Jul 2026, immediately
-after the decision workshop). Every input here is DECIDED - the session should
-contain zero open product questions. The one deliberate design exploration is
-the tab structure (below). Companion docs: `docs/NATIVE_APP_SCOPE.md`
-(section 8 = the settled decisions; section 9 = the timeline) and
-`docs/C25K_ENGAGEMENT_RESEARCH.md` (award mechanics and their evidence).
+Status: **session HELD 6 Jul 2026 - M1 complete.** This document was the brief
+(written the same day, after the decision workshop) and is now the record of
+what was designed and decided in the session. The design file is the Pencil
+document at `/Users/paulcox/Documents/RTR app`: all 12 screens in both themes,
+tokens on a dark/light mode axis, components, and the PWA-mark icon variants.
+In-session decisions (all resolved below): fourth leader tab; registration
+finish branches on cohort; icon = the PWA mark; map imagery light in both
+themes. Companion docs: `docs/NATIVE_APP_SCOPE.md` (section 8 = the settled
+decisions; section 9 = the timeline) and `docs/C25K_ENGAGEMENT_RESEARCH.md`
+(award mechanics and their evidence).
 
 App display name: **radcliffe.run**. Publisher: Paul Cox (personal accounts,
 both stores). Repo target: `apps/rtr` in `/Users/paulcox/native-apps`.
