@@ -350,6 +350,14 @@ Design notes baked into the shape:
 C25K sessions become `runs` rows (run_type='c25k'), which the sync/admin
 tooling already half-supports.
 
+**Prior art in this repo:** a concept mockup of exactly this flow was built for
+leader feedback in May 2026 - see
+[`docs/mockups/rtr-checkin-mockup.html`](mockups/rtr-checkin-mockup.html)
+(leader one-tap check-in with live counter, group selection with wrong-group
+correction, "not on this list?" walk-up handling, check-in-another-runner, plus
+a member "book your place" option). It is the starting wireframe for the autumn
+build. The booking half is NOT being taken forward - see the workshop decisions.
+
 **Measure before mechanising:** the first cohort with attendance data tells us
 where RTR's actual dropout curve is (section 1 is other people's populations).
 The attendance table is worth shipping a full season before any badge exists.
@@ -545,6 +553,18 @@ the check-in process should be live and proven well before the cohort arrives.
   time-sensitive. Sequence implied: site-side capture + schema (Sep-Oct, the
   web leader register works on phones regardless), Thursday pilot (Oct-Dec)
   overlapping the app's leader ring, member-facing app features by December.
+
+**Check-in, not booking (added 6 Jul 2026)**
+- The May 2026 concept mockup
+  ([`docs/mockups/rtr-checkin-mockup.html`](mockups/rtr-checkin-mockup.html))
+  explored two options: leader check-in and member per-session booking. Decision:
+  **check-in only - no per-session booking for club runs**. Thursday runs have
+  no capacity constraint, the club ethos is "just turn up", and attendance
+  recording is retrospective, not access control. The only booking-shaped thing
+  anywhere is C25K cohort registration itself (capacity-capped at sign-up),
+  which already exists. The mockup's check-in flow (one-tap, group selection
+  with correction, walk-up handling) is the starting wireframe for the autumn
+  build; its booking flow is dropped.
 
 **Still open (small)**
 - Retroactive credit: recommendation is counts start at first captured session
