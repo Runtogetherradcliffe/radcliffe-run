@@ -134,7 +134,13 @@ difference, so it can gate a scheduled run. It needs a Postgres connection strin
 per project (`DBDIFF_DEV_DB_URL` / `DBDIFF_PROD_DB_URL`) because the service-role
 key + JS client cannot read the catalogs. `supabase-rls-baseline.sql` remains the
 canonical desired RLS state you reconcile back to; `db-diff` is what surfaces the
-drift. See `tests/access/README.md`.
+drift. See `tests/access/README.md`. Its first live run (6 Jul 2026) found 14
+schema-level drifts (column nullability/defaults/types, a dev-only `'mixed'`
+terrain value in the `runs` check constraint, a prod-only unique constraint);
+dev was aligned to production the same day
+(`supabase-migration-dev-schema-align.sql`) and both projects now match on all
+six categories. Note `runs.terrain` allows only `'road'`/`'trail'` - a sheet row
+marked "Mixed" will fail the runs sync in both environments.
 
 Which client to use:
 

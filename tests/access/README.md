@@ -100,6 +100,16 @@ constraint). `supabase-rls-baseline.sql` is the canonical *desired* RLS state an
 the thing you reconcile drift *back to*; `db-diff` is what tells you the two live
 projects have wandered apart in the first place.
 
+Its first live run (6 Jul 2026) proved the point: RLS, policies and tables all
+matched (the 5 Jul reconciliation held), but it surfaced **14 deeper drifts** the
+manual pass never looked at - 11 column differences (nullability, defaults,
+types), a `runs.terrain` check constraint that allowed `'mixed'` on dev but not
+on production (so a sheet row marked "Mixed" would sync on dev and fail on
+live), and a prod-only unique constraint on `runs.google_event_id`. All were
+reconciled the same day by aligning dev to production - see
+`supabase-migration-dev-schema-align.sql` - and the report is now clean on all
+six categories.
+
 It prints a `present-in-dev-only / present-in-prod-only / differing-definition`
 report and **exits non-zero when any drift is found**, so it can gate a scheduled
 run or CI.
