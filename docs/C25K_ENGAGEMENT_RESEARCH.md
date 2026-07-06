@@ -500,6 +500,14 @@ retained for the record, with outcomes here. Context set at the workshop: the
 next C25K cohort starts **January 2027**, so there is no build urgency - but
 the check-in process should be live and proven well before the cohort arrives.
 
+> **Pacing superseded (later on 6 Jul 2026):** the build/pilot calendar
+> sketched in the decisions below (build Sep-Oct, pilot Oct-Dec) was replaced
+> the same day by the agreed timeline in `docs/NATIVE_APP_SCOPE.md` section 9:
+> build starts July 2026 (v1 includes registration + attendance check-in,
+> Android first-class), beta distribution in August, and check-in live for
+> regular club runs before 19 Sep 2026. The decisions themselves (what to
+> build, award design, check-in not booking) stand; only the dates moved.
+
 **Attendance capture**
 - Leader one-tap register is the system of record. Any `is_run_leader` member
   can record any session (`recorded_by` tracks who); the unique constraint

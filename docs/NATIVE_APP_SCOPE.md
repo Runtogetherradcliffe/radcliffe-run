@@ -1,4 +1,4 @@
-# radcliffe.run native iOS app - scoping document
+# radcliffe.run native app (iOS + Android) - scoping document
 
 Status: **proposed** (drafted 5 Jul 2026; revised same day after Paul's steer:
 leaders are the first users, so leader emergency contacts and local-only
@@ -6,6 +6,12 @@ breadcrumb route tracking move into v1, and the membership numbers are
 corrected - ~100 currently registered, 30-40 weekly attendees; the ~600 figure
 was the old site's all-time register). Analysis only - no build has started and
 no site code changes accompany this document.
+
+Revised 6 Jul 2026 after the C25K engagement workshop and timeline planning
+(workshop decisions in `docs/C25K_ENGAGEMENT_RESEARCH.md`): registration and
+attendance check-in move INTO v1, Android becomes first-class alongside iOS,
+and section 9 fixes the calendar. Where an earlier section conflicts with
+section 9, section 9 wins.
 
 This is Phase N4 of the native roadmap
 (`/Users/paulcox/Abingdon app/docs/NATIVE_ROADMAP.md`), pulled forward now that the
@@ -146,7 +152,6 @@ than an app whose payoff only appears at full distribution.
 
 ### Explicitly OUT of v1
 
-- Registration / join (deep-link to `radcliffe.run/join` in Safari)
 - Profile editing and account management screens (v1.1 candidate - sign-in
   itself is IN v1 for the leader area; account deletion excepted, see section 3)
 - C25K (programme page stays web; C25K runs still appear in the schedule feed)
@@ -165,7 +170,24 @@ than an app whose payoff only appears at full distribution.
   uploads, history - RTR is not a tracking app; Strava owns that. The
   breadcrumb is navigation aid, not a recorded artefact: it is discarded, not
   kept)
-- Android (same posture as the other apps: Expo keeps the door open)
+
+### Amended 6 Jul 2026 (workshop + timeline - see section 9)
+
+Two items originally cut from v1 moved INTO scope, and one new feature joined:
+
+- **Registration is IN v1** (was: deep-link to `radcliffe.run/join` in Safari,
+  per the "members do NOT need registration natively" reasoning above - now
+  superseded). The app becomes the member-facing home for C25K progress, and
+  the January 2027 cohort registers on it. The native form submits to the same
+  `/api/join` backend, so the members-table invariants (AGENTS.md) are
+  unchanged.
+- **Attendance check-in is IN v1** - the leader one-tap register decided at
+  the C25K workshop (`docs/C25K_ENGAGEMENT_RESEARCH.md`, check-in not booking).
+  It launches for **normal club runs FIRST** (live by early September 2026,
+  before 19 Sep), so the mechanic is proven on regulars a full season before
+  the C25K cohort depends on it.
+- **Android is IN v1 as a first-class platform** (was: door left open via
+  Expo). Section 9 lists what that adds to the build.
 
 ---
 
@@ -613,6 +635,13 @@ follows the monorepo's conventions. Neither leaks into the other.
 
 ### Build sequence (gated)
 
+**Pacing amended 6 Jul 2026:** the milestone contents below remain the work
+breakdown, but section 9 sets the calendar and widens the cut - registration
+and attendance check-in join the build (alongside the M2/M3-era screens),
+Gate 0 must clear early in July, M5/M6 compress into August with the Google
+Play closed track as a parallel second lane, and Android ships with iOS
+rather than waiting in M7.
+
 **Gate 0: the Abingdon TestFlight pipeline is proven end-to-end** (Apple ID
 review -> dev build -> device -> TestFlight). RTR starts nothing app-side until a
 build of an existing app has been installed and run from TestFlight, because
@@ -669,7 +698,9 @@ workflow):
 
 ## 8. Decision list for Paul
 
-The doc frames these; none are made yet.
+The doc frames these. Update 6 Jul 2026: the workshop amended item 1's v1 cut
+(registration and attendance check-in added - section 1 amendment, section 9)
+and settled the platform question (Android in). The rest remain open.
 
 1. **The v1 cut** - confirm: schedule + routes + push with no login wall for
    members, plus optional sign-in unlocking the leader emergency-contacts area
@@ -707,3 +738,53 @@ The doc frames these; none are made yet.
     trail discarded after the run) and its sequencing inside the
     internal-TestFlight ring. Shared live location stays out until someone
     makes the case for it.
+
+---
+
+## 9. Timeline (agreed 6 Jul 2026)
+
+Fixed points: check-in must be live for regular club runs **before 19 Sep
+2026**; October 2026 is written off (Abingdon Marathon); the **January 2027
+C25K cohort** launches on a system already proven over the autumn. Everything
+else backs out from those three dates.
+
+| When | Work |
+|---|---|
+| **Jul 2026** | Decision workshop (held 6 Jul). Pencil design session. Build starts. v1 must include **registration + attendance check-in**; normal-runner check-in launches first so C25K inherits a proven mechanic. Gate 0 (TestFlight pipeline proven via Abingdon) clears early in the month |
+| **Aug 2026** | Compliance: privacy-policy updates (section 4), in-app account deletion, Google Play Data safety form. Distribution: TestFlight **Beta App Review** (external testing) and the **Google Play closed track**. A personal Play account needs 12 testers over 14 continuous days before production access - the club beta satisfies this on its own. Tester rings: leaders first, then club runners |
+| **Early Sep 2026** | **Check-in live for regular club runs** - hard deadline 19 Sep |
+| **Oct 2026** | No planned work (Abingdon Marathon) |
+| **Nov-Dec 2026** | Gamification v1.1 (ladders/badges per the workshop decisions in `docs/C25K_ENGAGEMENT_RESEARCH.md`), informed by the real autumn attendance data - "measure before mechanising" holds |
+| **Jan 2027** | C25K cohort launches on the proven system |
+
+How this maps onto section 7's milestones: M0-M4 and the internal-TestFlight
+ring all land inside July's build window (with registration and check-in
+joining the M2/M3-era screens); M5 and M6 compress into August, with Google
+Play's closed track as a parallel second lane; M7's list is partly scoped
+now - gamification v1.1 is Nov-Dec, and Android is not deferred at all.
+
+### Android is first-class throughout
+
+The original iOS-first posture is dropped: leaders and members on Android
+cannot be excluded from a check-in system the club depends on.
+
+- **EAS builds both platforms** from the same codebase and config - the
+  marginal cost is setup, not a second app.
+- **FCM/Firebase setup is a named build task** (July): Expo Push delivers to
+  Android via FCM, which needs a Firebase project and its service credential
+  wired into EAS. It has its own lead time and failure modes; treat it as a
+  work item, not a checkbox.
+- **expo-blur needs an Android fallback in the design**: blur support on
+  Android is partial, so every blur treatment in the Pencil renders specifies
+  a solid/translucent equivalent up front rather than discovering the gap on
+  a device in August.
+- **A real-device Android test path is needed** - push delivery and background
+  location do not exercise properly in an emulator. Either a leader's own
+  phone enrolled via the Play internal track, or a cheap handset.
+
+### Immediate action
+
+**Register the Google Play developer account now** - $25 one-off, but identity
+verification has a lead time of days to weeks, and the 12-tester/14-day
+closed-test clock cannot start until the account exists. It is the longest
+external dependency in the August plan.
