@@ -437,13 +437,18 @@ suite('access matrix', () => {
     })
 
     // NOT a [HOLE]: already secure at the RLS layer. site_settings grants
-    // authenticated UPDATE but no authenticated SELECT, so a member's update
-    // locates 0 rows and silently no-ops (verified empirically - 204, row
-    // unchanged). The audit originally listed this as a write-hole; it is not
-    // exploitable via PostgREST. The only settings-write path that still needs
-    // hardening is the /api/admin/settings route (requireAdmin), asserted below.
-    it('member cannot UPDATE site_settings directly (no authenticated SELECT policy)', async () => {
+    // Jul 2026: the historical inert "Authenticated can update settings"
+    // grant is DROPPED and authenticated SELECT added (the native app reads
+    // the C25K flags under a member JWT). Members can read settings but the
+    // update must still locate no writable rows - now because no UPDATE
+    // policy exists at all.
+    it('member cannot UPDATE site_settings directly (no UPDATE policy)', async () => {
       expect(await memberCanMutate('site_settings', settingsRowId, 'email_default_subject', settingsSubject)).toBe(false)
+    })
+
+    it('member CAN read site_settings (C25K flags for the app)', async () => {
+      const { data } = await restClients.member!.from('site_settings').select('c25k_enabled').limit(1)
+      expect((data ?? []).length).toBe(1)
     })
 
     it('[HOLE] member cannot read scheduled_emails', async () => {
@@ -475,6 +480,32 @@ suite('access matrix', () => {
         .insert({ slug: PROBE_SLUG, name: 'ACCESS-AUDIT probe' })
       await svc.from('route_descriptions').delete().eq('slug', PROBE_SLUG)
       expect(error).not.toBeNull()
+    })
+
+    // attendance + push_tokens (native app, Jul 2026): service-role only -
+    // RLS enabled with NO policies. Reads return empty, writes error.
+    it('member cannot read attendance', async () => {
+      const { data } = await restClients.member!.from('attendance').select('id').limit(1)
+      expect(data ?? []).toHaveLength(0)
+    })
+
+    it('member cannot INSERT attendance', async () => {
+      const { error } = await restClients.member!
+        .from('attendance')
+        .insert({ run_id: '00000000-0000-0000-0000-000000000000', member_id: '00000000-0000-0000-0000-000000000000' })
+      expect(error).not.toBeNull()
+    })
+
+    it('member cannot read push_tokens', async () => {
+      const { data } = await restClients.member!.from('push_tokens').select('id').limit(1)
+      expect(data ?? []).toHaveLength(0)
+    })
+
+    it('anon cannot read attendance or push_tokens', async () => {
+      const a = await restClients.anon!.from('attendance').select('id').limit(1)
+      const p = await restClients.anon!.from('push_tokens').select('id').limit(1)
+      expect(a.data ?? []).toHaveLength(0)
+      expect(p.data ?? []).toHaveLength(0)
     })
   })
 

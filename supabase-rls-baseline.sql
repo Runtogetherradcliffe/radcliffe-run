@@ -111,8 +111,15 @@ CREATE POLICY "Anon can read settings"
   ON public.site_settings FOR SELECT TO anon
   USING (true);
 
-CREATE POLICY "Authenticated can update settings"
-  ON public.site_settings FOR UPDATE TO authenticated
+-- Signed-in members read the same public flags (the native app needs the
+-- C25K fields under a member JWT - added Jul 2026). The old
+-- "Authenticated can update settings" grant is DROPPED: it was retained
+-- only while provably inert (no authenticated SELECT existed); granting
+-- SELECT would have armed it, so both changed together. Settings writes are
+-- admin-only via /api/admin/settings (service role).
+DROP POLICY IF EXISTS "Authenticated can update settings" ON public.site_settings;
+CREATE POLICY "Authenticated can read settings"
+  ON public.site_settings FOR SELECT TO authenticated
   USING (true);
 
 -- ── posts ──────────────────────────────────────────────────────────────────
@@ -165,5 +172,17 @@ CREATE POLICY "Anyone can unsubscribe by endpoint"
 
 -- No "manage" policy: it granted ALL (incl. SELECT of every endpoint) to any
 -- authenticated member. Admin reads/writes go through the service role.
+
+-- ── attendance (native app check-in, Jul 2026) ─────────────────────────────
+-- Service-role only: leader identity is is_run_leader checked server-side in
+-- the /api/leader/* routes, not a Postgres role, so RLS cannot express
+-- "leaders only". Created by supabase-migration-attendance.sql. NO policies.
+ALTER TABLE public.attendance ENABLE ROW LEVEL SECURITY;
+
+-- ── push_tokens + push_send_log (native app push, Jul 2026) ────────────────
+-- Service-role only: writes go through POST /api/push/register and the send
+-- routes. Created by supabase-migration-push-tokens.sql. NO policies.
+ALTER TABLE public.push_tokens ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.push_send_log ENABLE ROW LEVEL SECURITY;
 
 COMMIT;

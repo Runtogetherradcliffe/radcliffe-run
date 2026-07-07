@@ -142,6 +142,45 @@ dev was aligned to production the same day
 six categories. Note `runs.terrain` allows only `'road'`/`'trail'` - a sheet row
 marked "Mixed" will fail the runs sync in both environments.
 
+### Native app tables (Jul 2026)
+
+Added for the native app (`apps/rtr` in the native-apps monorepo; scope in
+`docs/NATIVE_APP_SCOPE.md`). All three are service-role only - RLS enabled,
+NO policies (the admin-table rule: leader identity is `is_run_leader` checked
+server-side, not a Postgres role):
+
+- `attendance` - the check-in system of record (leader one-tap register).
+  `run_id` FK -> runs (CASCADE), `member_id` FK -> members (CASCADE - GDPR
+  cleanup erases the trail), `recorded_by` FK -> members (SET NULL),
+  `source` 'leader'|'self_report', `group_key` '8k'|'5k'|'jeff',
+  `UNIQUE(run_id, member_id)` makes re-taps/offline replays idempotent.
+  Everything the v1.1 award ladder needs is derivable from this table
+  (`supabase-migration-attendance.sql`).
+- `push_tokens` - Expo push tokens (iOS + Android), nullable `member_id`
+  (CASCADE), `prefs` jsonb `{weekly, alerts}`, `last_seen_at` (GDPR cron
+  prunes > 1 year unseen). Registered via `POST /api/push/register`
+  (`supabase-migration-push-tokens.sql`).
+- `push_send_log` - idempotency claim-lock for automated pushes:
+  `UNIQUE(kind, ref_date)`; the insert IS the claim.
+
+Native-app API surface (all in this repo): `GET /api/routes` (public
+catalogue - static `lib/routes.ts` merged with `route_descriptions`, light
+map webp URLs), `GET /api/leader/contacts` (full active-member emergency set
+for the app's encrypted offline cache), `GET /api/leader/register?run_id=`
+(check-in roster + counters), `POST /api/leader/checkin` (idempotent
+attendance upsert/delete), `POST/DELETE /api/push/register`,
+`GET /api/cron/send-push` (Thursday announcement; cron-job.org, CRON_SECRET,
+claim-locked). `lib/apiAuth.ts` adds Bearer-token auth (`getUserFromRequest`,
+`requireLeader`): every route above accepts `Authorization: Bearer <supabase
+access token>` alongside session cookies; `/api/profile` PATCH/DELETE gained
+the same so the in-app account-deletion screen reuses the web logic.
+`lib/expoPush.ts` mirrors `lib/brevo.ts` (never throws, prunes
+DeviceNotRegistered tokens); `/api/admin/notify` now broadcasts to web-push
+AND Expo tokens with per-channel reach counts. `middleware.ts` answers CORS
+preflight and stamps CORS headers on the app-facing API paths (native fetch
+ignores CORS - this exists for the app's browser-preview verification loop;
+auth is still enforced per-route).
+
 Which client to use:
 
 | Context | Client |
@@ -329,6 +368,12 @@ fails the whole deployment. Current jobs (`vercel.json`), authenticated via
 
 Because of the one-per-day limit, future scheduled work (e.g. leader nudges) must fold
 into the existing 8am job rather than adding a schedule.
+
+`GET /api/cron/send-push` (the Thursday ~4pm native run announcement) is NOT a
+Vercel cron for this reason - cron-job.org calls it at
+`https://www.radcliffe.run/api/cron/send-push` (www host, Bearer CRON_SECRET).
+It is idempotent via the `push_send_log` claim-lock, so retries cannot
+double-send. The gdpr-cleanup cron also prunes `push_tokens` unseen > 1 year.
 
 ---
 

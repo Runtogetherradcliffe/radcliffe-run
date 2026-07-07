@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient as createAdmin } from '@supabase/supabase-js'
 import { requireAdmin } from '@/lib/admin'
 import webpush from 'web-push'
+import { loadPushTokens, sendExpoPush } from '@/lib/expoPush'
 
 const supabaseAdmin = createAdmin(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -37,9 +38,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  if (!subscriptions || subscriptions.length === 0) {
-    return NextResponse.json({ sent: 0, failed: 0, total: 0 })
-  }
+  const webSubs = subscriptions ?? []
 
   const payload = JSON.stringify({
     title: title.trim(),
@@ -50,7 +49,7 @@ export async function POST(request: NextRequest) {
 
   // Send to all subscribers
   const results = await Promise.allSettled(
-    subscriptions.map(sub =>
+    webSubs.map(sub =>
       webpush.sendNotification(
         { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
         payload
@@ -67,7 +66,7 @@ export async function POST(request: NextRequest) {
     if (result.status === 'rejected') {
       const msg = String((result.reason as Error).message ?? '')
       if (msg.includes('404') || msg.includes('410')) {
-        expiredEndpoints.push(subscriptions[i].endpoint)
+        expiredEndpoints.push(webSubs[i].endpoint)
       }
     }
   })
@@ -78,5 +77,22 @@ export async function POST(request: NextRequest) {
       .in('endpoint', expiredEndpoints)
   }
 
-  return NextResponse.json({ sent, failed, total: subscriptions.length })
+  // Native devices (Expo push, added Jul 2026): manual broadcasts ride the
+  // 'alerts' preference. Reach is reported per channel.
+  const expoTokens = await loadPushTokens('alerts')
+  const expo = await sendExpoPush(expoTokens, {
+    title: title.trim(),
+    body: body.trim(),
+    url: url?.trim() || '/',
+  })
+
+  return NextResponse.json({
+    sent: sent + expo.sent,
+    failed: failed + expo.failed,
+    total: webSubs.length + expoTokens.length,
+    channels: {
+      web: { sent, failed, total: webSubs.length },
+      expo: { sent: expo.sent, failed: expo.failed, total: expoTokens.length },
+    },
+  })
 }
