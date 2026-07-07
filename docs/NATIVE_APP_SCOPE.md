@@ -698,7 +698,28 @@ workflow):
   Runs + Routes tabs against production anon reads, `useCached` wired,
   browser-preview verified against live data, typecheck/tests green. Delegation
   per the established tiers (screens to `screen-builder` once tokens and data
-  shapes are pinned).
+  shapes are pinned). **DONE 6 Jul 2026** - and the build ran well past M2:
+  all 12 designed screens exist (incl. registration + both finish variants,
+  check-in with offline queue, contacts with encrypted cache, sign-in,
+  primer, settings + account deletion), verified in the browser preview at
+  375x812 against LIVE data both themes (production anon reads; leader flows
+  against the dev project with a minted test-leader session - a real
+  check-in row landed in dev attendance). Site-side API prep (the M0
+  remainder) landed the same day in this repo: attendance +
+  push_tokens/push_send_log migrations applied to dev AND production,
+  Bearer auth (lib/apiAuth.ts), /api/routes, /api/leader/contacts,
+  /api/leader/register, /api/leader/checkin, /api/push/register,
+  lib/expoPush.ts, /api/cron/send-push (claim-locked), /admin/notify ->
+  web + Expo, CORS middleware for app-facing paths - staging push pending
+  approval. Still device-gated: real push delivery (+ Firebase/FCM
+  credential in EAS), MapLibre live maps + MapTiler bundle-id key,
+  breadcrumb tracking (internal-TestFlight ring per decision 17), OTP
+  auto-fill, expo-calendar. The full backend follow-up ledger (cancellation
+  push from the runs UI, cohort-leader welcome fields - the app's Session
+  Zero leader message is placeholder copy until then - cohorts table, solo
+  self-report, session-1 nudge, awards ledger + backfill) lives in
+  ~/Documents/rtr-site/TASKS.md under "Backend follow-ups from the app
+  build".
 - **M3 - sign-in + leader mode**: OTP flow with secure-store session, Club tab,
   leader contacts drill-in against `/api/leader/contacts`, the caching decision
   applied, account-deletion screen. Verified with Paul's own leader account.

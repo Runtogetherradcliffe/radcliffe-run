@@ -40,7 +40,15 @@ matching doc edit; treat that reminder as a blocking checklist item, not a sugge
   RLS cannot express "admins only": an `authenticated` grant exposes the table to every
   member. Admin pages/routes read these tables with `supabaseAdmin()` (bypasses RLS).
   This applies to `scheduled_emails`, `email_send_log`, `email_snippets`,
-  `push_subscriptions` (manage), and the write side of `runs`/`posts`/`route_descriptions`.
+  `push_subscriptions` (manage), the write side of `runs`/`posts`/`route_descriptions`,
+  and the native-app tables `attendance`, `push_tokens`, `push_send_log` (Jul 2026 -
+  RLS enabled, NO policies; all access via leader-gated or validated API routes).
+- **Bearer tokens are a first-class auth transport (Jul 2026).** `lib/apiAuth.ts`
+  (`getUserFromRequest` / `requireLeader`) accepts `Authorization: Bearer <supabase
+  access token>` alongside session cookies - the native app authenticates this way.
+  New app-facing routes must use these helpers, NOT a bare cookie client; an explicit
+  Bearer that fails validation must NOT fall back to cookies. Leader-gated routes
+  (`/api/leader/*`) check `is_run_leader` server-side via the service role.
 - **RLS is version-controlled in `supabase-rls-baseline.sql`** - the single source of
   truth for every policy. Policies live in the Supabase projects (not code) and once
   drifted between dev and prod. Any RLS change edits that file, is applied to BOTH the

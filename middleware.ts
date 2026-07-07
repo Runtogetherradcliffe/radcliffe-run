@@ -1,10 +1,21 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { CORS_HEADERS, isAppApi } from '@/lib/appCors'
 
 const PREVIEW_COOKIE = 'rtr-preview'
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
+
+  // ── CORS for app-facing API routes ───────────────────────────────────────
+  if (isAppApi(pathname)) {
+    if (request.method === 'OPTIONS') {
+      return new NextResponse(null, { status: 204, headers: CORS_HEADERS })
+    }
+    const res = NextResponse.next()
+    for (const [k, v] of Object.entries(CORS_HEADERS)) res.headers.set(k, v)
+    return res
+  }
 
   // ── Preview password gate ────────────────────────────────────────────────
   // Only active when PREVIEW_PASSWORD env var is set (remove var to disable)

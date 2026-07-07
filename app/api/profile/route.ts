@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/utils/supabase/server'
+import { getUserFromRequest } from '@/lib/apiAuth'
 import { supabaseAdmin } from '@/lib/supabase'
 
 const ALLOWED_FIELDS = [
@@ -10,9 +10,9 @@ const ALLOWED_FIELDS = [
 ]
 
 // PATCH /api/profile - update the authenticated member's own record
+// (cookie or Bearer - the native app authenticates with a Supabase JWT)
 export async function PATCH(req: NextRequest) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getUserFromRequest(req)
   if (!user?.email) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await req.json()
@@ -39,9 +39,9 @@ export async function PATCH(req: NextRequest) {
 }
 
 // DELETE /api/profile - permanently delete the authenticated member's account
-export async function DELETE() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+// (cookie or Bearer - the in-app account-deletion screen calls this)
+export async function DELETE(req: NextRequest) {
+  const user = await getUserFromRequest(req)
   if (!user?.email || !user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const admin = supabaseAdmin()
@@ -64,9 +64,12 @@ export async function DELETE() {
     return NextResponse.json({ error: 'Failed to delete account' }, { status: 500 })
   }
 
-  // Remove any push subscriptions for this member
+  // Remove any push subscriptions and native push tokens for this member
+  // (the push_tokens FK cascades on member delete, but the member row is
+  // deleted by email above - belt and braces for both token stores)
   if (member?.id) {
     await admin.from('push_subscriptions').delete().eq('member_id', member.id)
+    await admin.from('push_tokens').delete().eq('member_id', member.id)
   }
 
   // Delete the Supabase auth user entirely

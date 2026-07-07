@@ -42,8 +42,9 @@ export async function GET(req: NextRequest) {
   if (staleMembers && staleMembers.length > 0) {
     const ids = staleMembers.map(m => m.id)
 
-    // Delete push subscriptions linked to these members
+    // Delete push subscriptions and native push tokens linked to these members
     await db.from('push_subscriptions').delete().in('member_id', ids)
+    await db.from('push_tokens').delete().in('member_id', ids)
 
     // Delete the member rows
     const { error: deleteError } = await db
@@ -77,10 +78,21 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: logError.message }, { status: 500 })
   }
 
+  // 3. Prune native push tokens not seen for over a year (dead installs)
+  const { count: tokensPruned, error: tokenError } = await db
+    .from('push_tokens')
+    .delete({ count: 'exact' })
+    .lte('last_seen_at', cutoff)
+
+  if (tokenError) {
+    return NextResponse.json({ error: tokenError.message }, { status: 500 })
+  }
+
   return NextResponse.json({
     ok: true,
     membersDeleted,
     emailLogsDeleted: logsDeleted ?? 0,
+    pushTokensPruned: tokensPruned ?? 0,
     cutoffDate: cutoff,
   })
 }
