@@ -215,7 +215,8 @@ suite('access matrix', () => {
     leaderRowId = await upsert(LEADER_EMAIL, true)
     victimRowId = await upsert(VICTIM_EMAIL, false)
 
-    // Sessions + cookie jars + REST clients
+    // Sessions + cookie jars + REST clients (anon = bare anon-key client)
+    restClients.anon = anonClient()
     for (const [persona, email] of [
       ['member', MEMBER_EMAIL],
       ['leader', LEADER_EMAIL],
@@ -507,6 +508,33 @@ suite('access matrix', () => {
       expect(a.data ?? []).toHaveLength(0)
       expect(p.data ?? []).toHaveLength(0)
     })
+
+    // attendance recognition (Jul 2026): seeds, led-by records and awards are
+    // personal data, service-role only - RLS enabled with NO policies.
+    it('member cannot read attendance_seeds, run_leadership or awards', async () => {
+      const s = await restClients.member!.from('attendance_seeds').select('id').limit(1)
+      const l = await restClients.member!.from('run_leadership').select('id').limit(1)
+      const a = await restClients.member!.from('awards').select('id').limit(1)
+      expect(s.data ?? []).toHaveLength(0)
+      expect(l.data ?? []).toHaveLength(0)
+      expect(a.data ?? []).toHaveLength(0)
+    })
+
+    it('member cannot INSERT attendance_seeds', async () => {
+      const { error } = await restClients.member!
+        .from('attendance_seeds')
+        .insert({ member_id: '00000000-0000-0000-0000-000000000000', kind: 'run', count: 999, as_of: '2026-01-01', source: 'manual' })
+      expect(error).not.toBeNull()
+    })
+
+    it('anon cannot read attendance_seeds, run_leadership or awards', async () => {
+      const s = await restClients.anon!.from('attendance_seeds').select('id').limit(1)
+      const l = await restClients.anon!.from('run_leadership').select('id').limit(1)
+      const a = await restClients.anon!.from('awards').select('id').limit(1)
+      expect(s.data ?? []).toHaveLength(0)
+      expect(l.data ?? []).toHaveLength(0)
+      expect(a.data ?? []).toHaveLength(0)
+    })
   })
 
   // ────────────────────────────────────────────────────────────────────────
@@ -536,6 +564,26 @@ suite('access matrix', () => {
     it('admin is an admin', async () => {
       const body = await (await api('admin', 'GET', '/api/me')).json()
       expect(body.isAdmin).toBe(true)
+    })
+  })
+
+  describe('API: attendance recognition summary (Jul 2026)', () => {
+    it('anon gets 401 from /api/attendance/summary', async () => {
+      const res = await api('anon', 'GET', '/api/attendance/summary')
+      expect(res.status).toBe(401)
+    })
+
+    it('member gets own ladders (and only their own - route takes no member param)', async () => {
+      const res = await api('member', 'GET', '/api/attendance/summary')
+      expect(res.status).toBe(200)
+      const body = await res.json()
+      for (const kind of ['run', 'volunteer'] as const) {
+        expect(body[kind].total).toBeTypeOf('number')
+        expect(body[kind].total).toBe(body[kind].seed + body[kind].recorded)
+        expect(Array.isArray(body[kind].rungs)).toBe(true)
+        expect(body[kind].nextRung).toBeGreaterThan(body[kind].total)
+      }
+      expect(body.awardsPublic).toBeTypeOf('boolean')
     })
   })
 

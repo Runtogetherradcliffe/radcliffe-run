@@ -181,6 +181,51 @@ preflight and stamps CORS headers on the app-facing API paths (native fetch
 ignores CORS - this exists for the app's browser-preview verification loop;
 auth is still enforced per-route).
 
+### Attendance recognition (Jul 2026)
+
+The counting + milestone layer over `attendance` (parkrun model; full decision
+record in `docs/ATTENDANCE_RECOGNITION_BRIEF.md`). Two lifetime counters per
+member - RUN and VOLUNTEER - with rungs at 10/25/50/100 then every 100th.
+Three more service-role-only tables (RLS enabled, NO policies -
+`supabase-migration-attendance-recognition.sql`):
+
+- `attendance_seeds` - era-1 offsets for history that predates the site's
+  records: the old-site check-in export (runs, as of 30 Apr 2026) and the
+  WhatsApp leader availability polls (volunteer AND run credit, through
+  9 Jul 2026), plus `source='manual'` for by-exception adjustments.
+  `UNIQUE(member_id, kind, source)` keeps the importer idempotent.
+- `run_leadership` - volunteer credit: "this leader was at this night as a
+  leader". Written automatically by `POST /api/leader/checkin` when the
+  checked-in member has `is_run_leader` (leading implies attending); the rare
+  ran-but-didn't-lead night is corrected by deleting that night's row.
+  Keyed like attendance: anchor `run_id` + optional `group_key`.
+- `awards` - crossed rungs, `UNIQUE(member_id, kind, rung)`; `achieved_on`
+  NULL means "crossed inside the seed era" (undatable); `notified_at` makes
+  the recognition loop fire once.
+
+Counting rules (implemented in `lib/recognition.ts`, exposed by
+`GET /api/attendance/summary` - member self-only, cookie or Bearer):
+
+- The unit is a NIGHT: `COUNT(DISTINCT runs.date)`, never attendance rows
+  (8k hangs off the 5k anchor row; Jeffing has no row at all).
+- Qualifying runs: `run_type IN ('regular','c25k')`, not cancelled. Socials
+  and walks never count; on-tour counts.
+- Lifetime total = sum of seeds + distinct recorded nights.
+- `members.awards_public` (default false) is the opt-in consent flag for
+  public celebration; the summary endpoint only ever returns the caller's own
+  counts.
+
+Backfill: `scripts/import_attendance_seeds.py` (dry-run by default,
+idempotent, re-runnable). Sources live in `data/attendance-backfill/` +
+`data/leader-polls/` - both gitignored (names/emails/phone ids; the repo is
+public). People in the sources who never registered are reported but NEVER
+written to the DB (GDPR minimisation) - re-running the import attaches them
+if they register later. The era-2 gap (4 May - 9 Jul 2026, reconstructed from
+run photos) imports as real `attendance` rows (`source='photo'`,
+ignore-duplicates so live rows always win) and must NOT create
+`run_leadership` rows - leader history through 9 Jul is already covered by
+the polls seed.
+
 Which client to use:
 
 | Context | Client |

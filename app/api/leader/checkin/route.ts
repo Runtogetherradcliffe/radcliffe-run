@@ -10,6 +10,12 @@ import { supabaseAdmin } from '@/lib/supabase'
  * present=false removes the record (mis-tap correction).
  * Auth: run leaders only, cookie or Bearer; recorded_by = the tapping
  * leader's member id.
+ *
+ * Volunteer credit (10 Jul 2026): checking in a member who is a run leader
+ * also records a run_leadership row for the night - leading implies
+ * attending, and with several leaders per run it is not practical to record
+ * who held which role. The rare "ran but didn't lead" night is an override:
+ * delete that night's run_leadership row (unchecking removes both).
  */
 export async function POST(req: NextRequest) {
   const leader = await requireLeader(req)
@@ -42,6 +48,12 @@ export async function POST(req: NextRequest) {
       .eq('run_id', run_id)
       .eq('member_id', member_id)
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    const { error: leadErr } = await db
+      .from('run_leadership')
+      .delete()
+      .eq('run_id', run_id)
+      .eq('member_id', member_id)
+    if (leadErr) return NextResponse.json({ error: leadErr.message }, { status: 500 })
     return NextResponse.json({ ok: true, present: false })
   }
 
@@ -57,5 +69,25 @@ export async function POST(req: NextRequest) {
     { onConflict: 'run_id,member_id' }
   )
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  const { data: target } = await db
+    .from('members')
+    .select('is_run_leader')
+    .eq('id', member_id)
+    .maybeSingle()
+  if (target?.is_run_leader) {
+    const { error: leadErr } = await db.from('run_leadership').upsert(
+      {
+        run_id,
+        member_id,
+        group_key: group_key ?? null,
+        source: 'live',
+        recorded_by: leader.memberId,
+        recorded_at: new Date().toISOString(),
+      },
+      { onConflict: 'run_id,member_id' }
+    )
+    if (leadErr) return NextResponse.json({ error: leadErr.message }, { status: 500 })
+  }
   return NextResponse.json({ ok: true, present: true })
 }

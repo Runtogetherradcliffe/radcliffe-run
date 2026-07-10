@@ -42,7 +42,20 @@ matching doc edit; treat that reminder as a blocking checklist item, not a sugge
   This applies to `scheduled_emails`, `email_send_log`, `email_snippets`,
   `push_subscriptions` (manage), the write side of `runs`/`posts`/`route_descriptions`,
   and the native-app tables `attendance`, `push_tokens`, `push_send_log` (Jul 2026 -
-  RLS enabled, NO policies; all access via leader-gated or validated API routes).
+  RLS enabled, NO policies; all access via leader-gated or validated API routes), plus
+  the recognition tables `attendance_seeds`, `run_leadership`, `awards` (Jul 2026, same
+  treatment - attendance history is personal data).
+- **Attendance counting: the unit is a NIGHT, never an attendance row.** 8k attendance
+  is recorded against the 5k anchor run row and Jeffing has no row of its own, so any
+  lifetime count MUST be `COUNT(DISTINCT runs.date)` over qualifying runs
+  (`run_type IN ('regular','c25k')`, not cancelled - socials/walks never count), plus
+  the member's `attendance_seeds` offsets. Use `lib/recognition.ts`; do not write a new
+  counter. Leadership is `run_leadership` (auto-written at check-in for `is_run_leader`
+  members - leading implies attending); NEVER infer it from `attendance.recorded_by`
+  (who tapped) or `runs.leader_name` (empty free text). Backfill sources live in
+  gitignored `data/` dirs (names/emails/phone ids - the repo is PUBLIC); people who
+  never registered are never imported. Decision record:
+  `docs/ATTENDANCE_RECOGNITION_BRIEF.md`.
 - **Bearer tokens are a first-class auth transport (Jul 2026).** `lib/apiAuth.ts`
   (`getUserFromRequest` / `requireLeader`) accepts `Authorization: Bearer <supabase
   access token>` alongside session cookies - the native app authenticates this way.
