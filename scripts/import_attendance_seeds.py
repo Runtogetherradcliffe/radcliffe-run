@@ -208,6 +208,7 @@ def load_poll_tally(polls_path):
     return (
         {names[person]: len(dates) for person, dates in attend.items()},
         {names[person]: first_answer.get(person) for person in attend},
+        {names[person]: {d.isoformat() for d in dates} for person, dates in attend.items()},
     )
 
 
@@ -444,8 +445,9 @@ def main():
         exclude = {n.strip().lower() for n in json.loads(Path(args.poll_exclude).read_text())}
 
     # Polls first: they decide which members get precount-overridden CSV counts.
+    leader_nights = {}  # member_id -> poll-night dates already credited by the seed
     if args.polls:
-        tally, first_answer = load_poll_tally(args.polls)
+        tally, first_answer, night_sets = load_poll_tally(args.polls)
         precounts = load_precounts(args.precounts) if Path(args.precounts).is_dir() else {}
         print(f"\n── VOLUNTEER SEEDS (leader_polls, as of {VOL_SEED_AS_OF}) ──")
         if precounts:
@@ -463,6 +465,7 @@ def main():
                 rpt["volunteers"].append({"poll": name, "count": count, "status": "no_match"})
                 continue
             m = ms[0]
+            leader_nights[m["id"]] = night_sets.get(name, set())
             first = first_answer.get(name)
             # The export must end JUST before their first poll (<=21 days) -
             # an older export would miss their pre-poll runner history.
@@ -607,7 +610,10 @@ def main():
             anchors = {d: rid for d, (rid, _) in anchors.items()}
         else:
             anchors = fetch_anchor_runs(url, key)
-        rows, problems = [], []
+        if not args.polls:
+            print("\n  NOTE: pass --polls too so leaders' led nights (already credited by "
+                  "the seed) are skipped automatically instead of double-counting")
+        rows, problems, skipped_leaders = [], [], []
         for i, d, who_raw, grp in load_checkins(args.checkins):
             who = who_raw.lower()
             if grp and grp not in GROUPS:
@@ -622,14 +628,20 @@ def main():
             if len(ms) != 1:
                 problems.append(f"line {i}: {who_raw!r} matched {len(ms)} members")
                 continue
+            if d in leader_nights.get(ms[0]["id"], ()):
+                skipped_leaders.append(f"line {i}: {who_raw} on {d} - already credited "
+                                       f"by the polls seed (led that night), skipped")
+                continue
             rows.append({"run_id": anchors[d], "member_id": ms[0]["id"],
                          "source": "photo", "group_key": grp,
                          "recorded_at": f"{d}T19:00:00Z"})
         nights = len({r["recorded_at"][:10] for r in rows})
         print(f"\n── ERA-2 CHECK-INS (photo) ── {len(rows)} rows across {nights} nights, "
-              f"{len(problems)} problems")
+              f"{len(problems)} problems, {len(skipped_leaders)} leader-nights skipped")
         for p in problems:
             print(f"    ! {p}")
+        for s in skipped_leaders:
+            print(f"    ~ {s}")
         if rows and args.emit_sql:
             sql = ("-- attendance rows from the photo reconstruction\n"
                    "-- existing rows (live check-ins) always win: DO NOTHING on conflict\n"
