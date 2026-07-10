@@ -218,11 +218,21 @@ All open questions above were put to Paul and decided; the build follows these.
 3. **Leading implies attending** (revised mid-session by Paul): checking in a
    member who is a run leader auto-writes a `run_leadership` row, so a
    leader-night earns BOTH credits. Historic equivalent: poll leader-nights
-   seed both the volunteer AND run ladders (e.g. Paul 0 CSV + 160 polls =
-   160/160; Neil 142 + 25 = 167/25). The overlap where an old-site leader
-   also checked in as a runner is accepted imprecision ("close enough for a
-   running club"). Ran-but-didn't-lead nights are an override: delete that
-   night's `run_leadership` row.
+   seed both the volunteer AND run ladders. Ran-but-didn't-lead nights are an
+   override: delete that night's `run_leadership` row.
+   **Double-count fix (later, 10 Jul):** summing full CSV + poll nights
+   counted a night twice for leaders who both led (poll) and checked in
+   (old site) - Julie Smith read 156 when ~109 is right. Resolution: Paul
+   produces dated old-site exports (outset -> the day before each leader's
+   first poll answer, in `data/attendance-backfill/precounts/`); a leader's
+   oldsite_csv run seed becomes that pre-poll count, and poll nights supply
+   the rest (check-ins during their poll era are assumed to be led nights).
+   Leaders without an export yet fall back to the over-counting sum with a
+   loud dry-run warning.
+   **Volunteer-credit exclusions (Paul's call, 10 Jul):** Jane Marsh, Judith
+   Godfrey and Tanja Brajkovic receive no volunteer credit and count as
+   ordinary runners (full CSV, no poll additions) - see
+   `data/attendance-backfill/poll-exclude.json`.
 4. **Poll availability = leader attendance.** No provisional/confirmation
    layer, no photo corroboration required for leader history.
 5. **Eras and dates.** Old-site CSV runs to the week before the new site:

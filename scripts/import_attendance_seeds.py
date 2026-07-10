@@ -9,10 +9,18 @@ Era 1 (seeds - per-member offsets, no dates):
   --polls FILE    resolved WhatsApp leader polls JSON -> attendance_seeds,
                   source='leader_polls', as_of 2026-07-09. Each leader-night
                   seeds BOTH kind='volunteer' AND kind='run' (leading implies
-                  attending - revised model, 10 Jul 2026), so a leader's run
-                  total = old-site CSV + poll nights. Tally logic is reused
-                  from data/leader-polls/tally_attendance.py (an available
-                  vote = a leader-night; distinct dates).
+                  attending - revised model, 10 Jul 2026). Tally logic is
+                  reused from data/leader-polls/tally_attendance.py (an
+                  available vote = a leader-night; distinct dates).
+  --precounts DIR dated full exports (outset -> end date, named
+                  ...-to-YYYY-MM-DD.csv) that deduplicate a leader's run
+                  credit: check-ins DURING their poll era are assumed to be
+                  led nights, so their oldsite_csv run seed becomes the
+                  export count just before their FIRST poll answer, and the
+                  poll nights supply the rest. Leaders without a suitable
+                  export fall back to full CSV + polls with a loud warning.
+  --poll-exclude  JSON list of poll names given NO volunteer credit
+                  (Paul's call): they count as ordinary runners (full CSV).
 
 Era 2 (real attendance rows, from Paul's photo reconstruction):
   --checkins FILE CSV with header: date,email_or_name,group_key
@@ -58,6 +66,7 @@ import sys
 import unicodedata
 import urllib.request
 from collections import defaultdict
+from datetime import date
 from pathlib import Path
 
 try:  # python.org macOS builds ship no CA bundle; certifi fills the gap
@@ -173,10 +182,53 @@ def match_group(key, g, by_email, by_name, aliases):
 # ── era 1: leader polls ──────────────────────────────────────────────────────
 
 def load_poll_tally(polls_path):
+    """Per leader: poll led-night count AND first poll answer date.
+
+    The first answer (any vote, run polls only) marks when their availability
+    started being tracked - old-site check-ins from then on are assumed to be
+    nights they led (the double-count window)."""
     sys.path.insert(0, str(REPO / "data" / "leader-polls"))
     import tally_attendance  # noqa: E402
     attend, names, _skipped = tally_attendance.main(polls_path)
-    return {names[person]: len(dates) for person, dates in attend.items()}
+    first_answer = {}
+    for p in json.loads(Path(polls_path).read_text()):
+        q = " ".join((p["question"] or "").split())
+        if any(p["posted"][:10] == d and q.startswith(pre)
+               for d, pre in tally_attendance.EXCLUDE) \
+           or any(k in q.lower() for k in tally_attendance.EXCLUDE_Q):
+            continue
+        for v in p["votes"]:
+            d = date.fromisoformat(v["voted_at"][:10])
+            if v["person"] not in first_answer or d < first_answer[v["person"]]:
+                first_answer[v["person"]] = d
+    return (
+        {names[person]: len(dates) for person, dates in attend.items()},
+        {names[person]: first_answer.get(person) for person in attend},
+    )
+
+
+def load_precounts(dirpath):
+    """Dated old-site exports (outset -> end date), named ...-to-YYYY-MM-DD.csv."""
+    out = {}
+    for p in sorted(Path(dirpath).glob("*.csv")):
+        m = re.search(r"(\d{4}-\d{2}-\d{2})", p.name)
+        if not m:
+            print(f"  WARNING: precount file without a date in its name, skipped: {p.name}")
+            continue
+        out[date.fromisoformat(m[1])] = load_runner_csv(p)
+    return out
+
+
+def precount_for(member, groups, aliases):
+    """The member's check-in count inside one dated export (0 if absent)."""
+    email = (member.get("email") or "").strip().lower()
+    for key, g in groups.items():
+        emails = {r["email"] for r in g["rows"] if r["email"]}
+        if email and (email in emails or any(aliases.get(e) == email for e in emails)):
+            return g["total"]
+        if key == member["norm_name"]:
+            return g["total"]
+    return 0
 
 
 # ── era 2: photo check-ins ───────────────────────────────────────────────────
@@ -203,6 +255,12 @@ def main():
     ap.add_argument("--checkins", help="photo reconstruction CSV (era 2, attendance rows)")
     ap.add_argument("--aliases", default=str(REPO / "data" / "attendance-backfill" / "aliases.json"),
                     help="JSON: {source_email_or_name: member_email} (gitignored)")
+    ap.add_argument("--precounts", default=str(REPO / "data" / "attendance-backfill" / "precounts"),
+                    help="dir of dated exports (outset -> end date) used to deduplicate "
+                         "leaders' run credit against their poll era")
+    ap.add_argument("--poll-exclude", default=str(REPO / "data" / "attendance-backfill" / "poll-exclude.json"),
+                    help="JSON list of poll names to exclude from volunteer credit "
+                         "(counted as ordinary runners)")
     ap.add_argument("--members-json", help="offline members dump for a credential-free dry run")
     ap.add_argument("--apply", action="store_true", help="write to the database (default: dry run)")
     args = ap.parse_args()
@@ -224,6 +282,55 @@ def main():
           + (f" from {args.members_json}" if args.members_json else ""))
 
     seed_rows = []
+    run_override = {}  # member_id -> precount replacing their full-CSV run count
+
+    exclude = set()
+    if Path(args.poll_exclude).exists():
+        exclude = {n.strip().lower() for n in json.loads(Path(args.poll_exclude).read_text())}
+
+    # Polls first: they decide which members get precount-overridden CSV counts.
+    if args.polls:
+        tally, first_answer = load_poll_tally(args.polls)
+        precounts = load_precounts(args.precounts) if Path(args.precounts).is_dir() else {}
+        print(f"\n── VOLUNTEER SEEDS (leader_polls, as of {VOL_SEED_AS_OF}) ──")
+        if precounts:
+            print("  precount exports: " + ", ".join(d.isoformat() for d in sorted(precounts)))
+        for name, count in sorted(tally.items(), key=lambda kv: -kv[1]):
+            if name.strip().lower() in exclude:
+                print(f"  {count:>4}  {name} -> EXCLUDED from volunteer credit (Paul's call, "
+                      f"10 Jul 2026) - counted as an ordinary runner")
+                continue
+            target = aliases.get(name.strip().lower())
+            ms = by_email.get(target.lower(), []) if target else by_name.get(norm_name(name), [])
+            if len(ms) != 1:
+                print(f"  {count:>4}  {name} -> NO MEMBER MATCH (not imported)")
+                continue
+            m = ms[0]
+            first = first_answer.get(name)
+            # The export must end JUST before their first poll (<=21 days) -
+            # an older export would miss their pre-poll runner history.
+            cutoffs = [d for d in precounts
+                       if first and d < first and (first - d).days <= 21]
+            if cutoffs:
+                cutoff = max(cutoffs)
+                pre = precount_for(m, precounts[cutoff], aliases)
+                run_override[m["id"]] = {"precount": pre, "file": cutoff.isoformat(), "poll": name}
+                note = f"run = {pre} pre-poll check-ins [to {cutoff}] + {count} led nights"
+            else:
+                note = (f"MISSING precount export before first poll {first} - "
+                        f"run keeps FULL CSV + {count} (over-counts, add the export)")
+            print(f"  {count:>4}  {name} -> {m['first_name'].strip()} {m['last_name'].strip()}  ({note})")
+            seed_rows.append({
+                "member_id": m["id"], "kind": "volunteer", "count": count,
+                "as_of": VOL_SEED_AS_OF, "source": "leader_polls",
+                "source_detail": f"poll name: {name}",
+            })
+            # leading implies attending: the same nights seed the run ladder
+            seed_rows.append({
+                "member_id": m["id"], "kind": "run", "count": count,
+                "as_of": VOL_SEED_AS_OF, "source": "leader_polls",
+                "source_detail": f"poll name: {name} (leader-nights count as runs)",
+            })
 
     if args.csv:
         groups = load_runner_csv(args.csv)
@@ -240,40 +347,33 @@ def main():
         for m, total, how, detail in matched:
             flag = "" if how == "email+name" else f"  [{how}]"
             merge = "  MERGED: " + detail if "+" in detail else ""
-            print(f"  {total:>4}  {m['first_name'].strip()} {m['last_name'].strip()}{flag}{merge}")
+            ov = run_override.get(m["id"])
+            use = total
+            if ov is not None:
+                use = ov["precount"]
+                detail = (f"pre-poll check-ins to {ov['file']} "
+                          f"(full CSV {total} overlaps the poll era)")
+                flag = f"  [precount; full CSV {total}]"
+            print(f"  {use:>4}  {m['first_name'].strip()} {m['last_name'].strip()}{flag}{merge}")
             seed_rows.append({
-                "member_id": m["id"], "kind": "run", "count": total,
+                "member_id": m["id"], "kind": "run", "count": use,
                 "as_of": RUN_SEED_AS_OF, "source": "oldsite_csv",
                 "source_detail": f"{detail} [{how}]",
             })
+        # Poll leaders absent from the full CSV (e.g. never checked in) still
+        # get an explicit row so a re-run overwrites any stale earlier value.
+        seen = {m["id"] for m, _, _, _ in matched}
+        for mid, ov in run_override.items():
+            if mid not in seen:
+                seed_rows.append({
+                    "member_id": mid, "kind": "run", "count": ov["precount"],
+                    "as_of": RUN_SEED_AS_OF, "source": "oldsite_csv",
+                    "source_detail": f"pre-poll check-ins to {ov['file']} (no row in full CSV)",
+                })
         print(f"  unmatched (kept only in the source file): "
               f"{sum(t for t, _ in unmatched)} sessions across {len(unmatched)} people")
         for total, detail in unmatched[:200]:
             print(f"    - {total:>4}  {detail}")
-
-    if args.polls:
-        tally = load_poll_tally(args.polls)
-        print(f"\n── VOLUNTEER SEEDS (leader_polls, as of {VOL_SEED_AS_OF}) ──")
-        for name, count in sorted(tally.items(), key=lambda kv: -kv[1]):
-            target = aliases.get(name.strip().lower())
-            ms = by_email.get(target.lower(), []) if target else by_name.get(norm_name(name), [])
-            if len(ms) == 1:
-                m = ms[0]
-                print(f"  {count:>4}  {name} -> {m['first_name'].strip()} {m['last_name'].strip()}"
-                      f"  (+{count} run credit)")
-                seed_rows.append({
-                    "member_id": m["id"], "kind": "volunteer", "count": count,
-                    "as_of": VOL_SEED_AS_OF, "source": "leader_polls",
-                    "source_detail": f"poll name: {name}",
-                })
-                # leading implies attending: the same nights seed the run ladder
-                seed_rows.append({
-                    "member_id": m["id"], "kind": "run", "count": count,
-                    "as_of": VOL_SEED_AS_OF, "source": "leader_polls",
-                    "source_detail": f"poll name: {name} (leader-nights count as runs)",
-                })
-            else:
-                print(f"  {count:>4}  {name} -> NO MEMBER MATCH (not imported)")
 
     # Aggregate per (member, kind, source): if two source groups map to the
     # same member (e.g. rows under a maiden AND married name), their counts
