@@ -85,3 +85,63 @@ OUTPUTS
 Screen design proper, then the app build, follow in later sessions once
 Paul signs off the language.
 ```
+
+---
+
+## Decision record (design session, 10 Jul 2026)
+
+Session held in the Pencil file at `~/Documents/RTR app`. The badge language
+is designed, both themes, and signed off by Paul in-session.
+
+### The grammar (generative — no artwork per rung)
+
+One circular token: ladder glyph on top, the number as hero (Inter
+ExtraBold), self-contained fill (works on any background/export surface).
+
+- **Below 100** (the approach rungs, always exactly 10/25/50): quiet coin —
+  `card` fill, 2 px `orange` ring, `text-hi` numeral, `orange` glyph.
+- **Every 100th, forever**: the coin fills solid `orange` — century club —
+  with `#0f0f0f` numeral/glyph (the Primary Button ink-on-accent precedent,
+  theme-independent) and **one pip per hundred** under the number
+  (200 = ••, 300 = •••). The numeral always carries the rank;
+  solid-vs-outline makes century club scannable even at 40 px.
+- **The partial arc means one thing only: progress toward the next rung.**
+  It never encodes rank, and it renders only at 80 px and up — 40 px
+  thumbnails stay binary (achieved / locked) because a fat 80% arc is
+  indistinguishable from an achieved ring at that size. Next-up carries
+  "N to go" + a linear progress bar in the surrounding layout.
+- **States**: locked = hairline `border-2` ring + `text-faint` numeral;
+  next-up = locked coin + orange arc (+ copy); **seed-achieved = the SAME
+  badge as achieved** — honoured in full, the quietness lives in the caption
+  ("already achieved", no date) and the absence of the New dot. Only a fresh
+  crossing gets the orange New dot + celebration, once.
+- **Two ladders, one family**: identical token, the glyph differentiates —
+  footprints = Runs, hand-heart = Leading. No v-prefix, no second colour
+  (terrain blue/green and C25K purple stay untouched).
+- **Empty state** (0/0): all rungs render locked with next-up 10 —
+  aspirational, nothing missing or broken.
+
+### Copy decisions (Paul, in-session)
+
+1. **Bare numbers, no rung names.** The numeral is the badge; generates
+   forever with zero copywriting. (C25K programme names stay a C25K thing.)
+2. **The ladders are called RUNS / LEADING in-app** (not Volunteering —
+   says exactly what earns it; the API's `volunteer` key is unchanged).
+3. **Celebration copy is plain milestone**: "200 runs with RTR." /
+   "100 nights leading with RTR." — quiet, factual, the badge does the
+   celebrating.
+4. Volunteer/leading glyph: **hand-heart** confirmed.
+
+### In the Pencil file
+
+- Reusable components **Badge 40 / Badge 80 / Badge 160** (thumbnail / card /
+  celebration). States are instance overrides on named layers
+  `Coin / Arc / Glyph / Number / Pips`; pips are a text layer ("••") so any
+  count is an override, and the arc is an ellipse `sweepAngle` (start 12
+  o'clock, clockwise). Trivial to port to RN SVG / email / print.
+- Sheets: "Recognition · Badge Grammar · Dark" + "· Light" (rule card, both
+  ladders 10→500, all five states, three sizes, empty state), canvas note
+  "Note Recognition", and a rough size-test mock "My Ladder · Dark" built on
+  Paul's real summary shape (run 160 / volunteer 160, next 200, 40 to go).
+
+Next session: the recognition screen design proper, then the app build.
