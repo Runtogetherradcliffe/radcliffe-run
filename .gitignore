@@ -51,8 +51,8 @@ __pycache__/
 # ...but keep the shared project settings (Stop hook that guards doc freshness)
 !.claude/settings.json
 
-# Leader poll backfill — personal data (names + phone-number ids), never commit
+# Leader poll backfill - personal data (names + phone-number ids), never commit
 /data/leader-polls/
 
-# Attendance backfill sources — personal data (names + emails), never commit
+# Attendance backfill sources - personal data (names + emails), never commit
 /data/attendance-backfill/
