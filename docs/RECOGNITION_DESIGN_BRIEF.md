@@ -206,3 +206,73 @@ OUTPUTS
 - Placement + toggle decisions appended to this brief in the
   radcliffe-run repo (again: hyphens, not em dashes).
 ```
+
+---
+
+## Decision record (My Ladder screen session, 10 Jul 2026)
+
+Session held in the Pencil file at `~/Documents/RTR app`, on the badge
+language above. All placement and copy decisions taken with Paul in-session.
+
+### Placement (Paul's calls)
+
+1. **Recognition lives in BOTH places**: a compact **Ladder Card on the Club
+   tab** (directly under the profile card - latest badge at 40 px, "My
+   ladder", "160 runs - 160 leading - 40 to next badge", chevron) opening
+   the **full My Ladder stack screen** (back button, no tab bar - the
+   standard drill-in grammar). The M1 tab structure is untouched.
+2. **The awards_public consent toggle sits at the foot of My Ladder** in a
+   SHARING card: "Celebrate my milestones publicly", off by default, with
+   the copy: "Off by default. When on, the club may celebrate your new
+   badges in roundups and socials. In the app, your ladder is only ever
+   visible to you." **BUILD DEPENDENCY**: PATCH support for awards_public
+   on /api/profile does not exist yet - backend-first before the app build.
+
+### Screen design rules (settled in-session)
+
+- **Progress fraction** (badge arc + linear bar, identical value):
+  `(total - prevRung) / (nextRung - prevRung)` - progress resets to zero at
+  each crossing. Paul at 160 shows 60% of the way from 100 to 200, NOT
+  160/200. prevRung = highest achieved rung, 0 for none. The grammar
+  sheet's next-up example was corrected to match.
+- **The LEADING card renders only when the member has leading history**
+  (volunteer.total > 0, or the is_run_leader flag). A newcomer at 0/0 sees
+  the Runs ladder only - a "LEADING - 10 to go" card would imply members
+  are expected to lead.
+- **Ladder card anatomy**: count hero (26/800 + unit), 40 px thumbnail
+  strip (achieved rungs + next and one future rung, locked - thumbnails
+  stay binary per the grammar), next-up row (80 px badge with arc, "N to
+  go", "Next badge at N", linear bar), and the seed line ("Badges to 100
+  earned before the app - already achieved", history icon, faint).
+- **The seed line is data-driven, not time-driven, and never switches
+  off**: it renders while any achieved rung has `achieved_on` NULL (rung
+  <= seed), and those rungs never gain dates. So it is SCOPED to name the
+  seed rungs ("Badges to 100...") and stays true after the first live,
+  dated crossing lands above it. If seed = 0 it never renders.
+- **Empty state** (0/0): all-locked strip, next-up 10 with a 6 px endowed
+  nub on the bar, sub-copy "Your first badge is at 10". Nothing renders
+  broken; the SHARING card stays.
+- **Celebration = the Milestone screen** (in-screen state, not a push),
+  refined with Paul over three feedback rounds: a named greeting
+  "Congratulations, {firstName}" (20/800, orange - the first name comes
+  from the member profile the app already holds), a celebratory badge
+  scene (soft orange glow halo, two hairline ripple rings, confetti dots
+  in the orange family ONLY - terrain blue/green and C25K purple stay
+  semantic), the milestone line "200 runs with RTR." (28/800), dateline
+  ("Crossed Thursday 16 July 2026"), Continue. Shown once, on the first
+  open after a fresh crossing - seed rungs never trigger it. The
+  shown-once state belongs to the awards machinery (awards table / job),
+  which is a later build step.
+
+### In the Pencil file / renders
+
+Frames (all superseding the rough size-test mock, which is deleted):
+My Ladder Dark/Light (Paul's 160/160 shape), My Ladder 30-5 Dark/Light
+(leader-with-few-runs), My Ladder empty Dark/Light (0/0), Milestone
+Dark/Light, and the Club tab updated in place with the Ladder Card (both
+themes). Renders committed to design/screens/: recognition-my-ladder-*,
+recognition-milestone-*, club-dark/light (replaced), and the corrected
+badge grammar sheets.
+
+Next: backend PATCH for awards_public, then the app build of these screens
+off GET /api/attendance/summary.
