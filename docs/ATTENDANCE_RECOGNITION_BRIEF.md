@@ -258,14 +258,16 @@ All open questions above were put to Paul and decided; the build follows these.
    `source='manual'` is the by-exception adjustment channel, worked through
    with live data.
 
-Built: `supabase-migration-attendance-recognition.sql` (applied to dev 10 Jul;
-production pending approval), `scripts/import_attendance_seeds.py` (dry-run
-default; seed import verified idempotent on dev), `lib/recognition.ts`,
-`GET /api/attendance/summary`, volunteer auto-credit in
-`POST /api/leader/checkin`. Dry-run report against prod members:
-`data/attendance-backfill/dry-run-report.txt` (77 members matched, 2,683 of
-5,630 CSV sessions attach; 17 of 26 poll leaders match, 1,190 of 1,383
-leader-nights attach).
+Built: `supabase-migration-attendance-recognition.sql` (applied to dev AND
+production 10 Jul), `scripts/import_attendance_seeds.py` (dry-run default;
+`--html` review page, `--emit-sql` for applying via the Supabase MCP),
+`lib/recognition.ts`, `GET /api/attendance/summary`, volunteer auto-credit in
+`POST /api/leader/checkin`. SHIPPED 10 Jul 2026: merged to main (ad00e6c) and
+seeds imported to production the same day - 106 seed rows, 78 members, 3,741
+run credits, 1,179 volunteer credits. Headline launch numbers (run/volunteer):
+Paul 160/160, Kate Myers 151/119, Ken Smith 138/131, Delphine 126/126,
+Martyn 132/101, Julie Smith 114/109, Kath 111/107, Neil 160/25. Review pages
+regenerate from `data/attendance-backfill/` (gitignored).
 
 Still open (next sessions): awards-row computation/notification job (the
 `awards` table exists, nothing writes it yet), the leader recognition loop,
