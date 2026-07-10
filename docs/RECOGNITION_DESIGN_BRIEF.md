@@ -145,3 +145,64 @@ ExtraBold), self-contained fill (works on any background/export surface).
   Paul's real summary shape (run 160 / volunteer 160, next 200, 40 to go).
 
 Next session: the recognition screen design proper, then the app build.
+
+---
+
+## Session prompt: "My Ladder" screen design (paste into a native-apps thread)
+
+```
+Design the recognition display screens for the RTR app in the Pencil file,
+using the badge language designed and signed off on 10 Jul 2026. This is
+screen design; the app build follows in a later session.
+
+REPO RULE - READ BEFORE COMMITTING ANYTHING TO radcliffe-run
+No em dashes in ANY file (docs included) - a CI guard fails the build on
+them; the badge session's decision record had to be fixed after the fact.
+Use plain hyphens. And staging-first: never push to main; commit to the
+working branch, push to staging, Paul approves any merge.
+
+WHERE
+The Pencil file at ~/Documents/"RTR app". The badge components (Badge 40 /
+Badge 80 / Badge 160, states as instance overrides) and the grammar sheets
+("Recognition - Badge Grammar - Dark/Light") already exist in it, plus a
+rough size-test mock "My Ladder - Dark" to supersede.
+
+READ FIRST
+- radcliffe-run repo: docs/RECOGNITION_DESIGN_BRIEF.md - the badge grammar
+  and copy decisions (Runs / Leading naming, bare numbers, plain milestone
+  celebration copy). These are DECIDED - do not relitigate.
+- radcliffe-run repo: docs/NATIVE_APP_SCOPE.md section 5 - the endpoint
+  contract (GET /api/attendance/summary) and v1.1 sequencing.
+- docs/PENCIL_DESIGN_BRIEF.md for the M1 file's conventions.
+
+WHAT TO DESIGN (both themes throughout)
+1. The final My Ladder screen: both ladders (Runs / Leading) with achieved,
+   locked and next-up badges, progress to next ("N to go" + linear bar -
+   the badge arc renders only at 80 px and up), and the seed-achieved
+   caption treatment ("already achieved", no date, no New dot).
+2. WHERE recognition lives - decide with Paul: its own screen off the
+   profile, a card on an existing tab that opens the full ladder, or both
+   (summary card -> full screen). Respect the M1 tab structure.
+3. The celebration moment for a FRESH crossing: New dot + plain milestone
+   copy ("200 runs with RTR."), shown once. Design the moment (in-screen
+   state, not a push notification - that is the awards job, later).
+4. The awards_public consent toggle: private by default; where it sits in
+   the profile/consent screens and its explanatory copy. (Backend PATCH
+   support does not exist yet - flag it as a build dependency, design it
+   anyway.)
+5. Empty state 0/0 (new member: all locked, next-up 10) and the
+   leader-with-few-runs shape (e.g. 30 / 5) - no ladder may look broken.
+
+REAL DATA FOR MOCKS (live shapes from GET /api/attendance/summary:
+{ run: { total, seed, recorded, rungs, nextRung, toNext },
+  volunteer: { same }, awardsPublic })
+- Paul 160/160 (next 200, 40 to go), Kate 151/119, Neil 160/25, Ros 54/11,
+  mid-range ~40/0, newcomer 3/0, empty 0/0.
+
+OUTPUTS
+- Final screens in the Pencil file, both themes, superseding the rough mock.
+- Exported renders committed to radcliffe-run design/screens/ (hyphens in
+  filenames and commit messages - see the repo rule above).
+- Placement + toggle decisions appended to this brief in the
+  radcliffe-run repo (again: hyphens, not em dashes).
+```
