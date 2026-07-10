@@ -291,6 +291,18 @@ def main():
                 merged[k] = dict(row)
         seed_rows = list(merged.values())
 
+    if seed_rows:
+        # Combined per-member totals - what the ladder will actually show
+        # (a leader's run total = CSV check-ins + poll leader-nights).
+        name_of = {m["id"]: f"{m['first_name'].strip()} {m['last_name'].strip()}" for m in members}
+        totals = {}
+        for row in seed_rows:
+            t = totals.setdefault(row["member_id"], {"run": 0, "volunteer": 0})
+            t[row["kind"]] += row["count"]
+        print(f"\n── COMBINED SEED TOTALS (run / volunteer, as the API will report them) ──")
+        for mid, t in sorted(totals.items(), key=lambda kv: -(kv[1]["run"] + kv[1]["volunteer"])):
+            print(f"  {t['run']:>4} / {t['volunteer']:<4}  {name_of[mid]}")
+
     if seed_rows and args.apply:
         rest(url, key, "POST", "attendance_seeds?on_conflict=member_id,kind,source",
              body=seed_rows, prefer="resolution=merge-duplicates")
