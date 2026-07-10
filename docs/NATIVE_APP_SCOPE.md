@@ -515,6 +515,46 @@ surface) but does not create it.
    since Bearer support widens how authenticated requests reach the server.)
 5. Nothing else - reads are ready as-is.
 
+### Attendance recognition endpoint (shipped 10 Jul 2026 - ready for v1.1)
+
+The awards/gamification display has its backend live already - and v1.1 is
+PULLED FORWARD (Paul, 10 Jul 2026): the Nov-Dec slot was driven by the C25K
+cohort, but the historic backfill landed early (~90% of attendance data is
+in), so regulars get recognised ASAP. Sequencing:
+
+1. **Badge/trophy design session first** - digital badge artwork for the
+   rungs (10/25/50/100/every-100th, run + volunteer), designed in the Pencil
+   file to the site/app brand standards (RTR tokens, both themes).
+2. **Display screen** - achieved rungs + progress to next, straight off
+   `GET /api/attendance/summary`. Needs NO new backend. Presentation of
+   milestones crossed inside the seed is settled by the workshop principle:
+   members open the app to SEE what they have already achieved and how far
+   to the next - achieved is achieved, no retro fanfare (never celebrate a
+   2023 milestone as news).
+3. **Celebration machinery after** - the awards cron job (dated crossings,
+   notify-once, seed-era rungs written silently with `achieved_on` NULL) and
+   the leader recognition loop follow the display, not the other way round.
+
+The app needs NO changes for attendance capture (volunteer credit is written
+server-side by `POST /api/leader/checkin` when the checked-in member is a
+leader). For the member-facing display, consume:
+
+- `GET /api/attendance/summary` - cookie or `Authorization: Bearer` (same
+  as every app route). Returns the CALLER's own ladders only:
+  `{ run: { total, seed, recorded, rungs, nextRung, toNext },
+     volunteer: { ...same shape }, awardsPublic: boolean }`.
+  Rungs are 10/25/50/100 then every 100th. `seed` is pre-site history
+  (undatable - present milestones crossed inside it as "already achieved"),
+  `recorded` is counted nights since. 401 signed out; 404 if the account has
+  no member row.
+- `awardsPublic` mirrors `members.awards_public` (default false - private by
+  default, opt-in public celebration). A toggle for it belongs with the
+  profile/consent screens; PATCH support on `/api/profile` does not exist yet
+  and should be added backend-first when the display work starts.
+- Counting rules, schema and the decision record live in
+  `docs/ATTENDANCE_RECOGNITION_BRIEF.md` - the app renders shapes, it never
+  recomputes counts.
+
 ---
 
 ## 6. Design brief for the Pencil session

@@ -5,7 +5,8 @@ by default. Decision record: docs/ATTENDANCE_RECOGNITION_BRIEF.md.
 Era 1 (seeds - per-member offsets, no dates):
   --csv FILE      old-site runner export ("First Name,Last Name,Email Address,
                   Sessions Checked In") -> attendance_seeds kind='run',
-                  source='oldsite_csv', as_of 2026-04-30.
+                  source='oldsite_csv', as_of 2026-05-07 (the last run
+                  counted on the legacy site).
   --polls FILE    resolved WhatsApp leader polls JSON -> attendance_seeds,
                   source='leader_polls', as_of 2026-07-09. Each leader-night
                   seeds BOTH kind='volunteer' AND kind='run' (leading implies
@@ -23,15 +24,19 @@ Era 1 (seeds - per-member offsets, no dates):
                   (Paul's call): they count as ordinary runners (full CSV).
 
 Era 2 (real attendance rows, from Paul's photo reconstruction):
-  --checkins FILE CSV with header: date,email_or_name,group_key
-                  (group_key optional: 8k|5k|jeff). Rows become `attendance`
-                  rows with source='photo', anchored to that date's
-                  shortest-distance run row - the SAME anchor convention as the
-                  live check-in, so one member never gets two rows for one
-                  night. Dates must fall inside 2026-05-04..2026-07-09 (before
-                  that is the CSV seed's era; after it is live check-in).
-                  Photo rows must NOT be created in run_leadership: leader
-                  history through 9 Jul is already covered by the polls seed.
+  --checkins FILE names-only block format (template:
+                  data/attendance-backfill/photo-checkins.txt): a
+                  YYYY-MM-DD line starts a night, each following line is one
+                  attendee name (', 8k|5k|jeff' suffix optional; # comments
+                  ignored). A CSV with header date,email_or_name,group_key
+                  also works. Rows become `attendance` rows with
+                  source='photo', anchored to that date's shortest-distance
+                  run row - the SAME anchor convention as the live check-in,
+                  so one member never gets two rows for one night. Dates must
+                  fall inside 2026-05-08..2026-07-09 (7 May and before is the
+                  CSV seed's era; after 9 Jul is live check-in). Photo rows must NOT
+                  be created in run_leadership: leader history through 9 Jul
+                  is already covered by the polls seed.
 
 GDPR: people in the source files who do not match a registered member are
 REPORTED but never written to the database. Re-run the importer after someone
@@ -76,9 +81,9 @@ except ImportError:
     SSL_CTX = ssl.create_default_context()
 
 REPO = Path(__file__).resolve().parent.parent
-RUN_SEED_AS_OF = "2026-04-30"   # last old-site Thursday before the new site
+RUN_SEED_AS_OF = "2026-05-07"   # last run counted on the legacy site (Paul, 10 Jul)
 VOL_SEED_AS_OF = "2026-07-09"   # polls cover through the first live check-in
-ERA2_START, ERA2_END = "2026-05-04", "2026-07-09"
+ERA2_START, ERA2_END = "2026-05-08", "2026-07-09"  # photo gap: 14 May - 9 Jul nights
 GROUPS = {"8k", "5k", "jeff"}
 
 
@@ -204,6 +209,7 @@ def load_poll_tally(polls_path):
     return (
         {names[person]: len(dates) for person, dates in attend.items()},
         {names[person]: first_answer.get(person) for person in attend},
+        {names[person]: {d.isoformat() for d in dates} for person, dates in attend.items()},
     )
 
 
@@ -232,6 +238,39 @@ def precount_for(member, groups, aliases):
 
 
 # ── era 2: photo check-ins ───────────────────────────────────────────────────
+
+def load_checkins(path):
+    """Yield (lineno, date, who, group) from either supported format.
+
+    Block format (names-only, built for the photo pass):
+        # comment lines are ignored
+        2026-05-07
+        Neil Naisbitt
+        Kerry Burdaky, 5k      <- ', 8k|5k|jeff' suffix optional
+    CSV format: header row 'date,email_or_name,group_key'."""
+    text = Path(path).read_text(encoding="utf-8-sig")
+    lines = text.splitlines()
+    first = next((l for l in lines if l.strip() and not l.strip().startswith("#")), "")
+    if "email_or_name" in first:
+        import io
+        return [(i, r["date"].strip(), r["email_or_name"].strip(),
+                 (r.get("group_key") or "").strip().lower() or None)
+                for i, r in enumerate(csv.DictReader(io.StringIO(text)), start=2)]
+    entries, cur = [], None
+    for i, raw in enumerate(lines, start=1):
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        if re.fullmatch(r"\d{4}-\d{2}-\d{2}", line):
+            cur = line
+            continue
+        who, grp = line, None
+        head, _, tail = line.rpartition(",")
+        if head and tail.strip().lower() in GROUPS:
+            who, grp = head.strip(), tail.strip().lower()
+        entries.append((i, cur, who, grp))
+    return entries
+
 
 def fetch_anchor_runs(url, key):
     """date -> anchor run id: shortest-distance non-cancelled regular run."""
@@ -373,7 +412,12 @@ def main():
                     help="JSON list of poll names to exclude from volunteer credit "
                          "(counted as ordinary runners)")
     ap.add_argument("--members-json", help="offline members dump for a credential-free dry run")
+    ap.add_argument("--runs-json", help="offline runs dump (id,date,distance_km,run_type,cancelled) "
+                                        "for credential-free era-2 anchoring")
     ap.add_argument("--html", help="also write a readable HTML review page to this path")
+    ap.add_argument("--emit-sql", help="write the seed upsert as SQL to this path instead of "
+                                       "applying over REST (for applying via the Supabase MCP "
+                                       "when the target's service key is not on this machine)")
     ap.add_argument("--apply", action="store_true", help="write to the database (default: dry run)")
     args = ap.parse_args()
     if args.apply and args.members_json:
@@ -402,8 +446,9 @@ def main():
         exclude = {n.strip().lower() for n in json.loads(Path(args.poll_exclude).read_text())}
 
     # Polls first: they decide which members get precount-overridden CSV counts.
+    leader_nights = {}  # member_id -> poll-night dates already credited by the seed
     if args.polls:
-        tally, first_answer = load_poll_tally(args.polls)
+        tally, first_answer, night_sets = load_poll_tally(args.polls)
         precounts = load_precounts(args.precounts) if Path(args.precounts).is_dir() else {}
         print(f"\n── VOLUNTEER SEEDS (leader_polls, as of {VOL_SEED_AS_OF}) ──")
         if precounts:
@@ -421,6 +466,7 @@ def main():
                 rpt["volunteers"].append({"poll": name, "count": count, "status": "no_match"})
                 continue
             m = ms[0]
+            leader_nights[m["id"]] = night_sets.get(name, set())
             first = first_answer.get(name)
             # The export must end JUST before their first poll (<=21 days) -
             # an older export would miss their pre-poll runner history.
@@ -534,37 +580,82 @@ def main():
         Path(args.html).write_text(render_html(rpt), encoding="utf-8")
         print(f"\nHTML review page written to {args.html}")
 
+    if args.emit_sql and seed_rows:
+        def tup(r):
+            detail = (r.get("source_detail") or "").replace("'", "''")
+            return (f"('{r['member_id']}','{r['kind']}',{r['count']},"
+                    f"'{r['as_of']}','{r['source']}','{detail}')")
+        sql = ("-- attendance_seeds upsert, generated by import_attendance_seeds.py\n"
+               "-- idempotent: re-running updates counts in place\n"
+               "INSERT INTO attendance_seeds (member_id, kind, count, as_of, source, source_detail)\nVALUES\n"
+               + ",\n".join(tup(r) for r in seed_rows)
+               + "\nON CONFLICT (member_id, kind, source) DO UPDATE SET count = EXCLUDED.count,\n"
+                 "  as_of = EXCLUDED.as_of, source_detail = EXCLUDED.source_detail, updated_at = now();\n")
+        Path(args.emit_sql).write_text(sql, encoding="utf-8")
+        print(f"\nSQL for {len(seed_rows)} seed rows written to {args.emit_sql}")
+
     if seed_rows and args.apply:
         rest(url, key, "POST", "attendance_seeds?on_conflict=member_id,kind,source",
              body=seed_rows, prefer="resolution=merge-duplicates")
         print(f"\nUpserted {len(seed_rows)} seed rows")
 
     if args.checkins:
-        anchors = fetch_anchor_runs(url, key)
-        rows, problems = [], []
-        with open(args.checkins, newline="", encoding="utf-8-sig") as f:
-            for i, r in enumerate(csv.DictReader(f), start=2):
-                d = r["date"].strip()
-                who = r["email_or_name"].strip().lower()
-                grp = (r.get("group_key") or "").strip().lower() or None
-                if grp and grp not in GROUPS:
-                    problems.append(f"line {i}: bad group_key {grp!r}")
+        if args.runs_json:
+            anchors = {}
+            for r in json.loads(Path(args.runs_json).read_text()):
+                if r.get("cancelled") or r.get("run_type") != "regular":
                     continue
-                if d not in anchors:
-                    problems.append(f"line {i}: no anchor run for {d} "
-                                    f"(era 2 is {ERA2_START}..{ERA2_END}, regular runs only)")
+                d = r["date"]
+                if not (ERA2_START <= d <= ERA2_END):
                     continue
-                target = aliases.get(who, who)
-                ms = by_email.get(target, []) or by_name.get(re.sub(r"[^a-z]", "", target), [])
-                if len(ms) != 1:
-                    problems.append(f"line {i}: {r['email_or_name']!r} matched {len(ms)} members")
-                    continue
-                rows.append({"run_id": anchors[d], "member_id": ms[0]["id"],
-                             "source": "photo", "group_key": grp,
-                             "recorded_at": f"{d}T19:00:00Z"})
-        print(f"\n── ERA-2 CHECK-INS (photo) ── {len(rows)} rows, {len(problems)} problems")
+                if d not in anchors or float(r["distance_km"] or 999) < anchors[d][1]:
+                    anchors[d] = (r["id"], float(r["distance_km"] or 999))
+            anchors = {d: rid for d, (rid, _) in anchors.items()}
+        else:
+            anchors = fetch_anchor_runs(url, key)
+        if not args.polls:
+            print("\n  NOTE: pass --polls too so leaders' led nights (already credited by "
+                  "the seed) are skipped automatically instead of double-counting")
+        rows, problems, skipped_leaders = [], [], []
+        for i, d, who_raw, grp in load_checkins(args.checkins):
+            who = who_raw.lower()
+            if grp and grp not in GROUPS:
+                problems.append(f"line {i}: bad group {grp!r}")
+                continue
+            if not d or d not in anchors:
+                problems.append(f"line {i}: no anchor run for {d or '(no date heading)'} "
+                                f"(era 2 is {ERA2_START}..{ERA2_END}, regular runs only)")
+                continue
+            target = aliases.get(who, who)
+            ms = by_email.get(target, []) or by_name.get(re.sub(r"[^a-z]", "", target), [])
+            if len(ms) != 1:
+                problems.append(f"line {i}: {who_raw!r} matched {len(ms)} members")
+                continue
+            if d in leader_nights.get(ms[0]["id"], ()):
+                skipped_leaders.append(f"line {i}: {who_raw} on {d} - already credited "
+                                       f"by the polls seed (led that night), skipped")
+                continue
+            rows.append({"run_id": anchors[d], "member_id": ms[0]["id"],
+                         "source": "photo", "group_key": grp,
+                         "recorded_at": f"{d}T19:00:00Z"})
+        nights = len({r["recorded_at"][:10] for r in rows})
+        print(f"\n── ERA-2 CHECK-INS (photo) ── {len(rows)} rows across {nights} nights, "
+              f"{len(problems)} problems, {len(skipped_leaders)} leader-nights skipped")
         for p in problems:
             print(f"    ! {p}")
+        for s in skipped_leaders:
+            print(f"    ~ {s}")
+        if rows and args.emit_sql:
+            sql = ("-- attendance rows from the photo reconstruction\n"
+                   "-- existing rows (live check-ins) always win: DO NOTHING on conflict\n"
+                   "INSERT INTO attendance (run_id, member_id, source, group_key, recorded_at)\nVALUES\n"
+                   + ",\n".join(f"('{r['run_id']}','{r['member_id']}','photo',"
+                                + (f"'{r['group_key']}'" if r["group_key"] else "NULL")
+                                + f",'{r['recorded_at']}')" for r in rows)
+                   + "\nON CONFLICT (run_id, member_id) DO NOTHING;\n")
+            out = Path(args.emit_sql.replace(".sql", "-checkins.sql"))
+            out.write_text(sql, encoding="utf-8")
+            print(f"SQL for {len(rows)} attendance rows written to {out}")
         if rows and args.apply:
             # ignore-duplicates: an existing row (live check-in) always wins
             # over a photo reconstruction of the same (run, member)
