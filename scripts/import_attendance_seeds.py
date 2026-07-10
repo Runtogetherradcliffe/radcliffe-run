@@ -5,7 +5,8 @@ by default. Decision record: docs/ATTENDANCE_RECOGNITION_BRIEF.md.
 Era 1 (seeds - per-member offsets, no dates):
   --csv FILE      old-site runner export ("First Name,Last Name,Email Address,
                   Sessions Checked In") -> attendance_seeds kind='run',
-                  source='oldsite_csv', as_of 2026-04-30.
+                  source='oldsite_csv', as_of 2026-05-07 (the last run
+                  counted on the legacy site).
   --polls FILE    resolved WhatsApp leader polls JSON -> attendance_seeds,
                   source='leader_polls', as_of 2026-07-09. Each leader-night
                   seeds BOTH kind='volunteer' AND kind='run' (leading implies
@@ -32,8 +33,8 @@ Era 2 (real attendance rows, from Paul's photo reconstruction):
                   source='photo', anchored to that date's shortest-distance
                   run row - the SAME anchor convention as the live check-in,
                   so one member never gets two rows for one night. Dates must
-                  fall inside 2026-05-04..2026-07-09 (before that is the CSV
-                  seed's era; after it is live check-in). Photo rows must NOT
+                  fall inside 2026-05-08..2026-07-09 (7 May and before is the
+                  CSV seed's era; after 9 Jul is live check-in). Photo rows must NOT
                   be created in run_leadership: leader history through 9 Jul
                   is already covered by the polls seed.
 
@@ -80,9 +81,9 @@ except ImportError:
     SSL_CTX = ssl.create_default_context()
 
 REPO = Path(__file__).resolve().parent.parent
-RUN_SEED_AS_OF = "2026-04-30"   # last old-site Thursday before the new site
+RUN_SEED_AS_OF = "2026-05-07"   # last run counted on the legacy site (Paul, 10 Jul)
 VOL_SEED_AS_OF = "2026-07-09"   # polls cover through the first live check-in
-ERA2_START, ERA2_END = "2026-05-04", "2026-07-09"
+ERA2_START, ERA2_END = "2026-05-08", "2026-07-09"  # photo gap: 14 May - 9 Jul nights
 GROUPS = {"8k", "5k", "jeff"}
 
 
@@ -605,6 +606,8 @@ def main():
                 if r.get("cancelled") or r.get("run_type") != "regular":
                     continue
                 d = r["date"]
+                if not (ERA2_START <= d <= ERA2_END):
+                    continue
                 if d not in anchors or float(r["distance_km"] or 999) < anchors[d][1]:
                     anchors[d] = (r["id"], float(r["distance_km"] or 999))
             anchors = {d: rid for d, (rid, _) in anchors.items()}

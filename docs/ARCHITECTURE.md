@@ -190,7 +190,8 @@ Three more service-role-only tables (RLS enabled, NO policies -
 `supabase-migration-attendance-recognition.sql`):
 
 - `attendance_seeds` - era-1 offsets for history that predates the site's
-  records: the old-site check-in export (runs, as of 30 Apr 2026) and the
+  records: the old-site check-in export (runs, as of 7 May 2026 - the legacy
+  site's last counted run) and the
   WhatsApp leader availability polls (volunteer AND run credit, through
   9 Jul 2026), plus `source='manual'` for by-exception adjustments.
   `UNIQUE(member_id, kind, source)` keeps the importer idempotent.
@@ -220,7 +221,7 @@ idempotent, re-runnable). Sources live in `data/attendance-backfill/` +
 `data/leader-polls/` - both gitignored (names/emails/phone ids; the repo is
 public). People in the sources who never registered are reported but NEVER
 written to the DB (GDPR minimisation) - re-running the import attaches them
-if they register later. The era-2 gap (4 May - 9 Jul 2026, reconstructed from
+if they register later. The era-2 gap (14 May - 9 Jul 2026, reconstructed from
 run photos) imports as real `attendance` rows (`source='photo'`,
 ignore-duplicates so live rows always win) and must NOT create
 `run_leadership` rows - leader history through 9 Jul is already covered by

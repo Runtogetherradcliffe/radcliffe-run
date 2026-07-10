@@ -236,8 +236,11 @@ All open questions above were put to Paul and decided; the build follows these.
 4. **Poll availability = leader attendance.** No provisional/confirmation
    layer, no photo corroboration required for leader history.
 5. **Eras and dates.** Old-site CSV runs to the week before the new site:
-   run seed as-of 2026-04-30. Volunteer (polls) seed as-of 2026-07-09. The
-   photo reconstruction gap is exactly 4 May - 9 Jul 2026 and imports as
+   run seed as-of 2026-05-07 (corrected 10 Jul: the legacy site counted its
+   last run on 7 May - the new site ran in parallel before launch, so the
+   7 May night belongs to the CSV seed, not the photo gap). Volunteer
+   (polls) seed as-of 2026-07-09. The
+   photo reconstruction gap is exactly 14 May - 9 Jul 2026 and imports as
    `attendance` rows with `source='photo'` (attendance only - NO
    `run_leadership` rows, the polls seed already covers leaders to 9 Jul).
    Live `run_leadership` starts 16 Jul 2026.
