@@ -248,6 +248,117 @@ def fetch_anchor_runs(url, key):
     return {d: rid for d, (rid, _) in anchors.items()}
 
 
+def render_html(rpt):
+    """Self-contained review page: leaders' workings, combined totals,
+    runner seeds, and the not-imported list. Local file only - it contains
+    personal data, so it lives in the gitignored backfill dir."""
+    import html as h
+    e = h.escape
+
+    STATUS = {
+        "ok":       ("deduped", "#2e7d2e", "#edf7ed"),
+        "missing":  ("MISSING export - over-counts", "#b3261e", "#fdecea"),
+        "excluded": ("excluded - ordinary runner", "#666", "#eee"),
+        "no_match": ("not a member - not imported", "#666", "#eee"),
+    }
+
+    def badge(text, fg, bg):
+        return (f'<span style="background:{bg};color:{fg};border-radius:9px;'
+                f'padding:1px 9px;font-size:12px;white-space:nowrap">{text}</span>')
+
+    vol_rows = []
+    for v in rpt["volunteers"]:
+        label, fg, bg = STATUS[v["status"]]
+        if v["status"] == "ok":
+            workings = (f'{v["precount"]} pre-poll <span style="color:#888">[to {v["cutoff"]}]</span>'
+                        f' + {v["count"]} led = <b>{v["precount"] + v["count"]}</b>')
+        elif v["status"] == "missing":
+            workings = f'full CSV + {v["count"]} (needs export before {e(v["first"])})'
+        else:
+            workings = ""
+        member = e(v.get("member") or "")
+        vol_rows.append(f'<tr><td class="n">{v["count"]}</td><td>{e(v["poll"])}</td>'
+                        f'<td>{member}</td><td>{workings}</td><td>{badge(label, fg, bg)}</td></tr>')
+
+    leaders = {t["member"] for t in rpt["totals"] if t["volunteer"] > 0}
+    tot_rows = []
+    for i, t in enumerate(rpt["totals"], 1):
+        star = badge("leader", "#7a4a00", "#fdf3e0") if t["member"] in leaders else ""
+        tot_rows.append(f'<tr><td class="n">{i}</td><td>{e(t["member"])} {star}</td>'
+                        f'<td class="n"><b>{t["run"]}</b></td><td class="n">{t["volunteer"] or ""}</td></tr>')
+
+    run_rows = []
+    for r in sorted(rpt["runners"], key=lambda x: -x["count"]):
+        flags = []
+        if r["precount_file"]:
+            flags.append(badge(f'precount to {r["precount_file"]}; full CSV {r["full"]}', "#2e7d2e", "#edf7ed"))
+        if r["how"] != "email+name":
+            flags.append(badge(f'matched by {r["how"]} - check', "#7a4a00", "#fdf3e0"))
+        if r["merged"]:
+            flags.append(badge("duplicate rows summed", "#1a4a7a", "#e8f0f8"))
+        run_rows.append(f'<tr><td class="n">{r["count"]}</td><td>{e(r["member"])}</td>'
+                        f'<td>{" ".join(flags)}</td></tr>')
+
+    un_rows = [f'<tr><td class="n">{u["count"]}</td><td>{e(u["detail"])}</td></tr>'
+               for u in rpt["unmatched"]]
+    un_total = sum(u["count"] for u in rpt["unmatched"])
+    imported = sum(t["run"] for t in rpt["totals"])
+
+    return f"""<meta charset="utf-8">
+<title>Attendance seed review - {rpt["mode"]}</title>
+<style>
+  body {{ font: 15px/1.5 -apple-system, system-ui, sans-serif; color: #1a1a1a;
+         max-width: 860px; margin: 40px auto; padding: 0 20px; }}
+  h1 {{ font-size: 22px; }} h2 {{ font-size: 17px; margin-top: 36px; }}
+  table {{ border-collapse: collapse; width: 100%; margin-top: 10px; }}
+  th {{ text-align: left; font-size: 12px; text-transform: uppercase; color: #888;
+       border-bottom: 2px solid #ddd; padding: 6px 10px; }}
+  td {{ padding: 5px 10px; border-bottom: 1px solid #eee; }}
+  td.n {{ text-align: right; font-variant-numeric: tabular-nums; width: 1%; }}
+  tr:hover {{ background: #fafafa; }}
+  .cards {{ display: flex; gap: 14px; flex-wrap: wrap; margin-top: 18px; }}
+  .card {{ background: #f6f6f6; border-radius: 10px; padding: 12px 18px; }}
+  .card b {{ font-size: 22px; display: block; }}
+  .muted {{ color: #888; font-size: 13px; }}
+  summary {{ cursor: pointer; font-weight: 600; margin-top: 36px; }}
+  input {{ font: inherit; padding: 6px 10px; border: 1px solid #ccc;
+          border-radius: 8px; width: 240px; margin-top: 10px; }}
+</style>
+<h1>Attendance seed review <span class="muted">({rpt["mode"].lower()})</span></h1>
+<div class="cards">
+  <div class="card"><b>{len(rpt["totals"])}</b>members get history</div>
+  <div class="card"><b>{imported:,}</b>run credits</div>
+  <div class="card"><b>{len([v for v in rpt["volunteers"] if v["status"] in ("ok", "missing")])}</b>leaders credited</div>
+  <div class="card"><b>{len(rpt["unmatched"])}</b>people not imported <span class="muted">({un_total:,} sessions)</span></div>
+</div>
+
+<h2>Leaders - volunteer credit and run workings</h2>
+<p class="muted">Run credit = check-ins before their first poll + led nights (no night counted twice).</p>
+<table><tr><th>Led</th><th>Poll name</th><th>Member</th><th>Run workings</th><th></th></tr>{"".join(vol_rows)}</table>
+
+<h2>Combined totals - what each member's ladder will show</h2>
+<input placeholder="Filter by name..." oninput="f(this, 'tot')">
+<table id="tot"><tr><th>#</th><th>Member</th><th>Runs</th><th>Volunteer</th></tr>{"".join(tot_rows)}</table>
+
+<h2>Run seeds from the old-site export</h2>
+<p class="muted">Amber rows matched by something weaker than email+name - worth an eyeball.</p>
+<input placeholder="Filter by name..." oninput="f(this, 'run')">
+<table id="run"><tr><th>Runs</th><th>Member</th><th>Notes</th></tr>{"".join(run_rows)}</table>
+
+<details><summary>Not imported - never registered on the new site ({len(rpt["unmatched"])} people, {un_total:,} sessions)</summary>
+<p class="muted">Kept only in the source files. Re-run the import after someone registers and their history attaches.</p>
+<table><tr><th>Runs</th><th>Name(s) in the old-site export</th></tr>{"".join(un_rows)}</table></details>
+
+<script>
+function f(inp, id) {{
+  const q = inp.value.toLowerCase();
+  for (const tr of document.getElementById(id).rows)
+    if (tr.rowIndex) tr.style.display = tr.textContent.toLowerCase().includes(q) ? "" : "none";
+}}
+</script>
+"""
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--csv", help="old-site runner export CSV (era 1, run seeds)")
@@ -262,6 +373,7 @@ def main():
                     help="JSON list of poll names to exclude from volunteer credit "
                          "(counted as ordinary runners)")
     ap.add_argument("--members-json", help="offline members dump for a credential-free dry run")
+    ap.add_argument("--html", help="also write a readable HTML review page to this path")
     ap.add_argument("--apply", action="store_true", help="write to the database (default: dry run)")
     args = ap.parse_args()
     if args.apply and args.members_json:
@@ -283,6 +395,7 @@ def main():
 
     seed_rows = []
     run_override = {}  # member_id -> precount replacing their full-CSV run count
+    rpt = {"mode": mode, "volunteers": [], "runners": [], "unmatched": [], "totals": []}
 
     exclude = set()
     if Path(args.poll_exclude).exists():
@@ -299,11 +412,13 @@ def main():
             if name.strip().lower() in exclude:
                 print(f"  {count:>4}  {name} -> EXCLUDED from volunteer credit (Paul's call, "
                       f"10 Jul 2026) - counted as an ordinary runner")
+                rpt["volunteers"].append({"poll": name, "count": count, "status": "excluded"})
                 continue
             target = aliases.get(name.strip().lower())
             ms = by_email.get(target.lower(), []) if target else by_name.get(norm_name(name), [])
             if len(ms) != 1:
                 print(f"  {count:>4}  {name} -> NO MEMBER MATCH (not imported)")
+                rpt["volunteers"].append({"poll": name, "count": count, "status": "no_match"})
                 continue
             m = ms[0]
             first = first_answer.get(name)
@@ -316,9 +431,15 @@ def main():
                 pre = precount_for(m, precounts[cutoff], aliases)
                 run_override[m["id"]] = {"precount": pre, "file": cutoff.isoformat(), "poll": name}
                 note = f"run = {pre} pre-poll check-ins [to {cutoff}] + {count} led nights"
+                rpt["volunteers"].append({"poll": name, "count": count, "status": "ok",
+                                          "member": f"{m['first_name'].strip()} {m['last_name'].strip()}",
+                                          "precount": pre, "cutoff": cutoff.isoformat()})
             else:
                 note = (f"MISSING precount export before first poll {first} - "
                         f"run keeps FULL CSV + {count} (over-counts, add the export)")
+                rpt["volunteers"].append({"poll": name, "count": count, "status": "missing",
+                                          "member": f"{m['first_name'].strip()} {m['last_name'].strip()}",
+                                          "first": str(first)})
             print(f"  {count:>4}  {name} -> {m['first_name'].strip()} {m['last_name'].strip()}  ({note})")
             seed_rows.append({
                 "member_id": m["id"], "kind": "volunteer", "count": count,
@@ -355,6 +476,10 @@ def main():
                           f"(full CSV {total} overlaps the poll era)")
                 flag = f"  [precount; full CSV {total}]"
             print(f"  {use:>4}  {m['first_name'].strip()} {m['last_name'].strip()}{flag}{merge}")
+            rpt["runners"].append({"member": f"{m['first_name'].strip()} {m['last_name'].strip()}",
+                                   "count": use, "full": total, "how": how,
+                                   "merged": "+" in detail and ov is None,
+                                   "precount_file": ov["file"] if ov else None})
             seed_rows.append({
                 "member_id": m["id"], "kind": "run", "count": use,
                 "as_of": RUN_SEED_AS_OF, "source": "oldsite_csv",
@@ -372,6 +497,7 @@ def main():
                 })
         print(f"  unmatched (kept only in the source file): "
               f"{sum(t for t, _ in unmatched)} sessions across {len(unmatched)} people")
+        rpt["unmatched"] = [{"count": t, "detail": d} for t, d in unmatched]
         for total, detail in unmatched[:200]:
             print(f"    - {total:>4}  {detail}")
 
@@ -402,6 +528,11 @@ def main():
         print(f"\n── COMBINED SEED TOTALS (run / volunteer, as the API will report them) ──")
         for mid, t in sorted(totals.items(), key=lambda kv: -(kv[1]["run"] + kv[1]["volunteer"])):
             print(f"  {t['run']:>4} / {t['volunteer']:<4}  {name_of[mid]}")
+            rpt["totals"].append({"member": name_of[mid], "run": t["run"], "volunteer": t["volunteer"]})
+
+    if args.html:
+        Path(args.html).write_text(render_html(rpt), encoding="utf-8")
+        print(f"\nHTML review page written to {args.html}")
 
     if seed_rows and args.apply:
         rest(url, key, "POST", "attendance_seeds?on_conflict=member_id,kind,source",
