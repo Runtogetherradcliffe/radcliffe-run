@@ -185,4 +185,12 @@ ALTER TABLE public.attendance ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.push_tokens ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.push_send_log ENABLE ROW LEVEL SECURITY;
 
+-- ── attendance recognition (Jul 2026) ───────────────────────────────────────
+-- Seeds, "led by" records and crossed award rungs - personal data, service-
+-- role only, same reasoning as attendance. Created by
+-- supabase-migration-attendance-recognition.sql. NO policies.
+ALTER TABLE public.attendance_seeds ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.run_leadership   ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.awards           ENABLE ROW LEVEL SECURITY;
+
 COMMIT;

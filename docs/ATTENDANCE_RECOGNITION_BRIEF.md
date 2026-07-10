@@ -199,3 +199,65 @@ flag; (b) an import path for eras 1 and 2, idempotent, with a dry-run mode;
 the five decisions above, raised with Paul first. Propose a commit at each
 verified milestone.
 ```
+
+---
+
+## Decision record (built session, 10 Jul 2026)
+
+All open questions above were put to Paul and decided; the build follows these.
+
+1. **Model: parkrun.** Two lifetime counters per member - RUN (turned up) and
+   VOLUNTEER (was there as a leader). No per-group counting anywhere ("8
+   jeffing + 21 5k" is neither wanted nor supported by the data);
+   `group_key` survives as descriptive metadata only. Night/groups modelling
+   question resolved as Option B: `runs` untouched, no night entity, the
+   counting unit is a distinct run date.
+2. **Rungs: 10 / 25 / 50 / 100, then every 100th** (parkrun's newer model),
+   same ladder for both counters. Several leaders cross 100 at launch - a
+   launch moment, not a problem.
+3. **Leading implies attending** (revised mid-session by Paul): checking in a
+   member who is a run leader auto-writes a `run_leadership` row, so a
+   leader-night earns BOTH credits. Historic equivalent: poll leader-nights
+   seed both the volunteer AND run ladders (e.g. Paul 0 CSV + 160 polls =
+   160/160; Neil 142 + 25 = 167/25). The overlap where an old-site leader
+   also checked in as a runner is accepted imprecision ("close enough for a
+   running club"). Ran-but-didn't-lead nights are an override: delete that
+   night's `run_leadership` row.
+4. **Poll availability = leader attendance.** No provisional/confirmation
+   layer, no photo corroboration required for leader history.
+5. **Eras and dates.** Old-site CSV runs to the week before the new site:
+   run seed as-of 2026-04-30. Volunteer (polls) seed as-of 2026-07-09. The
+   photo reconstruction gap is exactly 4 May - 9 Jul 2026 and imports as
+   `attendance` rows with `source='photo'` (attendance only - NO
+   `run_leadership` rows, the polls seed already covers leaders to 9 Jul).
+   Live `run_leadership` starts 16 Jul 2026.
+6. **GDPR / unmatched people: not imported.** ~380 people in the CSV and 9
+   poll leaders never registered on the new site; their data stays in Paul's
+   offline source files only (which is also why `data/leader-polls/` and
+   `data/attendance-backfill/` are gitignored - the repo is public). The
+   importer is idempotent and re-runnable, so anyone who registers later
+   (e.g. Si Foulkes) gets their history attached by a re-run. Zero-count CSV
+   rows ignored.
+7. **Scope: cancelled runs don't count** (not in the data anyway - these are
+   check-ins). **On-tour counts. Socials don't** (e.g. the 20 Jun Steel
+   Cotton stage, `run_type='social'`), walks don't; qualifying =
+   `run_type IN ('regular','c25k')` so January's C25K sessions count from
+   day one.
+8. **Seeds live in `attendance_seeds`** (kind, count, as_of, source,
+   source_detail), not synthetic attendance rows and not a members column.
+   `source='manual'` is the by-exception adjustment channel, worked through
+   with live data.
+
+Built: `supabase-migration-attendance-recognition.sql` (applied to dev 10 Jul;
+production pending approval), `scripts/import_attendance_seeds.py` (dry-run
+default; seed import verified idempotent on dev), `lib/recognition.ts`,
+`GET /api/attendance/summary`, volunteer auto-credit in
+`POST /api/leader/checkin`. Dry-run report against prod members:
+`data/attendance-backfill/dry-run-report.txt` (77 members matched, 2,683 of
+5,630 CSV sessions attach; 17 of 26 poll leaders match, 1,190 of 1,383
+leader-nights attach).
+
+Still open (next sessions): awards-row computation/notification job (the
+`awards` table exists, nothing writes it yet), the leader recognition loop,
+member-facing display in the native app, era-2 photo reconstruction workflow
+(importer `--checkins` mode is ready and expects `date,email_or_name,group_key`).
