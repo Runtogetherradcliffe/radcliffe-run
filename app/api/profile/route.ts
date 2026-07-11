@@ -8,6 +8,7 @@ const ALLOWED_FIELDS = [
   'medical_info', 'email_opt_out', 'photo_consent',
   'theme', 'font_size',
   'awards_public', // recognition consent: private by default, opt-in public
+  'development_preference', // runner-home development ask: skippable, editable forever
 ]
 
 // PATCH /api/profile - update the authenticated member's own record

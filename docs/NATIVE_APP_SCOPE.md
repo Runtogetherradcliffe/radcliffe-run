@@ -562,6 +562,47 @@ leader). For the member-facing display, consume:
   `docs/ATTENDANCE_RECOGNITION_BRIEF.md` - the app renders shapes, it never
   recomputes counts.
 
+### Runner home endpoint (backend 11 Jul 2026)
+
+Built ahead of the app's home build, per `docs/RUNNER_HOME_BRIEF.md` (workshop
++ Pencil decision records). Backend-first: every surface is server-derived,
+the app never re-derives.
+
+- `GET /api/home` - cookie or Bearer, member-authed. 401 signed out, 404
+  signed-in with no active member row (the app renders its signed-out /
+  cold-start states off those). Returns:
+  `{ firstName, isRunLeader, usualGroup, groupCounts, collectiveStat,
+     developmentPreference }`.
+  - `usualGroup` (`'8k' | '5k' | 'jeff' | null`) - the majority
+    `attendance.group_key` over the member's live-era check-ins (a non-null
+    `group_key` IS the live-era filter - photo-era backfill mostly lacks it).
+    Null until 3+ such check-ins AND a strict majority; null means the app
+    renders equal tiles (cold start and no-majority are the same render).
+    Leader-inclusive by design. `groupCounts` carries the per-group counts
+    used, so provenance is auditable and the app never re-derives.
+  - `collectiveStat` (`{ count, runDate } | null`) - distinct members
+    checked in on the most recent qualifying run date (`run_type IN
+    ('regular','c25k')`, not cancelled - the AGENTS.md counting invariant).
+    A cancelled week keeps showing the previous run, never a zero state.
+    Members-only - never served anon.
+  - `developmentPreference` mirrors `members.development_preference`
+    (`'get_fitter' | 'run_further' | 'first_race' | 'enjoy_thursdays' |
+    null`), written via `PATCH /api/profile` (whitelisted 11 Jul 2026,
+    same optimistic-update contract as `awards_public`). Skippable,
+    editable forever, app-only for now (no email use).
+  - Does NOT duplicate the milestone summary - the app already consumes
+    `GET /api/attendance/summary` for the header badge + popover.
+  - Logic lives in `lib/home.ts` (`usualGroupFromCounts`,
+    `usualGroupForMember`, `collectiveStat`), unit-tested in
+    `tests/home.test.ts`.
+- `GET /api/walks` - anon read (walks are public site content, same trust
+  level as `GET /api/routes`). Tiny mirror of `lib/walks.ts` for the app's
+  solo-card Walks button; heritage `stages` (draft, unverified copy) are
+  deliberately left out of the payload.
+- Not yet built: invitation eligibility (waits on live `group_key` volume +
+  thresholds Paul calibrates) and route familiarity (deferred to autumn) -
+  both light up in the app without a layout change when their data exists.
+
 ---
 
 ## 6. Design brief for the Pencil session
