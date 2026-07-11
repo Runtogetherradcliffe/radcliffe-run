@@ -700,3 +700,90 @@ treatment.
 Next session: the interactive Pencil design session - the home in both
 themes, iterated with Paul surface by surface on the shapes decided here,
 never presented as a fait accompli. The build follows.
+
+---
+
+## Session prompt: runner home screen design (paste into a native-apps thread)
+
+```
+Design the personalised runner home for the RTR app in the Pencil file,
+on the shapes decided at the 11 Jul 2026 workshop. This is screen design,
+iterated INTERACTIVELY with Paul surface by surface - present each
+surface for reaction before polishing the next; never a fait accompli.
+The app build follows in a later session.
+
+REPO RULE - READ BEFORE COMMITTING ANYTHING TO radcliffe-run
+No em dashes in ANY file (CI guard) - plain hyphens. Staging-first:
+commit to the working branch, push to staging only; Paul approves merges.
+
+WHERE
+The Pencil file at ~/Documents/"RTR app". Start with get_editor_state
+(include_schema: true) and get_guidelines. The badge components (Badge
+40/80/160) and the Ladder Card grammar already exist in the file - reuse
+them, do not redesign.
+
+READ FIRST
+- radcliffe-run repo: docs/RUNNER_HOME_BRIEF.md - the straw-man home
+  (surface by surface), Paul's reaction record, and the workshop decision
+  record. The 13 decisions are FINAL - do not relitigate. Where straw man
+  and decision record differ, the record wins.
+- docs/RECOGNITION_DESIGN_BRIEF.md - badge grammar + Ladder Card anatomy
+  (the home reuses the card); "My Ladder" is called Milestones on every
+  member-facing surface.
+- docs/PENCIL_DESIGN_BRIEF.md - the M1 file's conventions.
+- docs/NATIVE_APP_SCOPE.md section 6 - tab structure (the Runs tab
+  becomes the home; tab count unchanged).
+
+WHAT TO DESIGN (both themes throughout)
+1. The home screen, top to bottom per the decided shapes: greeting hero
+   ("Evening, Kate.") + next run card (existing card grammar: date, time,
+   meeting point, on-tour, cancelled) + group tiles (usual group large,
+   others small, provenance line "your usual group, from your check-ins",
+   one-tap correction) + the standing role line ("Every group has a
+   leader at the front and the back") + collective stat line ("38 of us
+   ran last Thursday") + Milestones card (the shipped Ladder Card, reused)
+   + development ask card + solo section card (routes + walks).
+2. Every slot in BOTH states - lit and unlit - because the build is
+   shell-first and surfaces light up as data matures WITHOUT a layout
+   change: cold-start tiles (all equal), tile with usual-group-large,
+   development card asked/unasked, invitation present/absent.
+3. The progression invitation card: structure facts first (adapted from
+   the site About page + lib/groups.ts paces - regroup FREQUENCY, never
+   points), then the norm line, then the role-attributed back marker
+   voice ("one of our back markers: I run at the back on purpose - that
+   is the job"). No member quotes at launch. Two dismissals: "Maybe
+   another week" / "Don't show this again". Design BOTH pathway variants
+   (jeff -> 5k run, 5k -> 8k) framed sideways - another group on the same
+   night, never a ladder or a next step.
+4. The About-the-groups page (drill-in, no tab bar): the permanent home
+   of the invitation content, covering movement in EVERY direction
+   including 8k regulars running 5k some weeks.
+5. Full-screen states: signed-out / no member (generic runs list, quiet
+   sign-in invite, nothing broken), brand-new member (cold start
+   everywhere), established member (all lit), and LEADER (no invitation
+   ever renders - is_run_leader members are opted out of behavioural
+   interventions; check with Paul whether leaders want a different tile
+   treatment - flagged at the workshop).
+
+COPY DECISIONS TO SETTLE WITH PAUL IN-SESSION
+- The tab label: does "Runs" stay or become "Home"?
+- The greeting form and time-of-day variants.
+- The exact role line and collective stat wording.
+- The invitation copy drafts for both pathways (adapt, show, iterate).
+
+REAL DATA FOR MOCKS
+- Next run from the live runs table shape (date, title, meeting point,
+  groups 8k / 5k / jeffing, on_tour, cancelled).
+- Paul's member shape: 160/160 milestones, next 200. A mid-range member
+  ~40 runs. A newcomer 0/0 with 1 check-in. Collective stat 38.
+- Preferred group: 8k-usual, 5k-usual, jeff-usual, and no-majority (all
+  tiles equal) variants.
+
+OUTPUTS
+- Home + invitation + groups-page frames in the Pencil file, both themes,
+  all states above.
+- Exported renders committed to radcliffe-run design/screens/ (hyphens
+  in filenames and commit messages).
+- Decisions taken with Paul appended to this brief (again: hyphens, not
+  em dashes; staging only).
+```
