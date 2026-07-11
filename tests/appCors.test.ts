@@ -19,6 +19,8 @@ describe('isAppApi', () => {
       '/api/leader/checkin',
       '/api/leader/member/some-uuid',
       '/api/attendance/summary',
+      '/api/home',
+      '/api/walks',
     ]) {
       expect(isAppApi(p), p).toBe(true)
     }

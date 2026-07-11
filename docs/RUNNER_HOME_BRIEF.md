@@ -933,3 +933,69 @@ follows in native-apps - it consumes GET /api/home, /api/walks,
 /api/attendance/summary and PATCH /api/profile, and adds the km <-> mi
 units toggle in Settings (client-side, no API).
 ```
+
+---
+
+# Decision record: runner-home APIs (radcliffe-run, 11 Jul 2026)
+
+Built on the working branch, staging only (Paul approves the merge to main).
+All endpoints use Bearer-or-cookie auth (`lib/apiAuth.ts`), match the
+`/api/attendance/summary` pattern exactly, and are added to `APP_API_PATHS`
+(`lib/appCors.ts` + `tests/appCors.test.ts`).
+
+1. **`GET /api/home`** built as designed: `firstName`, `isRunLeader`,
+   `usualGroup` + `groupCounts`, `collectiveStat`, `developmentPreference`.
+   401 signed out, 404 signed-in with no active member row. Derivation logic
+   lives in `lib/home.ts` (`usualGroupFromCounts` is pure and unit-tested in
+   `tests/home.test.ts` - 5 cases covering the 3-check-in floor, a strict
+   majority at exactly 3, an even split, exactly-half, and jeff-as-usual).
+   Does not duplicate the milestone summary (the app already has
+   `GET /api/attendance/summary`).
+2. **`usualGroup` derivation**: live era = `group_key IS NOT NULL` (no
+   separate date cutoff needed - photo-era backfill mostly lacks
+   `group_key`, so non-null already selects live rows, matching the brief's
+   caveat). Strict majority = a group's count > half the total. Leader
+   check-ins are included, per the workshop's leader-inclusive-tile rule.
+3. **`collectiveStat` derivation**: most recent qualifying run date
+   (`run_type IN ('regular','c25k')`, not cancelled, date <= today), then
+   distinct `attendance.member_id` across that date's qualifying run rows.
+   Verified the cancelled-week fallback live: cancelling the most recent
+   qualifying run on dev made the endpoint fall back to the previous
+   qualifying date with no zero state, exactly as designed.
+4. **`GET /api/walks`** mirrors `GET /api/routes`'s shape and trust level
+   (anon read). Heritage `stages` are left out of the payload - they are
+   draft, unverified copy per `lib/walks.ts`'s own header, not yet fit for
+   the app.
+5. **Development preference**: `members.development_preference` (nullable
+   text, `CHECK IN ('get_fitter','run_further','first_race',
+   'enjoy_thursdays')`) - `supabase-migration-runner-home.sql`, applied to
+   dev then production (schema-before-code, per AGENTS.md - staging preview
+   deployments hit the production Supabase project, so the column had to
+   exist before any staging push). Whitelisted in `PATCH /api/profile`
+   alongside `awards_public`, same optimistic-update contract. Served back
+   in `GET /api/home`.
+6. **Verification**: typecheck, lint, and `npm test` (81 tests) all clean.
+   Probed against dev with minted sessions (service-role `generateLink` +
+   `verifyOtp`, the `tests/access` pattern) covering: signed-out 401; a
+   leader with 3 live grouped check-ins (2x `8k`, 1x `5k`) confirming
+   `usualGroup: '8k'`, `isRunLeader: true`; a member with one check-in per
+   group confirming `usualGroup: null` (no majority); the cancelled-week
+   fallback (above). `PATCH /api/profile` round-tripped
+   `development_preference` and `GET /api/home` reflected it immediately.
+   Production probes: `GET /api/home` 404s (route not yet deployed - correct
+   pre-push state), `GET /api/attendance/summary` still 401s signed out
+   (existing route unaffected), CORS preflight (`OPTIONS`) verified locally
+   for both new paths (`Access-Control-Allow-Origin: *`, Authorization in
+   allowed headers). Test attendance rows were removed from dev after the
+   probe; the attendance table is back to its pre-session state (empty).
+7. **`docs/NATIVE_APP_SCOPE.md` section 5** gained a "Runner home endpoint"
+   subsection documenting the same shape, mirroring the attendance
+   recognition subsection immediately above it.
+
+Not built this session (per scope): invitation eligibility and route
+familiarity - both wait on live `group_key` volume and light up without a
+layout change when their data exists.
+
+Next session: the app build in native-apps - consumes `GET /api/home`,
+`GET /api/walks`, `GET /api/attendance/summary` and `PATCH /api/profile`,
+plus the client-side km <-> mi units toggle in Settings.
