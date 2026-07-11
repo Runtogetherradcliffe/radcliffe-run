@@ -170,10 +170,13 @@ for the app's encrypted offline cache), `GET /api/leader/register?run_id=`
 (check-in roster + counters), `POST /api/leader/checkin` (idempotent
 attendance upsert/delete), `POST/DELETE /api/push/register`,
 `GET /api/cron/send-push` (Thursday announcement; cron-job.org, CRON_SECRET,
-claim-locked). `lib/apiAuth.ts` adds Bearer-token auth (`getUserFromRequest`,
-`requireLeader`): every route above accepts `Authorization: Bearer <supabase
-access token>` alongside session cookies; `/api/profile` PATCH/DELETE gained
-the same so the in-app account-deletion screen reuses the web logic.
+claim-locked), `GET /api/attendance/summary` (member's own lifetime ladders),
+`GET /api/home` (personalised home aggregate), `GET /api/walks` (public
+walks catalogue - see "Runner home" below). `lib/apiAuth.ts` adds
+Bearer-token auth (`getUserFromRequest`, `requireLeader`): every route above
+accepts `Authorization: Bearer <supabase access token>` alongside session
+cookies; `/api/profile` PATCH/DELETE gained the same so the in-app
+account-deletion screen reuses the web logic.
 `lib/expoPush.ts` mirrors `lib/brevo.ts` (never throws, prunes
 DeviceNotRegistered tokens); `/api/admin/notify` now broadcasts to web-push
 AND Expo tokens with per-channel reach counts. `middleware.ts` answers CORS
@@ -228,6 +231,35 @@ run photos) imports as real `attendance` rows (`source='photo'`,
 ignore-duplicates so live rows always win) and must NOT create
 `run_leadership` rows - leader history through 9 Jul is already covered by
 the polls seed.
+
+### Runner home (Jul 2026)
+
+Backend for the personalised home screen (decision record:
+`docs/RUNNER_HOME_BRIEF.md`; API list also mirrored in
+`docs/NATIVE_APP_SCOPE.md` section 5). Backend-first: every surface is
+server-derived in `lib/home.ts`, the app never re-derives.
+
+- `members.development_preference` - nullable text, `CHECK IN
+  ('get_fitter', 'run_further', 'first_race', 'enjoy_thursdays')`
+  (`supabase-migration-runner-home.sql`). The development-preference ask:
+  skippable, editable forever via `PATCH /api/profile` (whitelisted
+  alongside `awards_public`), app-only for now (no email use).
+- `GET /api/home` - member-authed aggregate (cookie or Bearer). 401 signed
+  out, 404 signed-in with no active member row. Returns `firstName`,
+  `isRunLeader`, `usualGroup` + `groupCounts`, `collectiveStat`,
+  `developmentPreference`. `usualGroup` is the majority
+  `attendance.group_key` over live-era check-ins (`group_key IS NOT NULL`
+  IS the live-era filter - photo-era backfill mostly lacks it); null until
+  3+ check-ins AND a strict majority (cold start and no-majority render the
+  same equal tiles), leader-inclusive by design. `collectiveStat` is
+  distinct members checked in on the most recent qualifying run date
+  (`run_type IN ('regular','c25k')`, not cancelled - the counting
+  invariant); a cancelled week keeps showing the previous run, never a zero
+  state. Does not duplicate `GET /api/attendance/summary` (the header
+  badge's source).
+- `GET /api/walks` - anon read, mirrors `GET /api/routes`'s trust level; a
+  tiny projection of `lib/walks.ts` for the app's solo card. Draft heritage
+  `stages` content is deliberately left out of the payload.
 
 Which client to use:
 
