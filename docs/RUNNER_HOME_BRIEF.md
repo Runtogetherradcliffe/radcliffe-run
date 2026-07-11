@@ -326,17 +326,18 @@ banner, cancelled state - the existing card grammar). Below it the night's
 groups as tiles: the member's usual group rendered large (8k with its
 route), the others small but always present and tappable. A one-line
 provenance note on the large tile: "your usual group, from your check-ins" -
-tap to switch or clear. No leader name on upcoming runs yet (see DATA).
+tap to switch or clear. No leader names on upcoming runs; instead one
+standing role line: "Every group has a leader at the front and the back."
 
 - DATA: runs + routes exist (anon reads). First name exists (`/api/me`).
   Preferred group DOES NOT exist as a field - derive from
   `attendance.group_key`, live era only (reliable 9 Jul 2026 onward;
   photo-era rows mostly lack it). Needs ~3 live check-ins for confidence -
-  cold start below. "Led by Kate" for an UPCOMING run is NOT derivable
-  today: `run_leadership` is retrospective (written at check-in). Honest
-  options are past-tense facts or nothing until the leader-signup feature
-  (designed May 2026, unbuilt) provides forward claims - workshop
-  decision 9.
+  cold start below. The role line needs NO data and is always true -
+  naming the leader of an upcoming run was considered and dropped
+  (Paul, 11 Jul - reaction record below): leader roles are voted week by
+  week, so names are volatile, and the reassurance that matters is that
+  the roles exist.
 
 ### 2. Preferred-group tile cold start
 
@@ -387,8 +388,10 @@ Tuesday") per the 6 Jul decision.
      back-of-group pace, duration, regroup points.
   2. NORM, descriptive and true: "Plenty of Thursday regulars run 8k some
      weeks and 5k others."
-  3. VOICES: the named back marker ("I run at the back on purpose - that
-     is the job") and one member quote ("I thought I would hold everyone
+  3. VOICES: a back marker speaking AS THE ROLE, not a rota promise ("I
+     run at the back on purpose - that is the job", attributed to "one of
+     our back markers"; named only if a leader is happy to be - workshop
+     decision 6), and one member quote ("I thought I would hold everyone
      up. Nobody does.").
   4. Never "You can do it!" - persuasion argues with self-assessment and
      is the weakest measured source.
@@ -403,7 +406,7 @@ Tuesday") per the 6 Jul decision.
 
 - DATA: usual group as above (live era). Milestone trigger: interim local
   now, `awards` machinery when built. The COPY is the real dependency:
-  back-of-group pace, regroup facts, a named leader's line and a member
+  back-of-group pace, regroup facts, a back marker's line and a member
   quote (with consent) do not exist anywhere and must be collected from
   humans - workshop decisions 5 and 6.
 
@@ -469,7 +472,7 @@ home after none. Engagement mechanics with no Thursday behind them.
 | Development ask | no | schema addition (workshop flag) |
 | Route familiarity | derivable live era | derivation endpoint; data volume |
 | Solo section | routes API | walks API (tiny) |
-| Upcoming-run leader | no (run_leadership is retrospective) | leader-signup feature (designed, unbuilt) |
+| Role line ("leader at front and back") | needs no data - always true | - |
 
 A practical build note (not a decision): most personalised surfaces want
 one aggregate `GET /api/home` payload (member, usual group, next run,
@@ -516,10 +519,12 @@ screen with him - never a fait accompli.
    the back)? These facts are the invitation's spine and only leaders can
    supply them. Decide the collection route (a WhatsApp ask vs at the
    next leaders' meeting) and where they live (site content vs app copy).
-6. **The voices.** Which leader is the named back-marker voice, and which
-   member gives the vicarious quote? Both need asking and explicit consent
-   (a member quote about being slow is personal - photo_consent-grade
-   care). Decide who Paul asks and the consent shape.
+6. **The voices.** The back-marker line is attributed to the ROLE ("one
+   of our back markers") unless a specific leader is happy to be named -
+   Paul leans unnamed for weekly runs (reaction record below). Which
+   member gives the vicarious quote? Quotes need asking and explicit
+   consent (a member quote about being slow is personal -
+   photo_consent-grade care). Decide who Paul asks and the consent shape.
 7. **Route familiarity threshold and placement.** Show from (a) the 2nd
    run of a route ("you've run this route before" reads warmer than a
    count of 1) - RECOMMENDED; (b) from the 1st; (c) defer the surface
@@ -529,12 +534,15 @@ screen with him - never a fait accompli.
    RECOMMENDED; (b) routes only, walks later; (c) defer the section. Also
    confirm the no-logging stance stands (it is the decided scope; restated
    because the workshop could be tempted).
-9. **Upcoming-run leader line.** (a) Nothing until the leader-signup
-   feature ships, then "led by Kate" comes from real claims -
-   RECOMMENDED (only honest forward-looking source); (b) "usually leads
-   the 8k" from run_leadership history (true but slightly odd on an
-   upcoming run); (c) pull the leader-signup build forward on the roadmap.
-   This decision quietly sequences a whole other feature - flag it.
+9. **Upcoming-run leader line - SETTLED (Paul, 11 Jul, reaction record
+   below).** Weekly runs never name leaders: roles are voted on week by
+   week and subject to change, so names are a logistical liability, and
+   the reassurance that matters is that the roles EXIST. The home carries
+   the standing role line ("every group has a leader at the front and the
+   back") - always true, zero data, zero logistics. This also removes the
+   leader-signup feature as a dependency of this thread entirely. C25K is
+   the exception: a named cohort contact is stable for ten weeks and
+   stays viable (already the decided welcome-email shape from 6 Jul).
 10. **Development preference schema flag.** Confirm the feature is wanted;
     settle the question wording and the options list (straw man: get
     fitter / run further / first race or parkrun / just enjoy Thursdays);
@@ -559,7 +567,28 @@ screen with him - never a fait accompli.
     doubles as the C25K graduation bridge (same trigger shape: graduation
     milestone; swapped copy: "plenty of graduates run with the 5k group -
     it is the same Thursday night"). If yes, nothing extra is built in
-    January beyond copy.
+    January beyond copy. The C25K variant MAY carry a named contact - the
+    cohort leader is stable for ten weeks, so naming is logistically easy
+    there and already the decided welcome-email shape.
+
+---
+
+## Paul's first reaction (11 Jul 2026, on reading the straw man)
+
+Recorded ahead of the workshop so the session starts from the current
+shape:
+
+- **No named leaders on weekly runs, anywhere on the home.** Leader roles
+  are voted on week by week and subject to change, so names are a
+  logistical liability - and the reassurance that matters is that the
+  roles EXIST ("there will be someone at the front and the back"), not
+  who fills them. This settles workshop decision 9 and tilts decision 6
+  toward role-attributed voices. It also sits comfortably with the
+  evidence: parkrun's guarantee is that A tail walker exists, never a
+  named one - the structural assurance was never about identity.
+- **C25K is the exception**: a named cohort contact is stable for ten
+  weeks and stays viable (already the decided welcome-email shape from
+  the 6 Jul workshop).
 
 ## Source list (this session's additions)
 
