@@ -274,5 +274,106 @@ themes). Renders committed to design/screens/: recognition-my-ladder-*,
 recognition-milestone-*, club-dark/light (replaced), and the corrected
 badge grammar sheets.
 
-Next: backend PATCH for awards_public, then the app build of these screens
-off GET /api/attendance/summary.
+Next: backend PATCH for awards_public (DONE 11 Jul 2026 - live on
+production, commit 995efd1), then the app build of these screens off
+GET /api/attendance/summary.
+
+---
+
+## Session prompt: My Ladder app build (paste into a native-apps thread)
+
+```
+Build the recognition screens in apps/rtr (the native-apps monorepo at
+~/native-apps) against the LIVE production API. The designs, badge grammar
+and copy are all decided and signed off - this session is implementation.
+
+READ FIRST
+- radcliffe-run repo: docs/RECOGNITION_DESIGN_BRIEF.md - the badge grammar,
+  the My Ladder screen decision record (placement, progress fraction, seed
+  line, LEADING visibility, celebration spec) and this prompt. Decisions
+  there are FINAL - do not redesign.
+- radcliffe-run repo: docs/NATIVE_APP_SCOPE.md section 5 - API contracts.
+- The Pencil file at ~/Documents/"RTR app" for exact specs: components
+  Badge 40 / Badge 80 / Badge 160, states as instance overrides on layers
+  Coin / Arc / Glyph / Number / Pips; arc = ellipse sweepAngle from 12
+  o'clock. Renders in radcliffe-run design/screens/recognition-*.png and
+  club-*.png.
+
+LIVE API (production, both live since 11 Jul 2026; Bearer auth, the same
+transport every app route already uses)
+- GET /api/attendance/summary ->
+  { run: { total, seed, recorded, rungs, nextRung, toNext },
+    volunteer: { same shape }, awardsPublic: boolean }
+  401 signed out; 404 = signed-in but no member row (handle both).
+- PATCH /api/profile with { "awards_public": true|false } -> the SHARING
+  toggle. Optimistic update, revert + toast on failure.
+
+WHAT TO BUILD
+1. The Badge component (RN SVG) implementing the grammar exactly: coin /
+   ring / glyph (footprints = Runs, hand-heart = Leading) / numeral / pips
+   (one per hundred); solid orange century fill with #0f0f0f ink; locked
+   and next-up states; the partial arc ONLY at 80 px and up (40 px stays
+   binary); app theme tokens, both themes.
+2. My Ladder screen (drill-in, no tab bar): Runs ladder always; LEADING
+   ladder only when volunteer.total > 0 or is_run_leader; per-card anatomy
+   from the decision record (count hero, 40 px thumbnail strip, next-up row
+   with segment-based fraction (total - prevRung) / (nextRung - prevRung),
+   linear bar); the scoped seed line while any rung <= seed ("Badges to
+   100 earned before the app - already achieved"); SHARING card at the
+   foot; empty state per the design (0/0: all locked, "Your first badge is
+   at 10").
+3. Club tab Ladder Card under the profile card, opening My Ladder (latest
+   badge at 40 px, counts line, chevron). Hide it (or show a join prompt)
+   on 404/signed-out per the app's existing patterns.
+4. The Milestone celebration screen (named greeting, glow + ripple rings,
+   orange-family confetti only, milestone line, dateline, Continue).
+   TRIGGERING - decide with Paul in-session: the server-side shown-once
+   state (awards table / notified_at) is a LATER build, so either
+   (a) RECOMMENDED interim: store last-seen rungs locally; on load, if a
+   rung is present that was absent last time AND the previous state was
+   non-empty (so seed import / first sign-in never triggers it), show the
+   screen once and update local state - the server state supersedes later;
+   or (b) build the screen unwired and connect it when the awards job lands.
+5. States and behaviours: loading, offline (render last-fetched summary if
+   the app caches, else a quiet retry state), pull-to-refresh consistent
+   with the app's other screens.
+
+VERIFY before calling it done: real sign-ins against production - Paul's
+account (160/160, next 200, 40 to go, seed line visible), a plain member,
+and if possible a fresh account for the 0/0 empty state. Both themes,
+Android + iOS.
+
+IF COMMITTING ANYTHING TO radcliffe-run (decisions appended to this brief,
+render updates): no em dashes anywhere (CI guard), plain hyphens; commit to
+the working branch and push to staging only - Paul approves merges.
+```
+
+---
+
+## Decision record (app build session, 11 Jul 2026)
+
+Built in the native-apps monorepo (apps/rtr), all screens to the signed-off
+designs: the LadderBadge component (RN SVG, the full badge grammar in one
+generative token), the My Ladder drill-in, the Club tab Ladder Card, and the
+Milestone celebration screen, consuming GET /api/attendance/summary and
+PATCH /api/profile (awards_public).
+
+- **Milestone triggering: interim option (a) implemented** (the prompt's
+  recommended path). Last-seen rungs live locally per member
+  (`rtr.ladder.seen.v1.<memberId>`); a rung present that was absent in the
+  stored snapshot celebrates once. No stored snapshot (first sign-in, new
+  install, seed import) stores silently and never celebrates - so the first
+  NEW crossing is the first celebration. Marked seen at presentation, checks
+  serialised across screens. The server-side awards machinery (dated
+  crossings, notified_at) supersedes this when it lands.
+- **CORS**: `/api/attendance` added to APP_API_PATHS (lib/appCors.ts + test).
+  Native fetch never needed it; the app's browser-preview verification loop
+  does. Auth is still enforced per-route - CORS is not a security layer.
+- **Verified** against a live stack (dev Supabase project + local site, a
+  minted member session): all ladder shapes (160/160, 30/5, 0/0), both
+  themes at 375x812, the sharing toggle round-trip written to and read back
+  from the DB, the milestone trigger firing once and never re-firing, the
+  Club card hiding signed-out, zero console errors. The seed line correctly
+  re-scopes ("Badges to 25 ...") when the seed sits below 100. Production
+  endpoints probed (401 signed out, CORS preflight). Device pass on Paul's
+  phone (production build, real account) is the remaining verification.
