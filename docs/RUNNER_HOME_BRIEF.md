@@ -963,9 +963,9 @@ All endpoints use Bearer-or-cookie auth (`lib/apiAuth.ts`), match the
    qualifying run on dev made the endpoint fall back to the previous
    qualifying date with no zero state, exactly as designed.
 4. **`GET /api/walks`** mirrors `GET /api/routes`'s shape and trust level
-   (anon read). Heritage `stages` are left out of the payload - they are
-   draft, unverified copy per `lib/walks.ts`'s own header, not yet fit for
-   the app.
+   (anon read). Heritage `stages` were left out of the payload at first -
+   draft, unverified copy per `lib/walks.ts`'s own header - then added in a
+   follow-up session; see the dated entry below.
 5. **Development preference**: `members.development_preference` (nullable
    text, `CHECK IN ('get_fitter','run_further','first_race',
    'enjoy_thursdays')`) - `supabase-migration-runner-home.sql`, applied to
@@ -999,3 +999,56 @@ layout change when their data exists.
 Next session: the app build in native-apps - consumes `GET /api/home`,
 `GET /api/walks`, `GET /api/attendance/summary` and `PATCH /api/profile`,
 plus the client-side km <-> mi units toggle in Settings.
+
+## GET /api/walks: heritage stages + historic map parity (follow-up)
+
+To let the native app match the PWA's walks experience (heritage stops +
+historic map), `GET /api/walks` now resolves each walk's `stages` server-side
+and serves them in the payload, instead of omitting them.
+
+1. **`stages: [{ index, title, blurb, point: [lng, lat] }]`** added to every
+   walk in the response. `point` is resolved from each `Stage`'s `at` (an
+   explicit coordinate) or `fraction` (0..1 along the route) against the
+   walk's GPX, at request time, server-side (`lib/walkStages.ts`). Backend-
+   first: the app never parses GPX or does fraction math - it just renders
+   the resolved points. Order is preserved (an `index` is included so the
+   app doesn't need to re-derive it); walks with no `stages` entry serve
+   `stages: []`.
+2. **Numerically identical to the PWA's client-side resolution.**
+   `lib/walkStages.ts`'s `haversine`/`pointAtFraction` are a direct port of
+   `app/walks/WalksClient.tsx`'s same-named functions, so a stage lands in
+   the same spot whether resolved by this API (app) or client-side against
+   the same GPX (PWA). GPX parsing is a small regex extractor (trkpt, falling
+   back to rtept then wpt, same precedence as the client's `DOMParser` walk)
+   rather than a new dependency, since Node has no built-in DOM parser and
+   the file is well-formed, plotaroute-generated GPX.
+3. **Coordinate convention change at the API boundary.** Internally
+   (`lib/walks.ts`'s `Stage.at`, GPX lat/lon, Leaflet) everything is
+   `[lat, lon]`. The API's `point` is `[lng, lat]` (GeoJSON order) instead,
+   since that is what was scoped for the app - `lib/walkStages.ts` does the
+   conversion at the edge; nothing upstream changed convention.
+4. **Historic map layer is not part of this payload.** The app already holds
+   the MapTiler config; the API doesn't need to name a tile URL. For the
+   app's implementation, the layer to match is `lib/mapLayers.ts`'s `h1888`:
+   NLS six-inch OS (1888-1913) via MapTiler
+   (`uk-osgb10k1888/{z}/{x}/{y}.jpg`), `maxZoom: 17`, NLS + MapTiler
+   attribution.
+5. **Content-verification gap now covers app + web equally.** `stages`
+   blurbs (and `accessibility`) are still DRAFT text per `lib/walks.ts`'s
+   header - inferred from historic OS maps and general local history, not
+   yet checked by someone who has walked the routes. Serving `stages` to the
+   app does not change that; it just means the outstanding "walk the routes
+   and verify" task now applies to both surfaces, not just the PWA.
+6. **Verification**: typecheck, lint, `npm test` (93 tests - 12 new in
+   `tests/walkStages.test.ts` covering `pointAtFraction`'s endpoints
+   (0 and 1), a mid-fraction point, out-of-range clamping, `resolveStages`'s
+   `at`-passthrough and fraction resolution, stage-order preservation across
+   mixed `at`/`fraction` stages, the no-stages and no-coords empty-array
+   cases, and `parseGpxCoords`'s trkpt/rtept/wpt fallback) and the em-dash
+   guard all clean. Probed `GET /api/walks` on dev: all 7 walks with `stages`
+   in `lib/walks.ts` returned the expected stage count: resolved points for
+   Elton Reservoir via Milltown Bridge sat between roughly 53.556-53.581 lat
+   / -2.325 to -2.317 lon, inside that walk's ~8.8km loop around its
+   `center` (53.57081, -2.32042) - both `fraction`-derived and `at`-passthrough
+   stages resolved correctly and in the declared order.
+7. Staging only this session - not merged to main.
