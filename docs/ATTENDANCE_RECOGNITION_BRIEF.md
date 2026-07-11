@@ -273,6 +273,8 @@ Martyn 132/101, Julie Smith 114/109, Kath 111/107, Neil 160/25. Review pages
 regenerate from `data/attendance-backfill/` (gitignored).
 
 Still open (next sessions): awards-row computation/notification job (the
-`awards` table exists, nothing writes it yet), the leader recognition loop,
-member-facing display in the native app, era-2 photo reconstruction workflow
+`awards` table exists, nothing writes it yet), the /admin/recognition
+surface + leader recognition loop, era-2 photo reconstruction workflow
 (importer `--checkins` mode is ready and expects `date,email_or_name,group_key`).
+The member-facing display SHIPPED 11 Jul 2026 (native app My Ladder screens,
+native-apps 905f058 by OTA; build record in docs/RECOGNITION_DESIGN_BRIEF.md).

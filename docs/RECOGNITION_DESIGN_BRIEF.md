@@ -377,3 +377,23 @@ PATCH /api/profile (awards_public).
   re-scopes ("Badges to 25 ...") when the seed sits below 100. Production
   endpoints probed (401 signed out, CORS preflight). Device pass on Paul's
   phone (production build, real account) is the remaining verification.
+
+---
+
+## Naming amendment (Paul, 11 Jul 2026): "My Ladder" becomes "Milestones"
+
+Paul's call on reflection after using the built app: the member-facing
+feature is called **Milestones**, not "My Ladder". It matches the consent
+copy ("Celebrate my milestones publicly"), the Milestone celebration
+screen, and the digest language - one word across every surface.
+
+Scope of the rename (a small native-apps change):
+- Screen title "My Ladder" -> "Milestones"; the Club tab card label
+  "My ladder" -> "Milestones"; any other user-facing "ladder" strings.
+- Pencil file frame names updated to match when next touched.
+- NOT changed: the API (`/api/attendance/summary`, `volunteer` key), and
+  ladder/rung as internal vocabulary in code, docs and these briefs -
+  technical terms, not member-facing copy.
+
+Any future session reading the decision records above: where they say
+"My Ladder" for a screen or card, read "Milestones".
