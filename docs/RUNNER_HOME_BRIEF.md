@@ -859,3 +859,77 @@ The canvas note "Note Runner Home" carries the same record beside the frames.
 Next session: the app build (shell-first per workshop decision 12 - hero,
 role line, stat, solo and the header badge have their data today; tiles
 and invitations light up as live check-ins accumulate).
+
+---
+
+## Session prompt: runner-home APIs (paste into a radcliffe-run site thread)
+
+```
+Build the runner-home APIs in the radcliffe-run repo (Next.js + Supabase),
+ahead of the native app's home build. Backend-first rule: the app holds no
+logic - these endpoints own every derivation. Read first:
+docs/RUNNER_HOME_BRIEF.md (the workshop decision record AND the 11 Jul 2026
+Pencil decision record - both FINAL, do not relitigate); the designed
+screens are design/screens/home-*.png and about-groups-*.png.
+
+REPO RULES
+No em dashes in ANY file (CI guard) - plain hyphens. Staging-first: commit
+to the working branch, push to staging only; Paul approves merges.
+
+AUTH + TRANSPORT
+Bearer-token auth per lib/apiAuth.ts, exactly as /api/attendance/summary.
+Add each new app-facing path to APP_API_PATHS (lib/appCors.ts + its test) -
+CORS exists ONLY for the browser-preview verification loop, auth is still
+enforced per-route.
+
+WHAT TO BUILD
+1. GET /api/home - one member-authed aggregate for the personalised home
+   (401 signed out, 404 signed-in with no member row; the app renders its
+   signed-out/cold-start states off those):
+   - firstName, isRunLeader
+   - usualGroup: the majority group_key over the member's LIVE-era
+     check-ins (group_key non-null; reliable 9 Jul 2026 onward). null
+     until 3+ such check-ins AND a strict majority - null means the app
+     renders equal tiles (cold start and no-majority are the same render).
+     Leaders are INCLUDED (the tile is leader-inclusive; only behavioural
+     interventions exclude them - the app shows leaders different
+     provenance copy off isRunLeader). Include the per-group counts used,
+     so provenance is auditable and the app never re-derives.
+   - collectiveStat: { count, runDate } - distinct members checked in on
+     the most recent qualifying run date (run_type IN ('regular','c25k'),
+     not cancelled - the AGENTS.md counting invariant). A cancelled week
+     keeps showing the previous run; no zero states. Members-only by
+     Paul's decision (11 Jul) - it lives in this authed payload, never
+     anon.
+   - developmentPreference (see 3).
+   - Do NOT duplicate the milestone summary here - the app already
+     consumes GET /api/attendance/summary for the header badge + popover.
+2. GET /api/walks - tiny read-only mirror of lib/walks.ts for the solo
+   card's Walks button. Anon read is fine (walks are public site content).
+3. Development preference (workshop decision 10 deferred the schema to
+   build time - this is that moment): a single nullable enum column on the
+   member row (get_fitter | run_further | first_race | enjoy_thursdays),
+   written ONLY via PATCH /api/profile (alongside awards_public, same
+   optimistic-update contract), served in GET /api/home. Skippable,
+   editable forever, app-only for now (no email use).
+4. NOT this session: invitation eligibility (waits on live group_key
+   volume + thresholds Paul calibrates) and route familiarity (deferred
+   to autumn, workshop decision 7). Both light up in the app without a
+   layout change when their data exists.
+
+VERIFY
+Typecheck + tests + the em-dash guard. Probe endpoints against the dev
+Supabase project with a minted member session (the .env.local service-role
+generate_link -> verify pattern from the recognition build), including:
+a member with 3+ live grouped check-ins (usualGroup set), a member with
+mixed groups (null), a leader (isRunLeader true), signed-out 401, and the
+cancelled-week stat fallback. Then production probes (401 signed out,
+CORS preflight). Update docs/NATIVE_APP_SCOPE.md section 5's API list.
+
+OUTPUT
+Working endpoints on staging + a decision record appended to
+docs/RUNNER_HOME_BRIEF.md (hyphens, staging only). The app build session
+follows in native-apps - it consumes GET /api/home, /api/walks,
+/api/attendance/summary and PATCH /api/profile, and adds the km <-> mi
+units toggle in Settings (client-side, no API).
+```
