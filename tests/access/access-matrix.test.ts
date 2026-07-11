@@ -585,6 +585,22 @@ suite('access matrix', () => {
       }
       expect(body.awardsPublic).toBeTypeOf('boolean')
     })
+
+    it('member can toggle awards_public via PATCH /api/profile and it reflects in the summary', async () => {
+      const flip = async (value: boolean) => {
+        const res = await api('member', 'PATCH', '/api/profile', { json: { awards_public: value } })
+        expect(res.status).toBe(200)
+        const summary = await (await api('member', 'GET', '/api/attendance/summary')).json()
+        expect(summary.awardsPublic).toBe(value)
+      }
+      await flip(true)
+      await flip(false) // leave the fixture in the private-by-default state
+    })
+
+    it('anon cannot PATCH awards_public', async () => {
+      const res = await api('anon', 'PATCH', '/api/profile', { json: { awards_public: true } })
+      expect(res.status).toBe(401)
+    })
   })
 
   describe('API: leader emergency contacts (must stay green through the hardening)', () => {

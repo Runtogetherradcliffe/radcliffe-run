@@ -548,9 +548,10 @@ leader). For the member-facing display, consume:
   `recorded` is counted nights since. 401 signed out; 404 if the account has
   no member row.
 - `awardsPublic` mirrors `members.awards_public` (default false - private by
-  default, opt-in public celebration). A toggle for it belongs with the
-  profile/consent screens; PATCH support on `/api/profile` does not exist yet
-  and should be added backend-first when the display work starts.
+  default, opt-in public celebration). The toggle (designed 10 Jul at the
+  foot of My Ladder) writes `PATCH /api/profile` with
+  `{ "awards_public": true|false }` - supported since 11 Jul 2026, cookie or
+  Bearer, same route the app's account screens already use.
 - Counting rules, schema and the decision record live in
   `docs/ATTENDANCE_RECOGNITION_BRIEF.md` - the app renders shapes, it never
   recomputes counts.

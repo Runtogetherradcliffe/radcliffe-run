@@ -7,6 +7,7 @@ const ALLOWED_FIELDS = [
   'emergency_name', 'emergency_phone', 'emergency_relationship',
   'medical_info', 'email_opt_out', 'photo_consent',
   'theme', 'font_size',
+  'awards_public', // recognition consent: private by default, opt-in public
 ]
 
 // PATCH /api/profile - update the authenticated member's own record

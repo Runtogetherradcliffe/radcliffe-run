@@ -145,3 +145,134 @@ ExtraBold), self-contained fill (works on any background/export surface).
   Paul's real summary shape (run 160 / volunteer 160, next 200, 40 to go).
 
 Next session: the recognition screen design proper, then the app build.
+
+---
+
+## Session prompt: "My Ladder" screen design (paste into a native-apps thread)
+
+```
+Design the recognition display screens for the RTR app in the Pencil file,
+using the badge language designed and signed off on 10 Jul 2026. This is
+screen design; the app build follows in a later session.
+
+REPO RULE - READ BEFORE COMMITTING ANYTHING TO radcliffe-run
+No em dashes in ANY file (docs included) - a CI guard fails the build on
+them; the badge session's decision record had to be fixed after the fact.
+Use plain hyphens. And staging-first: never push to main; commit to the
+working branch, push to staging, Paul approves any merge.
+
+WHERE
+The Pencil file at ~/Documents/"RTR app". The badge components (Badge 40 /
+Badge 80 / Badge 160, states as instance overrides) and the grammar sheets
+("Recognition - Badge Grammar - Dark/Light") already exist in it, plus a
+rough size-test mock "My Ladder - Dark" to supersede.
+
+READ FIRST
+- radcliffe-run repo: docs/RECOGNITION_DESIGN_BRIEF.md - the badge grammar
+  and copy decisions (Runs / Leading naming, bare numbers, plain milestone
+  celebration copy). These are DECIDED - do not relitigate.
+- radcliffe-run repo: docs/NATIVE_APP_SCOPE.md section 5 - the endpoint
+  contract (GET /api/attendance/summary) and v1.1 sequencing.
+- docs/PENCIL_DESIGN_BRIEF.md for the M1 file's conventions.
+
+WHAT TO DESIGN (both themes throughout)
+1. The final My Ladder screen: both ladders (Runs / Leading) with achieved,
+   locked and next-up badges, progress to next ("N to go" + linear bar -
+   the badge arc renders only at 80 px and up), and the seed-achieved
+   caption treatment ("already achieved", no date, no New dot).
+2. WHERE recognition lives - decide with Paul: its own screen off the
+   profile, a card on an existing tab that opens the full ladder, or both
+   (summary card -> full screen). Respect the M1 tab structure.
+3. The celebration moment for a FRESH crossing: New dot + plain milestone
+   copy ("200 runs with RTR."), shown once. Design the moment (in-screen
+   state, not a push notification - that is the awards job, later).
+4. The awards_public consent toggle: private by default; where it sits in
+   the profile/consent screens and its explanatory copy. (Backend PATCH
+   support does not exist yet - flag it as a build dependency, design it
+   anyway.)
+5. Empty state 0/0 (new member: all locked, next-up 10) and the
+   leader-with-few-runs shape (e.g. 30 / 5) - no ladder may look broken.
+
+REAL DATA FOR MOCKS (live shapes from GET /api/attendance/summary:
+{ run: { total, seed, recorded, rungs, nextRung, toNext },
+  volunteer: { same }, awardsPublic })
+- Paul 160/160 (next 200, 40 to go), Kate 151/119, Neil 160/25, Ros 54/11,
+  mid-range ~40/0, newcomer 3/0, empty 0/0.
+
+OUTPUTS
+- Final screens in the Pencil file, both themes, superseding the rough mock.
+- Exported renders committed to radcliffe-run design/screens/ (hyphens in
+  filenames and commit messages - see the repo rule above).
+- Placement + toggle decisions appended to this brief in the
+  radcliffe-run repo (again: hyphens, not em dashes).
+```
+
+---
+
+## Decision record (My Ladder screen session, 10 Jul 2026)
+
+Session held in the Pencil file at `~/Documents/RTR app`, on the badge
+language above. All placement and copy decisions taken with Paul in-session.
+
+### Placement (Paul's calls)
+
+1. **Recognition lives in BOTH places**: a compact **Ladder Card on the Club
+   tab** (directly under the profile card - latest badge at 40 px, "My
+   ladder", "160 runs - 160 leading - 40 to next badge", chevron) opening
+   the **full My Ladder stack screen** (back button, no tab bar - the
+   standard drill-in grammar). The M1 tab structure is untouched.
+2. **The awards_public consent toggle sits at the foot of My Ladder** in a
+   SHARING card: "Celebrate my milestones publicly", off by default, with
+   the copy: "Off by default. When on, the club may celebrate your new
+   badges in roundups and socials. In the app, your ladder is only ever
+   visible to you." **BUILD DEPENDENCY**: PATCH support for awards_public
+   on /api/profile does not exist yet - backend-first before the app build.
+
+### Screen design rules (settled in-session)
+
+- **Progress fraction** (badge arc + linear bar, identical value):
+  `(total - prevRung) / (nextRung - prevRung)` - progress resets to zero at
+  each crossing. Paul at 160 shows 60% of the way from 100 to 200, NOT
+  160/200. prevRung = highest achieved rung, 0 for none. The grammar
+  sheet's next-up example was corrected to match.
+- **The LEADING card renders only when the member has leading history**
+  (volunteer.total > 0, or the is_run_leader flag). A newcomer at 0/0 sees
+  the Runs ladder only - a "LEADING - 10 to go" card would imply members
+  are expected to lead.
+- **Ladder card anatomy**: count hero (26/800 + unit), 40 px thumbnail
+  strip (achieved rungs + next and one future rung, locked - thumbnails
+  stay binary per the grammar), next-up row (80 px badge with arc, "N to
+  go", "Next badge at N", linear bar), and the seed line ("Badges to 100
+  earned before the app - already achieved", history icon, faint).
+- **The seed line is data-driven, not time-driven, and never switches
+  off**: it renders while any achieved rung has `achieved_on` NULL (rung
+  <= seed), and those rungs never gain dates. So it is SCOPED to name the
+  seed rungs ("Badges to 100...") and stays true after the first live,
+  dated crossing lands above it. If seed = 0 it never renders.
+- **Empty state** (0/0): all-locked strip, next-up 10 with a 6 px endowed
+  nub on the bar, sub-copy "Your first badge is at 10". Nothing renders
+  broken; the SHARING card stays.
+- **Celebration = the Milestone screen** (in-screen state, not a push),
+  refined with Paul over three feedback rounds: a named greeting
+  "Congratulations, {firstName}" (20/800, orange - the first name comes
+  from the member profile the app already holds), a celebratory badge
+  scene (soft orange glow halo, two hairline ripple rings, confetti dots
+  in the orange family ONLY - terrain blue/green and C25K purple stay
+  semantic), the milestone line "200 runs with RTR." (28/800), dateline
+  ("Crossed Thursday 16 July 2026"), Continue. Shown once, on the first
+  open after a fresh crossing - seed rungs never trigger it. The
+  shown-once state belongs to the awards machinery (awards table / job),
+  which is a later build step.
+
+### In the Pencil file / renders
+
+Frames (all superseding the rough size-test mock, which is deleted):
+My Ladder Dark/Light (Paul's 160/160 shape), My Ladder 30-5 Dark/Light
+(leader-with-few-runs), My Ladder empty Dark/Light (0/0), Milestone
+Dark/Light, and the Club tab updated in place with the Ladder Card (both
+themes). Renders committed to design/screens/: recognition-my-ladder-*,
+recognition-milestone-*, club-dark/light (replaced), and the corrected
+badge grammar sheets.
+
+Next: backend PATCH for awards_public, then the app build of these screens
+off GET /api/attendance/summary.
