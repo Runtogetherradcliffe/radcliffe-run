@@ -515,25 +515,31 @@ surface) but does not create it.
    since Bearer support widens how authenticated requests reach the server.)
 5. Nothing else - reads are ready as-is.
 
-### Attendance recognition endpoint (shipped 10 Jul 2026 - ready for v1.1)
+### Attendance recognition endpoint (backend 10 Jul 2026; display SHIPPED 11 Jul)
 
 The awards/gamification display has its backend live already - and v1.1 is
 PULLED FORWARD (Paul, 10 Jul 2026): the Nov-Dec slot was driven by the C25K
 cohort, but the historic backfill landed early (~90% of attendance data is
 in), so regulars get recognised ASAP. Sequencing:
 
-1. **Badge/trophy design session first** - digital badge artwork for the
-   rungs (10/25/50/100/every-100th, run + volunteer), designed in the Pencil
-   file to the site/app brand standards (RTR tokens, both themes).
-2. **Display screen** - achieved rungs + progress to next, straight off
-   `GET /api/attendance/summary`. Needs NO new backend. Presentation of
-   milestones crossed inside the seed is settled by the workshop principle:
-   members open the app to SEE what they have already achieved and how far
-   to the next - achieved is achieved, no retro fanfare (never celebrate a
-   2023 milestone as news).
-3. **Celebration machinery after** - the awards cron job (dated crossings,
-   notify-once, seed-era rungs written silently with `achieved_on` NULL) and
-   the leader recognition loop follow the display, not the other way round.
+1. **Badge/trophy design session first** - DONE 10 Jul: badge grammar +
+   My Ladder screens designed in the Pencil file; decision records in
+   `docs/RECOGNITION_DESIGN_BRIEF.md`.
+2. **Display screen** - DONE 11 Jul 2026: built in native-apps (apps/rtr
+   commit 905f058) and shipped by OTA to the production channel - My Ladder
+   drill-in, Club tab Ladder Card, Milestone celebration (interim
+   client-side once-only trigger; build decision record in
+   `docs/RECOGNITION_DESIGN_BRIEF.md`). Straight off
+   `GET /api/attendance/summary`, no new backend; seed presentation per the
+   workshop principle - achieved is achieved, no retro fanfare.
+3. **Celebration machinery - the OPEN step**: the awards cron job (dated
+   crossings, notify-once, seed-era rungs written silently with
+   `achieved_on` NULL; the `awards` table exists on production, nothing
+   writes it yet), an /admin/recognition surface (recent crossings with the
+   awards_public flag beside each - the toggle gates public naming in
+   roundups/socials, not admin visibility), and the leader recognition
+   loop. Once live, the app's interim local milestone trigger should switch
+   to the server's notified_at state.
 
 The app needs NO changes for attendance capture (volunteer credit is written
 server-side by `POST /api/leader/checkin` when the checked-in member is a
