@@ -214,7 +214,9 @@ Counting rules (implemented in `lib/recognition.ts`, exposed by
 - Lifetime total = sum of seeds + distinct recorded nights.
 - `members.awards_public` (default false) is the opt-in consent flag for
   public celebration; the summary endpoint only ever returns the caller's own
-  counts.
+  counts. Members toggle it via `PATCH /api/profile`
+  (`{ "awards_public": true|false }` - whitelisted 11 Jul 2026; cookie or
+  Bearer, self-only like every profile field).
 
 Backfill: `scripts/import_attendance_seeds.py` (dry-run by default,
 idempotent, re-runnable). Sources live in `data/attendance-backfill/` +
