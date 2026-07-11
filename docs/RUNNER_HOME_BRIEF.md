@@ -112,3 +112,475 @@ DELIVERABLES
 REPO RULES: no em dashes anywhere (CI guard); commit to the working
 branch, push to staging only; this is a docs-only session.
 ```
+
+---
+
+# (a) Evidence brief (research session, 11 Jul 2026)
+
+Confidence key as in `C25K_ENGAGEMENT_RESEARCH.md`:
+**High** = peer-reviewed meta-analysis / replicated result. **Medium** =
+single peer-reviewed study or robust extrapolation. **Low / lore** =
+industry data, UX pattern literature, or design reasoning; plausible
+mechanism, weak methodology.
+
+## 1. The keystone: "too slow" is a misread contract, and structure fixes it
+
+- **Feeling too unfit is a documented, gendered barrier to group running.**
+  parkrun's barrier research (BMC Public Health 2022) finds the
+  psychological fear of not being fit enough is a principal barrier to
+  initiating participation, reported more by women (RTR's likely majority).
+  A Scotland cohort study of first-time parkrunners adds the self-fulfilling
+  half: finishers over 40 minutes returned at disproportionately low rates -
+  the fear is real, and where the event does nothing structural, the
+  experience confirms it. Confidence: **High** (multiple studies, consistent
+  direction).
+  Sources: [PMC8759213](https://pmc.ncbi.nlm.nih.gov/articles/PMC8759213/),
+  [PMC10431652](https://pmc.ncbi.nlm.nih.gov/articles/PMC10431652/)
+- **Structural roles beat reassurance - the parkwalker natural experiment.**
+  parkrun made the tail walker compulsory in 2017 ("no one finishes last"
+  as a designed guarantee, not a promise), then added the parkwalker role in
+  Oct 2022 - a staffed, visible role whose whole job is walking with people.
+  parkrun reports a 69% increase in walkers since; a University of Stirling
+  analysis (Jan 2026) found a 55% increase, strongest among women and older
+  participants - the exact population the fear evidence identifies. A staffed
+  role legitimising the back of the field moved participation where copy
+  alone had not. This is the closest analogue to RTR's back marker and the
+  strongest single support for the "lead with structure, not pep" tenet.
+  Confidence: **Medium-high** (large-N natural experiment, no RCT).
+  Sources: [Stirling, Jan 2026](https://www.stir.ac.uk/news/2026/january-2026-news/participation-in-parkrun-surging-thanks-to-parkwalkers-new-stirling-research-shows/),
+  [parkrun tail walker role](https://resources.parkrun.com/resources/volunteer-roles-explained-tail-walker)
+- **Norm-misperception correction works, but the copy shape matters.** The
+  social norms approach rests on people misperceiving peers' behaviour and
+  attitudes. An RCT (N=111) found descriptive-plus-injunctive norm feedback
+  raised physical activity over the short term; a larger adolescent RCT
+  found adding personal identification to norm messages added nothing; a
+  critical appraisal warns that generic "norm messages" without a real,
+  measured misperception often fail. Reading: the effective form is a
+  concrete, TRUE, descriptive fact about the group, delivered plainly -
+  not exhortation, and never anything that singles the member out.
+  Confidence: **Medium**.
+  Sources: [PubMed 28213634](https://pubmed.ncbi.nlm.nih.gov/28213634/),
+  [PMC7457489](https://pmc.ncbi.nlm.nih.gov/articles/PMC7457489/),
+  [PMC6232455](https://pmc.ncbi.nlm.nih.gov/articles/PMC6232455/)
+- **Intimidation research points at perceived descriptive-norm mismatch.**
+  Work on gym intimidation (power-threat-meaning framework) finds believing
+  you are unlike the others present drives intimidation, and that meeting
+  the group's descriptive norm is protective even when an idealised standard
+  is not met. "Plenty of Thursday regulars run 8k some weeks and 5k others"
+  targets the actual mechanism: it corrects the perceived norm rather than
+  arguing with the member's self-assessment. Confidence: **Low-medium**
+  (recent framework paper, qualitative).
+  Source: [Frontiers in Sports and Active Living 2026](https://www.frontiersin.org/journals/sports-and-active-living/articles/10.3389/fspor.2026.1712367/full)
+- **Self-efficacy sources, empirically ranked for physical activity.** A
+  2025 dominance analysis (N=335 adults) ranks the sources by share of
+  explained variance in PA self-efficacy: mastery experience 18.4%, verbal
+  SELF-persuasion 15.8%, affective states ~11-12%, vicarious experience
+  2.3%, verbal persuasion BY OTHERS 1.0%. Caveats: single study, sample
+  skews active (maintenance, not initiation); the authors suggest vicarious
+  experience matters more when INITIATING a new behaviour. Four readings
+  for this feature, in order of force:
+  1. Generic encouragement from an app is the WEAKEST lever measured -
+     "encouragement argues with self-assessment" is what the data says.
+  2. The strongest lever is a real mastery experience - so the invitation's
+     true job is making the first 8k attempt guaranteed-survivable
+     (structure), after which the experience does the persuading.
+  3. Facts a member can repeat to themselves ("the back marker stays with
+     the last runner - that is the job") work as self-persuasion, the
+     second-ranked source. Structure copy doubles as self-persuasion
+     ammunition.
+  4. Vicarious quotes still earn their place for the initiation moment
+     specifically, despite the low maintenance-phase rank.
+  Confidence: **Medium** (single study; direction consistent with the wider
+  Bandura literature).
+  Source: [PMC12502103](https://pmc.ncbi.nlm.nih.gov/articles/PMC12502103/)
+
+## 2. Invitation timing, frequency, dismissal
+
+- **Receptive-moment delivery is the JITAI core principle**: support lands
+  "at the moment the person needs it most and is most likely to be
+  receptive". Combined with the fresh-start effect already in the evidence
+  base (aspiration spikes at temporal landmarks), a just-crossed milestone
+  is a plausible warm moment: competence is momentarily high and the member
+  is already looking at an achievement surface. Direct evidence for
+  post-achievement receptivity to PROGRESSION invitations specifically is
+  thin - treat the timing as a well-grounded bet, not a proven result.
+  Confidence: **Medium** for receptivity/timing in general; **Low** for the
+  specific post-milestone claim.
+  Source: [PMC5364076](https://pmc.ncbi.nlm.nih.gov/articles/PMC5364076/)
+- **The downside risk is asymmetric.** Cold or repeated pushes are the
+  documented opt-out driver (notification evidence already in
+  C25K_ENGAGEMENT_RESEARCH.md section 3); a single, dismissible, in-app
+  invitation at a warm moment risks almost nothing. Once-and-dismissible has
+  no direct trial evidence; it follows from the opt-out literature plus
+  autonomy (an invitation the member controls supports autonomy; a repeating
+  nudge is imposed). Design consequence: show once, dismiss forever, but
+  keep the CONTENT permanently reachable somewhere low-key so the door
+  never closes and dismissal costs nothing. Confidence: **Low** (design
+  reasoning) resting on **High** adjacent evidence.
+
+## 3. Home-screen personalisation: what comparable products teach
+
+- **The personalisation-privacy paradox is real and has a clean escape.**
+  Users like personalised content but distrust the data trail. A Penn State
+  study found users strongly prefer recommendations based on SELF-REPORTED
+  preferences; over 96% switched away from social-media-inference
+  personalisation when given a choice; having choices itself built trust.
+  Escape for RTR: personalise only from what the member knowingly gave
+  (check-ins a leader did in front of them, preferences they typed), show
+  provenance inline ("based on your check-ins"), make every inference
+  correctable in one tap. Warm vs surveillance-y is exactly the line
+  between disclosed-and-correctable and inferred-and-silent. Confidence:
+  **Medium** (news summary of a single study; mechanism consistent across
+  the paradox literature).
+  Sources: [PSU ICDS](https://www.icds.psu.edu/app-users-wary-of-health-and-fitness-recommendations-based-on-social-media-data/),
+  [PMC9309778](https://pmc.ncbi.nlm.nih.gov/articles/PMC9309778/)
+- **parkrun's app leads with celebration and gets crowding complaints.**
+  The relaunched official app reorganised its home around the milestone
+  widget and a wall of badges; user feedback complains celebration crowds
+  out utility (a badge taking three quarters of the screen). Lesson:
+  milestones belong on the home as a compact summary card, not the hero.
+  Confidence: **Lore**.
+  Source: [The Easy Run review](https://www.theeasyrun.com/parkrun/the-new-parkrun-app-is-here-but-is-it-actually-better-than-the-5k-app/)
+- **Strava's recurring redesign backlash is about displaced utility.** Each
+  layout change draws the same complaint shape: the thing users open the
+  app for gets pushed down or moved, and novelty is stacked on top. Lesson:
+  RTR's hero must stay the one thing everyone opens the app for - when and
+  where is the next run - and layout STABILITY is itself a feature.
+  Personalisation should change what fills the slots, rarely the slots.
+  Confidence: **Lore**.
+  Source: [Strava community thread](https://communityhub.strava.com/strava-features-chat-5/new-layout-is-beyond-awful-8990)
+- **Training apps put "your next session" first.** Runna's home is the next
+  planned workout; NRC similar. Consistent with next-run-as-hero. **Lore**.
+- **Self-set beats imposed for goals.** The SDT taxonomy of app features:
+  self-set goals support autonomy; app-imposed goals undermine motivation.
+  Focus-group work with sedentary users confirms autonomy-supportive
+  features (own goals, tailored feedback) are valued. The development
+  preference ask must be optional, skippable, and member-editable - never
+  a wizard that assigns a pathway. Confidence: **Medium-high**.
+  Sources: [IJHCS 2020 SDT taxonomy](https://www.sciencedirect.com/science/article/pii/S1071581920300513),
+  [PMC7704278](https://pmc.ncbi.nlm.nih.gov/articles/PMC7704278/)
+
+## 4. Signposting vs coaching: where the line sits
+
+- **The LiRF / CiRF boundary is explicit in England Athletics' framework.**
+  LiRF (Leadership in Running Fitness) leaders are insured to LEAD group
+  runs within the course content: safe routes, warm-ups/cool-downs, simple
+  inclusive activities from pre-defined session cards. Planning or designing
+  structured training programmes, coaching technique, and guiding
+  performance progression belong to CiRF (Coach in Running Fitness) and
+  above. RTR leaders are LiRF-shaped; nothing in the app may put them, or
+  the club, on the coaching side of that line. Confidence: **High**
+  (regulatory documents).
+  Sources: [England Athletics LiRF](https://www.englandathletics.org/coaches-and-officials/coaching-qualifications/leadership-in-running-fitness/),
+  [UKA C25K leader requirements](https://www.uka.org.uk/wp-content/uploads/2023/03/230321-Couch-to-5K-Leader-Requirements-March-2023.pdf)
+- **Safe side**: pointing at existing self-serve resources (pace groups,
+  parkrun, the route library, England Athletics / NHS resources), stating
+  facts about club sessions, celebrating attendance. **Unsafe side**:
+  generating training plans, prescribing paces, distances or progressions,
+  any adaptive "your next step is X" logic. The development feature is a
+  signposting MENU, not a pathway engine - which also keeps it honest under
+  principle 1 (attendance, never performance).
+
+## 5. Collective stat and return framing (consolidating existing evidence)
+
+- "38 of us ran last Thursday" is descriptive-norm social proof with no
+  comparison surface - the same mechanism as section 1's norm correction,
+  pointed at belonging instead of ability. Cohort collective totals were
+  already adopted on 6 Jul; this extends the same shape to the whole club.
+  Data exists (live check-ins). Confidence: **Medium** (mechanism), and it
+  is the club's own true number either way.
+- Return framing: counts only go up; a gap changes nothing (principles 2-3).
+  "We missed you" stays DEFERRED (decided 6 Jul - regulars missing weeks is
+  life, not dropout). Consequence for the home: it must render identically
+  after a six-week gap - no state that admits guilt copy exists.
+
+## Hard constraints (restated - all 11 principles bind)
+
+Attendance, never performance. Counts only go up - no streaks, no decay.
+Build for return - never guilt. Private by default, celebrated by consent.
+No member-vs-member comparison, ever. Recognition routes through humans.
+Amplify Thursday night, never simulate it. Registration is session zero.
+Capture costs members nothing. Notifications are few and event-anchored.
+Measure before mechanising. Nothing exists "to drive engagement" as an end
+in itself.
+
+---
+
+# (b) Straw-man home (to react to, not decided)
+
+The Runs tab today is a generic list: next-run hero + upcoming feed. The
+straw man keeps that skeleton (the hero stays the one thing everyone opens
+the app for) and makes each slot personal. Surfaces top to bottom as a
+member would scroll. Every surface carries a DATA line stating what it
+needs and whether that exists today; nothing here claims data we do not
+have.
+
+**Signed-out / no-member state:** the home degrades to what the Runs tab
+already is (runs are anon reads) - generic next run, no greeting, no
+personal cards. Nothing renders broken; sign-in is invited once, quietly.
+
+### 1. Hero: greeting + next run, preferred group large
+
+"Evening, Kate." over the next run card (date, time, meeting point, on-tour
+banner, cancelled state - the existing card grammar). Below it the night's
+groups as tiles: the member's usual group rendered large (8k with its
+route), the others small but always present and tappable. A one-line
+provenance note on the large tile: "your usual group, from your check-ins" -
+tap to switch or clear. No leader name on upcoming runs yet (see DATA).
+
+- DATA: runs + routes exist (anon reads). First name exists (`/api/me`).
+  Preferred group DOES NOT exist as a field - derive from
+  `attendance.group_key`, live era only (reliable 9 Jul 2026 onward;
+  photo-era rows mostly lack it). Needs ~3 live check-ins for confidence -
+  cold start below. "Led by Kate" for an UPCOMING run is NOT derivable
+  today: `run_leadership` is retrospective (written at check-in). Honest
+  options are past-tense facts or nothing until the leader-signup feature
+  (designed May 2026, unbuilt) provides forward claims - workshop
+  decision 9.
+
+### 2. Preferred-group tile cold start
+
+Until the member has 3+ live check-ins with a clear majority group, all
+group tiles render equal-size (the current generic behaviour, which is
+correct when we know nothing). Mixed history (no majority) also renders
+equal - that IS the fact, and it quietly normalises moving between groups.
+Never ask the member to declare a group: a declared group is an identity,
+and the keystone problem is members over-identifying with "their" group.
+Inference from behaviour plus one-tap correction is warmer than a form and
+avoids hardening the identity cliff (workshop decision 2).
+
+- DATA: same as surface 1. Threshold (3) is a guess for Paul to calibrate.
+
+### 3. Milestones summary (compact, never the hero)
+
+The existing Ladder Card grammar (latest badge at 40px, counts line,
+next-rung progress, chevron into Milestones). One card height, never more -
+the parkrun app's badge-wall crowding complaint is the cautionary tale.
+Celebration stays in the Milestone screen; the home only summarises.
+
+- DATA: exists - `GET /api/attendance/summary`, card built (Club tab).
+  Decision needed on whether it moves to home or renders in both places
+  (workshop decision 3).
+
+### 4. Collective stat (one line, comparison-free)
+
+A single quiet line under the hero: "38 of us ran last Thursday." Nothing
+about who, nothing about the member's own count here, no trend arrows. In
+C25K season it can carry the cohort variant ("14 of your cohort ran
+Tuesday") per the 6 Jul decision.
+
+- DATA: exists, live era - count DISTINCT members checked in on the most
+  recent qualifying run date (`run_type IN ('regular','c25k')`, not
+  cancelled, per the AGENTS.md counting invariant).
+
+### 5. The progression invitation (the keystone surface)
+
+- **Trigger**: shown ONCE, on the home, at the first milestone celebration
+  moment for a member whose usual group is 5k (i.e. immediately after the
+  Milestone screen's warm moment, not as a push, never cold). Milestone
+  crossings become server truth when the awards job ships
+  (AWARDS_LOOP_BRIEF); the app already has the interim local trigger.
+- **Copy shape** (order is the evidence, section (a)1):
+  1. STRUCTURE, the guarantee: "The 8k has a back marker - a leader whose
+     whole job is running with the last person. Nobody runs alone, and the
+     group regroups on the way round." Plus the concrete facts: typical
+     back-of-group pace, duration, regroup points.
+  2. NORM, descriptive and true: "Plenty of Thursday regulars run 8k some
+     weeks and 5k others."
+  3. VOICES: the named back marker ("I run at the back on purpose - that
+     is the job") and one member quote ("I thought I would hold everyone
+     up. Nobody does.").
+  4. Never "You can do it!" - persuasion argues with self-assessment and
+     is the weakest measured source.
+- **Dismissal**: two affordances - "Maybe another week" (card goes, no
+  state change) and "Don't show this again" (forever). Either way the same
+  content lives permanently on a low-key "About the groups" page reachable
+  from run detail, so dismissing costs nothing and the door stays open.
+- **January reuse**: the same component with swapped copy serves C25K
+  graduation ("am I really a club runner?" is the same fear one rung
+  down) - graduation is itself a milestone moment, so the trigger shape
+  is identical.
+
+- DATA: usual group as above (live era). Milestone trigger: interim local
+  now, `awards` machinery when built. The COPY is the real dependency:
+  back-of-group pace, regroup facts, a named leader's line and a member
+  quote (with consent) do not exist anywhere and must be collected from
+  humans - workshop decisions 5 and 6.
+
+### 6. Development preference ask (once, skippable, editable)
+
+One card, one question: "How would you like your running to develop?" -
+options like: get fitter / run further / a first race or parkrun / just
+enjoy Thursdays. Answering swaps the card for a signposting row matched to
+the answer: pace groups (About page), parkrun, the route library, England
+Athletics / NHS resources. "Just enjoy Thursdays" is a first-class answer
+that produces no signposts and no follow-up - it must be as respected as
+any other. Skippable ("not now" - card leaves the home, ask lives on in
+profile); answer editable in profile forever. No plans, no paces, no
+prescriptions - signposting only (the LiRF line, section (a)4).
+
+- DATA: does not exist - needs one small schema addition (member
+  development preference). Flagged for the workshop; NOT designed here
+  per the brief.
+
+### 7. Route familiarity (only when provable)
+
+On the next-run card and run detail: "You've run this route 3 times."
+Rendered ONLY when the count is provable from live-era data; otherwise
+nothing renders - absence of a claim cannot lie. NEVER "new to you"
+(unprovable pre-app, insulting when wrong).
+
+- DATA: derivable live era only: member's `group_key` per night -> that
+  night's run row for that group (jeff falls back to the 5k row - the
+  anchoring caveat in ATTENDANCE_RECOGNITION_BRIEF applies) -> `route_slug`
+  -> count. Needs a small server derivation (backend-first rule: the app
+  holds no logic). Counts will be small until autumn - display threshold
+  is workshop decision 7.
+
+### 8. Solo section (a gift, not a tracker)
+
+A small card at the foot: "Running solo this week?" -> the route library
+(in-app, exists) and the walks library. No logging, no self-report, no
+counting - solo runs do not count toward milestones (decided scope) and
+this surface must never imply they should. It is the club handing you a
+map, not watching you run.
+
+- DATA: routes exist in-app (`GET /api/routes`). Walks data is site-bound
+  (`lib/walks.ts`, no API) - needs a tiny read-only endpoint or bundled
+  data (workshop decision 8).
+
+### What the home NEVER shows
+
+Pace, distance PBs, or any performance number. Streaks or gap-counting of
+any kind. Any other member's name or count (except a consented leader
+voice in the invitation). "New to you" or any unprovable claim. Guilt copy
+in any state - the home after a six-week gap is pixel-identical to the
+home after none. Engagement mechanics with no Thursday behind them.
+
+### Data dependency summary
+
+| Surface | Exists today | Missing |
+|---|---|---|
+| Greeting + next run hero | yes (runs anon, /api/me) | - |
+| Preferred-group tile | group_key live era (9 Jul on) | ~3 check-ins volume; derivation endpoint |
+| Milestones summary | yes (summary API + card) | placement decision |
+| Collective stat | yes (live check-ins) | tiny aggregate endpoint |
+| Progression invitation | usual-group + interim trigger | awards job (in flight); THE COPY (humans) |
+| Development ask | no | schema addition (workshop flag) |
+| Route familiarity | derivable live era | derivation endpoint; data volume |
+| Solo section | routes API | walks API (tiny) |
+| Upcoming-run leader | no (run_leadership is retrospective) | leader-signup feature (designed, unbuilt) |
+
+A practical build note (not a decision): most personalised surfaces want
+one aggregate `GET /api/home` payload (member, usual group, next run,
+familiarity count, collective stat, milestone summary ref) rather than the
+app assembling five calls - consistent with the backend-first rule. Design
+it at build time, not here.
+
+---
+
+# (c) Workshop agenda - decisions for Paul
+
+Format: interactive, reacting to the straw man surface by surface. Each
+decision has options and a recommendation; nothing is decided until Paul
+says so. The later Pencil session iterates the chosen shape screen by
+screen with him - never a fait accompli.
+
+1. **Home identity.** (a) The Runs tab BECOMES the personalised home
+   (same tab count, hero stays first) - RECOMMENDED; (b) a separate new
+   Home tab (five tabs incl. leader Check-in); (c) personalise the Club tab
+   instead. Straw man assumes (a): the runs list is already the de facto
+   home, and stability-of-slots is the lesson from Strava's backlash.
+2. **Preferred-group cold start and inference.** (a) Infer from live
+   check-ins, equal tiles until 3+ with a majority, one-tap correct -
+   RECOMMENDED (warm, no identity form, matches the privacy-paradox
+   evidence for disclosed provenance); (b) ask once at first open ("which
+   group do you usually run with?") - simpler, but hardens the identity
+   the keystone wants to dissolve; (c) default everyone to 5k-large.
+   Also calibrate: is 3 check-ins the right threshold?
+3. **Milestones card placement.** (a) Home AND Club tab (same card twice) -
+   RECOMMENDED, cheap and consistent; (b) move to home, remove from Club;
+   (c) Club only (status quo). Also: does the Milestone celebration screen
+   hand off to the home (where the progression invitation waits) or back
+   to where the member was?
+4. **Progression invitation trigger.** (a) First milestone celebration for
+   a 5k-usual member, once ever - RECOMMENDED (warmest moment, lowest
+   risk); (b) every milestone until engaged-or-dismissed (more chances,
+   more nag risk); (c) also allow a time-based fallback for members who
+   never cross a rung (contradicts "warm moments only" - included for
+   completeness, recommend against). Plus: confirm the two-button
+   dismissal ("Maybe another week" / "Don't show this again") and the
+   permanent "About the groups" page as the always-open door.
+5. **The structural facts.** What ARE the 8k's true back-of-group pace,
+   duration, and regroup points? Who confirms them (the leaders who run
+   the back)? These facts are the invitation's spine and only leaders can
+   supply them. Decide the collection route (a WhatsApp ask vs at the
+   next leaders' meeting) and where they live (site content vs app copy).
+6. **The voices.** Which leader is the named back-marker voice, and which
+   member gives the vicarious quote? Both need asking and explicit consent
+   (a member quote about being slow is personal - photo_consent-grade
+   care). Decide who Paul asks and the consent shape.
+7. **Route familiarity threshold and placement.** Show from (a) the 2nd
+   run of a route ("you've run this route before" reads warmer than a
+   count of 1) - RECOMMENDED; (b) from the 1st; (c) defer the surface
+   until autumn data volume exists. Placement: next-run card + run detail
+   (straw man) or run detail only.
+8. **Solo section scope.** (a) Routes + walks, build the tiny walks API -
+   RECOMMENDED; (b) routes only, walks later; (c) defer the section. Also
+   confirm the no-logging stance stands (it is the decided scope; restated
+   because the workshop could be tempted).
+9. **Upcoming-run leader line.** (a) Nothing until the leader-signup
+   feature ships, then "led by Kate" comes from real claims -
+   RECOMMENDED (only honest forward-looking source); (b) "usually leads
+   the 8k" from run_leadership history (true but slightly odd on an
+   upcoming run); (c) pull the leader-signup build forward on the roadmap.
+   This decision quietly sequences a whole other feature - flag it.
+10. **Development preference schema flag.** Confirm the feature is wanted;
+    settle the question wording and the options list (straw man: get
+    fitter / run further / first race or parkrun / just enjoy Thursdays);
+    agree that the schema addition (single preference field vs multi-select)
+    is designed in a build session, not the workshop. Also: does the
+    answer ever influence email content, or app-only for now?
+11. **Collective stat copy.** Confirm "38 of us ran last Thursday" shape
+    and placement (one line under the hero). C25K-season cohort variant
+    per the 6 Jul decision. Decide the quiet-week behaviour (a cancelled
+    Thursday means the line simply shows the previous run - no zero
+    states).
+12. **Sequencing.** What ships in the first home build vs waits: the hero,
+    milestones card, collective stat and solo section have their data
+    today; the preferred-group tile and route familiarity want a few more
+    weeks of live check-ins (which accumulate regardless); the progression
+    invitation waits on the awards job plus the human copy (decisions 5-6);
+    the development ask waits on its schema flag. Recommendation: build
+    the home shell with the always-available surfaces first, light the
+    data-dependent surfaces as their data matures - each lights up without
+    a layout change (stability-of-slots again).
+13. **January reuse check.** Confirm the progression invitation component
+    doubles as the C25K graduation bridge (same trigger shape: graduation
+    milestone; swapped copy: "plenty of graduates run with the 5k group -
+    it is the same Thursday night"). If yes, nothing extra is built in
+    January beyond copy.
+
+## Source list (this session's additions)
+
+Peer-reviewed:
+- [Barriers to initiating and maintaining participation in parkrun, BMC Public Health 2022](https://pmc.ncbi.nlm.nih.gov/articles/PMC8759213/)
+- [Predictors of successful return to parkrun for first-time adult participants in Scotland](https://pmc.ncbi.nlm.nih.gov/articles/PMC10431652/)
+- [Social norm interventions to increase physical activity RCT, Annals of Behavioral Medicine 2017](https://pubmed.ncbi.nlm.nih.gov/28213634/)
+- [Social norm-based intervention with observable behaviour, adolescents RCT](https://pmc.ncbi.nlm.nih.gov/articles/PMC7457489/)
+- [Critical appraisal of the social norms approach](https://pmc.ncbi.nlm.nih.gov/articles/PMC6232455/)
+- [Empirical ranking of the sources of self-efficacy for physical activity, 2025](https://pmc.ncbi.nlm.nih.gov/articles/PMC12502103/)
+- [Understanding social gym intimidation, Frontiers in Sports and Active Living 2026](https://www.frontiersin.org/journals/sports-and-active-living/articles/10.3389/fspor.2026.1712367/full)
+- [JITAIs in mobile health: key components and design principles](https://pmc.ncbi.nlm.nih.gov/articles/PMC5364076/)
+- [Apps That Motivate: SDT taxonomy of app features, IJHCS 2020](https://www.sciencedirect.com/science/article/pii/S1071581920300513)
+- [Engagement features in PA apps: focus groups with sedentary people](https://pmc.ncbi.nlm.nih.gov/articles/PMC7704278/)
+- [A personalized mobile app for physical activity: mixed-methods study](https://pmc.ncbi.nlm.nih.gov/articles/PMC9309778/)
+
+Industry / institutional / lore (flagged as such in text):
+- [University of Stirling parkwalker analysis, Jan 2026](https://www.stir.ac.uk/news/2026/january-2026-news/participation-in-parkrun-surging-thanks-to-parkwalkers-new-stirling-research-shows/)
+- [parkrun tail walker role explainer](https://resources.parkrun.com/resources/volunteer-roles-explained-tail-walker)
+- [Penn State ICDS: app users wary of social-media-based recommendations](https://www.icds.psu.edu/app-users-wary-of-health-and-fitness-recommendations-based-on-social-media-data/)
+- [England Athletics: Leadership in Running Fitness](https://www.englandathletics.org/coaches-and-officials/coaching-qualifications/leadership-in-running-fitness/)
+- [UKA Couch to 5K leader requirements (PDF)](https://www.uka.org.uk/wp-content/uploads/2023/03/230321-Couch-to-5K-Leader-Requirements-March-2023.pdf)
+- [The Easy Run: the new parkrun app reviewed](https://www.theeasyrun.com/parkrun/the-new-parkrun-app-is-here-but-is-it-actually-better-than-the-5k-app/)
+- [Strava community: layout backlash thread](https://communityhub.strava.com/strava-features-chat-5/new-layout-is-beyond-awful-8990)
