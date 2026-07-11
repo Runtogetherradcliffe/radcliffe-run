@@ -787,3 +787,149 @@ OUTPUTS
 - Decisions taken with Paul appended to this brief (again: hyphens, not
   em dashes; staging only).
 ```
+
+---
+
+# Decision record (Pencil design session, 11 Jul 2026)
+
+Session held in the Pencil file at ~/Documents/"RTR app", iterated with Paul
+surface by surface on the workshop shapes. Frames (both themes): Home in
+eight states - 8k usual / badge tapped / new member cold start / leader
+160-160 / signed out / invitation 5k to 8k / invitation jeff to 5k / no
+majority + development answered - plus the About the Groups drill-in.
+Renders committed to design/screens/ (home-*.png, about-groups-*.png).
+The canvas note "Note Runner Home" carries the same record beside the frames.
+
+1. **Tab label: Runs becomes Home** (house icon). Applied on the new Home
+   frames; the older M1 frames keep the historic label - they are
+   superseded by these designs.
+2. **Greeting: "Hi {firstName}"** - no time-of-day variants.
+3. **Milestones on the home = the header badge** (evolved in-session from
+   the workshop's card-on-home; the Club tab card is unchanged, so
+   recognition still lives in both places). The badge replaces the
+   radcliffe.run wordmark: badge-only, 40 px, binary per the grammar.
+   Tapping it opens a popover over a scrim - next-up badge at 80 px with
+   the progress arc, count ("40 runs"), "10 to next badge" + linear bar,
+   and a View milestones link into the full screen; tap anywhere to
+   dismiss. Leaders carry TWO coins (runs + hand-heart leading) and the
+   popover gains a row per ladder. Cold start shows the locked 10-coin
+   from day one - the header never reflows.
+4. **Slot order**: greeting -> next-run hero (existing card grammar) ->
+   collective stat -> THURSDAY'S GROUPS -> role line -> UPCOMING ->
+   development ask -> solo card.
+5. **Collective stat**: "38 of us ran last Thursday." - members-only
+   (hidden signed out).
+6. **Role line**: "Every group has a leader at the front and the back -
+   nobody gets left behind."
+7. **Group tiles**: usual group large with provenance "Your usual group,
+   from your check-ins" and a one-tap Change; for leaders the provenance
+   reads "Where you usually lead, from your check-ins" (same tile
+   otherwise). Equal tiles for cold start AND no-majority. Paces are in
+   km on every home surface (member preference roughly 60/40). BUILD
+   ITEM: a Settings units toggle, km <-> mi.
+8. **Invitation copy (both pathways)**: eyebrow ANOTHER GROUP, SAME NIGHT;
+   titles "Fancy trying the 8k sometime?" / "Fancy trying the 5k run
+   sometime?" ("sometime", not "some week"); the facts paragraphs share
+   "There is a leader at the front and back, and usually in the middle
+   too." and "The back leader is there to make sure nobody runs alone.";
+   the norm line is SOFTENED to "You can pick a different group any week -
+   same time, same place." (not "same market" - on-tour nights exist; the
+   stronger descriptive norm "plenty run 8k some weeks and 5k others"
+   returns only when live group_key data proves it). NO quote at launch -
+   the role-attributed line felt fake; revisit if a real leader wording
+   surfaces. Dismissals confirmed: "Maybe another week" / "Don't show
+   this again".
+9. **Development ask**: "What would you like from your running?" - Get
+   fitter / Run further / A first race or parkrun / Just enjoy Thursdays,
+   with a quiet "Not now". Answered state: YOUR RUNNING eyebrow + the
+   answer + Edit, over signpost rows (the groups page, parkrun, the route
+   library). "Just enjoy Thursdays" produces no signposts.
+10. **Solo card**: "Fancy a solo run or walk this week?" + "We've lots of
+    options for you." + Routes / Walks buttons. No logging, per scope.
+11. **Signed-out home**: title falls back to radcliffe.run, no badge,
+    equal tiles, no development ask, and a quiet "Are you a member?"
+    sign-in card after the role line. Nothing renders broken.
+12. **About the Groups drill-in**: intro says "usually from Radcliffe
+    Market" (on-tour exists); three group cards adapted from
+    lib/groups.ts; a MOVING BETWEEN GROUPS card covering movement in
+    every direction (8k regulars dropping to 5k included); the
+    back-leader line at the foot. This page is the permanent home of the
+    invitation content - dismissing the card costs nothing.
+
+Next session: the app build (shell-first per workshop decision 12 - hero,
+role line, stat, solo and the header badge have their data today; tiles
+and invitations light up as live check-ins accumulate).
+
+---
+
+## Session prompt: runner-home APIs (paste into a radcliffe-run site thread)
+
+```
+Build the runner-home APIs in the radcliffe-run repo (Next.js + Supabase),
+ahead of the native app's home build. Backend-first rule: the app holds no
+logic - these endpoints own every derivation. Read first:
+docs/RUNNER_HOME_BRIEF.md (the workshop decision record AND the 11 Jul 2026
+Pencil decision record - both FINAL, do not relitigate); the designed
+screens are design/screens/home-*.png and about-groups-*.png.
+
+REPO RULES
+No em dashes in ANY file (CI guard) - plain hyphens. Staging-first: commit
+to the working branch, push to staging only; Paul approves merges.
+
+AUTH + TRANSPORT
+Bearer-token auth per lib/apiAuth.ts, exactly as /api/attendance/summary.
+Add each new app-facing path to APP_API_PATHS (lib/appCors.ts + its test) -
+CORS exists ONLY for the browser-preview verification loop, auth is still
+enforced per-route.
+
+WHAT TO BUILD
+1. GET /api/home - one member-authed aggregate for the personalised home
+   (401 signed out, 404 signed-in with no member row; the app renders its
+   signed-out/cold-start states off those):
+   - firstName, isRunLeader
+   - usualGroup: the majority group_key over the member's LIVE-era
+     check-ins (group_key non-null; reliable 9 Jul 2026 onward). null
+     until 3+ such check-ins AND a strict majority - null means the app
+     renders equal tiles (cold start and no-majority are the same render).
+     Leaders are INCLUDED (the tile is leader-inclusive; only behavioural
+     interventions exclude them - the app shows leaders different
+     provenance copy off isRunLeader). Include the per-group counts used,
+     so provenance is auditable and the app never re-derives.
+   - collectiveStat: { count, runDate } - distinct members checked in on
+     the most recent qualifying run date (run_type IN ('regular','c25k'),
+     not cancelled - the AGENTS.md counting invariant). A cancelled week
+     keeps showing the previous run; no zero states. Members-only by
+     Paul's decision (11 Jul) - it lives in this authed payload, never
+     anon.
+   - developmentPreference (see 3).
+   - Do NOT duplicate the milestone summary here - the app already
+     consumes GET /api/attendance/summary for the header badge + popover.
+2. GET /api/walks - tiny read-only mirror of lib/walks.ts for the solo
+   card's Walks button. Anon read is fine (walks are public site content).
+3. Development preference (workshop decision 10 deferred the schema to
+   build time - this is that moment): a single nullable enum column on the
+   member row (get_fitter | run_further | first_race | enjoy_thursdays),
+   written ONLY via PATCH /api/profile (alongside awards_public, same
+   optimistic-update contract), served in GET /api/home. Skippable,
+   editable forever, app-only for now (no email use).
+4. NOT this session: invitation eligibility (waits on live group_key
+   volume + thresholds Paul calibrates) and route familiarity (deferred
+   to autumn, workshop decision 7). Both light up in the app without a
+   layout change when their data exists.
+
+VERIFY
+Typecheck + tests + the em-dash guard. Probe endpoints against the dev
+Supabase project with a minted member session (the .env.local service-role
+generate_link -> verify pattern from the recognition build), including:
+a member with 3+ live grouped check-ins (usualGroup set), a member with
+mixed groups (null), a leader (isRunLeader true), signed-out 401, and the
+cancelled-week stat fallback. Then production probes (401 signed out,
+CORS preflight). Update docs/NATIVE_APP_SCOPE.md section 5's API list.
+
+OUTPUT
+Working endpoints on staging + a decision record appended to
+docs/RUNNER_HOME_BRIEF.md (hyphens, staging only). The app build session
+follows in native-apps - it consumes GET /api/home, /api/walks,
+/api/attendance/summary and PATCH /api/profile, and adds the km <-> mi
+units toggle in Settings (client-side, no API).
+```
