@@ -347,3 +347,33 @@ IF COMMITTING ANYTHING TO radcliffe-run (decisions appended to this brief,
 render updates): no em dashes anywhere (CI guard), plain hyphens; commit to
 the working branch and push to staging only - Paul approves merges.
 ```
+
+---
+
+## Decision record (app build session, 11 Jul 2026)
+
+Built in the native-apps monorepo (apps/rtr), all screens to the signed-off
+designs: the LadderBadge component (RN SVG, the full badge grammar in one
+generative token), the My Ladder drill-in, the Club tab Ladder Card, and the
+Milestone celebration screen, consuming GET /api/attendance/summary and
+PATCH /api/profile (awards_public).
+
+- **Milestone triggering: interim option (a) implemented** (the prompt's
+  recommended path). Last-seen rungs live locally per member
+  (`rtr.ladder.seen.v1.<memberId>`); a rung present that was absent in the
+  stored snapshot celebrates once. No stored snapshot (first sign-in, new
+  install, seed import) stores silently and never celebrates - so the first
+  NEW crossing is the first celebration. Marked seen at presentation, checks
+  serialised across screens. The server-side awards machinery (dated
+  crossings, notified_at) supersedes this when it lands.
+- **CORS**: `/api/attendance` added to APP_API_PATHS (lib/appCors.ts + test).
+  Native fetch never needed it; the app's browser-preview verification loop
+  does. Auth is still enforced per-route - CORS is not a security layer.
+- **Verified** against a live stack (dev Supabase project + local site, a
+  minted member session): all ladder shapes (160/160, 30/5, 0/0), both
+  themes at 375x812, the sharing toggle round-trip written to and read back
+  from the DB, the milestone trigger firing once and never re-firing, the
+  Club card hiding signed-out, zero console errors. The seed line correctly
+  re-scopes ("Badges to 25 ...") when the seed sits below 100. Production
+  endpoints probed (401 signed out, CORS preflight). Device pass on Paul's
+  phone (production build, real account) is the remaining verification.

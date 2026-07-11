@@ -15,6 +15,7 @@ export const APP_API_PATHS = [
   '/api/join',
   '/api/check-member',
   '/api/profile',
+  '/api/attendance',
 ] as const
 
 export const CORS_HEADERS: Record<string, string> = {
