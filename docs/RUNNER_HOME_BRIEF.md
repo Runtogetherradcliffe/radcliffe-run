@@ -613,3 +613,177 @@ Industry / institutional / lore (flagged as such in text):
 - [UKA Couch to 5K leader requirements (PDF)](https://www.uka.org.uk/wp-content/uploads/2023/03/230321-Couch-to-5K-Leader-Requirements-March-2023.pdf)
 - [The Easy Run: the new parkrun app reviewed](https://www.theeasyrun.com/parkrun/the-new-parkrun-app-is-here-but-is-it-actually-better-than-the-5k-app/)
 - [Strava community: layout backlash thread](https://communityhub.strava.com/strava-features-chat-5/new-layout-is-beyond-awful-8990)
+
+---
+
+# Workshop decision record (11 Jul 2026)
+
+Workshop held in-session the same day as the research pass; Paul reacted
+to the straw man decision by decision. All 13 agenda items are resolved.
+The straw-man surfaces above stand except where amended here; where this
+record and the straw man differ, this record wins.
+
+**Cross-cutting rule (added by Paul mid-workshop): leaders are opted out
+of behavioural interventions.** A leader's check-ins encode where they
+were NEEDED, not what they would choose - so any surface that reads
+attendance as preference or ability excludes `is_run_leader` members.
+Applies to both progression pathways (a leader with ten 5k nights is on
+duty, not stuck). The preferred-group tile REMAINS leader-inclusive - the
+group they usually lead is still the right answer to "what is my Thursday" -
+but the Pencil session should check whether leaders want a different tile
+treatment.
+
+1. **Home identity: the Runs tab becomes the personalised home.** Same
+   tab count, hero stays first. Whether the tab label changes from
+   "Runs" is a Pencil-session detail.
+2. **Preferred-group tile: inferred, never asked.** Equal tiles until 3+
+   live check-ins show a majority group; provenance line ("your usual
+   group, from your check-ins"); one-tap correction.
+3. **Milestones card: home AND Club tab** (the same shipped card twice).
+4. **Progression invitation: restructured in-workshop (Paul's catch).**
+   Milestone-based triggering was WRONG: milestones count nights, not
+   groups - 9 jeffing nights plus 1 5k night crosses the 10 rung and
+   would have aimed an 8k invitation at the wrong person. Replaced by
+   group-count eligibility:
+   - Eligibility = check-ins with a SPECIFIC group (live-era group_key),
+     not ladder rungs. Threshold: 10+ with that group once live data
+     matures; until then an interim proxy from total lifetime nights
+     (seeds included), baselined by Paul from personal knowledge - a
+     calibration, not a spec, like the per-day badge threshold.
+   - TWO pathways: jeff -> 5k run and 5k -> 8k. Framed SIDEWAYS
+     ("another group on the same night, here is how it actually works"),
+     never as a ladder - jeffing is a destination, not a bottom rung.
+     The About-the-groups page covers movement in every direction,
+     including 8k regulars running 5k some weeks.
+   - Leaders excluded (the cross-cutting rule above).
+   - Moment: first app open after the qualifying check-in - anchored to
+     the member's own attendance, in-app card only, never a push. Once
+     ever; two dismissals ("maybe another week" / "don't show again");
+     the groups page stays reachable forever.
+5. **Structure facts: already mostly written.** The site About page
+   carries the contract ("nobody gets left behind - we regroup at
+   junctions and make sure everyone gets back together") and
+   `lib/groups.ts` is the single source for per-group paces and
+   descriptions. The invitation ADAPTS this content; regroup FREQUENCY
+   is stated, never specific points. No new collection process needed.
+6. **Launch without member quotes.** The facts plus the role-attributed
+   back marker line carry the invitation; quotes join later if good ones
+   surface naturally (photo_consent-grade consent when they do).
+7. **Route familiarity: deferred** until autumn data exists. Not in the
+   first build; the derivation is built later and the surface lights up
+   without a layout change.
+8. **Solo section: routes AND walks.** Build the tiny read-only walks
+   API (walks data is site-bound in `lib/walks.ts`). No logging, no
+   counting - solo stays a gift.
+9. **Upcoming-run leader line: settled pre-workshop** (reaction record
+   above). The standing role line; no names on weekly runs; C25K named
+   cohort contact stays viable.
+10. **Development ask: in, with the straw-man options** (get fitter /
+    run further / a first race or parkrun / just enjoy Thursdays).
+    Skippable, editable in profile, signposting only, "just enjoy
+    Thursdays" produces no follow-up. Schema designed at build time.
+11. **Collective stat: one quiet line under the hero.** "38 of us ran
+    last Thursday." Always the most recent qualifying run (a cancelled
+    week keeps showing the previous one - no zero states). Cohort
+    variant in C25K season per the 6 Jul decision.
+12. **Sequencing: shell-first.** The first build ships the surfaces
+    whose data exists today: hero + role line, milestones card,
+    collective stat, solo section. The preferred-group tile lights up as
+    live check-ins accumulate; the invitations wait on thresholds plus
+    the adapted copy; the development ask waits on its schema flag. Each
+    surface lights up without a layout change.
+13. **January reuse: confirmed.** The invitation component doubles as
+    the C25K graduation bridge (graduation-triggered, swapped copy), and
+    the C25K variant may carry the named cohort contact - the one place
+    naming is logistically easy.
+
+Next session: the interactive Pencil design session - the home in both
+themes, iterated with Paul surface by surface on the shapes decided here,
+never presented as a fait accompli. The build follows.
+
+---
+
+## Session prompt: runner home screen design (paste into a native-apps thread)
+
+```
+Design the personalised runner home for the RTR app in the Pencil file,
+on the shapes decided at the 11 Jul 2026 workshop. This is screen design,
+iterated INTERACTIVELY with Paul surface by surface - present each
+surface for reaction before polishing the next; never a fait accompli.
+The app build follows in a later session.
+
+REPO RULE - READ BEFORE COMMITTING ANYTHING TO radcliffe-run
+No em dashes in ANY file (CI guard) - plain hyphens. Staging-first:
+commit to the working branch, push to staging only; Paul approves merges.
+
+WHERE
+The Pencil file at ~/Documents/"RTR app". Start with get_editor_state
+(include_schema: true) and get_guidelines. The badge components (Badge
+40/80/160) and the Ladder Card grammar already exist in the file - reuse
+them, do not redesign.
+
+READ FIRST
+- radcliffe-run repo: docs/RUNNER_HOME_BRIEF.md - the straw-man home
+  (surface by surface), Paul's reaction record, and the workshop decision
+  record. The 13 decisions are FINAL - do not relitigate. Where straw man
+  and decision record differ, the record wins.
+- docs/RECOGNITION_DESIGN_BRIEF.md - badge grammar + Ladder Card anatomy
+  (the home reuses the card); "My Ladder" is called Milestones on every
+  member-facing surface.
+- docs/PENCIL_DESIGN_BRIEF.md - the M1 file's conventions.
+- docs/NATIVE_APP_SCOPE.md section 6 - tab structure (the Runs tab
+  becomes the home; tab count unchanged).
+
+WHAT TO DESIGN (both themes throughout)
+1. The home screen, top to bottom per the decided shapes: greeting hero
+   ("Evening, Kate.") + next run card (existing card grammar: date, time,
+   meeting point, on-tour, cancelled) + group tiles (usual group large,
+   others small, provenance line "your usual group, from your check-ins",
+   one-tap correction) + the standing role line ("Every group has a
+   leader at the front and the back") + collective stat line ("38 of us
+   ran last Thursday") + Milestones card (the shipped Ladder Card, reused)
+   + development ask card + solo section card (routes + walks).
+2. Every slot in BOTH states - lit and unlit - because the build is
+   shell-first and surfaces light up as data matures WITHOUT a layout
+   change: cold-start tiles (all equal), tile with usual-group-large,
+   development card asked/unasked, invitation present/absent.
+3. The progression invitation card: structure facts first (adapted from
+   the site About page + lib/groups.ts paces - regroup FREQUENCY, never
+   points), then the norm line, then the role-attributed back marker
+   voice ("one of our back markers: I run at the back on purpose - that
+   is the job"). No member quotes at launch. Two dismissals: "Maybe
+   another week" / "Don't show this again". Design BOTH pathway variants
+   (jeff -> 5k run, 5k -> 8k) framed sideways - another group on the same
+   night, never a ladder or a next step.
+4. The About-the-groups page (drill-in, no tab bar): the permanent home
+   of the invitation content, covering movement in EVERY direction
+   including 8k regulars running 5k some weeks.
+5. Full-screen states: signed-out / no member (generic runs list, quiet
+   sign-in invite, nothing broken), brand-new member (cold start
+   everywhere), established member (all lit), and LEADER (no invitation
+   ever renders - is_run_leader members are opted out of behavioural
+   interventions; check with Paul whether leaders want a different tile
+   treatment - flagged at the workshop).
+
+COPY DECISIONS TO SETTLE WITH PAUL IN-SESSION
+- The tab label: does "Runs" stay or become "Home"?
+- The greeting form and time-of-day variants.
+- The exact role line and collective stat wording.
+- The invitation copy drafts for both pathways (adapt, show, iterate).
+
+REAL DATA FOR MOCKS
+- Next run from the live runs table shape (date, title, meeting point,
+  groups 8k / 5k / jeffing, on_tour, cancelled).
+- Paul's member shape: 160/160 milestones, next 200. A mid-range member
+  ~40 runs. A newcomer 0/0 with 1 check-in. Collective stat 38.
+- Preferred group: 8k-usual, 5k-usual, jeff-usual, and no-majority (all
+  tiles equal) variants.
+
+OUTPUTS
+- Home + invitation + groups-page frames in the Pencil file, both themes,
+  all states above.
+- Exported renders committed to radcliffe-run design/screens/ (hyphens
+  in filenames and commit messages).
+- Decisions taken with Paul appended to this brief (again: hyphens, not
+  em dashes; staging only).
+```
