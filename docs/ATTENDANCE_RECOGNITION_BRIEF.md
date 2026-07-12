@@ -334,17 +334,25 @@ existing `awards` rows and writes exactly the missing crossings.
   seed-line treatment). A rung `> seed` was crossed live: `achieved_on` is the
   date of the `(rung - seed)`th qualifying attendance date, sorted
   chronologically - i.e. the exact night the count reached that rung.
-- **The first-run backfill rule (load-bearing).** This is evaluated
-  **per member+kind**, not globally: if a member+ladder has ZERO existing
-  `awards` rows at the start of a run, every rung being written in that pass
-  (their personal backfill moment - whether that's the very first time the
-  job ever ran, or a brand-new member's first-ever computation) gets
-  `notified_at = now()`, silenced. Once a member+ladder has any existing
-  rows, newly-missing rungs on a later run are fresh crossings and get
-  `notified_at = NULL` (celebration pending). This is what lets the server
+- **The backfill-quiet rule (load-bearing, cutoff-based - fixed 12 Jul 2026
+  same day as first written).** The first version keyed silencing on "does
+  this member+kind have zero existing `awards` rows" - wrong: that proxy
+  also matches every brand-new member's REAL first celebration (their rung
+  10 IS their first award row), so it would have silenced the rung-10
+  celebration for every member who joins after this feature ships,
+  including the whole January 2027 C25K cohort. Replaced with a temporal
+  cutoff: `AWARDS_BACKFILL_CUTOFF` (`lib/recognition.ts`, `'2026-07-12'`,
+  the date this job was deployed). `notified_at = now()` (silenced) when
+  `achieved_on` is NULL (a seed rung) OR `achieved_on < AWARDS_BACKFILL_CUTOFF`
+  (a live rung crossed before the job existed); otherwise `notified_at = NULL`
+  (celebration pending). The decision is made per RUNG from its own date,
+  never from whether the member has other existing award rows. This also
+  gets a reactivated member (status inactive -> active) right for free:
+  their historical crossings, even if only computed for the first time on
+  reactivation, carry OLD `achieved_on` dates and stay quiet; only a
+  crossing dated after the cutoff celebrates. This is what lets the server
   state eventually supersede the app's local last-seen-rungs guard
-  (docs/RECOGNITION_DESIGN_BRIEF.md) without a burst of retro celebrations -
-  and it self-onboards new members correctly without a special case.
+  (docs/RECOGNITION_DESIGN_BRIEF.md) without a burst of retro celebrations.
 - **Pure core, thin shell.** `computeAwardRows(memberId, kind, seed,
   sortedDates, existingRungs, nowIso)` in `lib/recognition.ts` is the pure,
   unit-tested (tests/recognition.test.ts) implementation of the two rules

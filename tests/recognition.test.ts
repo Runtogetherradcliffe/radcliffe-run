@@ -87,12 +87,16 @@ describe('counting scope', () => {
 })
 
 // computeAwardRows is the pure core of the awards job (lib/awardsJob.ts):
-// dating and the first-run backfill notified_at rule. Decision record:
-// docs/ATTENDANCE_RECOGNITION_BRIEF.md (12 Jul 2026 build).
+// dating and the backfill-quiet notified_at rule. Decision record:
+// docs/ATTENDANCE_RECOGNITION_BRIEF.md (12 Jul 2026 build, cutoff fix same day).
+// The rule is keyed on AWARDS_BACKFILL_CUTOFF against each rung's OWN
+// achieved_on date, NEVER on whether the member already has other award
+// rows - that proxy would wrongly silence every brand-new member's actual
+// first celebration (rung 10 IS their first award row).
 describe('computeAwardRows', () => {
   const NOW = '2026-07-17T12:00:00.000Z'
 
-  it('first-ever run (backfill): seed-only rungs get achieved_on null, ALL missing rungs get notified_at = now', () => {
+  it('seed-only rungs (achieved_on null) are always backfill: notified_at = now', () => {
     // seed 30, no recorded dates yet -> only rung 25 achieved, entirely inside the seed.
     const rows = computeAwardRows('m1', 'run', 30, [], new Set(), NOW)
     expect(rows).toEqual([
@@ -101,21 +105,48 @@ describe('computeAwardRows', () => {
     ])
   })
 
-  it('backfill with live-era rungs: dates the (rung - seed)th recorded date, still notified_at = now (no existing rows yet)', () => {
+  it('live-era rung dated BEFORE the cutoff is backfill: notified_at = now, even with no existing rows', () => {
     const dates = ['2026-05-07', '2026-05-14', '2026-05-21', '2026-05-28', '2026-06-04']
-    // seed 5, 5 recorded dates -> total 10, rung 10 crossed on the (10-5)=5th date.
+    // seed 5, 5 recorded dates -> total 10, rung 10 crossed on the (10-5)=5th date, before the cutoff.
     const rows = computeAwardRows('m1', 'run', 5, dates, new Set(), NOW)
     expect(rows).toEqual([
       { member_id: 'm1', kind: 'run', rung: 10, achieved_on: '2026-06-04', notified_at: NOW },
     ])
   })
 
-  it('a fresh crossing on a re-run (existing rows present) gets notified_at null', () => {
-    // seed 5 + 20 recorded dates -> total 25, rung 10 already recorded (existing), rung 25 is new.
-    const manyDates = Array.from({ length: 20 }, (_, i) => `2026-0${1 + Math.floor(i / 9)}-${String((i % 28) + 1).padStart(2, '0')}`)
-    const rows = computeAwardRows('m1', 'run', 5, manyDates, new Set([10]), NOW)
+  it('a brand-new member whose FIRST rung is dated on/after the cutoff celebrates - not silenced by having zero existing rows', () => {
+    // 9 runs before the cutoff, no awards rows yet (never computed before); the 10th run,
+    // dated after the cutoff, crosses rung 10 - this is a genuinely fresh celebration and
+    // must NOT be silenced just because the member has no other award rows.
+    const nineBefore = ['2026-05-04', '2026-05-11', '2026-05-18', '2026-05-25', '2026-06-01', '2026-06-08', '2026-06-15', '2026-06-22', '2026-06-29']
+    const tenthAfterCutoff = '2026-07-16'
+    const rows = computeAwardRows('m1', 'run', 0, [...nineBefore, tenthAfterCutoff], new Set(), NOW)
     expect(rows).toEqual([
-      { member_id: 'm1', kind: 'run', rung: 25, achieved_on: manyDates[19], notified_at: null },
+      { member_id: 'm1', kind: 'run', rung: 10, achieved_on: tenthAfterCutoff, notified_at: null },
+    ])
+  })
+
+  it('a fresh crossing dated on/after the cutoff gets notified_at null (existing rows present)', () => {
+    // seed 5 + 20 recorded dates, the last one after the cutoff -> total 25, rung 10
+    // already recorded (existing), rung 25 is new and dated after the cutoff.
+    const earlyDates = Array.from({ length: 19 }, (_, i) => `2026-0${1 + Math.floor(i / 9)}-${String((i % 28) + 1).padStart(2, '0')}`)
+    const dates = [...earlyDates, '2026-07-15']
+    const rows = computeAwardRows('m1', 'run', 5, dates, new Set([10]), NOW)
+    expect(rows).toEqual([
+      { member_id: 'm1', kind: 'run', rung: 25, achieved_on: '2026-07-15', notified_at: null },
+    ])
+  })
+
+  it('reactivated member: a historical crossing computed for the first time still stays quiet, regardless of existing rows', () => {
+    // Existing rung 10 already recorded (from before the member went inactive). On
+    // reactivation their attendance is recomputed and now reaches rung 25 - but that
+    // crossing happened historically (dated before the cutoff), so it must stay quiet
+    // even though existingRungs is non-empty (the old existingRungs.size===0 proxy would
+    // have wrongly celebrated this).
+    const historicalDates = Array.from({ length: 25 }, (_, i) => `2025-${String(1 + Math.floor(i / 3)).padStart(2, '0')}-${String((i % 28) + 1).padStart(2, '0')}`)
+    const rows = computeAwardRows('m1', 'run', 0, historicalDates, new Set([10]), NOW)
+    expect(rows).toEqual([
+      { member_id: 'm1', kind: 'run', rung: 25, achieved_on: historicalDates[24], notified_at: NOW },
     ])
   })
 
@@ -124,13 +155,13 @@ describe('computeAwardRows', () => {
     expect(rows).toEqual([])
   })
 
-  it('mixed backfill: rung inside the seed gets null date, a rung crossed live gets dated, both notified_at = now together', () => {
+  it('mixed backfill: rung inside the seed gets null date, a rung crossed live before the cutoff gets dated, both notified_at = now together', () => {
     const dates = [
       '2026-05-07', '2026-05-14', '2026-05-21', '2026-05-28', '2026-06-04',
       '2026-06-11', '2026-06-18', '2026-06-25', '2026-07-02', '2026-07-09',
     ]
     // seed 15 covers rung 10 only; 10 recorded dates -> total 25, rung 25 crossed
-    // live on the (25-15)=10th recorded date.
+    // live on the (25-15)=10th recorded date, still before the 2026-07-12 cutoff.
     const rows = computeAwardRows('m1', 'run', 15, dates, new Set(), NOW)
     expect(rows).toEqual([
       { member_id: 'm1', kind: 'run', rung: 10, achieved_on: null, notified_at: NOW },

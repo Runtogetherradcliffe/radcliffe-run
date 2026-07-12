@@ -90,6 +90,14 @@ export interface AwardRow {
 }
 
 /**
+ * The awards job deployed on this date - anything crossed before it is
+ * backfill, dated or not; anything crossed on/after it is a genuinely fresh
+ * crossing. See the notified_at rule below. Update this only if the job is
+ * ever re-deployed from scratch against a fresh awards table.
+ */
+export const AWARDS_BACKFILL_CUTOFF = '2026-07-12'
+
+/**
  * Pure computation for the awards job (lib/awardsJob.ts): given a member's
  * seed, their chronologically SORTED distinct qualifying dates, and the
  * rungs already recorded in `awards`, return the rows still missing.
@@ -99,12 +107,22 @@ export interface AwardRow {
  * achieved", never dated). A rung > seed was crossed live, on the
  * (rung - seed)th recorded date (1-indexed into sortedDates).
  *
- * FIRST-RUN BACKFILL RULE (load-bearing): if this member+kind has NO
- * existing award rows at all, every rung being written now is that
- * member's backfill moment - all get notified_at = nowIso so the
- * celebration-trigger switchover never fires a burst of retro
- * celebrations. Once a member has ANY existing rows, newly-missing rungs
- * are fresh crossings and get notified_at = null (celebration pending).
+ * BACKFILL-QUIET RULE (load-bearing): notified_at is decided from the
+ * rung's OWN achieved_on date against AWARDS_BACKFILL_CUTOFF, never from
+ * whether the member has other existing award rows. A seed rung
+ * (achieved_on NULL) or a live rung dated before the cutoff is backfill -
+ * notified_at = nowIso, silenced. A rung dated on/after the cutoff is a
+ * genuinely fresh crossing - notified_at = null, pending celebration.
+ * This is deliberately NOT keyed on "does this member have zero existing
+ * award rows": that proxy wrongly silences every brand-new member's actual
+ * first celebration (their rung 10 IS their first award row, but it's
+ * dated after launch, so it must celebrate) - it would have gone quiet for
+ * every member who joins after this feature ships, including the whole
+ * January 2027 C25K cohort. The date-based rule also does the right thing
+ * for a reactivated member (status inactive -> active): their historical
+ * crossings, even if only computed for the first time now, carry OLD
+ * achieved_on dates and stay quiet; only a crossing dated after the cutoff
+ * celebrates.
  */
 export function computeAwardRows(
   memberId: string,
@@ -118,14 +136,17 @@ export function computeAwardRows(
   const missing = rungsAchieved(total).filter((r) => !existingRungs.has(r))
   if (missing.length === 0) return []
 
-  const isBackfill = existingRungs.size === 0
-  return missing.map((rung) => ({
-    member_id: memberId,
-    kind,
-    rung,
-    achieved_on: rung > seed ? sortedDates[rung - seed - 1] ?? null : null,
-    notified_at: isBackfill ? nowIso : null,
-  }))
+  return missing.map((rung) => {
+    const achieved_on = rung > seed ? sortedDates[rung - seed - 1] ?? null : null
+    const isBackfill = achieved_on === null || achieved_on < AWARDS_BACKFILL_CUTOFF
+    return {
+      member_id: memberId,
+      kind,
+      rung,
+      achieved_on,
+      notified_at: isBackfill ? nowIso : null,
+    }
+  })
 }
 
 /**
