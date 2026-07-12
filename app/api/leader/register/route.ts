@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireLeader } from '@/lib/apiAuth'
 import { supabaseAdmin } from '@/lib/supabase'
+import { runMilestonesTonight } from '@/lib/recognition'
 
 /**
  * GET /api/leader/register?run_id=<uuid>
@@ -8,6 +9,12 @@ import { supabaseAdmin } from '@/lib/supabase'
  * "search the whole register" - at club scale the roster IS the member
  * list), tonight's check-in state per member, and live group counters.
  * Auth: run leaders only, cookie or Bearer.
+ *
+ * `milestoneTonight` (Runs ladder only, docs/ATTENDANCE_RECOGNITION_BRIEF.md
+ * 12 Jul 2026 build): the rung this member would CROSS if checked in
+ * tonight, or null. Leaders see it regardless of the member's
+ * awards_public flag - admin/leader visibility is unaffected by the public
+ * celebration consent flag, same rule as emergency contacts.
  */
 export async function GET(req: NextRequest) {
   const leader = await requireLeader(req)
@@ -66,6 +73,8 @@ export async function GET(req: NextRequest) {
     counts[k] = (counts[k] ?? 0) + 1
   }
 
+  const milestones = await runMilestonesTonight((members ?? []).map(m => m.id), runId).catch(() => new Map<string, number | null>())
+
   return NextResponse.json({
     run,
     members: (members ?? []).map(m => ({
@@ -74,6 +83,7 @@ export async function GET(req: NextRequest) {
       last_name: m.last_name,
       checked_in: tonight.has(m.id),
       group_key: tonight.get(m.id) ?? lastGroup.get(m.id) ?? null,
+      milestoneTonight: milestones.get(m.id) ?? null,
     })),
     counts,
     total: (attendance ?? []).length,

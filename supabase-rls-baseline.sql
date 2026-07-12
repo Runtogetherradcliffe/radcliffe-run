@@ -193,4 +193,10 @@ ALTER TABLE public.attendance_seeds ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.run_leadership   ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.awards           ENABLE ROW LEVEL SECURITY;
 
+-- ── awards_cron_log (12 Jul 2026) ───────────────────────────────────────────
+-- Claim-lock for the weekly /api/cron/awards run, same shape as
+-- push_send_log. Service-role only. Created by
+-- supabase-migration-awards-cron.sql. NO policies.
+ALTER TABLE public.awards_cron_log ENABLE ROW LEVEL SECURITY;
+
 COMMIT;

@@ -19,6 +19,7 @@ describe('isAppApi', () => {
       '/api/leader/checkin',
       '/api/leader/member/some-uuid',
       '/api/attendance/summary',
+      '/api/attendance/pending',
       '/api/home',
       '/api/walks',
     ]) {

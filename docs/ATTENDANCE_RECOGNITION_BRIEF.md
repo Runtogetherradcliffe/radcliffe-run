@@ -314,3 +314,150 @@ recomputing crossings from zero. The awards table/cron is not built yet; when
 it is, it must adopt the same last-seen guard so backfilled rungs are written
 (or presented) as `achieved_on` NULL / already-achieved, never as fresh
 crossings.
+
+## Decision record: the awards machinery build (12 Jul 2026)
+
+The `awards` table existed (10 Jul migration) but nothing wrote to it. This
+session built the job that writes it, the app-facing pending-celebrations
+contract, the admin surface, and the check-in milestone field. Read alongside
+the ladder/rung-list revision above and docs/RECOGNITION_DESIGN_BRIEF.md
+(badge grammar, celebration screen spec) - this is the server-side piece the
+app's celebration-trigger swap has been waiting on.
+
+### 1. The awards job (`lib/awardsJob.ts`, `GET /api/cron/awards`)
+
+For every active member and both ladders, compares the current total against
+existing `awards` rows and writes exactly the missing crossings.
+
+- **Dating.** A rung `<= seed` was crossed pre-site: `achieved_on` NULL,
+  presented as "already achieved", never dated (matches the app's existing
+  seed-line treatment). A rung `> seed` was crossed live: `achieved_on` is the
+  date of the `(rung - seed)`th qualifying attendance date, sorted
+  chronologically - i.e. the exact night the count reached that rung.
+- **The first-run backfill rule (load-bearing).** This is evaluated
+  **per member+kind**, not globally: if a member+ladder has ZERO existing
+  `awards` rows at the start of a run, every rung being written in that pass
+  (their personal backfill moment - whether that's the very first time the
+  job ever ran, or a brand-new member's first-ever computation) gets
+  `notified_at = now()`, silenced. Once a member+ladder has any existing
+  rows, newly-missing rungs on a later run are fresh crossings and get
+  `notified_at = NULL` (celebration pending). This is what lets the server
+  state eventually supersede the app's local last-seen-rungs guard
+  (docs/RECOGNITION_DESIGN_BRIEF.md) without a burst of retro celebrations -
+  and it self-onboards new members correctly without a special case.
+- **Pure core, thin shell.** `computeAwardRows(memberId, kind, seed,
+  sortedDates, existingRungs, nowIso)` in `lib/recognition.ts` is the pure,
+  unit-tested (tests/recognition.test.ts) implementation of the two rules
+  above. `lib/awardsJob.ts` is the DB-facing shell: a handful of bulk queries
+  (all members, all seeds, all attendance+runs, all run_leadership+runs, all
+  existing awards - never per-member round trips) feeding that pure function,
+  then one `upsert(..., { onConflict: 'member_id,kind,rung', ignoreDuplicates:
+  true })`.
+- **Idempotent, claim-locked.** Re-runs with unchanged totals write nothing
+  (verified on dev). The `awards_cron_log` table (new migration,
+  `supabase-migration-awards-cron.sql`, applied to dev AND production) is a
+  `UNIQUE(ref_date)` claim-lock, exactly mirroring `push_send_log` - a
+  same-day retry (cron-job.org retry, manual re-run) skips rather than
+  re-computing. This is a courtesy against wasted work, not a correctness
+  backstop - the `awards` unique constraint is the real idempotency guarantee.
+- **Not a Vercel cron.** Exposed at `/api/cron/awards`, `CRON_SECRET`-gated,
+  same pattern as `/api/cron/send-push` - deliberately outside `vercel.json`
+  so it doesn't compete for the Hobby plan's one-cron-per-day budget. **Paul
+  needs to add a cron-job.org job**: weekly, Thursday ~22:30 UK (after
+  check-in traffic), `GET https://www.radcliffe.run/api/cron/awards` with
+  `Authorization: Bearer <CRON_SECRET>` (same secret as the other cron-job.org
+  jobs - see AGENTS.md for the www-host rule and why the apex won't work).
+
+### 2. App-facing pending-celebrations contract (`GET`/`POST /api/attendance/pending`)
+
+A sibling to `GET /api/attendance/summary`, so the app's eventual swap from
+its local last-seen-rungs guard to server state is pure app work against a
+contract that is final now:
+
+```
+GET /api/attendance/pending
+  -> [{ ladder: 'run' | 'volunteer', rung: number, achieved_on: string | null }]
+  Auth: any member, cookie or Bearer. Always the caller's own rows
+  (awards WHERE member_id = caller AND notified_at IS NULL), ordered by rung
+  ascending. Empty array = nothing pending.
+
+POST /api/attendance/pending
+  body: { ladder: 'run' | 'volunteer', rung: number }
+  -> { ok: true }
+  Marks that one row's notified_at = now(). Call this AT presentation of the
+  Milestone celebration screen (docs/RECOGNITION_DESIGN_BRIEF.md), once.
+  Idempotent: marking an already-notified or non-existent row is still a
+  200 no-op (no error branch to handle app-side).
+```
+
+No `id` field in the GET response - `(member_id, kind, rung)` is already
+unique (the `awards` table's constraint), so `{ ladder, rung }` is enough to
+address a row without exposing one. Added to `APP_API_PATHS` (already covered
+by the existing `/api/attendance` prefix entry; a test line added anyway,
+`tests/appCors.test.ts`, to lock the new path in explicitly).
+
+### 3. `/admin/recognition` (read-only v1)
+
+Lists every crossing, most-recent first (`achieved_on` desc, nulls last, then
+`created_at` desc so same-day/seed rows have a stable secondary order):
+member name, ladder, rung, achieved date (or "pre-site"), notified state, and
+the member's `awards_public` flag shown alongside every row - admins see
+everyone's crossings regardless of that flag, which only gates public
+celebration in roundups/socials, not admin visibility (same rule as
+emergency contacts). Search by name, filter by ladder and notified state.
+Follows the existing admin page pattern exactly (server component fetches
+with `supabaseAdmin()`, gated by `middleware.ts`'s existing `/admin/*` admin-
+email check - no new auth code needed, matching `/admin/routes` and
+`/admin/members`). The `awards_public` toggle itself remains member-owned via
+the app's PATCH `/api/profile` (shipped 11 Jul) - this page is read-only.
+
+### 4. Check-in milestone field (`GET /api/leader/register`)
+
+Each roster member gains `milestoneTonight: number | null` - the Runs-ladder
+rung they would CROSS if checked in tonight: lifetime run total **excluding
+any of tonight's attendance rows** (the whole night, all groups, hangs off one
+anchor `run_id` - excluding by that id is enough, per "a night is not a run
+row" above), plus one, if-and-only-if that lands exactly on a rung.
+Runs ladder only (no leading-milestone-tonight field - leading credit is
+automatic on check-in, not something a leader "crosses" by choosing a role).
+Leaders see it regardless of the member's `awards_public` flag (admin/leader
+visibility rule, unaffected by the public-celebration consent flag).
+Bulk-computed (`runMilestonesTonight` in `lib/recognition.ts`, two queries
+for the whole roster) rather than per-member, matching the register route's
+existing bulk-fetch shape.
+
+### Verification (dev, 12 Jul 2026)
+
+Shaped a throwaway test member with `attendance_seeds` (`source='manual'`)
+and fabricated qualifying runs/attendance, then exercised the real endpoints
+end to end (minted a Supabase Auth session via the Admin API for the
+member-authed routes): first run wrote the seed-covered rung with
+`achieved_on` NULL and `notified_at` set (backfill); a re-run same day was
+skipped by the claim-lock; forcing a fresh crossing on a later run wrote it
+with `achieved_on` dated to the correct qualifying date and `notified_at`
+NULL; unrelated members' already-written rungs were untouched (idempotent).
+`GET /api/attendance/pending` served the pending row, the `POST` cleared it,
+a follow-up `GET` returned empty. `milestoneTonight` was `null` when
+total+1 landed off a rung, non-null (correct rung) when it landed exactly on
+one, and - critically - unaffected by the member's own tonight's check-in row
+being present (excluded correctly, not double-counted). Test member, its
+auth user, and fabricated runs/attendance/seeds were removed after; the
+real backfill this run produced for existing dev members (50 rows, 14
+members) was left in place as genuine, correct state, not test pollution.
+`/admin/recognition`'s query shape and ordering were verified directly
+against the database; the page itself was not click-verified in a browser in
+this session (would have required either minting an OTP-based admin session
+or temporarily touching a real admin account's credentials, neither of which
+felt proportionate) - it follows the identical server-component + middleware-
+gating pattern as `/admin/routes` and `/admin/members`, which are known-good
+in production.
+
+Migration `supabase-migration-awards-cron.sql` applied to dev AND production;
+`supabase-rls-baseline.sql` updated with the new table (service-role only, no
+policies, same reasoning as `attendance`/`awards`). `npm run typecheck`,
+`npm run lint`, and `npm test` (101 tests) all clean. Staging only - not
+merged to main without Paul's approval.
+
+Still open: the cron-job.org job itself (Paul adds it - see section 1 above),
+and the app-side wiring of `/api/attendance/pending` to replace the local
+last-seen-rungs guard (a later native-apps session, now unblocked).

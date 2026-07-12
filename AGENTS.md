@@ -157,6 +157,11 @@ matching doc edit; treat that reminder as a blocking checklist item, not a sugge
   the apex. `radcliffe.run` 307-redirects to `www`, and external callers do not follow the
   redirect and drop the `Authorization` header across it. The cron routes authenticate via
   `Authorization: Bearer <CRON_SECRET>`.
+- **Not every cron is a Vercel cron.** `/api/cron/send-push` and `/api/cron/awards` are
+  deliberately NOT in `vercel.json` - they are triggered by their own cron-job.org jobs
+  (same `CRON_SECRET` bearer auth, same www-host rule above), specifically so they don't
+  count against the Hobby one-cron-per-day budget. Only `send-emails` and `gdpr-cleanup`
+  are true Vercel crons.
 - **`CRON_SECRET` is marked Sensitive in Vercel (write-only)** - you cannot read it back, and
   it is not in `.env.local`. If it is needed and not recorded, rotate it (set a new value in
   Vercel, redeploy, update every caller). Record the current value in the credentials
