@@ -27,8 +27,16 @@ READ FIRST
   decisions, eras and seed semantics.
 - docs/RECOGNITION_DESIGN_BRIEF.md - the app build's decision record: the
   app currently triggers its Milestone screen from an INTERIM local
-  last-seen-rungs store; the awards machinery built here supersedes it
-  (a later app change - not this session).
+  last-seen snapshot, per member in AsyncStorage (native-apps
+  apps/rtr/src/lib/useMilestone.ts + ladder.ts). The snapshot stores the
+  last-seen RUNGS and the last-seen TOTALS: a rung celebrates only when it
+  is both absent last time AND genuinely crossed (seenTotal < rung <=
+  total). The total window is the retro-introduction guard - a backend
+  rung-list change never fires for rungs that land at or below a member's
+  existing total. Proven live 12 Jul 2026: introducing 75/125/150 under the
+  160-run leaders celebrated nothing. The awards machinery built here
+  (server-side notified_at) supersedes this interim store - a later app
+  change, not this session.
 - lib/recognition.ts (rungsAchieved / nextRung / lifetimeCounts),
   app/api/leader/register/route.ts, app/api/cron/send-emails/route.ts and
   lib/sendScheduledEmail.ts (the claim-lock pattern), lib/brevo.ts.
