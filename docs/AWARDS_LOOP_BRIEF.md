@@ -85,7 +85,9 @@ WHAT TO BUILD
    For each roster member, computed against counts EXCLUDING tonight's
    date (they may already be checked in when the leader looks):
    - milestone_tonight: { kind: 'run'|'volunteer', rung } when tonight's
-     night makes their total exactly a rung (10/25/50/100/every 100th).
+     night makes their total exactly a rung (10/25/50/75/100 then every 25;
+     centuries are the celebrated tier - use lib/recognition.ts, never a
+     literal list).
      Volunteer applies to is_run_leader members (their check-in also
      writes run_leadership).
    - first_run_tonight: true when their lifetime total INCLUDING seed is 0

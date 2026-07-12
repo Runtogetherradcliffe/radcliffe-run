@@ -188,7 +188,10 @@ auth is still enforced per-route).
 
 The counting + milestone layer over `attendance` (parkrun model; full decision
 record in `docs/ATTENDANCE_RECOGNITION_BRIEF.md`). Two lifetime counters per
-member - RUN and VOLUNTEER - with rungs at 10/25/50/100 then every 100th.
+member - RUN and VOLUNTEER - with rungs at 10/25/50/75/100 then every 25
+(Paul, 12 Jul 2026; centuries stay the celebrated tier). The rung list is
+generative in `lib/recognition.ts`, not in the DB (`awards.rung` is only
+CHECK rung > 0), so revising it needs no migration.
 Three more service-role-only tables (RLS enabled, NO policies -
 `supabase-migration-attendance-recognition.sql`):
 

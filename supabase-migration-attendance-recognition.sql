@@ -3,8 +3,11 @@
 -- docs/ATTENDANCE_RECOGNITION_BRIEF.md (decision record, 10 Jul 2026).
 --
 -- The model is parkrun's: two lifetime counters per member - RUN (turned up
--- and ran) and VOLUNTEER (led a group). Rungs at 10/25/50/100 then every
--- 100th. The unit is a NIGHT ATTENDED (a distinct run date), never an
+-- and ran) and VOLUNTEER (led a group). Rungs at 10/25/50/75/100 then every
+-- 25 (Paul, 12 Jul 2026; centuries stay the celebrated tier). The rung list
+-- lives in lib/recognition.ts, not the DB (awards.rung is only CHECK rung >
+-- 0), so this ladder change needs no migration. The unit is a NIGHT ATTENDED
+-- (a distinct run date), never an
 -- attendance row: 8k attendance is recorded against the 5k anchor row and
 -- Jeffing has no row of its own, so counts MUST be COUNT(DISTINCT runs.date),
 -- with runs.run_type IN ('regular','c25k') AND NOT cancelled. Socials and

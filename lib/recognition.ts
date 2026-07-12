@@ -14,16 +14,33 @@ import { supabaseAdmin } from '@/lib/supabase'
 
 export const COUNTED_RUN_TYPES = ['regular', 'c25k']
 
-/** Rungs: 10 / 25 / 50 / 100, then every 100th (parkrun's newer model). */
+/**
+ * Rung ladder (Paul, 12 Jul 2026): approach rungs 10 / 25 / 50 / 75 / 100,
+ * then every 25 forever (125, 150, 175, ...). Both ladders (run and
+ * volunteer) share this list. Centuries (every 100th) stay the celebrated
+ * solid-coin tier - see `isCentury`; all other rungs are the quiet tier.
+ * The old list (10/25/50/100 then every 100th) left a weekly regular ~2
+ * years from the next badge after 100; every-25 makes it roughly 6 months.
+ * Generative on purpose so it never needs another edit as totals climb.
+ * Decision record: docs/ATTENDANCE_RECOGNITION_BRIEF.md.
+ */
+const APPROACH_RUNGS = [10, 25, 50, 75, 100]
+const RUNG_STEP = 25
+
 export function rungsAchieved(count: number): number[] {
-  const rungs = [10, 25, 50].filter((r) => count >= r)
-  for (let r = 100; r <= count; r += 100) rungs.push(r)
+  const rungs = APPROACH_RUNGS.filter((r) => count >= r)
+  for (let r = 100 + RUNG_STEP; r <= count; r += RUNG_STEP) rungs.push(r)
   return rungs
 }
 
 export function nextRung(count: number): number {
-  for (const r of [10, 25, 50, 100]) if (count < r) return r
-  return (Math.floor(count / 100) + 1) * 100
+  for (const r of APPROACH_RUNGS) if (count < r) return r
+  return (Math.floor(count / RUNG_STEP) + 1) * RUNG_STEP
+}
+
+/** Celebrated tier: every 100th rung fills the solid coin; the rest are quiet. */
+export function isCentury(rung: number): boolean {
+  return rung % 100 === 0
 }
 
 export interface LadderState {

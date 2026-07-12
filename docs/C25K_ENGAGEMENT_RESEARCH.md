@@ -529,7 +529,9 @@ the check-in process should be live and proven well before the cohort arrives.
   (threshold ~7 of 10 group sessions, group-verified only) - day-level
   recognition without three ladders to explain.
 - **Ladder B adopted as proposed** (10/25/50/100 lifetime sessions, C25K and
-  club runs alike), counting from the autumn pilot.
+  club runs alike), counting from the autumn pilot. *Rung list revised
+  12 Jul 2026 to 10/25/50/75/100 then every 25 - see
+  docs/ATTENDANCE_RECOGNITION_BRIEF.md.*
 - Awards are digital on the rungs; **physical at Graduate** (printed
   certificate + consent-aware cohort photo at the parkrun).
 - **Private by default, opt-in public** celebration, via a consent flag in the

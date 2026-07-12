@@ -549,7 +549,10 @@ leader). For the member-facing display, consume:
   as every app route). Returns the CALLER's own ladders only:
   `{ run: { total, seed, recorded, rungs, nextRung, toNext },
      volunteer: { ...same shape }, awardsPublic: boolean }`.
-  Rungs are 10/25/50/100 then every 100th. `seed` is pre-site history
+  Rungs are 10/25/50/75/100 then every 25 (revised 12 Jul 2026; centuries
+  stay the celebrated tier). The app is rung-agnostic - it renders whatever
+  `rungs`/`nextRung` the API returns - so the list can change server-side
+  without an app release. `seed` is pre-site history
   (undatable - present milestones crossed inside it as "already achieved"),
   `recorded` is counted nights since. 401 signed out; 404 if the account has
   no member row.
@@ -877,7 +880,8 @@ the doc's recommendation it is flagged.
 6. **Award structure - confirmed**: C25K programme ladder First Step /
    Off the Couch / 4 / 8 / 12 / 16 / Graduate (event-based); per-day
    "Tuesday Regular" / "Thursday Regular" badges (~7 of 10, tuned on real
-   data); lifetime Ladder B 10/25/50/100 **club-wide** - existing regulars
+   data); lifetime Ladder B 10/25/50/75/100 then every 25 (rung list revised
+   12 Jul 2026 - see docs/ATTENDANCE_RECOGNITION_BRIEF.md) **club-wide** - existing regulars
    earn it too, seeded by the backfill. Attendance-only, never performance.
    Digital rungs, physical at Graduate (certificate + consent-aware photo).
    *Rationale: attendance-contingent recognition is the strongest finding in

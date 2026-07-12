@@ -17,13 +17,14 @@ Build the attendance-counting and milestone-recognition backend for radcliffe.ru
 
 GOAL
 Recognise regular runners, parkrun-style. Members accumulate lifetime attendance;
-crossing a rung (10/25/50/100) is recognised. Run leaders are recognised too, in
+crossing a rung (10/25/50/75/100 then every 25 - see the 12 Jul 2026 record
+below) is recognised. Run leaders are recognised too, in
 the way parkrun recognises volunteers. Nothing exists for any of this today.
 
 READ FIRST (do not skip; the design is already decided in places)
 - docs/C25K_ENGAGEMENT_RESEARCH.md - especially "Workshop decisions (6 Jul 2026)"
-  and the two award ladders. Ladder B (10/25/50/100 lifetime, C25K + club runs
-  alike) is ADOPTED. Awards are private by default, opt-in public. There is a
+  and the two award ladders. Ladder B (lifetime rungs, C25K + club runs
+  alike) is ADOPTED - rung list revised 12 Jul 2026 (record below). Awards are private by default, opt-in public. There is a
   "leader recognition loop" (surface milestones to the leader).
 - docs/NATIVE_APP_SCOPE.md section 8 (settled decisions) - backfill is decided YES.
 - app/api/leader/{register,checkin,contacts}/route.ts - the only code that touches
@@ -215,6 +216,9 @@ All open questions above were put to Paul and decided; the build follows these.
 2. **Rungs: 10 / 25 / 50 / 100, then every 100th** (parkrun's newer model),
    same ladder for both counters. Several leaders cross 100 at launch - a
    launch moment, not a problem.
+   **SUPERSEDED 12 Jul 2026** - the list is now 10 / 25 / 50 / 75 / 100, then
+   every 25 forever; centuries stay the celebrated tier. See the 12 Jul
+   record at the foot of this file.
 3. **Leading implies attending** (revised mid-session by Paul): checking in a
    member who is a run leader auto-writes a `run_leadership` row, so a
    leader-night earns BOTH credits. Historic equivalent: poll leader-nights
@@ -278,3 +282,35 @@ surface + leader recognition loop, era-2 photo reconstruction workflow
 (importer `--checkins` mode is ready and expects `date,email_or_name,group_key`).
 The member-facing display SHIPPED 11 Jul 2026 (native app My Ladder screens,
 native-apps 905f058 by OTA; build record in docs/RECOGNITION_DESIGN_BRIEF.md).
+
+## Decision record: rung list revised (Paul, 12 Jul 2026)
+
+**New list, both ladders:** approach rungs 10 / 25 / 50 / 75 / 100, then every
+25 forever (125, 150, 175, ...). Centuries (every 100th: 100, 200, 300, ...)
+remain the celebrated solid-coin tier; every other rung is the quiet tier.
+Run and volunteer ladders share the single list. Lives in `lib/recognition.ts`
+(`rungsAchieved` / `nextRung` / `isCentury`) as a generative rule, not a
+literal array, so it never needs another edit as totals climb. The API
+contract is unchanged: `GET /api/attendance/summary` still returns
+`{ rungs, nextRung, toNext }` per ladder - only the values move.
+
+**Rationale.** The old list (10/25/50/100 then every 100th) left a weekly
+regular roughly two years from the next badge once they passed 100. Every-25
+brings that to roughly six months, so recognition keeps arriving at a human
+cadence for the long-servers without cheapening the century milestones.
+
+**Rollout order: app first, then site.** The native app is already
+rung-agnostic (it renders whatever `rungs`/`nextRung` the API returns) and is
+guarded against retro-celebrations - it celebrates only rungs crossed since a
+member's last-seen total, so introducing new rungs never fires a backlog of
+notifications. That guard shipped by OTA first, by design, which is why this
+list change can deploy from the site with no app coordination.
+
+**No retro celebration.** A newly introduced rung that sits below an existing
+member's total (e.g. 75 or 125/150 for a 160-total leader) presents as quietly
+already-achieved: it appears filled on the Milestones screen with no
+celebration, because the app guards on the member's last-seen total rather than
+recomputing crossings from zero. The awards table/cron is not built yet; when
+it is, it must adopt the same last-seen guard so backfilled rungs are written
+(or presented) as `achieved_on` NULL / already-achieved, never as fresh
+crossings.

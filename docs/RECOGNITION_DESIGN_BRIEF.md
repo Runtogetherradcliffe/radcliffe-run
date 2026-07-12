@@ -7,9 +7,10 @@ shipped (migration + seeds live on production; decision record in
 `docs/ATTENDANCE_RECOGNITION_BRIEF.md`). Paste the block below into a
 native-apps session.
 
-**Why a separate session.** The ladder is open-ended (10/25/50/100 then
-every 100th), so this is a visual GRAMMAR that must generate 200/300/500
-without bespoke artwork, not a set of icons. The badges will also outlive
+**Why a separate session.** The ladder is open-ended (10/25/50/75/100 then
+every 25 - list revised 12 Jul 2026; centuries stay the celebrated tier, see
+docs/ATTENDANCE_RECOGNITION_BRIEF.md), so this is a visual GRAMMAR that must
+generate 125/200/300/500 without bespoke artwork, not a set of icons. The badges will also outlive
 the app screen: weekly roundup posts, carousel graphics, milestone emails,
 printed C25K graduation certificates. Design them as standalone tokens with
 rules and every future surface inherits them.
@@ -37,7 +38,7 @@ READ FIRST
 
 WHAT TO DESIGN (in order)
 1. The badge grammar: a generative rule that renders ANY rung - 10, 25, 50,
-   100, then every 100th forever - without new artwork per rung. Think
+   75, 100, then every 25 forever - without new artwork per rung. Think
    colour/material tiers, numeral treatment on a common token, or an
    evolving shape. It must be obvious that 250 outranks 100 at a glance.
 2. Two ladders, one family: RUN and VOLUNTEER badges. Decide family
@@ -70,7 +71,7 @@ PRINCIPLES ALREADY DECIDED - DO NOT RELITIGATE
 REAL DATA FOR MOCKS (live production shapes from GET /api/attendance/summary:
 { run: { total, seed, recorded, rungs, nextRung, toNext },
   volunteer: { same }, awardsPublic })
-- Paul: run 160 / volunteer 160 (rungs 10,25,50,100 both; next 200)
+- Paul: run 160 / volunteer 160 (rungs 10,25,50,75,100,125,150 both; next 175)
 - Kate Myers: 151 / 119. Neil: 160 / 25. Ros: 54 / 11.
 - A mid-range regular: ~40 / 0. A newcomer: 3 / 0 (nextRung 10, toNext 7).
 - Design must be graceful at 0 / 0 (brand-new member, nothing unlocked).
@@ -98,8 +99,13 @@ is designed, both themes, and signed off by Paul in-session.
 One circular token: ladder glyph on top, the number as hero (Inter
 ExtraBold), self-contained fill (works on any background/export surface).
 
-- **Below 100** (the approach rungs, always exactly 10/25/50): quiet coin -
-  `card` fill, 2 px `orange` ring, `text-hi` numeral, `orange` glyph.
+- **Non-century rungs** (the quiet tier): quiet coin - `card` fill, 2 px
+  `orange` ring, `text-hi` numeral, `orange` glyph. At the 10 Jul session
+  these were only the approach rungs 10/25/50; the 12 Jul 2026 rung-list
+  revision (10/25/50/75/100 then every 25) adds 75 and every non-century
+  rung above 100 (125, 150, 175, ...) to this same quiet tier. The grammar
+  is unchanged - it keys on century-vs-not (`isCentury`), so these render
+  with zero new artwork.
 - **Every 100th, forever**: the coin fills solid `orange` - century club -
   with `#0f0f0f` numeral/glyph (the Primary Button ink-on-accent precedent,
   theme-independent) and **one pip per hundred** under the number

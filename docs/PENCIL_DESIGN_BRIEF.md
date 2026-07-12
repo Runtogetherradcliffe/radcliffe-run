@@ -48,7 +48,8 @@ Android is first-class alongside iOS.
 - **Awards (v1.1 surfaces, design space reserved now)**: cumulative counts
   only - no streaks, no decay. C25K ladder: First Step / Off the Couch /
   4 / 8 / 12 / 16 / Graduate. Per-day Regular badges. Lifetime ladder
-  10/25/50/100, club-wide (existing regulars included, counts seeded from
+  10/25/50/75/100 then every 25 (list revised 12 Jul 2026; centuries stay the
+  celebrated tier), club-wide (existing regulars included, counts seeded from
   historic records). Private by default with an opt-in celebration flag;
   cohort collective totals are the only shared number; no leaderboards, no
   member-vs-member comparison, ever.
