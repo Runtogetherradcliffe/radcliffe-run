@@ -453,8 +453,11 @@ Because of the one-per-day limit, future scheduled work (e.g. leader nudges) mus
 into the existing 8am job rather than adding a schedule.
 
 `GET /api/cron/send-push` (the Thursday ~4pm native run announcement) is NOT a
-Vercel cron for this reason - cron-job.org calls it at
-`https://www.radcliffe.run/api/cron/send-push` (www host, Bearer CRON_SECRET).
+Vercel cron for this reason - it is DESIGNED to be called by cron-job.org at
+`https://www.radcliffe.run/api/cron/send-push` (www host, Bearer CRON_SECRET),
+but the cron-job.org entry is NOT YET CREATED (deliberate, 12 Jul 2026: no
+members carry the app yet). Switch-on, once leaders/members have the app:
+one cron-job.org job, Thursday ~16:00, same header as the awards job.
 It is idempotent via the `push_send_log` claim-lock, so retries cannot
 double-send. The gdpr-cleanup cron also prunes `push_tokens` unseen > 1 year.
 
