@@ -94,6 +94,13 @@ with a supporting index on `members(email)`.
 Active policies (production, hardened Jul 2026):
 
 - **members**: anon INSERT (registration); authenticated read/write own row by email.
+  Write access is **column-scoped by GRANT**, not by RLS (RLS cannot restrict columns):
+  `authenticated` has SELECT + UPDATE on the self-editable columns only (the
+  `/api/profile` whitelist; no INSERT/DELETE), `anon` has INSERT on the registration
+  columns only. `is_run_leader`/`status`/`cohort` are not grantable to either role -
+  they change only via the service role. This closes a privilege-escalation path where a
+  member (or anon) could set `is_run_leader=true` straight to PostgREST and reach the
+  leader PII surfaces (Jul 2026, `supabase-migration-members-column-grants.sql`).
 - **runs**: anon SELECT and authenticated SELECT (the homepage and join flow read runs
   with the member JWT). Writes are service-role only.
 - **posts**: anon SELECT of published posts only. No authenticated grant (the app reads

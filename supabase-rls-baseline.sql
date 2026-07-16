@@ -66,6 +66,33 @@ CREATE POLICY "Members can access own data"
 -- Supports the email-based policy (dev was missing this index entirely).
 CREATE INDEX IF NOT EXISTS members_email_idx ON public.members (email);
 
+-- Column-scoped write grants (privilege-escalation fix, Jul 2026 -
+-- supabase-migration-members-column-grants.sql). The policy above scopes to the
+-- caller's OWN row but RLS CANNOT restrict columns, so the FOR ALL policy is
+-- deliberately paired with narrow GRANTs: without them a member could PATCH
+-- their own is_run_leader=true straight to PostgREST (-> leader -> all emergency
+-- PII), or DELETE+re-INSERT a leader row, and an anon caller could INSERT a
+-- leader row for an email they control. Leaders are set ONLY by admins
+-- (service role). No app path writes members as authenticated/anon - profile,
+-- join and delete all use the service role - so authenticated keeps SELECT +
+-- column-scoped UPDATE (no INSERT/DELETE), and anon keeps column-scoped INSERT
+-- (registration) only. These GRANTs are load-bearing security, not cosmetics.
+REVOKE INSERT, UPDATE, DELETE ON public.members FROM authenticated;
+GRANT UPDATE (
+  first_name, last_name, mobile,
+  emergency_name, emergency_phone, emergency_relationship,
+  medical_info, email_opt_out, photo_consent,
+  theme, font_size, awards_public, development_preference
+) ON public.members TO authenticated;
+
+REVOKE INSERT, UPDATE, DELETE ON public.members FROM anon;
+GRANT INSERT (
+  first_name, last_name, email, mobile,
+  emergency_name, emergency_phone, emergency_relationship,
+  medical_info, consent_data, consent_medical, health_declaration,
+  email_opt_out, photo_consent
+) ON public.members TO anon;
+
 -- ── runs ───────────────────────────────────────────────────────────────────
 -- Reads only for authenticated: the homepage and join flow SELECT runs with the
 -- member JWT (server + browser clients). All writes go through the admin API on
