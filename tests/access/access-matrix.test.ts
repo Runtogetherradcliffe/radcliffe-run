@@ -53,6 +53,7 @@ const LEADER_EMAIL = 'access-test-leader@radcliffe.run'
 const ADMIN_EMAIL = process.env.ACCESS_ADMIN_EMAIL ?? 'paul.j.cox@gmail.com'
 const VICTIM_EMAIL = 'access-test-victim@radcliffe.run'
 const ANON_INSERT_EMAIL = 'access-test-anon-insert@radcliffe.run'
+const JWT_INSERT_EMAIL = 'access-test-jwt-insert@radcliffe.run'
 const PROBE_SLUG = 'access-audit--probe'
 const PROBE_ENDPOINT = 'https://example.com/access-audit-probe'
 const PROBE_SNIPPET = 'ACCESS-AUDIT probe snippet'
@@ -293,6 +294,7 @@ suite('access matrix', () => {
     await svc.from('email_snippets').delete().eq('title', PROBE_SNIPPET)
     await svc.from('route_descriptions').delete().eq('slug', PROBE_SLUG)
     await svc.from('members').delete().eq('email', ANON_INSERT_EMAIL)
+    await svc.from('members').delete().eq('email', JWT_INSERT_EMAIL)
     await svc.from('members').delete().eq('email', VICTIM_EMAIL)
   }, 60_000)
 
@@ -328,7 +330,11 @@ suite('access matrix', () => {
       expect(data ?? []).toHaveLength(0)
     })
 
-    it('anon can INSERT a member (registration path)', async () => {
+    it('anon cannot INSERT a member (registration is service-role via /api/join)', async () => {
+      // The "Anon can register" WITH CHECK (true) policy is gone and anon has no
+      // INSERT grant: anon must not be able to plant a members row at all - not a
+      // leader row, and not a duplicate-email row that would lock a leader out of
+      // the register (unique key is email+first+last, lookups use maybeSingle).
       const { error } = await anonClient().from('members').insert({
         email: ANON_INSERT_EMAIL,
         first_name: 'Access',
@@ -342,8 +348,12 @@ suite('access matrix', () => {
         consent_medical: true,
         photo_consent: false,
         email_opt_out: true,
+        is_run_leader: true,
       })
-      expect(error).toBeNull()
+      expect(error).not.toBeNull()
+      // Belt and braces: nothing landed.
+      const { data } = await svc.from('members').select('id').eq('email', ANON_INSERT_EMAIL)
+      expect(data ?? []).toHaveLength(0)
       await svc.from('members').delete().eq('email', ANON_INSERT_EMAIL)
     })
 
@@ -363,13 +373,16 @@ suite('access matrix', () => {
       expect(data?.length).toBe(1)
     })
 
-    it('member can update their own row (theme toggle path)', async () => {
-      const { count, error } = await restClients.member!
+    it('member cannot write their own row via PostgREST (self-edits go through /api/profile, service role)', async () => {
+      // members writes are service-role only; the member JWT has SELECT but no
+      // UPDATE grant, so even a self-edit of a harmless column (theme) is denied.
+      const { error } = await restClients.member!
         .from('members')
-        .update({ theme: 'dark' }, { count: 'exact' })
+        .update({ theme: 'dark' })
         .eq('email', MEMBER_EMAIL)
-      expect(error).toBeNull()
-      expect(count).toBe(1)
+      expect(error).not.toBeNull()
+      const { data } = await svc.from('members').select('theme').eq('id', memberRowId).single()
+      expect(data?.theme).not.toBe('dark')
     })
 
     it("member cannot read another member's row", async () => {
@@ -450,6 +463,40 @@ suite('access matrix', () => {
     it('member CAN read site_settings (C25K flags for the app)', async () => {
       const { data } = await restClients.member!.from('site_settings').select('c25k_enabled').limit(1)
       expect((data ?? []).length).toBe(1)
+    })
+
+    // Privilege-escalation guards (Jul 2026 fix): the member self-access policy
+    // is FOR ALL scoped by email, so RLS alone would let a member touch their OWN
+    // row - the ONLY thing keeping them from writing privileged columns (or any
+    // column) is the write-lockdown (no INSERT/UPDATE/DELETE grant). Verify the
+    // write did not land by reading back with the service role (never trust the
+    // member client's own response). These would all succeed on the un-hardened DB.
+    it('member cannot escalate to is_run_leader via PostgREST', async () => {
+      await restClients.member!.from('members').update({ is_run_leader: true }).eq('email', MEMBER_EMAIL)
+      const { data } = await svc.from('members').select('is_run_leader').eq('id', memberRowId).single()
+      expect(data?.is_run_leader).toBe(false)
+    })
+
+    it('member cannot change their own status via PostgREST', async () => {
+      await restClients.member!.from('members').update({ status: 'inactive' }).eq('email', MEMBER_EMAIL)
+      const { data } = await svc.from('members').select('status').eq('id', memberRowId).single()
+      expect(data?.status).toBe('active')
+    })
+
+    it('member cannot INSERT a members row via their JWT (no INSERT grant - blocks DELETE+re-INSERT escalation)', async () => {
+      const { error } = await restClients.member!.from('members').insert({
+        email: JWT_INSERT_EMAIL,
+        first_name: 'Access',
+        last_name: 'JwtInsert',
+        emergency_name: 'Access Test EC',
+        emergency_phone: '07000000006',
+        emergency_relationship: 'test',
+        consent_data: true,
+        health_declaration: true,
+        is_run_leader: true,
+      })
+      expect(error).not.toBeNull()
+      await svc.from('members').delete().eq('email', JWT_INSERT_EMAIL)
     })
 
     it('[HOLE] member cannot read scheduled_emails', async () => {

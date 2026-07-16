@@ -54,9 +54,12 @@ DROP POLICY IF EXISTS "Members can read own record"  ON public.members;  -- lega
 DROP POLICY IF EXISTS "Members can update own record" ON public.members; -- legacy (dev)
 DROP POLICY IF EXISTS "members_insert_anon"          ON public.members;  -- legacy (dev)
 
-CREATE POLICY "Anon can register"
-  ON public.members FOR INSERT TO anon
-  WITH CHECK (true);
+-- NO "Anon can register" policy: registration is service-role via /api/join,
+-- and a WITH CHECK (true) anon INSERT was an unauthenticated hazard - it let
+-- anyone with the public anon key plant a members row (is_run_leader=true, or a
+-- duplicate-email row that locks a leader out of the register, since the unique
+-- key is (email,first_name,last_name) and lookups use maybeSingle). Dropped in
+-- the write-lockdown below.
 
 CREATE POLICY "Members can access own data"
   ON public.members FOR ALL TO authenticated
@@ -65,6 +68,21 @@ CREATE POLICY "Members can access own data"
 
 -- Supports the email-based policy (dev was missing this index entirely).
 CREATE INDEX IF NOT EXISTS members_email_idx ON public.members (email);
+
+-- Members writes are SERVICE-ROLE ONLY (privilege-escalation fix, Jul 2026 -
+-- supabase-migration-members-write-lockdown.sql). RLS cannot restrict columns
+-- and the policy above is FOR ALL, so leaving authenticated/anon any write grant
+-- let a member PATCH their own is_run_leader=true to PostgREST (-> leader -> all
+-- emergency PII), DELETE+re-INSERT a leader row, or (anon) INSERT a leader /
+-- duplicate row for any email. Nothing in the app writes members as
+-- authenticated/anon: the only non-service client (components/ThemeProvider.tsx)
+-- just SELECTs, while profile edits (/api/profile), registration (/api/join),
+-- deletion and leader-setting (/api/admin/members/[id]) all use the service
+-- role. So revoke every write verb from both roles; they keep SELECT only. These
+-- REVOKEs are load-bearing security - db-diff cannot see grants, tests/access is
+-- the guard.
+REVOKE INSERT, UPDATE, DELETE ON public.members FROM authenticated;
+REVOKE INSERT, UPDATE, DELETE ON public.members FROM anon;
 
 -- ── runs ───────────────────────────────────────────────────────────────────
 -- Reads only for authenticated: the homepage and join flow SELECT runs with the
