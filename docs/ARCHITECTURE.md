@@ -93,14 +93,16 @@ with a supporting index on `members(email)`.
 
 Active policies (production, hardened Jul 2026):
 
-- **members**: anon INSERT (registration); authenticated read/write own row by email.
-  Write access is **column-scoped by GRANT**, not by RLS (RLS cannot restrict columns):
-  `authenticated` has SELECT + UPDATE on the self-editable columns only (the
-  `/api/profile` whitelist; no INSERT/DELETE), `anon` has INSERT on the registration
-  columns only. `is_run_leader`/`status`/`cohort` are not grantable to either role -
-  they change only via the service role. This closes a privilege-escalation path where a
-  member (or anon) could set `is_run_leader=true` straight to PostgREST and reach the
-  leader PII surfaces (Jul 2026, `supabase-migration-members-column-grants.sql`).
+- **members**: authenticated SELECT of own row by email. **No write access for
+  `authenticated` or `anon`** - all writes are service-role. RLS cannot restrict which
+  columns are written and the self-access policy is `FOR ALL`, so any write grant let a
+  member set their own `is_run_leader=true` straight to PostgREST (-> leader -> all
+  emergency PII), and the old `WITH CHECK (true)` anon INSERT let anyone with the public
+  anon key plant a leader row or a duplicate-email row that locks a leader out of the
+  register (unique key `(email,first_name,last_name)`, lookups use `.maybeSingle()`).
+  Registration is service-role via `/api/join`, profile edits via `/api/profile`,
+  leader-setting via `/api/admin/members/[id]` (Jul 2026,
+  `supabase-migration-members-write-lockdown.sql`).
 - **runs**: anon SELECT and authenticated SELECT (the homepage and join flow read runs
   with the member JWT). Writes are service-role only.
 - **posts**: anon SELECT of published posts only. No authenticated grant (the app reads

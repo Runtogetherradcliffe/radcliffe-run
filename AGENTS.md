@@ -21,18 +21,21 @@ matching doc edit; treat that reminder as a blocking checklist item, not a sugge
 - **`members.id` is NOT the Supabase auth UUID.** It is `gen_random_uuid()` assigned at
   registration. Never write an RLS policy as `auth.uid() = id` - it will never match.
   Member self-access RLS must use `(SELECT auth.email()) = email`.
-- **`members` column write-access is enforced by GRANTs, not RLS - keep it that way.**
-  The self-access policy is `FOR ALL` and scopes to the caller's own row, but RLS
-  CANNOT restrict which columns are written, so a member could otherwise PATCH their
-  own `is_run_leader=true` straight to PostgREST (-> leader -> all emergency PII), or
-  DELETE+re-INSERT a leader row, and anon could INSERT a leader row (Jul 2026 fix,
-  `supabase-migration-members-column-grants.sql`). `authenticated` therefore has only
-  SELECT + column-scoped UPDATE (the `/api/profile` whitelist columns; NO
-  INSERT/DELETE); `anon` has only column-scoped INSERT (registration columns).
-  `is_run_leader`/`status`/`cohort` are NOT grantable to either role - they change
-  only via the service role (`/api/admin/members/[id]`, `/api/join`, `/api/profile`).
-  Never widen these grants or add `is_run_leader` to the `/api/profile` whitelist.
-  `db-diff` does NOT watch column grants; the `tests/access` harness is the guard.
+- **`members` writes are SERVICE-ROLE ONLY - `authenticated` and `anon` have SELECT,
+  never a write grant.** The self-access policy is `FOR ALL` and scopes to the caller's
+  own row, but RLS CANNOT restrict which columns are written, so any write grant let a
+  member PATCH their own `is_run_leader=true` straight to PostgREST (-> leader -> all
+  emergency PII) or DELETE+re-INSERT a leader row, and a WITH CHECK (true) anon INSERT
+  let anyone with the public anon key plant a leader row - or a duplicate-email row that
+  locks a leader out of the register (the unique key is `(email,first_name,last_name)`
+  and lookups use `.maybeSingle()`, which errors on >1 row). Fixed Jul 2026 -
+  `supabase-migration-members-write-lockdown.sql` revokes every write verb from both
+  roles and drops the "Anon can register" policy. Nothing in the app needs those grants:
+  the only non-service client (`components/ThemeProvider.tsx`) just SELECTs, and profile
+  edits (`/api/profile`), registration (`/api/join`), deletion and leader-setting
+  (`/api/admin/members/[id]`) all use the service role. NEVER re-grant INSERT/UPDATE/
+  DELETE on `members` to `authenticated`/`anon` or recreate an anon INSERT policy;
+  `db-diff` does NOT watch grants, so the `tests/access` harness is the only guard.
 - **Admin and leader pages must use `supabaseAdmin()`** (service role, bypasses RLS) -
   see `lib/supabase.ts`. The user-JWT client (`utils/supabase/server.ts`) is subject to
   RLS and returns no rows for queries that scan all members. A past security fix that
