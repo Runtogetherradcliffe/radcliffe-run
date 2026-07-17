@@ -177,7 +177,17 @@ server-side, not a Postgres role):
   `source` 'leader'|'self_report', `group_key` '8k'|'5k'|'jeff',
   `UNIQUE(run_id, member_id)` makes re-taps/offline replays idempotent.
   Everything the v1.1 award ladder needs is derivable from this table
-  (`supabase-migration-attendance.sql`).
+  (`supabase-migration-attendance.sql`). An uncheck (`present=false`)
+  hard-deletes the row, so it writes an `attendance_deletions` audit row
+  first (below).
+- `attendance_deletions` - append-only audit of who removed whom from a
+  register, written by `POST /api/leader/checkin` before the `present=false`
+  hard-delete (`deleted_by`, original `recorded_by`/`recorded_at`, `group_key`,
+  `had_leadership_row`). Deliberately NO foreign keys, so it survives a
+  member/run deletion - the cascade above is exactly what erased the trace and
+  made the 16 Jul phantom uncheck untraceable. Stricter than its siblings: RLS
+  on, no policies, AND all anon/authenticated grants revoked
+  (`supabase-migration-attendance-deletions.sql`).
 - `push_tokens` - Expo push tokens (iOS + Android), nullable `member_id`
   (CASCADE), `prefs` jsonb `{weekly, alerts}`, `last_seen_at` (GDPR cron
   prunes > 1 year unseen). Registered via `POST /api/push/register`
