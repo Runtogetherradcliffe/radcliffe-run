@@ -79,8 +79,11 @@ CREATE INDEX IF NOT EXISTS members_email_idx ON public.members (email);
 -- just SELECTs, while profile edits (/api/profile), registration (/api/join),
 -- deletion and leader-setting (/api/admin/members/[id]) all use the service
 -- role. So revoke every write verb from both roles; they keep SELECT only. These
--- REVOKEs are load-bearing security - db-diff cannot see grants, tests/access is
--- the guard.
+-- REVOKEs are load-bearing security. Guarded two ways since 17 Jul 2026: db-diff
+-- diffs grants between the two projects, AND raises a write-lockdown alarm
+-- against this intent per project (a diff alone is blind when both projects are
+-- identically wrong, as they were before Jul 2026). tests/access remains the
+-- behavioural guard.
 REVOKE INSERT, UPDATE, DELETE ON public.members FROM authenticated;
 REVOKE INSERT, UPDATE, DELETE ON public.members FROM anon;
 
