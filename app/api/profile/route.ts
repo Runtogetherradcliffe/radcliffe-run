@@ -48,12 +48,30 @@ export async function DELETE(req: NextRequest) {
 
   const admin = supabaseAdmin()
 
-  // Look up the member's id before deletion (needed for push subscription cleanup)
+  // Look up the member's id before deletion (needed for push cleanup)
   const { data: member } = await admin
     .from('members')
     .select('id')
     .eq('email', user.email)
     .maybeSingle()
+
+  // Remove push subscriptions and native push tokens FIRST, while the member row
+  // still exists to match on. Order is load-bearing: push_subscriptions.member_id
+  // is ON DELETE SET NULL, so deleting the member first NULLs those rows out from
+  // under this delete-by-member_id, orphaning them - the admin broadcast
+  // (/api/admin/notify) then keeps reaching a deleted member's browser, and the
+  // erasure is incomplete. push_tokens.member_id is ON DELETE CASCADE so order is
+  // harmless there, but both are done together here, matching the proven order in
+  // the gdpr-cleanup cron. Errors are logged, not fatal: the account deletion is
+  // the priority and a stray subscription is swept by the cron / re-created on
+  // next visit. (Changing the FK to CASCADE was rejected: an unlinked, anonymous
+  // subscription - a logged-out browser - is a legitimate row this must not touch.)
+  if (member?.id) {
+    const { error: subErr } = await admin.from('push_subscriptions').delete().eq('member_id', member.id)
+    if (subErr) console.error('Delete push_subscriptions error:', subErr)
+    const { error: tokErr } = await admin.from('push_tokens').delete().eq('member_id', member.id)
+    if (tokErr) console.error('Delete push_tokens error:', tokErr)
+  }
 
   // Delete the member row (removes all personal data, emergency contact, medical info)
   const { error: memberError } = await admin
@@ -64,14 +82,6 @@ export async function DELETE(req: NextRequest) {
   if (memberError) {
     console.error('Delete member error:', memberError)
     return NextResponse.json({ error: 'Failed to delete account' }, { status: 500 })
-  }
-
-  // Remove any push subscriptions and native push tokens for this member
-  // (the push_tokens FK cascades on member delete, but the member row is
-  // deleted by email above - belt and braces for both token stores)
-  if (member?.id) {
-    await admin.from('push_subscriptions').delete().eq('member_id', member.id)
-    await admin.from('push_tokens').delete().eq('member_id', member.id)
   }
 
   // Delete the Supabase auth user entirely
