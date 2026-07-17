@@ -35,7 +35,10 @@ matching doc edit; treat that reminder as a blocking checklist item, not a sugge
   edits (`/api/profile`), registration (`/api/join`), deletion and leader-setting
   (`/api/admin/members/[id]`) all use the service role. NEVER re-grant INSERT/UPDATE/
   DELETE on `members` to `authenticated`/`anon` or recreate an anon INSERT policy;
-  `db-diff` does NOT watch grants, so the `tests/access` harness is the only guard.
+  since 17 Jul 2026 `db-diff` DOES diff table/column GRANTs and raises a members
+  write-lockdown alarm, so a re-grant is caught as dev/prod drift AND against
+  intent (per project, even if both are identically wrong); `tests/access`
+  remains the behavioural guard.
 - **Admin and leader pages must use `supabaseAdmin()`** (service role, bypasses RLS) -
   see `lib/supabase.ts`. The user-JWT client (`utils/supabase/server.ts`) is subject to
   RLS and returns no rows for queries that scan all members. A past security fix that
