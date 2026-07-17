@@ -138,7 +138,8 @@ Because the two Supabase projects are still edited by hand (no migration
 pipeline), schema and RLS can drift again. `npm run db-diff`
 (`scripts/db-diff.mjs`) is the automated detector: it connects to BOTH projects
 read-only, introspects the `public` schema (tables, columns, indexes,
-constraints, RLS policies, per-table RLS-enabled) and exits non-zero on any
+constraints, RLS policies, per-table RLS-enabled, and GRANTs to
+`anon`/`authenticated`/`PUBLIC`) and exits non-zero on any
 difference, so it can gate a scheduled run. It needs a Postgres connection string
 per project (`DBDIFF_DEV_DB_URL` / `DBDIFF_PROD_DB_URL`) because the service-role
 key + JS client cannot read the catalogs. `supabase-rls-baseline.sql` remains the
@@ -150,6 +151,18 @@ dev was aligned to production the same day
 (`supabase-migration-dev-schema-align.sql`) and both projects now match on all
 six categories. Note `runs.terrain` allows only `'road'`/`'trail'` - a sheet row
 marked "Mixed" will fail the runs sync in both environments.
+
+Grants became a seventh category on 17 Jul 2026. After the 16 Jul
+privilege-escalation fix (`supabase-migration-members-write-lockdown.sql`) the
+property "a member cannot make themselves a run leader and read the club's
+emergency/medical PII" rests entirely on column/table GRANTs, which db-diff could
+not see - and `tests/access`, the named guard, is CI-excluded, needs a live site
+and the service key, writes rows, and defaults to dev, so it cannot watch prod.
+db-diff being read-only is what makes it the right home. It carries two checks:
+the `grants` diff (have the projects drifted apart?) and a **write-lockdown
+alarm** checked per project against intent, because both projects can be
+identically wrong - before 16 Jul they were, and a pure diff would have said "no
+drift".
 
 ### Native app tables (Jul 2026)
 
