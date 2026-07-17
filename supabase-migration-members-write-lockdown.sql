@@ -56,9 +56,12 @@ DROP POLICY IF EXISTS "Anon can register" ON public.members;
 
 COMMIT;
 
--- NOTE: db-diff (scripts/db-diff.mjs) compares policies + schema but NOT column
--- or table GRANTs, so it will NOT detect drift if a future change re-grants write
--- access here. The regression guard is the access harness (tests/access) - it
--- asserts a member cannot write their own row (self-edits go through /api/profile)
--- and an anon caller cannot INSERT a member at all. Extending db-diff to diff
--- privileges is a reasonable follow-up.
+-- NOTE (updated 17 Jul 2026): db-diff (scripts/db-diff.mjs) now DOES diff table
+-- and column GRANTs, so a future change that re-grants write access here is
+-- caught two ways: as dev/prod drift, and - because both projects can be
+-- identically wrong, as they were before this migration - by a write-lockdown
+-- ALARM checked against intent per project. db-diff is read-only, so unlike the
+-- access harness it is safe to point at production routinely. The access harness
+-- (tests/access) remains the behavioural guard: it asserts a member cannot write
+-- their own row (self-edits go through /api/profile) and an anon caller cannot
+-- INSERT a member at all.

@@ -79,10 +79,24 @@ CREATE INDEX IF NOT EXISTS members_email_idx ON public.members (email);
 -- just SELECTs, while profile edits (/api/profile), registration (/api/join),
 -- deletion and leader-setting (/api/admin/members/[id]) all use the service
 -- role. So revoke every write verb from both roles; they keep SELECT only. These
--- REVOKEs are load-bearing security - db-diff cannot see grants, tests/access is
--- the guard.
+-- REVOKEs are load-bearing security. Guarded two ways since 17 Jul 2026: db-diff
+-- diffs grants between the two projects, AND raises a write-lockdown alarm
+-- against this intent per project (a diff alone is blind when both projects are
+-- identically wrong, as they were before Jul 2026). tests/access remains the
+-- behavioural guard.
 REVOKE INSERT, UPDATE, DELETE ON public.members FROM authenticated;
 REVOKE INSERT, UPDATE, DELETE ON public.members FROM anon;
+
+-- Also revoke TRUNCATE and TRIGGER (Supabase grants both to anon/authenticated
+-- by default on every table). RLS does not gate TRUNCATE, so the only thing
+-- between anon and wiping the membership is that PostgREST exposes no TRUNCATE
+-- verb - an interface limitation, not a permission. Low risk (anon is a
+-- PostgREST-assumed role, not one you connect as) but the same shape as the
+-- escalation above, and free to close on members. Applied via
+-- supabase-migration-attendance-deletions.sql. NOT db-diff-alarmed: granted on
+-- 16/16 tables, so a general alarm would fire on a correct database for ever.
+REVOKE TRUNCATE, TRIGGER ON public.members FROM authenticated;
+REVOKE TRUNCATE, TRIGGER ON public.members FROM anon;
 
 -- ── runs ───────────────────────────────────────────────────────────────────
 -- Reads only for authenticated: the homepage and join flow SELECT runs with the
@@ -210,6 +224,16 @@ ALTER TABLE public.push_send_log ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.attendance_seeds ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.run_leadership   ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.awards           ENABLE ROW LEVEL SECURITY;
+
+-- ── attendance_deletions (uncheck audit trail, Jul 2026) ────────────────────
+-- Append-only record of who removed whom from a register (an uncheck otherwise
+-- hard-deletes without trace - the 16 Jul phantom-uncheck lesson). Created by
+-- supabase-migration-attendance-deletions.sql. Stricter than its sibling
+-- attendance tables: RLS on with NO policies AND all anon/authenticated grants
+-- REVOKEd (defence-in-depth, since it records who-removed-whom and the app never
+-- reads it). Do NOT normalise back to the RLS-only pattern.
+ALTER TABLE public.attendance_deletions ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON public.attendance_deletions FROM anon, authenticated;
 
 -- ── awards_cron_log (12 Jul 2026) ───────────────────────────────────────────
 -- Claim-lock for the weekly /api/cron/awards run, same shape as
