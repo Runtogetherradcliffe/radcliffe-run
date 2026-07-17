@@ -87,6 +87,17 @@ CREATE INDEX IF NOT EXISTS members_email_idx ON public.members (email);
 REVOKE INSERT, UPDATE, DELETE ON public.members FROM authenticated;
 REVOKE INSERT, UPDATE, DELETE ON public.members FROM anon;
 
+-- Also revoke TRUNCATE and TRIGGER (Supabase grants both to anon/authenticated
+-- by default on every table). RLS does not gate TRUNCATE, so the only thing
+-- between anon and wiping the membership is that PostgREST exposes no TRUNCATE
+-- verb - an interface limitation, not a permission. Low risk (anon is a
+-- PostgREST-assumed role, not one you connect as) but the same shape as the
+-- escalation above, and free to close on members. Applied via
+-- supabase-migration-attendance-deletions.sql. NOT db-diff-alarmed: granted on
+-- 16/16 tables, so a general alarm would fire on a correct database for ever.
+REVOKE TRUNCATE, TRIGGER ON public.members FROM authenticated;
+REVOKE TRUNCATE, TRIGGER ON public.members FROM anon;
+
 -- ── runs ───────────────────────────────────────────────────────────────────
 -- Reads only for authenticated: the homepage and join flow SELECT runs with the
 -- member JWT (server + browser clients). All writes go through the admin API on
@@ -213,6 +224,16 @@ ALTER TABLE public.push_send_log ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.attendance_seeds ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.run_leadership   ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.awards           ENABLE ROW LEVEL SECURITY;
+
+-- ── attendance_deletions (uncheck audit trail, Jul 2026) ────────────────────
+-- Append-only record of who removed whom from a register (an uncheck otherwise
+-- hard-deletes without trace - the 16 Jul phantom-uncheck lesson). Created by
+-- supabase-migration-attendance-deletions.sql. Stricter than its sibling
+-- attendance tables: RLS on with NO policies AND all anon/authenticated grants
+-- REVOKEd (defence-in-depth, since it records who-removed-whom and the app never
+-- reads it). Do NOT normalise back to the RLS-only pattern.
+ALTER TABLE public.attendance_deletions ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON public.attendance_deletions FROM anon, authenticated;
 
 -- ── awards_cron_log (12 Jul 2026) ───────────────────────────────────────────
 -- Claim-lock for the weekly /api/cron/awards run, same shape as
