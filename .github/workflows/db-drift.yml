@@ -1,0 +1,109 @@
+# Weekly database guard.
+#
+# db-diff reports two independent things, and this job treats them DIFFERENTLY
+# on purpose:
+#
+#   ALARMS  - a write grant on a locked-down table held by a role the public
+#             anon key can reach. This is the 16 Jul 2026 members hole: any
+#             member could self-award is_run_leader and read the whole
+#             membership's emergency contacts. It must never be non-zero, so it
+#             FAILS the job.
+#
+#   DRIFT   - dev and prod schemas differ. Normal and expected mid-development
+#             (dev takes a migration before prod does), so it only WARNS. A job
+#             that goes red every week for an ordinary reason gets ignored, and
+#             an ignored guard is the thing this workflow exists to prevent.
+#
+# A config or connection failure (db-diff exit 2, or unparseable output) also
+# FAILS. That case is the whole reason this exists: db-diff had a bug meaning it
+# had never once completed a run, and the crash read as a network error, so
+# nobody noticed. A guard that silently stops running looks exactly like a guard
+# that is running and finding nothing.
+name: DB drift
+
+on:
+  schedule:
+    # Mondays 08:00 UTC. Weekly is enough: this watches settings that change
+    # only when someone changes them, not live data.
+    - cron: '0 8 * * 1'
+  workflow_dispatch:
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run db-diff
+        id: diff
+        env:
+          DBDIFF_DEV_DB_URL: ${{ secrets.DBDIFF_DEV_DB_URL }}
+          DBDIFF_PROD_DB_URL: ${{ secrets.DBDIFF_PROD_DB_URL }}
+          DBDIFF_JSON: '1'
+        run: |
+          set +e
+          node scripts/db-diff.mjs > report.json 2> stderr.txt
+          echo "code=$?" >> "$GITHUB_OUTPUT"
+          set -e
+          cat stderr.txt
+
+      - name: Interpret the report
+        run: |
+          node <<'NODE'
+          const fs = require('fs')
+          const code = Number('${{ steps.diff.outputs.code }}')
+          const summary = (s) => fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, s + '\n')
+
+          // Exit 2 is a config/connection failure. Treat anything unreadable the
+          // same way: we must never mistake "could not check" for "nothing wrong".
+          if (code === 2) {
+            summary('## DB drift check could NOT RUN')
+            summary('db-diff exited 2 - connection strings missing, rejected, or the DB unreachable.')
+            summary('See the step log above. This is a failure, not a pass.')
+            process.exit(1)
+          }
+
+          let report
+          try {
+            report = JSON.parse(fs.readFileSync('report.json', 'utf8'))
+          } catch {
+            summary('## DB drift check produced no readable report')
+            summary(`db-diff exited ${code} but its output was not valid JSON. Treating as a failure.`)
+            process.exit(1)
+          }
+
+          const alarms = report.totalAlarms ?? 0
+          const drift = report.totalDrift ?? 0
+
+          if (alarms > 0) {
+            summary('## ALARM: write lockdown breached')
+            summary(`${alarms} grant(s) that must not exist. A role the public anon key can reach`)
+            summary('holds a write privilege on a locked-down table.')
+            summary('')
+            summary('```json')
+            summary(JSON.stringify(report.writeLockdownAlarms, null, 2))
+            summary('```')
+          } else {
+            summary('## Write lockdown intact')
+            summary('No exposed write grants on the locked-down tables.')
+          }
+
+          summary('')
+          if (drift > 0) {
+            summary(`### Note: ${drift} dev/prod drift(s)`)
+            summary('Not a failure - dev is often ahead of prod. Reconcile when convenient.')
+          } else {
+            summary('### No dev/prod drift')
+          }
+
+          // Alarms fail the job; drift alone does not.
+          process.exit(alarms > 0 ? 1 : 0)
+          NODE

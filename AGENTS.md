@@ -38,7 +38,15 @@ matching doc edit; treat that reminder as a blocking checklist item, not a sugge
   since 17 Jul 2026 `db-diff` DOES diff table/column GRANTs and raises a members
   write-lockdown alarm, so a re-grant is caught as dev/prod drift AND against
   intent (per project, even if both are identically wrong); `tests/access`
-  remains the behavioural guard.
+  remains the behavioural guard. Since 18 Jul that alarm runs WEEKLY and
+  unattended (`.github/workflows/db-drift.yml`, Mondays 08:00 UTC plus manual
+  dispatch), because until then db-diff ran only when someone remembered to type
+  it, and nobody did. The job FAILS on an alarm and on a config/connection
+  failure (db-diff exit 2, or unreadable output - "could not check" must never
+  read as "nothing wrong"), but only WARNS on dev/prod drift, which is normal
+  while dev is ahead of prod: a job that goes red every week for an ordinary
+  reason gets ignored, and an ignored guard is what this replaced. Needs repo
+  secrets `DBDIFF_DEV_DB_URL` / `DBDIFF_PROD_DB_URL`.
 - **Admin and leader pages must use `supabaseAdmin()`** (service role, bypasses RLS) -
   see `lib/supabase.ts`. The user-JWT client (`utils/supabase/server.ts`) is subject to
   RLS and returns no rows for queries that scan all members. A past security fix that
