@@ -24,7 +24,8 @@ const TC = {
 
 /* ── Social sheet columns ── */
 const SC = {
-  date: 0, title: 1, location: 4, routeUrl: 5, distance: 6, notes: 7, cancelled: 8,
+  date: 0, title: 1, startTime: 2, endTime: 3, location: 4, routeUrl: 5,
+  distance: 6, notes: 7, cancelled: 8,
   eventId: 9,    // Google Calendar Event ID
 }
 
@@ -107,6 +108,15 @@ function normalise(t: string): 'road' | 'trail' | 'mixed' | null {
   return null
 }
 
+/** "10:30" | "9:00" | "09:00:00" -> "10:30:00"; anything else -> null */
+export function parseTime(raw: string): string | null {
+  const m = /^(\d{1,2}):(\d{2})(?::(\d{2}))?$/.exec(raw.trim())
+  if (!m) return null
+  const h = Number(m[1]), min = Number(m[2])
+  if (h > 23 || min > 59) return null
+  return `${String(h).padStart(2, '0')}:${m[2]}:${m[3] ?? '00'}`
+}
+
 function parseDistance(s: string): number | null {
   if (!s) return null
   const n = parseFloat(s.replace(/[^\d.]/g, ''))
@@ -116,6 +126,9 @@ function parseDistance(s: string): number | null {
 type RunRow = {
   date: string
   title: string
+  /** NULL means the club convention applies - see supabase-migration-run-times.sql */
+  start_time: string | null
+  end_time: string | null
   description: string | null
   terrain: 'road' | 'trail' | 'mixed' | null
   distance_km: number | null
@@ -176,6 +189,9 @@ function parseThursdayRows(rows: string[][]): RunRow[] {
       has_jeffing:     false,
       run_type:        'regular',
       description:     notesText,
+      // The Thursday sheet has no time column: NULL = the club convention (7pm).
+      start_time:      null,
+      end_time:        null,
     }
 
     // Route 1 (shorter / primary route)
@@ -210,7 +226,7 @@ function parseThursdayRows(rows: string[][]): RunRow[] {
 }
 
 /* ── Parse social sheet ── */
-function parseSocialRows(rows: string[][]): RunRow[] {
+export function parseSocialRows(rows: string[][]): RunRow[] {
   const out: RunRow[] = []
   for (const row of rows.slice(1)) {
     const date = parseDate(row[SC.date] ?? '')
@@ -233,6 +249,8 @@ function parseSocialRows(rows: string[][]): RunRow[] {
     out.push({
       date,
       title,
+      start_time:       parseTime(row[SC.startTime] ?? ''),
+      end_time:         parseTime(row[SC.endTime]   ?? ''),
       description,
       terrain:          null,
       distance_km:      parseDistance(distance),
@@ -331,6 +349,8 @@ export async function POST() {
         .from('runs')
         .update({
           title:            run.title,
+          start_time:       run.start_time,
+          end_time:         run.end_time,
           description:      run.description,
           terrain:          run.terrain,
           distance_km:      run.distance_km,

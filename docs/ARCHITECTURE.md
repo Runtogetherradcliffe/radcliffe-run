@@ -64,7 +64,8 @@ Full DDL in `supabase-schema-production.sql`. Tables:
   `theme`, `font_size`, `deactivated_at`.
 - **runs** - the schedule. `date`, `title`, `route_slug`, `terrain` ('road'|'trail'),
   `run_type` ('regular'|'social'|'c25k'|'walk'), `cancelled`, `on_tour`, `has_jeffing`,
-  `strava_url`, `meeting_*`.
+  `strava_url`, `meeting_*`, `start_time`/`end_time` (from the social sheet's time
+  columns; NULL means the club convention applies - see the runs sync section).
 - **route_descriptions** - DB override layer for route names/descriptions (slug PK).
   `lib/routes.ts` is the static base; this table wins where present.
 - **site_settings** - single-row config: hero image, email defaults, social calendar
@@ -441,6 +442,14 @@ Route map imagery: every route has a dark webp and a light webp;
 - `POST /api/admin/runs/sync` upserts upcoming runs from two Google Sheets (Thursday
   schedule + social calendar), preserving `cancelled` and `has_jeffing`, and upserts
   route names into `route_descriptions`.
+- **Start times.** The social sheet has "Start Time"/"End Time" columns (cols 2-3);
+  `parseTime()` normalises `10:30`, `9:00` and `09:00:00` alike and writes them to
+  `runs.start_time`/`end_time`. The Thursday sheet has no time column, so those rows
+  are written NULL - which is the meaningful value: NULL means the club convention
+  (7:00pm, meet from 6:45pm) applies, and stamping 19:00 on them would make a display
+  default indistinguishable from a real sheet value. Both fields are in the sync's
+  explicit UPDATE column list, not just the insert, so runs already in the DB pick up
+  their times on the next sync.
 - **On-tour meeting map links.** The Thursday sheet's "On tour meeting location map"
   column holds a Google Maps share URL (also read by an external calendar Apps Script
   and the Abingdon app - see `AGENTS.md`, do not change its format). At sync time,

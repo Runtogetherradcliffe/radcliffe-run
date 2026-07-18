@@ -99,6 +99,15 @@ matching doc edit; treat that reminder as a blocking checklist item, not a sugge
   short-link redirects) and caches the result in `runs.meeting_lat`/`meeting_lng` -
   keep any future map-precision work internal to this DB, never by changing what goes
   in the sheet.
+- **`runs.start_time` NULL means "the club convention applies"** (7:00pm, meet from
+  6:45pm) - it is not missing data. Only the social sheet has time columns; the
+  Thursday sheet has none, so Thursday and C25K rows are written NULL deliberately.
+  Do NOT "fix" this by stamping 19:00 on them: the site, the app's `hasClubTime()`
+  and the calendar button all key off NULL to tell a display default apart from a
+  real sheet value. `end_time` exists for calendar durations - do not render it as a
+  finish-time promise on a run card. Both fields must stay in the sync's explicit
+  UPDATE column list (`app/api/admin/runs/sync/route.ts`), not just the insert, or
+  runs already in the DB never receive their times.
 
 ## Email
 
