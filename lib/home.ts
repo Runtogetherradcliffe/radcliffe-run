@@ -101,20 +101,58 @@ export async function collectiveStat(): Promise<CollectiveStat | null> {
   return { count: distinctMembers.size, runDate: recentRun.date }
 }
 
-/** How long the admin-edited weekly note stays live on the app's Home. The
- * note describes THIS week (route overview / club news), so a forgotten one
- * must fall silent by itself rather than present last week as current. */
+/** The weekly note's candidate-run window, and its fallback lifespan when
+ * that window holds no runs at all (off-season gap, sync failure): 7 days
+ * from the last text change. */
 export const WEEKLY_NOTE_FRESH_MS = 7 * 24 * 60 * 60 * 1000
+
+/** A run keeps the note alive until "the morning after": its date at 00:00
+ * UTC plus 28h = 04:00 the next day. Approximate on purpose - UK local 4am
+ * vs 5am across BST is immaterial for "gone by breakfast". */
+const MORNING_AFTER_MS = 28 * 60 * 60 * 1000
+
+/** The date range (inclusive, YYYY-MM-DD) of runs that can anchor the note's
+ * lifespan: runs on or after the day it was written, within the 7-day
+ * window. Exported so /api/home queries exactly the range the freshness
+ * function will consider. */
+export function weeklyNoteAnchorWindow(updatedAt: string): { from: string; to: string } {
+  const t = new Date(updatedAt).getTime()
+  return {
+    from: new Date(t).toISOString().slice(0, 10),
+    to: new Date(t + WEEKLY_NOTE_FRESH_MS).toISOString().slice(0, 10),
+  }
+}
 
 /** The note, or null once it has expired / was cleared / was never set. All
  * freshness logic lives HERE - the app renders the string when present and
- * never re-derives (backend-first rule). `now` is injectable for tests. */
+ * never re-derives (backend-first rule).
+ *
+ * Lifespan is SCHEDULE-anchored (Paul, 21 Jul): the note lives until the
+ * morning after the LAST run dated within 7 days of writing it. An ordinary
+ * week (Thursday only) dies Friday ~4am; a social weekend's Sunday run
+ * keeps it up through the weekend; a bank-holiday Monday extends it again.
+ * Cancelled runs anchor too, deliberately - "Thursday is CANCELLED" must
+ * live until the would-have-been night. Runs before the note was written
+ * never anchor (a past run must not expire a note about a coming one), and
+ * with no runs in the window at all the plain 7-day cap applies.
+ * `runDates` are the YYYY-MM-DD dates from the runs table inside
+ * weeklyNoteAnchorWindow; `now` is injectable for tests. */
 export function freshWeeklyNote(
   s: { weekly_note: string | null; weekly_note_updated_at: string | null } | null,
+  runDates: string[],
   now: number = Date.now(),
 ): string | null {
   const text = s?.weekly_note?.trim()
   if (!text || !s?.weekly_note_updated_at) return null
-  const age = now - new Date(s.weekly_note_updated_at).getTime()
-  return age <= WEEKLY_NOTE_FRESH_MS ? text : null
+  const edited = new Date(s.weekly_note_updated_at).getTime()
+  if (Number.isNaN(edited)) return null
+  const { from, to } = weeklyNoteAnchorWindow(s.weekly_note_updated_at)
+  const anchors = runDates
+    .filter((d) => d >= from && d <= to)
+    .map((d) => Date.parse(`${d}T00:00:00Z`))
+    .filter((t) => !Number.isNaN(t))
+  const expiry = anchors.length
+    ? Math.max(...anchors) + MORNING_AFTER_MS
+    : edited + WEEKLY_NOTE_FRESH_MS
+  return now <= expiry ? text : null
 }
