@@ -163,7 +163,8 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
         </p>
         <p style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 12, lineHeight: 1.6 }}>
           A short line for the app&apos;s Home - this week&apos;s route in a sentence, plus any club news.
-          Shows for 7 days from saving a change, then falls quiet by itself until the next one.
+          Shows until the morning after the last run scheduled in the week after you save it - so an
+          ordinary week ends Friday morning, and a Sunday social keeps it up through the weekend.
           Clear the box and save to take it down early.
         </p>
         <textarea

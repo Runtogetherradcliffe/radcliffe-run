@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getUserFromRequest } from '@/lib/apiAuth'
 import { supabaseAdmin } from '@/lib/supabase'
-import { usualGroupForMember, collectiveStat, freshWeeklyNote } from '@/lib/home'
+import { usualGroupForMember, collectiveStat, freshWeeklyNote, weeklyNoteAnchorWindow } from '@/lib/home'
 
 /**
  * GET /api/home
@@ -39,6 +39,20 @@ export async function GET(req: NextRequest) {
         .eq('id', 1)
         .maybeSingle(),
     ])
+    // The note's lifespan is anchored to the runs scheduled in the week
+    // after it was written (see freshWeeklyNote) - one extra query, and only
+    // when a note is actually set.
+    let anchorDates: string[] = []
+    const note = settings.data
+    if (note?.weekly_note?.trim() && note.weekly_note_updated_at) {
+      const window = weeklyNoteAnchorWindow(note.weekly_note_updated_at)
+      const { data: anchorRuns } = await db
+        .from('runs')
+        .select('date')
+        .gte('date', window.from)
+        .lte('date', window.to)
+      anchorDates = (anchorRuns ?? []).map((r) => r.date as string)
+    }
     return NextResponse.json({
       firstName: member.first_name,
       isRunLeader: !!member.is_run_leader,
@@ -46,7 +60,7 @@ export async function GET(req: NextRequest) {
       groupCounts: usual.groupCounts,
       collectiveStat: stat,
       developmentPreference: member.development_preference ?? null,
-      weeklyNote: freshWeeklyNote(settings.data),
+      weeklyNote: freshWeeklyNote(note, anchorDates),
     })
   } catch (e) {
     return NextResponse.json(
