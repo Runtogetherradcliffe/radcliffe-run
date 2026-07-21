@@ -28,7 +28,7 @@ export default async function AdminPage() {
     supabase.from('runs').select('*', { count: 'exact', head: true }).gte('date', new Date().toISOString().split('T')[0]),
     supabaseAdmin().from('posts').select('*', { count: 'exact', head: true }).eq('type', 'roundup').eq('status', 'published'),
     supabaseAdmin().from('members').select('first_name, last_name, email, created_at').order('created_at', { ascending: false }).limit(5),
-    supabaseAdmin().from('site_settings').select('hero_image_url, sync_thursday_sheet, sync_social_sheet, show_social_calendar, email_default_subject, email_default_opening, email_default_closing, c25k_enabled, c25k_registration_open, c25k_start_date, c25k_cohort_label, c25k_max_registrations, c25k_session_order').single(),
+    supabaseAdmin().from('site_settings').select('weekly_note, hero_image_url, sync_thursday_sheet, sync_social_sheet, show_social_calendar, email_default_subject, email_default_opening, email_default_closing, c25k_enabled, c25k_registration_open, c25k_start_date, c25k_cohort_label, c25k_max_registrations, c25k_session_order').single(),
   ])
 
   return (
@@ -85,6 +85,7 @@ export default async function AdminPage() {
           </div>
           <SettingsClient initial={{
             hero_image_url:         settings?.hero_image_url         ?? null,
+            weekly_note:            settings?.weekly_note            ?? null,
             sync_thursday_sheet:    settings?.sync_thursday_sheet    ?? true,
             sync_social_sheet:      settings?.sync_social_sheet      ?? true,
             show_social_calendar:   settings?.show_social_calendar   ?? false,

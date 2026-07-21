@@ -100,3 +100,21 @@ export async function collectiveStat(): Promise<CollectiveStat | null> {
   const distinctMembers = new Set((attendanceRows ?? []).map((r) => r.member_id))
   return { count: distinctMembers.size, runDate: recentRun.date }
 }
+
+/** How long the admin-edited weekly note stays live on the app's Home. The
+ * note describes THIS week (route overview / club news), so a forgotten one
+ * must fall silent by itself rather than present last week as current. */
+export const WEEKLY_NOTE_FRESH_MS = 7 * 24 * 60 * 60 * 1000
+
+/** The note, or null once it has expired / was cleared / was never set. All
+ * freshness logic lives HERE - the app renders the string when present and
+ * never re-derives (backend-first rule). `now` is injectable for tests. */
+export function freshWeeklyNote(
+  s: { weekly_note: string | null; weekly_note_updated_at: string | null } | null,
+  now: number = Date.now(),
+): string | null {
+  const text = s?.weekly_note?.trim()
+  if (!text || !s?.weekly_note_updated_at) return null
+  const age = now - new Date(s.weekly_note_updated_at).getTime()
+  return age <= WEEKLY_NOTE_FRESH_MS ? text : null
+}
