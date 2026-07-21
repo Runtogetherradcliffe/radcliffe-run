@@ -8,6 +8,7 @@ type SessionOrder = { [week: string]: [number, number, number] }
 
 type Settings = {
   hero_image_url: string | null
+  weekly_note: string | null
   sync_thursday_sheet: boolean
   sync_social_sheet: boolean
   show_social_calendar: boolean
@@ -44,6 +45,7 @@ const VARYING_WEEKS: { n: number; title: string; sessions: { label: string; shor
 
 export default function SettingsClient({ initial }: { initial: Settings }) {
   const [heroUrl,            setHeroUrl]            = useState(initial.hero_image_url ?? '')
+  const [weeklyNote,         setWeeklyNote]         = useState(initial.weekly_note ?? '')
   const [syncThursday,       setSyncThursday]       = useState(initial.sync_thursday_sheet)
   const [syncSocial,         setSyncSocial]         = useState(initial.sync_social_sheet)
   const [showSocialCalendar, setShowSocialCalendar] = useState(initial.show_social_calendar)
@@ -110,6 +112,7 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           hero_image_url:        heroUrl.trim() || null,
+          weekly_note:           weeklyNote.trim() || null,
           sync_thursday_sheet:   syncThursday,
           sync_social_sheet:     syncSocial,
           show_social_calendar:  showSocialCalendar,
@@ -152,6 +155,30 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
 
   return (
     <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, padding: 24 }}>
+
+      {/* Weekly note - the app Home's admin-edited line */}
+      <div style={{ marginBottom: 24 }}>
+        <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 4 }}>
+          Weekly note
+        </p>
+        <p style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 12, lineHeight: 1.6 }}>
+          A short line for the app&apos;s Home - this week&apos;s route in a sentence, plus any club news.
+          Shows for 7 days from saving a change, then falls quiet by itself until the next one.
+          Clear the box and save to take it down early.
+        </p>
+        <textarea
+          value={weeklyNote}
+          onChange={e => setWeeklyNote(e.target.value)}
+          placeholder={"This week we're out on the Banana Path - flat, fast and mostly puddle-free. Cake at the market after!"}
+          rows={3}
+          style={{
+            width: '100%', background: 'var(--bg)', border: '1px solid var(--border-2)',
+            borderRadius: 8, padding: '10px 14px', fontSize: 'var(--text-sm)', color: 'var(--dim)',
+            fontFamily: 'Inter, sans-serif', outline: 'none', resize: 'vertical',
+            lineHeight: 1.6, boxSizing: 'border-box',
+          }}
+        />
+      </div>
 
       {/* Hero image upload */}
       <div style={{ marginBottom: 24 }}>

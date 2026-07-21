@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getUserFromRequest } from '@/lib/apiAuth'
 import { supabaseAdmin } from '@/lib/supabase'
-import { usualGroupForMember, collectiveStat } from '@/lib/home'
+import { usualGroupForMember, collectiveStat, freshWeeklyNote } from '@/lib/home'
 
 /**
  * GET /api/home
@@ -30,9 +30,14 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const [usual, stat] = await Promise.all([
+    const [usual, stat, settings] = await Promise.all([
       usualGroupForMember(member.id),
       collectiveStat(),
+      db
+        .from('site_settings')
+        .select('weekly_note, weekly_note_updated_at')
+        .eq('id', 1)
+        .maybeSingle(),
     ])
     return NextResponse.json({
       firstName: member.first_name,
@@ -41,6 +46,7 @@ export async function GET(req: NextRequest) {
       groupCounts: usual.groupCounts,
       collectiveStat: stat,
       developmentPreference: member.development_preference ?? null,
+      weeklyNote: freshWeeklyNote(settings.data),
     })
   } catch (e) {
     return NextResponse.json(

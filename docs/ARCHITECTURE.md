@@ -69,7 +69,9 @@ Full DDL in `supabase-schema-production.sql`. Tables:
 - **route_descriptions** - DB override layer for route names/descriptions (slug PK).
   `lib/routes.ts` is the static base; this table wins where present.
 - **site_settings** - single-row config: hero image, email defaults, social calendar
-  toggles, and all C25K settings (`c25k_enabled`, `c25k_registration_open`,
+  toggles, the app Home's weekly note (`weekly_note` + `weekly_note_updated_at`,
+  stamped on text change by `/api/admin/settings`, served fresh-gated by
+  `/api/home`), and all C25K settings (`c25k_enabled`, `c25k_registration_open`,
   `c25k_start_date`, `c25k_cohort_label`, `c25k_max_registrations`,
   `c25k_session_order`).
 - **scheduled_emails** - newsletter drafts/schedule. `status`
@@ -283,7 +285,11 @@ server-derived in `lib/home.ts`, the app never re-derives.
 - `GET /api/home` - member-authed aggregate (cookie or Bearer). 401 signed
   out, 404 signed-in with no active member row. Returns `firstName`,
   `isRunLeader`, `usualGroup` + `groupCounts`, `collectiveStat`,
-  `developmentPreference`. `usualGroup` is the majority
+  `developmentPreference`, `weeklyNote` (the admin-edited line from
+  `site_settings.weekly_note`, served only while under 7 days from
+  `weekly_note_updated_at` - the API is the single freshness decider, the
+  app just renders the string when present; null = expired/cleared/unset,
+  and `supabase-migration-weekly-note.sql` added both columns, Jul 2026). `usualGroup` is the majority
   `attendance.group_key` over live-era check-ins (`group_key IS NOT NULL`
   IS the live-era filter - photo-era backfill mostly lacks it); null until
   3+ check-ins AND a strict majority (cold start and no-majority render the
