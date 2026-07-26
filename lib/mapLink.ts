@@ -6,13 +6,29 @@
  * Maps URL that the calendar script and other consumers still understand.
  */
 
+// Order matters, and it is the whole point of this list. Sharing a meeting point
+// from Google Maps produces one of two link shapes:
+//
+//   long-press the map, then Share  ->  .../maps/search/<lat>,+<lng>
+//                                       one location, nothing to get wrong
+//   search a name, then Share       ->  .../maps/place/Name/@<framing>/data=...!3d<pin>!4d<pin>
+//                                       TWO locations: the place itself (!3d!4d)
+//                                       and where the map was framed on screen
+//                                       when it was shared (@...)
+//
+// Those two are not the same point. On the club's own market link they sit about
+// 170 m apart, and on a car park shared this way the gap has been up to ~300 m.
+// The place's own pin is what a member needs, so it must be tried BEFORE the
+// framing. The framing stays last as a fallback for a link that carries no pin.
+// (Fixed 26 Jul 2026, after the same defect was caught by a test in the native
+// apps' port of this file: apps/abingdon/src/lib/format.ts and social.py.)
 const COORD_PATTERNS = [
   /maps\/search\/(-?\d+\.\d+),\+?(-?\d+\.\d+)/,  // .../maps/search/<lat>,+<lng>
-  /@(-?\d+\.\d+),(-?\d+\.\d+)/,                   // .../@<lat>,<lng>,<zoom>z
-  /!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/,               // place link data blob
+  /!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/,               // the place's own pin
+  /@(-?\d+\.\d+),(-?\d+\.\d+)/,                   // only the map framing
 ]
 
-function extractCoords(text: string): { lat: number; lng: number } | null {
+export function extractCoords(text: string): { lat: number; lng: number } | null {
   for (const pattern of COORD_PATTERNS) {
     const m = text.match(pattern)
     if (m) {
