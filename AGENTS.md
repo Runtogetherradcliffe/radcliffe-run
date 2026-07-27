@@ -225,3 +225,13 @@ matching doc edit; treat that reminder as a blocking checklist item, not a sugge
 - `.env.local` points at the DEV Supabase project. Production credentials live in
   Vercel env vars and the production Supabase project. Local sends only ever touch dev
   data. `.env.production` in this repo has blank secrets - do not use it.
+- **The dev Supabase project is free-tier and auto-pauses without API activity.**
+  Supabase counts only API-gateway traffic (REST/Auth) as activity; direct Postgres
+  connections do NOT count - the weekly db-drift job connects to dev every Monday and
+  a pause warning still arrived (27 Jul 2026). `.github/workflows/
+  supabase-dev-keepalive.yml` makes a real PostgREST request to dev twice weekly
+  (Mon/Thu 06:23 UTC) and FAILS on any non-200, because a keepalive that silently
+  stops working looks exactly like one that is working. Needs repo secret
+  `SUPABASE_DEV_ANON_KEY` (the dev publishable/anon key - same value as
+  `NEXT_PUBLIC_SUPABASE_ANON_KEY` in `.env.local`). If Supabase ever pauses dev
+  anyway, unpause from the dashboard within 90 days or the project is unrecoverable.
