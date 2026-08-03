@@ -26,8 +26,11 @@ Two Supabase projects:
 | Dev | `rnbiqxhlqjbahgiwabuv` | `.env.local`, localhost |
 | Production | `qpdymxagloeghypntpct` | Vercel env vars, radcliffe.run |
 
-The dev project is on the free tier and auto-pauses after ~7 days idle; restore it from
-the Supabase dashboard if local dev cannot connect.
+The dev project is on the free tier and auto-pauses after ~7 days of LOW activity - the
+bar is "a few user requests each day", not one request a week, and only API-gateway
+(REST/Auth) traffic counts. `.github/workflows/supabase-dev-keepalive.yml` runs daily to
+stay above it; see the Environments section of `AGENTS.md`. If local dev cannot connect,
+restore the project from the Supabase dashboard (Resume project) within 90 days.
 
 ---
 
@@ -568,8 +571,9 @@ merged via `staging`. If local state ever looks confusing, trust GitHub:
 
 ## Known gotchas (quick list)
 
-- Dev Supabase project auto-pauses after ~7 days idle (free tier) - restore from
-  dashboard.
+- Dev Supabase project auto-pauses after ~7 days of low activity (free tier). "Low",
+  not "zero": a twice-weekly keepalive ping returned 200 every time and dev was paused
+  anyway (3 Aug 2026). The keepalive is daily now - restore from dashboard if it slips.
 - `npm audit fix --force` downgrades Next.js catastrophically - never run it.
 - Dev server: run from the project root (worktree paths break hydration) and use
   `localhost`, not `127.0.0.1` (blocked by Next.js 16).

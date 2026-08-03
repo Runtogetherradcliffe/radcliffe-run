@@ -6,20 +6,31 @@
 # job connects to dev every Monday and Supabase still sent a pause warning
 # (27 Jul 2026). So this job makes a real PostgREST request instead.
 #
-# Twice weekly, because the pause threshold is ~7 days of inactivity and both
-# GitHub schedules and a single weekly run are best-effort: one missed Monday
-# must not be enough to get the project paused. Odd minute chosen because
-# on-the-hour GitHub schedules are the most delayed.
+# DAILY, several requests per run. The first version of this job ran twice a
+# week with a single request, and dev was paused anyway on 3 Aug 2026 - a week
+# after the warning - even though both scheduled pings returned 200. The
+# threshold is not "any activity at all": Supabase's docs say a project is
+# paused when it shows "low activity over a 7-day period", and that "a few
+# user requests to the database each day over the previous week" is what keeps
+# it off the pause list. Two requests a week is well under that, so the pings
+# succeeded and the project was paused regardless. Do NOT thin this back out
+# to a weekly or twice-weekly single ping.
+# https://supabase.com/docs/guides/platform/free-project-pausing
 #
-# The request must FAIL the job when it does not get a 200: a keepalive that
+# The requests must FAIL the job when any does not get a 200: a keepalive that
 # silently stops working looks exactly like one that is working, right up
-# until the project is paused.
+# until the project is paused. Note GitHub also disables scheduled workflows
+# in a repo with no commits for 60 days - if the repo ever goes that quiet,
+# this job stops firing with no failure to notice.
 name: Supabase dev keepalive
 
 on:
   schedule:
-    # Mondays and Thursdays, 06:23 UTC.
-    - cron: '23 6 * * 1,4'
+    # Daily, 06:23 UTC. GitHub routinely delays scheduled runs by a couple of
+    # hours and can skip one outright; daily means a skipped day costs one of
+    # seven chances that week, not one of two. Odd minute chosen because
+    # on-the-hour GitHub schedules are the most delayed.
+    - cron: '23 6 * * *'
   workflow_dispatch:
 
 jobs:
@@ -35,15 +46,27 @@ jobs:
             echo "SUPABASE_DEV_ANON_KEY secret is not set" >&2
             exit 1
           fi
-          # A real table read through PostgREST. RLS may filter the rows; the
+          # Real table reads through PostgREST. RLS may filter the rows; the
           # gateway hit is what counts, but only a 200 proves the project is
-          # up and the key valid.
-          status=$(curl -sS -o /dev/null -w '%{http_code}' \
-            -H "apikey: $SUPABASE_DEV_ANON_KEY" \
-            -H "Authorization: Bearer $SUPABASE_DEV_ANON_KEY" \
-            "$SUPABASE_DEV_URL/rest/v1/runs?select=id&limit=1")
-          echo "HTTP $status"
-          if [ "$status" != "200" ]; then
+          # up and the key valid. Several spaced-out reads, because one
+          # request a day is close to the low-activity signal we are avoiding.
+          fail=0
+          for path in \
+            "runs?select=id&limit=1" \
+            "posts?select=id&limit=1" \
+            "route_descriptions?select=slug&limit=1" \
+            "runs?select=id&order=date.desc&limit=5" \
+            "posts?select=id&order=id.desc&limit=5"
+          do
+            status=$(curl -sS -o /dev/null -w '%{http_code}' \
+              -H "apikey: $SUPABASE_DEV_ANON_KEY" \
+              -H "Authorization: Bearer $SUPABASE_DEV_ANON_KEY" \
+              "$SUPABASE_DEV_URL/rest/v1/$path")
+            echo "HTTP $status  $path"
+            [ "$status" = "200" ] || fail=1
+            sleep 5
+          done
+          if [ "$fail" != "0" ]; then
             echo "Keepalive ping failed - dev project may be paused or the key rotated" >&2
             exit 1
           fi
