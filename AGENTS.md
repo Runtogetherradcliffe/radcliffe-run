@@ -154,6 +154,20 @@ matching doc edit; treat that reminder as a blocking checklist item, not a sugge
 - Route map cards use `<ThemeMapImage slug={...} />`, never `<img>` - every route needs
   BOTH a dark webp (`public/route-maps/<slug>.webp`) and a light webp
   (`public/route-maps/light/<slug>.webp`).
+- **The run card image is keyed on `runs.route_slug` alone, and need not be a map.**
+  All three surfaces resolve it the same way: the site checks
+  `public/route-maps/<slug>.webp` exists and renders `<ThemeMapImage>`, and the native
+  app hotlinks `<site>/route-maps/light/<slug>.webp` (`apps/rtr/src/lib/format.ts`).
+  So a run with no catalogue route can show a PHOTO by inventing a slug
+  (`social--boggart-hole-clough`, Aug 2026, an athletics track) and dropping an
+  800x450 dark+light webp pair in under that name. Deliberately do NOT add such a
+  slug to `ROUTES` in `lib/routes.ts`: `tests/routeAssets.test.ts` demands a GPX for
+  every entry, and every consumer guards on `ROUTES.find()`, so a non-catalogue slug
+  cleanly omits the route description, interactive map and GPX button instead of
+  half-rendering them. Because the app resolves the image by URL, a new photo reaches
+  phones without an app release. Known rough edge: the native run screen still offers
+  a GPX download and "Track this run" whenever `routeSlug` is set, which 404s for a
+  photo slug.
 - **No em dashes anywhere in source files.** Use a plain hyphen. (The block at the
   top of this file is third-party managed and exempt.)
 

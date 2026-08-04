@@ -474,9 +474,11 @@ export default async function HomePage() {
                   const hasMap = !!mapSlug && slugsWithMap.has(mapSlug)
                   const headerHeight = hasMap ? 160 : 100
                   const mapRoute = mapSlug ? ROUTES.find(r => r.slug === mapSlug) : null
+                  // No catalogue route means the image is not a map (a social can
+                  // carry a photo instead), so do not claim one in the alt text.
                   const mapAlt = mapRoute
                     ? `Map of ${mapRoute.name}, a ${mapRoute.distance_km}km ${mapRoute.terrain} running route in Radcliffe`
-                    : `Route map for ${cleanTitle(run.title)} in Radcliffe`
+                    : cleanTitle(run.title)
 
                   // Card border colour keyed on group
                   const cardBorder = primaryGroup === '5K'
@@ -668,7 +670,7 @@ export default async function HomePage() {
                   const socialRoute = run.route_slug ? ROUTES.find(r => r.slug === run.route_slug) : null
                   const socialMapAlt = socialRoute
                     ? `Map of ${socialRoute.name}, a ${socialRoute.distance_km}km ${socialRoute.terrain} running route in Radcliffe`
-                    : `Route map for ${cleanTitle(run.title)} in Radcliffe`
+                    : cleanTitle(run.title)
                   return (
                   <div key={run.id} style={{ background: 'var(--card)', border: '1px solid rgba(196,168,232,0.15)', borderRadius: 12, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                     <div style={{ height: socialHeaderHeight, position: 'relative', background: 'linear-gradient(160deg,#100a20,#1c1030,#120a1c)', overflow: 'hidden' }}>
