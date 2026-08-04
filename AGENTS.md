@@ -165,9 +165,15 @@ matching doc edit; treat that reminder as a blocking checklist item, not a sugge
   every entry, and every consumer guards on `ROUTES.find()`, so a non-catalogue slug
   cleanly omits the route description, interactive map and GPX button instead of
   half-rendering them. Because the app resolves the image by URL, a new photo reaches
-  phones without an app release. Known rough edge: the native run screen still offers
-  a GPX download and "Track this run" whenever `routeSlug` is set, which 404s for a
-  photo slug.
+  phones without an app release. Consequently a `route_slug` on a run does NOT imply a
+  GPX or a catalogue route: anything offering a GPX download, a route description or
+  route-based tracking must check `GET /api/routes` (the authoritative catalogue)
+  rather than the slug's presence. The native app shipped that exact bug - its run
+  detail screen offered a GPX button and a "Track this run" action for any run with a
+  slug set, both of which 404'd on the Boggart social - fixed app-side 4 Aug 2026 by
+  gating both on the catalogue (`hasRoute`, `apps/rtr/src/app/run/[id].tsx`). The next
+  photo slug added will silently do the same to any other consumer that made the same
+  assumption.
 - **No em dashes anywhere in source files.** Use a plain hyphen. (The block at the
   top of this file is third-party managed and exempt.)
 
