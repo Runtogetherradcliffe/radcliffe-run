@@ -116,6 +116,14 @@ matching doc edit; treat that reminder as a blocking checklist item, not a sugge
   finish-time promise on a run card. Both fields must stay in the sync's explicit
   UPDATE column list (`app/api/admin/runs/sync/route.ts`), not just the insert, or
   runs already in the DB never receive their times.
+- **Render times through `lib/runTimes.ts`, in the app's words** (Aug 2026). The site
+  says "Sets off 9:00am - back about 9:30am", matching the native app, on the home
+  social cards and the run detail page. `formatClock`/`formatRunTimeLine` return NULL
+  for a NULL `start_time` so each caller keeps its own 7pm default rather than the
+  helper inventing one; the "back about" hedge is how `end_time` is allowed to appear
+  at all, so keep that wording and do not print it as a bare finish time. A run with a
+  real `start_time` also gets it in the detail page's `Event` JSON-LD `startDate`
+  (plus `endDate` when there is an end time) instead of the 7pm assumption.
 
 ## Email
 

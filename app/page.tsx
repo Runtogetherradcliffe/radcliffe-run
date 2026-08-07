@@ -10,6 +10,7 @@ import { ROUTES } from '@/lib/routes'
 import { existsSync } from 'fs'
 import { join } from 'path'
 import ThemeMapImage from '@/components/ThemeMapImage'
+import { formatClock, formatRunTimeLine } from '@/lib/runTimes'
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 const DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
@@ -93,7 +94,7 @@ export default async function HomePage() {
       .single(),
     supabase
       .from('runs')
-      .select('id, date, title, distance_km, terrain, meeting_point, route_slug, on_tour, has_jeffing, run_type, cancelled')
+      .select('id, date, title, distance_km, terrain, meeting_point, route_slug, on_tour, has_jeffing, run_type, cancelled, start_time, end_time')
       .gte('date', today)
       .lte('date', fourWeeksOutStr)
       .eq('cancelled', false)
@@ -121,7 +122,7 @@ export default async function HomePage() {
   const { data: socialRunsData } = showSocialRuns
     ? await supabase
         .from('runs')
-        .select('id, date, title, distance_km, terrain, meeting_point, route_slug, on_tour, has_jeffing, run_type, cancelled')
+        .select('id, date, title, distance_km, terrain, meeting_point, route_slug, on_tour, has_jeffing, run_type, cancelled, start_time, end_time')
         .gte('date', today)
         .eq('cancelled', false)
         .eq('run_type', 'social')
@@ -559,7 +560,8 @@ export default async function HomePage() {
                         {/* ── Card body ── */}
                         <div style={{ padding: '14px 16px', flex: 1, display: 'flex', flexDirection: 'column' }}>
                           <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#f5a623', marginBottom: 6 }}>
-                            {fmtRunDate(run.date)} &middot; 7pm
+                            {/* A run with its own start time shows it; NULL means the 7pm club convention */}
+                            {fmtRunDate(run.date)} &middot; {formatClock(run.start_time) ?? '7pm'}
                           </p>
                           <p style={{ fontSize: 'var(--text-md)', fontWeight: 700, marginBottom: 8, lineHeight: 1.3 }}>
                             {cleanTitle(run.title)}
@@ -671,6 +673,7 @@ export default async function HomePage() {
                   const socialMapAlt = socialRoute
                     ? `Map of ${socialRoute.name}, a ${socialRoute.distance_km}km ${socialRoute.terrain} running route in Radcliffe`
                     : cleanTitle(run.title)
+                  const socialTimeLine = formatRunTimeLine(run.start_time, run.end_time)
                   return (
                   <div key={run.id} style={{ background: 'var(--card)', border: '1px solid rgba(196,168,232,0.15)', borderRadius: 12, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                     <div style={{ height: socialHeaderHeight, position: 'relative', background: 'linear-gradient(160deg,#100a20,#1c1030,#120a1c)', overflow: 'hidden' }}>
@@ -696,7 +699,11 @@ export default async function HomePage() {
                       <p style={{ fontSize: 'var(--text-md)', fontWeight: 700, marginBottom: 8, lineHeight: 1.3 }}>
                         {cleanTitle(run.title)}
                       </p>
-                      <p style={{ fontSize: 'var(--text-xs)', color: 'var(--faint)', marginBottom: 8 }}>📍 {run.meeting_point.split(',')[0]}</p>
+                      <p style={{ fontSize: 'var(--text-xs)', color: 'var(--faint)', marginBottom: socialTimeLine ? 4 : 8 }}>📍 {run.meeting_point.split(',')[0]}</p>
+                      {/* Socials set their own time in the sheet - Thursdays keep the 7pm convention */}
+                      {socialTimeLine && (
+                        <p style={{ fontSize: 'var(--text-xs)', color: 'var(--faint)', marginBottom: 8 }}>🕘 {socialTimeLine}</p>
+                      )}
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                         {run.distance_km && <span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)' }}>{run.distance_km} km</span>}
                         {run.terrain && <TerrainBadge terrain={run.terrain} />}

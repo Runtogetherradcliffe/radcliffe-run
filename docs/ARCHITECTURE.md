@@ -462,7 +462,13 @@ Route map imagery: every route has a dark webp and a light webp;
   (7:00pm, meet from 6:45pm) applies, and stamping 19:00 on them would make a display
   default indistinguishable from a real sheet value. Both fields are in the sync's
   explicit UPDATE column list, not just the insert, so runs already in the DB pick up
-  their times on the next sync.
+  their times on the next sync. `lib/runTimes.ts` renders them in the native app's
+  words - `formatClock()` gives "9:00am", `formatRunTimeLine()` gives "Sets off 9:00am
+  - back about 9:30am" - and both return null for a NULL start so the caller keeps its
+  own 7pm default. The home page uses them on the social cards (and on the Thursday
+  card's date line, where NULL still yields 7pm), and `app/runs/[id]/page.tsx` shows
+  the clock beside the date, the full line under the meeting point, and the real
+  `startDate`/`endDate` in its `Event` JSON-LD.
 - **On-tour meeting map links.** The Thursday sheet's "On tour meeting location map"
   column holds a Google Maps share URL (also read by an external calendar Apps Script
   and the Abingdon app - see `AGENTS.md`, do not change its format). At sync time,
