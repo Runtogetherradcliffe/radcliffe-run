@@ -9,6 +9,7 @@ import RunMapExpand from './RunMapExpand'
 import RunBadges from './RunBadges'
 import GpxButton from './GpxButton'
 import DirectionsLink from '@/components/DirectionsLink'
+import { formatClock, formatRunTimeLine } from '@/lib/runTimes'
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 const DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
@@ -56,7 +57,7 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
 
   const { data: run } = await supabaseAdmin()
     .from('runs')
-    .select('id, date, title, description, distance_km, terrain, meeting_point, meeting_map_url, meeting_lat, meeting_lng, route_slug, strava_url, on_tour, has_jeffing, run_type, cancelled, leader_name')
+    .select('id, date, title, description, distance_km, terrain, meeting_point, meeting_map_url, meeting_lat, meeting_lng, route_slug, strava_url, on_tour, has_jeffing, run_type, cancelled, leader_name, start_time, end_time')
     .eq('id', id)
     .single()
 
@@ -80,11 +81,18 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
 
   // Default Thursday runs meet at Radcliffe Market at 7pm; social/on-tour runs vary
   const atMarket = !run.on_tour && !isSocial
+
+  // A run with its own start time (socials come from the sheet's time columns)
+  // shows it; NULL keeps the club convention, which is the 7pm below.
+  const startClock = formatClock(run.start_time)
+  const timeLine   = formatRunTimeLine(run.start_time, run.end_time)
+
   const eventJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Event',
     name: `${title} - Run Together Radcliffe`,
-    startDate: isSocial ? run.date : `${run.date}T19:00`,
+    startDate: run.start_time ? `${run.date}T${run.start_time}` : isSocial ? run.date : `${run.date}T19:00`,
+    ...(run.start_time && run.end_time ? { endDate: `${run.date}T${run.end_time}` } : {}),
     eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
     eventStatus: run.cancelled ? 'https://schema.org/EventCancelled' : 'https://schema.org/EventScheduled',
     isAccessibleForFree: true,
@@ -132,7 +140,7 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
               </span>
               <span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)' }}>·</span>
               <span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)' }}>{fmtRunDate(run.date)}</span>
-              {!isSocial && <><span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)' }}>·</span><span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)' }}>7pm</span></>}
+              {(startClock || !isSocial) && <><span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)' }}>·</span><span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)' }}>{startClock ?? '7pm'}</span></>}
             </div>
 
             <h1 style={{ fontSize: 'clamp(26px, 4vw, 40px)', fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: 16 }}>
@@ -154,11 +162,16 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
             <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 10 }}>
               Meeting point
             </p>
-            <p style={{ fontSize: 'var(--text-base)', color: 'var(--dim)', lineHeight: 1.5, marginBottom: run.meeting_map_url ? 14 : 0 }}>
+            <p style={{ fontSize: 'var(--text-base)', color: 'var(--dim)', lineHeight: 1.5, marginBottom: timeLine ? 8 : run.meeting_map_url ? 14 : 0 }}>
               📍 {(!run.on_tour && !isSocial)
                 ? <a href="https://maps.app.goo.gl/d1FUYuqmNVpsWUs99" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>Radcliffe Market</a>
                 : meetingPoint}
             </p>
+            {timeLine && (
+              <p style={{ fontSize: 'var(--text-base)', color: 'var(--dim)', lineHeight: 1.5, marginBottom: run.meeting_map_url ? 14 : 0 }}>
+                🕘 {timeLine}
+              </p>
+            )}
             {run.meeting_map_url && (
               <DirectionsLink
                 googleMapsUrl={run.meeting_map_url}
