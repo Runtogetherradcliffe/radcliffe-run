@@ -4,6 +4,7 @@ import WalksClient from './WalksClient'
 export const metadata = {
   title: 'Walks in Radcliffe | radcliffe.run',
   description: 'Free, self-guided walking routes around Radcliffe and the Irwell Valley, Greater Manchester - with maps, distances, walking times and historic Ordnance Survey overlays.',
+  alternates: { canonical: '/walks' },
 }
 
 export default function WalksPage() {

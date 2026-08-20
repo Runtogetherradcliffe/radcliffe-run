@@ -11,7 +11,7 @@ import { getRouteOverrides } from '@/lib/routeDescriptions'
 import { sendBrevoEmail } from '@/lib/brevo'
 import { makeUnsubscribeToken } from '@/lib/unsubscribe'
 
-const SITE_URL           = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://radcliffe.run'
+const SITE_URL           = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.radcliffe.run'
 const FROM_ADDRESS       = process.env.EMAIL_FROM ?? 'noreply@radcliffe.run'
 const FROM_NAME          = process.env.EMAIL_FROM_NAME ?? 'Run Together Radcliffe'
 // Brevo transactional sends are one request per recipient, so each member gets

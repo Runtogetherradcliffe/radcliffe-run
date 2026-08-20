@@ -5,7 +5,7 @@ import { buildEmailHtml, RunInfo } from '@/lib/buildEmail'
 import { ROUTES } from '@/lib/routes'
 import { getRouteOverrides } from '@/lib/routeDescriptions'
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://radcliffe.run'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.radcliffe.run'
 
 /** POST body can override any field for live preview as the user edits */
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

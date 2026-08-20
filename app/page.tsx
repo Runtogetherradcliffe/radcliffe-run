@@ -1,5 +1,9 @@
 export const dynamic = 'force-dynamic'
 
+export const metadata = {
+  alternates: { canonical: '/' },
+}
+
 import Link from 'next/link'
 import Nav from '@/components/layout/Nav'
 import Footer from '@/components/layout/Footer'
@@ -151,9 +155,9 @@ export default async function HomePage() {
     '@type': 'SportsClub',
     name: 'Run Together Radcliffe',
     alternateName: 'radcliffe.run',
-    url: 'https://radcliffe.run',
-    logo: 'https://radcliffe.run/logo.png',
-    image: 'https://radcliffe.run/og-image.png',
+    url: 'https://www.radcliffe.run',
+    logo: 'https://www.radcliffe.run/logo.png',
+    image: 'https://www.radcliffe.run/og-image.png',
     email: 'hello@radcliffe.run',
     description: 'A free, friendly running club and group in Radcliffe, Bury (Greater Manchester), open to everyone. No memberships, no minimum pace - good routes and good people, every Thursday.',
     foundingDate: '2022',

@@ -5,6 +5,7 @@ import BackLink from './BackLink'
 export const metadata = {
   title: 'Privacy Policy - radcliffe.run',
   description: 'How Run Together Radcliffe collects, uses, and protects your personal data.',
+  alternates: { canonical: '/privacy' },
 }
 
 type Props = { searchParams: Promise<{ modal?: string }> }

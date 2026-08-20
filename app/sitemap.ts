@@ -1,7 +1,8 @@
 import { MetadataRoute } from 'next'
 import { supabaseAdmin } from '@/lib/supabase'
+import { ROUTES } from '@/lib/routes'
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://radcliffe.run'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.radcliffe.run'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -11,14 +12,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/walks`,       changeFrequency: 'monthly', priority: 0.9 },
     { url: `${SITE_URL}/join`,        changeFrequency: 'monthly', priority: 0.7 },
     { url: `${SITE_URL}/news`,        changeFrequency: 'weekly',  priority: 0.8 },
+    { url: `${SITE_URL}/c25k`,        changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${SITE_URL}/contact`,     changeFrequency: 'yearly',  priority: 0.5 },
     { url: `${SITE_URL}/privacy`,     changeFrequency: 'yearly',  priority: 0.3 },
   ]
+
+  // Per-route pages (catalogue routes only - photo-only slugs have no page)
+  const routePages: MetadataRoute.Sitemap = ROUTES.map(r => ({
+    url: `${SITE_URL}/routes/${r.slug}`,
+    changeFrequency: 'yearly' as const,
+    priority: 0.6,
+  }))
 
   // Published news/roundup posts
   const { data: posts } = await supabaseAdmin()
     .from('posts')
     .select('slug, published_at')
-    .eq('published', true)
+    .eq('status', 'published')
     .not('slug', 'is', null)
 
   const postRoutes: MetadataRoute.Sitemap = (posts ?? []).map(p => ({
@@ -44,5 +54,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }))
 
-  return [...staticRoutes, ...postRoutes, ...runRoutes]
+  return [...staticRoutes, ...routePages, ...postRoutes, ...runRoutes]
 }

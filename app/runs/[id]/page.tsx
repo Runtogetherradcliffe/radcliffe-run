@@ -47,6 +47,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   return {
     title,
     description,
+    alternates: { canonical: `/runs/${id}` },
     openGraph: { title, description, type: 'website' },
     twitter: { card: 'summary', title, description },
   }
@@ -113,7 +114,7 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
     organizer: {
       '@type': 'SportsClub',
       name: 'Run Together Radcliffe',
-      url: 'https://radcliffe.run',
+      url: 'https://www.radcliffe.run',
     },
   }
 

@@ -5,6 +5,7 @@ import { getRouteOverrides } from '@/lib/routeDescriptions'
 export const metadata = {
   title: 'Running Routes in Radcliffe, Bury | radcliffe.run',
   description: 'Explore our free library of running and walking routes around Radcliffe, Bury, Greater Manchester - with maps, distances and GPX downloads.',
+  alternates: { canonical: '/routes' },
 }
 
 export default async function RoutesPage() {

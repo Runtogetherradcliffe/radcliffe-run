@@ -17,6 +17,6 @@ export default function robots(): MetadataRoute.Robots {
         ],
       },
     ],
-    sitemap: 'https://radcliffe.run/sitemap.xml',
+    sitemap: 'https://www.radcliffe.run/sitemap.xml',
   }
 }

@@ -26,7 +26,7 @@ export interface EmailData {
   customText:     string | null
   showClosing:    boolean
   closingText:    string
-  siteUrl:        string      // e.g. 'https://radcliffe.run'
+  siteUrl:        string      // e.g. 'https://www.radcliffe.run'
 }
 
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December']

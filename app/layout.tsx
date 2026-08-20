@@ -11,11 +11,14 @@ const SITE_DESCRIPTION = 'A free, friendly running club and group in Radcliffe, 
 export const metadata: Metadata = {
   title: SITE_TITLE,
   description: SITE_DESCRIPTION,
-  metadataBase: new URL('https://radcliffe.run'),
+  // www is the canonical host: the apex 307-redirects to www at Vercel, and
+  // external cron callers depend on that direction (see AGENTS.md). Keep every
+  // absolute URL here, in JSON-LD and in NEXT_PUBLIC_SITE_URL on the www form.
+  metadataBase: new URL('https://www.radcliffe.run'),
   openGraph: {
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
-    url: 'https://radcliffe.run',
+    url: 'https://www.radcliffe.run',
     siteName: 'radcliffe.run',
     locale: 'en_GB',
     type: 'website',
