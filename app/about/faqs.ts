@@ -62,7 +62,7 @@ export const FAQS: FaqItem[] = [
   },
   {
     q: 'Can I bring my dog?',
-    a: 'We\'re sorry, but dogs can\'t come along on our group runs. We\'d love to meet them before or after, though.',
+    a: 'We\'re sorry, but dogs can\'t come along on our group runs.',
   },
   {
     q: 'Is there a minimum age?',
