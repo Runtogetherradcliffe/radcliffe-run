@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Nav from '@/components/layout/Nav'
 import Footer from '@/components/layout/Footer'
 import FaqAccordion from './FaqAccordion'
+import { FAQS } from './faqs'
 import PaceGroups from './PaceGroups'
 import { supabaseAdmin } from '@/lib/supabase'
 import { ROUTES } from '@/lib/routes'
@@ -11,6 +12,7 @@ export const dynamic = 'force-dynamic'
 export const metadata = {
   title: 'About Run Together Radcliffe | radcliffe.run',
   description: 'Find out about Run Together Radcliffe - who we are, when we meet, and how to get involved with our free running club and group in Radcliffe, Bury.',
+  alternates: { canonical: '/about' },
 }
 
 /* ── Stat card ── */
@@ -42,8 +44,22 @@ export default async function AboutPage() {
   const { count } = await supabaseAdmin().from('members').select('*', { count: 'exact', head: true })
   const memberCount = count !== null ? String(count) : '…'
 
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: FAQS.map(f => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
+  }
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, '\\u003c') }}
+      />
       <Nav />
       <main>
 
