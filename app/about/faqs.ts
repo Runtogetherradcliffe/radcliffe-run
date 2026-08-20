@@ -54,7 +54,7 @@ export const FAQS: FaqItem[] = [
   },
   {
     q: 'Is there parking at Radcliffe Market?',
-    a: 'Yes - there is free parking in Radcliffe town centre a short walk from the market, and on-street parking nearby is free in the evening. Give yourself a few minutes to park and walk over before the 7pm start.',
+    a: 'Yes - there is limited parking in the Lidl car park, free parking in Radcliffe town centre a short walk away, and on-street parking nearby is free in the evening. Give yourself a few minutes to park and walk over before the 7pm start.',
   },
   {
     q: 'Can I get there by Metrolink?',
@@ -62,7 +62,7 @@ export const FAQS: FaqItem[] = [
   },
   {
     q: 'Can I bring my dog or a running buggy?',
-    a: 'Please check with us first via the contact page or the WhatsApp group. It usually depends on the week\'s route - some of our trail routes suit dogs and buggies better than the road ones - and the run leaders can tell you what\'s planned.',
+    a: 'We\'re sorry, but dogs can\'t come along on our group runs. If you\'d like to bring a running buggy, please check with us first via the contact page or the WhatsApp group - it depends on the week\'s route, and the run leaders can tell you what\'s planned.',
   },
   {
     q: 'Is there a minimum age?',
