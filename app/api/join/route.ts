@@ -18,7 +18,7 @@ async function sendWelcomeEmail(firstName: string, email: string, cohort?: strin
   const apiKey = process.env.BREVO_API_KEY
   const from   = process.env.EMAIL_FROM
   const fromName = process.env.EMAIL_FROM_NAME ?? 'Run Together Radcliffe'
-  const siteUrl  = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://radcliffe.run'
+  const siteUrl  = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.radcliffe.run'
   if (!apiKey || !from) return
 
   // Fetch next upcoming run

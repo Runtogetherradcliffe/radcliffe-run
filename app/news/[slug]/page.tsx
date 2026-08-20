@@ -49,6 +49,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title,
     description,
+    alternates: { canonical: `/news/${slug}` },
     openGraph: { title, description, type: 'article', publishedTime: post.published_at ?? undefined },
     twitter: { card: 'summary', title, description },
   }
@@ -79,8 +80,23 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
   const accentColor = TYPE_COLOR[post.type] ?? '#f5a623'
 
+  const postJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: post.title,
+    ...(post.summary ? { description: post.summary } : {}),
+    ...(post.published_at ? { datePublished: post.published_at } : {}),
+    url: `https://www.radcliffe.run/news/${post.slug ?? post.id}`,
+    author: { '@type': 'Organization', name: 'Run Together Radcliffe' },
+    publisher: { '@type': 'Organization', name: 'Run Together Radcliffe', url: 'https://www.radcliffe.run' },
+  }
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(postJsonLd).replace(/</g, '\\u003c') }}
+      />
       <Nav />
       <main style={{ minHeight: '100vh' }}>
         <article style={{ maxWidth: 680, margin: '0 auto', padding: '32px 24px 80px' }}>

@@ -1,12 +1,12 @@
 import Nav from '@/components/layout/Nav'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
 import { supabaseAdmin } from '@/lib/supabase'
 import { createClient } from '@/utils/supabase/server'
 
 export const metadata = {
   title: 'Couch to 5K in Radcliffe, Bury | radcliffe.run',
   description: 'The NHS Couch to 5K programme with Run Together Radcliffe. 10 weeks, two group sessions a week, and a 5K finish line ahead.',
+  alternates: { canonical: '/c25k' },
 }
 
 /* ── Programme data ── */
@@ -127,11 +127,14 @@ export default async function C25KPage() {
     .select('c25k_enabled, c25k_registration_open, c25k_start_date, c25k_cohort_label')
     .single()
 
-  if (!settings?.c25k_enabled) notFound()
-
-  const registrationOpen = settings.c25k_registration_open ?? false
-  const startDate        = settings.c25k_start_date ?? null
-  const cohortLabel      = settings.c25k_cohort_label ?? null
+  // This page stays up between cohorts (it ranks for "couch to 5k Radcliffe")
+  // with the registration state handled inside it. When the module is disabled
+  // the stored cohort label and start date belong to the PREVIOUS cohort, so
+  // suppress them rather than advertising a date that has already passed.
+  const enabled          = settings?.c25k_enabled ?? false
+  const registrationOpen = enabled && (settings?.c25k_registration_open ?? false)
+  const startDate        = enabled ? (settings?.c25k_start_date ?? null) : null
+  const cohortLabel      = enabled ? (settings?.c25k_cohort_label ?? null) : null
 
   // Check visitor's membership status
   const supabase = await createClient()

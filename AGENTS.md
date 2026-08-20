@@ -132,10 +132,13 @@ matching doc edit; treat that reminder as a blocking checklist item, not a sugge
   emails are sent by Supabase Auth via Resend SMTP configured in the Supabase dashboard,
   NOT in this codebase. Do not remove the Resend account or its `resend._domainkey` DNS
   record - sign-in would break for everyone.
-- **Route links in emails must be `/routes#<slug>`, never `/routes/<slug>`.** The routes
-  page selects routes client-side via the URL hash; there is no per-route page. Path-style
-  links 404'd in a sent newsletter. `app/routes/[slug]/page.tsx` exists only to redirect
-  old path-style links to the hash form - keep it.
+- **Route links: both `/routes#<slug>` and `/routes/<slug>` now work (Aug 2026).**
+  `app/routes/[slug]/page.tsx` was redirect-only (path-style links once 404'd in a sent
+  newsletter); it now renders a real per-route page for every CATALOGUE slug (description,
+  map image, GPX, Place JSON-LD) so each route has a citable URL for search/AI. A slug not
+  in `ROUTES` (a typo, or a photo-only run slug like `social--boggart-hole-clough`) still
+  redirects to `/routes` - keep that fallback. Emails keep using the hash form by
+  convention (it lands on the interactive map), but path links no longer break.
 - The newsletter sends one Brevo request per member (bounded concurrency 5), because
   Brevo's batch `messageVersions` cannot vary HTML or headers per recipient and each
   member needs a personalised unsubscribe link. Keep `maxDuration = 60` on the cron and
@@ -220,6 +223,14 @@ matching doc edit; treat that reminder as a blocking checklist item, not a sugge
   the apex. `radcliffe.run` 307-redirects to `www`, and external callers do not follow the
   redirect and drop the `Authorization` header across it. The cron routes authenticate via
   `Authorization: Bearer <CRON_SECRET>`.
+- **`https://www.radcliffe.run` is the canonical host (Aug 2026)** - the apex redirects to
+  www, and flipping that direction in Vercel would break every external cron caller (see
+  the bullet above), so www it is. Consequences: `metadataBase`, per-page
+  `alternates.canonical`, all JSON-LD urls, `robots.ts`, the sitemap and `public/llms.txt`
+  all use the www form, and `NEXT_PUBLIC_SITE_URL` in Vercel must be set to
+  `https://www.radcliffe.run` (it feeds the sitemap and email links). Never reintroduce a
+  bare-apex absolute URL in code, and give every new public page an
+  `alternates.canonical` entry.
 - **Not every cron is a Vercel cron.** `/api/cron/send-push` and `/api/cron/awards` are
   deliberately NOT in `vercel.json` - they are triggered by their own cron-job.org jobs
   (same `CRON_SECRET` bearer auth, same www-host rule above), specifically so they don't
