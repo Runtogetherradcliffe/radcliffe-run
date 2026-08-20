@@ -61,8 +61,8 @@ export const FAQS: FaqItem[] = [
     a: 'Yes. Radcliffe Metrolink stop is on the Bury line and is about a 10-minute walk from Radcliffe Market, so the tram works well from Bury, Whitefield, Prestwich and Manchester. Trams run late enough to get you home after the run.',
   },
   {
-    q: 'Can I bring my dog or a running buggy?',
-    a: 'We\'re sorry, but dogs can\'t come along on our group runs. If you\'d like to bring a running buggy, please check with us first via the contact page or the WhatsApp group - it depends on the week\'s route, and the run leaders can tell you what\'s planned.',
+    q: 'Can I bring my dog?',
+    a: 'We\'re sorry, but dogs can\'t come along on our group runs. We\'d love to meet them before or after, though.',
   },
   {
     q: 'Is there a minimum age?',
