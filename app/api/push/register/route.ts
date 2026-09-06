@@ -1,14 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getUserFromRequest } from '@/lib/apiAuth'
 import { supabaseAdmin } from '@/lib/supabase'
+import { pushDeviceFields } from '@/lib/pushDeviceFields'
 
 /**
  * POST /api/push/register
- * Upserts a native Expo push token: { token, platform, prefs }.
+ * Upserts a native Expo push token:
+ *   { token, platform, prefs, runtime?, update_id?, app_build? }.
  * Mirrors /api/push/subscribe (web push): no account needed - the member
  * link is attached opportunistically when the caller is signed in (cookie
  * or Bearer) so GDPR cleanup can cascade. last_seen_at refreshes on every
  * call; the GDPR cron prunes tokens unseen for ~12 months.
+ *
+ * runtime / update_id / app_build (Sept 2026) describe what the device is
+ * running (lib/pushDeviceFields.ts); they make push_tokens the per-device
+ * fleet record for both platforms. Optional, never a reason to refuse.
  */
 export async function POST(req: NextRequest) {
   let body: {
@@ -23,6 +29,7 @@ export async function POST(req: NextRequest) {
   }
 
   const { token, platform, prefs } = body
+  const device = pushDeviceFields(body)
   if (!token || typeof token !== 'string' || !token.startsWith('ExponentPushToken')) {
     return NextResponse.json({ error: 'Invalid token' }, { status: 400 })
   }
@@ -58,6 +65,9 @@ export async function POST(req: NextRequest) {
           alerts: prefs?.alerts !== false,
         },
         last_seen_at: new Date().toISOString(),
+        runtime: device.runtime,
+        update_id: device.update_id,
+        app_build: device.app_build,
       },
       { onConflict: 'token' }
     )
