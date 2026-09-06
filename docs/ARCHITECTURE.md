@@ -207,7 +207,11 @@ server-side, not a Postgres role):
   the per-device installed-runtime record for BOTH platforms - Play Console
   has no per-tester version view - so retiring an entry from rtr-app's
   `fleet-runtimes.json` is a query here: `select platform, runtime,
-  app_build, count(*) from push_tokens group by 1,2,3`.
+  app_build, count(*) from push_tokens group by 1,2,3`. Coverage is
+  push-enabled phones only: the app registers a token only after the
+  notifications primer with the OS permission granted, so a phone that never
+  opted in (or had the permission revoked) has no row and tells you nothing.
+  Accepted limit, 6 Sept 2026 (AGENTS.md).
 - `push_send_log` - idempotency claim-lock for automated pushes:
   `UNIQUE(kind, ref_date)`; the insert IS the claim.
 
