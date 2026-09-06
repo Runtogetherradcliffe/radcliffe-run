@@ -71,13 +71,20 @@ matching doc edit; treat that reminder as a blocking checklist item, not a sugge
   RLS enabled, NO policies; all access via leader-gated or validated API routes), plus
   the recognition tables `attendance_seeds`, `run_leadership`, `awards` (Jul 2026, same
   treatment - attendance history is personal data).
-- **`push_tokens` is the per-device installed-runtime record (Sept 2026).** The
-  native app sends `runtime`, `update_id`, `app_build` on every
-  `POST /api/push/register`; the route stores them (nullable, bad values become
-  NULL, never a refusal - `lib/pushDeviceFields.ts`). When the question is "which
-  phones are still on the old build", query this table rather than the Play
-  Console (which has no per-tester version view); rtr-app's `fleet-runtimes.json`
-  retirements key off it. Keep the fields optional: older app versions send none.
+- **`push_tokens` is the per-device installed-runtime record (Sept 2026) - for
+  PUSH-ENABLED phones only.** The native app sends `runtime`, `update_id`,
+  `app_build` on every `POST /api/push/register`; the route stores them
+  (nullable, bad values become NULL, never a refusal - `lib/pushDeviceFields.ts`).
+  When the question is "which phones are still on the old build", query this
+  table rather than the Play Console (which has no per-tester version view);
+  rtr-app's `fleet-runtimes.json` retirements key off it. COVERAGE LIMIT, found
+  6 Sept 2026 with a real tester: a phone registers only if it completed the
+  notifications primer AND the OS permission is granted - the app's launch sync
+  returns early otherwise and nothing else sends the fields. So a phone missing
+  from this table may be on any runtime; it is not evidence of anything. Paul's
+  decision (6 Sept 2026): accept the limit for now (leaders need pushes for
+  Thursday announcements anyway); revisit before the December Play closed test.
+  Keep the fields optional: older app versions send none.
 - **Attendance counting: the unit is a NIGHT, never an attendance row.** 8k attendance
   is recorded against the 5k anchor run row and Jeffing has no row of its own, so any
   lifetime count MUST be `COUNT(DISTINCT runs.date)` over qualifying runs
