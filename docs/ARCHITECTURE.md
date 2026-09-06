@@ -197,7 +197,17 @@ server-side, not a Postgres role):
 - `push_tokens` - Expo push tokens (iOS + Android), nullable `member_id`
   (CASCADE), `prefs` jsonb `{weekly, alerts}`, `last_seen_at` (GDPR cron
   prunes > 1 year unseen). Registered via `POST /api/push/register`
-  (`supabase-migration-push-tokens.sql`).
+  (`supabase-migration-push-tokens.sql`). Since Sept 2026 also `runtime`,
+  `update_id`, `app_build` (all nullable text,
+  `supabase-migration-push-device-fields.sql`): what the device reported it
+  was running at its last registration - the Expo Updates runtime
+  fingerprint, the applied OTA update id (NULL = embedded bundle) and the
+  native build id (iOS build number / Android versionCode). Validated by
+  `lib/pushDeviceFields.ts` (bad values become NULL, never a 400). This is
+  the per-device installed-runtime record for BOTH platforms - Play Console
+  has no per-tester version view - so retiring an entry from rtr-app's
+  `fleet-runtimes.json` is a query here: `select platform, runtime,
+  app_build, count(*) from push_tokens group by 1,2,3`.
 - `push_send_log` - idempotency claim-lock for automated pushes:
   `UNIQUE(kind, ref_date)`; the insert IS the claim.
 
