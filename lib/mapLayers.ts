@@ -1,8 +1,16 @@
 /**
- * Shared map base-layer definitions for the route maps (routes library + run
- * detail page). Modern base maps work without any key; the historic Ordnance
- * Survey overlays are served by MapTiler from the National Library of Scotland
- * archive and need a free NEXT_PUBLIC_MAPTILER_KEY to render.
+ * Shared map base-layer definitions for the route maps (routes library, walks,
+ * run detail page). The Standard street layer and the historic Ordnance Survey
+ * overlays are served by MapTiler on NEXT_PUBLIC_MAPTILER_KEY (origin-restricted
+ * to the site's hosts); the other modern layers are keyless or on their own key.
+ *
+ * Standard moved from CARTO Voyager to MapTiler's "openstreetmap" raster on
+ * 16 Sept 2026: CARTO began watermarking keyless tiles with "API KEY REQUIRED"
+ * and is retiring raster tiles altogether, and the native app already draws its
+ * maps from the same MapTiler style, so site and app now share one provider and
+ * one look. Without the key (a bare dev checkout) Standard falls back to the
+ * public OpenStreetMap tile server so the map still renders; that fallback is
+ * for local development only - OSM's tile policy is not for production sites.
  */
 
 const TF_KEY       = process.env.NEXT_PUBLIC_THUNDERFOREST_API_KEY
@@ -23,9 +31,18 @@ export type MapLayer = {
   historic?: boolean
 }
 
-// Modern base maps - all render without a MapTiler key.
+const MT_ATTR = `© <a href="https://www.maptiler.com/copyright/">MapTiler</a> · ${OSM_ATTR}`
+
+// Standard: MapTiler's OpenStreetMap-styled raster (the same style the native
+// app renders as vector), 256px tiles, {r} -> "@2x" on retina screens.
+const STANDARD_URL = MAPTILER_KEY
+  ? `https://api.maptiler.com/maps/openstreetmap/256/{z}/{x}/{y}{r}.png?key=${MAPTILER_KEY}`
+  : 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+const STANDARD_ATTR = MAPTILER_KEY ? MT_ATTR : OSM_ATTR
+
+// Modern base maps. Standard needs the MapTiler key in production (see above).
 export const BASE_LAYERS: MapLayer[] = [
-  { id: 'road',      label: 'Standard',    sub: 'Street map',        url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',                              attr: '© OpenStreetMap © CARTO',                  maxZoom: 19 },
+  { id: 'road',      label: 'Standard',    sub: 'Street map',        url: STANDARD_URL,                                                                                             attr: STANDARD_ATTR,                              maxZoom: 19 },
   { id: 'outdoors',  label: 'Outdoors',    sub: 'Trails & terrain',  url: `https://api.thunderforest.com/outdoors/{z}/{x}/{y}.png?apikey=${TF_KEY}`,                                attr: `© <a href="https://www.thunderforest.com">Thunderforest</a> · ${OSM_ATTR}`, maxZoom: 19 },
   { id: 'satellite', label: 'Satellite',   sub: 'Aerial imagery',    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',          attr: 'Imagery © Esri',                           maxZoom: 19 },
   { id: 'topo',      label: 'Topographic', sub: 'Contours & relief', url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',                                                      attr: `© OpenTopoMap (CC-BY-SA) · ${OSM_ATTR}`,   maxZoom: 17 },
