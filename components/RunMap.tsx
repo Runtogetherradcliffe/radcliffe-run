@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { loadLeaflet, type Leaflet, type LeafletContainer } from '@/lib/leaflet'
+import { resolveLayer } from '@/lib/mapLayers'
 
 function haversine(a: [number, number], b: [number, number]): number {
   const R = 6371000
@@ -54,10 +55,10 @@ export default function RunMap({ gpxFile, center, onTour = false, meetingLabel =
       const map = Lx.map(mapRef.current, { center, zoom: 14, zoomControl: true })
       mapObjRef.current = map
 
-      Lx.tileLayer(
-        'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-        { attribution: '© OpenStreetMap © CARTO', maxZoom: 19 }
-      ).addTo(map)
+      // Same Standard layer as the layer picker (lib/mapLayers.ts) - one
+      // definition, so a provider change happens in one place.
+      const road = resolveLayer('road')
+      Lx.tileLayer(road.url, { attribution: road.attr, maxZoom: road.maxZoom }).addTo(map)
 
       // Meeting point marker - will be placed after GPX loads for on-tour runs
       const meetIcon = Lx.divIcon({
