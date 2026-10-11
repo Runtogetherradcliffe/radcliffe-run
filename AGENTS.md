@@ -146,6 +146,17 @@ matching doc edit; treat that reminder as a blocking checklist item, not a sugge
   emails are sent by Supabase Auth via Resend SMTP configured in the Supabase dashboard,
   NOT in this codebase. Do not remove the Resend account or its `resend._domainkey` DNS
   record - sign-in would break for everyone.
+- **Route descriptions: road routes describe the ROUTE (Paul, 11 Oct 2026).** The
+  streets, climbs and descents - not parks, woods or the canal beside the road. Name a
+  feature only when it IS the route (the Banana Path). Generate the facts with
+  `scripts/describe_route.py <slug>`, which since Oct 2026 matches features against their
+  real shape (`features_on_route` = inside/alongside >= 200 m; `features_passed` must never
+  be written as "through"/"along") and lists the actual street sequence. The old version
+  used bounding rectangles, so every road description written from it in April claimed
+  parks and a towpath the routes never use. It fails loudly (exit 2) when Overpass is
+  down - an empty result is never "no features". Descriptions saved in the admin Routes
+  page (`route_descriptions.description`) override the catalogue text in `lib/routes.ts`;
+  Paul's own overrides are his words - do not overwrite them in bulk.
 - **Route links: both `/routes#<slug>` and `/routes/<slug>` now work (Aug 2026).**
   `app/routes/[slug]/page.tsx` was redirect-only (path-style links once 404'd in a sent
   newsletter); it now renders a real per-route page for every CATALOGUE slug (description,
