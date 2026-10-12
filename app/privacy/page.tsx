@@ -92,7 +92,7 @@ export default async function PrivacyPage({ searchParams }: Props) {
                   ['Email preferences', 'Determine whether to send you club emails', 'Consent'],
                   ['Photo consent', 'Determine whether to include you in group photos shared online', 'Consent'],
                   ['Run attendance (the runs a run leader checks you in to) and the milestones it earns', 'Keep the club register, count your runs and mark your milestones', 'Legitimate interests'],
-                  ['Milestone sharing preference', 'Decide whether your milestones are celebrated by name with the club. Run leaders see run counts and milestones on the register whatever this setting is', 'Consent'],
+                  ['Milestone sharing preference', 'Decide whether your milestones are celebrated by name with the club. Whatever this setting is, the register shows run leaders when tonight&rsquo;s run takes you to a milestone', 'Consent'],
                   ['Notification address for your phone or browser', 'Send you the run announcements and alerts you switch on', 'Consent'],
                   ['The app version your phone is running', 'Check that every phone has received the latest app update', 'Legitimate interests'],
                   ['App crash and error reports', 'Find and fix faults in the app. Reports hold technical details such as phone model, system version and what the app was doing - never your name, email or location', 'Legitimate interests'],
