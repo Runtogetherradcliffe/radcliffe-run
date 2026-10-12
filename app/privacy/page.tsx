@@ -50,10 +50,10 @@ export default async function PrivacyPage({ searchParams }: Props) {
             Privacy Policy
           </h1>
           <p style={paraStyle}>
-            Last updated: April 2026
+            Last updated: October 2026
           </p>
           <p style={paraStyle}>
-            radcliffe.run (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;) is a free community running group based in Radcliffe, Greater Manchester. This policy explains what personal data we collect, why we collect it, and your rights under UK data protection law (UK GDPR and the Data Protection Act 2018).
+            radcliffe.run (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;) is a free community running group based in Radcliffe, Greater Manchester. This policy covers this website and the radcliffe.run app for iPhone and Android. It explains what personal data we collect, why we collect it, and your rights under UK data protection law (UK GDPR and the Data Protection Act 2018).
           </p>
           <p style={paraStyle}>
             If you have any questions, contact us at{' '}
@@ -65,13 +65,13 @@ export default async function PrivacyPage({ searchParams }: Props) {
           {/* 1. Who we are */}
           <p style={sectionHeadStyle}>1. Who we are</p>
           <p style={paraStyle}>
-            radcliffe.run is a free community running group based in Radcliffe, Greater Manchester. We are the data controller for the personal data collected through this website.
+            radcliffe.run is a free community running group based in Radcliffe, Greater Manchester. We are the data controller for the personal data collected through this website and our app.
           </p>
 
           {/* 2. What we collect */}
           <p style={sectionHeadStyle}>2. What data we collect and why</p>
           <p style={paraStyle}>
-            We collect the following categories of data when you register, sign in, or use the site:
+            We collect the following categories of data when you register, sign in, or use the site or app:
           </p>
 
           <div style={{ border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden', marginBottom: 24 }}>
@@ -91,6 +91,11 @@ export default async function PrivacyPage({ searchParams }: Props) {
                   ['Health / medical notes', 'Help run leaders support you safely during runs', 'Explicit consent (Article 9)'],
                   ['Email preferences', 'Determine whether to send you club emails', 'Consent'],
                   ['Photo consent', 'Determine whether to include you in group photos shared online', 'Consent'],
+                  ['Run attendance (the runs a run leader checks you in to) and the milestones it earns', 'Keep the club register, count your runs and mark your milestones', 'Legitimate interests'],
+                  ['Milestone sharing preference', 'Decide whether your milestones are celebrated by name with the club. Whatever this setting is, the register shows run leaders when tonight&rsquo;s run takes you to a milestone', 'Consent'],
+                  ['Notification address for your phone or browser', 'Send you the run announcements and alerts you switch on', 'Consent'],
+                  ['The app version your phone is running', 'Check that every phone has received the latest app update', 'Legitimate interests'],
+                  ['App crash and error reports', 'Find and fix faults in the app. Reports hold technical details such as phone model, system version and what the app was doing - never your name, email or location', 'Legitimate interests'],
                 ].map(([data, purpose, basis], i, arr) => (
                   <tr key={i} style={i < arr.length - 1 ? tableRowStyle : {}}>
                     <td style={tdLabelStyle}>{data}</td>
@@ -115,10 +120,29 @@ export default async function PrivacyPage({ searchParams }: Props) {
             We hold this data on the basis of legitimate interests: the safety benefit of being able to contact a next of kin in an emergency clearly outweighs any privacy impact given the limited access and protective purpose. We recommend you let your emergency contact know their details are held.
           </p>
 
-          {/* 4. Who we share data with */}
-          <p style={sectionHeadStyle}>4. Who we share your data with</p>
+
+          {/* 4. The app */}
+          <p style={sectionHeadStyle}>4. The radcliffe.run app</p>
           <p style={paraStyle}>
-            We do not sell or share your data with third parties for marketing. We use the following services to operate the site:
+            <strong style={{ color: 'var(--dim)' }}>Location.</strong> When you use &ldquo;Track this run&rdquo;, the app uses your phone&rsquo;s location to draw your trail on the map and to alert you if you go off route, including with the screen off. Your position and trail are processed on your phone only and are never sent to us, and the trail is discarded when you stop tracking. As with any map, the app downloads map images for the area on screen from the map providers listed in section 5.
+          </p>
+          <p style={paraStyle}>
+            <strong style={{ color: 'var(--dim)' }}>Calendar.</strong> &ldquo;Add to calendar&rdquo; opens your phone&rsquo;s own calendar screen for you to save the run. The app does not read your calendar.
+          </p>
+          <p style={paraStyle}>
+            <strong style={{ color: 'var(--dim)' }}>Notifications.</strong> If you allow notifications, your phone gives the app a notification address, which we store with the app version your phone is running so we can send you run announcements and check updates have reached everyone. Turn notifications off at any time in the app or in your phone&rsquo;s settings.
+          </p>
+          <p style={paraStyle}>
+            <strong style={{ color: 'var(--dim)' }}>Stored on your phone.</strong> The app keeps your sign-in, and a copy of club information such as upcoming runs so it works with a poor signal, in its own storage on your phone. Signing out clears both.
+          </p>
+          <p style={paraStyle}>
+            <strong style={{ color: 'var(--dim)' }}>Deleting your account.</strong> You can delete your account yourself in the app, under Settings. This removes your membership, emergency contact and medical details, and your sign-in.
+          </p>
+
+          {/* 5. Who we share data with */}
+          <p style={sectionHeadStyle}>5. Who we share your data with</p>
+          <p style={paraStyle}>
+            We do not sell or share your data with third parties for marketing. We use the following services to operate the site and app:
           </p>
           <div style={{ border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden', marginBottom: 24 }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -133,7 +157,11 @@ export default async function PrivacyPage({ searchParams }: Props) {
                   ['Supabase', 'Database and authentication - stores all member data on servers in the EU'],
                   ['Brevo', 'Email delivery: your email address is passed to Brevo, an EU-based provider, when we send you club emails'],
                   ['Vercel', 'Website hosting - processes requests to serve the site'],
-                  ['Map providers', 'Map display: when you view a route or walk map, your browser loads map tiles directly from MapTiler, Thunderforest, Esri and OpenTopoMap, which receive your IP address in order to deliver the imagery'],
+                  ['Map providers', 'Map display: when you view a route or walk map, your browser or the app loads map tiles directly from MapTiler, Thunderforest, Esri and OpenTopoMap, which receive your IP address in order to deliver the imagery'],
+                  ['Expo', 'App updates and notifications: delivers updates to the app and passes app notifications on to Apple and Google. Receives your phone notification address and the message, not your name or email. Based in the USA'],
+                  ['Apple and Google', 'Deliver notifications to iPhones and Android phones, and distribute the app through the App Store and Google Play'],
+                  ['Browser push services', 'If you turn on notifications in your web browser, the browser maker (for example Google, Apple, Mozilla or Microsoft) delivers them'],
+                  ['Sentry', 'App crash and error reports, stored on servers in the EU'],
                 ].map(([service, purpose], i, arr) => (
                   <tr key={i} style={i < arr.length - 1 ? tableRowStyle : {}}>
                     <td style={tdLabelStyle}>{service}</td>
@@ -144,11 +172,11 @@ export default async function PrivacyPage({ searchParams }: Props) {
             </table>
           </div>
           <p style={paraStyle}>
-            Emergency contact and health data is also accessible to verified run leaders within the club.
+            Emergency contact and health data is also accessible to verified run leaders within the club. Run leaders using the app keep an encrypted copy on their phone so it is available at a run with no signal; it is removed when they sign out or their leader access ends.
           </p>
 
-          {/* 5. How long we keep your data */}
-          <p style={sectionHeadStyle}>5. How long we keep your data</p>
+          {/* 6. How long we keep your data */}
+          <p style={sectionHeadStyle}>6. How long we keep your data</p>
           <div style={{ border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden', marginBottom: 24 }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
@@ -163,6 +191,11 @@ export default async function PrivacyPage({ searchParams }: Props) {
                   ['Emergency contact details', 'Deleted immediately when you leave the group or request erasure.'],
                   ['Health / medical notes', 'Deleted immediately when you leave the group or withdraw consent.'],
                   ['Email send logs', 'Retained for up to 1 year for troubleshooting purposes.'],
+                  ['Run attendance and milestones', 'Kept while you are a member. Deleted with your membership record.'],
+                  ['Register correction records', 'When a run leader removes a check-in, a short record is kept so the register can be checked. Once your membership record is deleted it can no longer be linked to you.'],
+                  ['App notification address and app version', 'Deleted when you sign out of the app or delete your account, and in any case after 1 year without use.'],
+                  ['Browser notification subscription', 'Deleted when you delete your account, or when your browser reports that the subscription has ended.'],
+                  ['App crash reports', 'Deleted automatically by Sentry after 30 days.'],
                 ].map(([data, retention], i, arr) => (
                   <tr key={i} style={i < arr.length - 1 ? tableRowStyle : {}}>
                     <td style={tdLabelStyle}>{data}</td>
@@ -173,14 +206,14 @@ export default async function PrivacyPage({ searchParams }: Props) {
             </table>
           </div>
 
-          {/* 6. Cookies */}
-          <p style={sectionHeadStyle}>6. Cookies</p>
+          {/* 7. Cookies */}
+          <p style={sectionHeadStyle}>7. Cookies</p>
           <p style={paraStyle}>
-            We use only strictly necessary cookies to keep you signed in. We do not use advertising, tracking, or analytics cookies. No cookie consent banner is required.
+            We use only strictly necessary cookies to keep you signed in. We do not use advertising, tracking, or analytics cookies. No cookie consent banner is required. The app does not use cookies; it keeps your sign-in in its own storage on your phone.
           </p>
 
-          {/* 7. Your rights */}
-          <p style={sectionHeadStyle}>7. Your rights</p>
+          {/* 8. Your rights */}
+          <p style={sectionHeadStyle}>8. Your rights</p>
           <p style={paraStyle}>
             Under UK GDPR you have the following rights:
           </p>
@@ -188,7 +221,7 @@ export default async function PrivacyPage({ searchParams }: Props) {
             {[
               ['Right to access', 'Request a copy of the data we hold about you.'],
               ['Right to rectification', 'Ask us to correct inaccurate data. You can update most details yourself on your profile page.'],
-              ['Right to erasure', 'Ask us to delete your data. We will action this within 30 days.'],
+              ['Right to erasure', 'Ask us to delete your data. We will action this within 30 days. You can also delete your account yourself in the app.'],
               ['Right to restriction', 'Ask us to limit how we use your data while a dispute is resolved.'],
               ['Right to object', 'Object to processing based on legitimate interests.'],
               ['Right to withdraw consent', 'Where we rely on consent (emails, photos, health data), you can withdraw it at any time - this does not affect the lawfulness of prior processing.'],
@@ -213,14 +246,14 @@ export default async function PrivacyPage({ searchParams }: Props) {
             or by calling 0303 123 1113.
           </p>
 
-          {/* 8. Age */}
-          <p style={sectionHeadStyle}>8. Age</p>
+          {/* 9. Age */}
+          <p style={sectionHeadStyle}>9. Age</p>
           <p style={paraStyle}>
             Radcliffe.run is open to runners aged 18 and over. Young people aged 12–17 may register with parental or guardian consent, with a parent or guardian completing the registration form on their behalf. We do not knowingly collect data from children under 12.
           </p>
 
-          {/* 9. Changes */}
-          <p style={sectionHeadStyle}>9. Changes to this policy</p>
+          {/* 10. Changes */}
+          <p style={sectionHeadStyle}>10. Changes to this policy</p>
           <p style={paraStyle}>
             We may update this policy from time to time. The date at the top of this page shows when it was last revised. Significant changes will be communicated by email to registered members.
           </p>
