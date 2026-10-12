@@ -195,7 +195,7 @@ export default async function PrivacyPage({ searchParams }: Props) {
                   ['Register correction records', 'When a run leader removes a check-in, a short record is kept so the register can be checked. Once your membership record is deleted it can no longer be linked to you.'],
                   ['App notification address and app version', 'Deleted when you sign out of the app or delete your account, and in any case after 1 year without use.'],
                   ['Browser notification subscription', 'Deleted when you delete your account, or when your browser reports that the subscription has ended.'],
-                  ['App crash reports', 'Deleted automatically by Sentry after at most 90 days.'],
+                  ['App crash reports', 'Deleted automatically by Sentry after 30 days.'],
                 ].map(([data, retention], i, arr) => (
                   <tr key={i} style={i < arr.length - 1 ? tableRowStyle : {}}>
                     <td style={tdLabelStyle}>{data}</td>
