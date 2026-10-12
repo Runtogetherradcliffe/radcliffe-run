@@ -92,7 +92,7 @@ export default async function PrivacyPage({ searchParams }: Props) {
                   ['Email preferences', 'Determine whether to send you club emails', 'Consent'],
                   ['Photo consent', 'Determine whether to include you in group photos shared online', 'Consent'],
                   ['Run attendance (the runs a run leader checks you in to) and the milestones it earns', 'Keep the club register, count your runs and mark your milestones', 'Legitimate interests'],
-                  ['Milestone sharing preference', 'Decide whether your milestones are celebrated by name with the club', 'Consent'],
+                  ['Milestone sharing preference', 'Decide whether your milestones are celebrated by name with the club. Run leaders see run counts and milestones on the register whatever this setting is', 'Consent'],
                   ['Notification address for your phone or browser', 'Send you the run announcements and alerts you switch on', 'Consent'],
                   ['The app version your phone is running', 'Check that every phone has received the latest app update', 'Legitimate interests'],
                   ['App crash and error reports', 'Find and fix faults in the app. Reports hold technical details such as phone model, system version and what the app was doing - never your name, email or location', 'Legitimate interests'],
@@ -124,7 +124,7 @@ export default async function PrivacyPage({ searchParams }: Props) {
           {/* 4. The app */}
           <p style={sectionHeadStyle}>4. The radcliffe.run app</p>
           <p style={paraStyle}>
-            <strong style={{ color: 'var(--dim)' }}>Location.</strong> When you use &ldquo;Track this run&rdquo;, the app uses your phone&rsquo;s location to draw your trail on the map and to alert you if you go off route, including with the screen off. Your location is processed on your phone only. It is never sent to us or anyone else, and the trail is discarded when you stop tracking.
+            <strong style={{ color: 'var(--dim)' }}>Location.</strong> When you use &ldquo;Track this run&rdquo;, the app uses your phone&rsquo;s location to draw your trail on the map and to alert you if you go off route, including with the screen off. Your position and trail are processed on your phone only and are never sent to us, and the trail is discarded when you stop tracking. As with any map, the app downloads map images for the area on screen from the map providers listed in section 5.
           </p>
           <p style={paraStyle}>
             <strong style={{ color: 'var(--dim)' }}>Calendar.</strong> &ldquo;Add to calendar&rdquo; opens your phone&rsquo;s own calendar screen for you to save the run. The app does not read your calendar.
@@ -133,7 +133,7 @@ export default async function PrivacyPage({ searchParams }: Props) {
             <strong style={{ color: 'var(--dim)' }}>Notifications.</strong> If you allow notifications, your phone gives the app a notification address, which we store with the app version your phone is running so we can send you run announcements and check updates have reached everyone. Turn notifications off at any time in the app or in your phone&rsquo;s settings.
           </p>
           <p style={paraStyle}>
-            <strong style={{ color: 'var(--dim)' }}>Stored on your phone.</strong> The app keeps your sign-in in your phone&rsquo;s secure storage and caches club information such as upcoming runs so it works with a poor signal. Signing out clears it.
+            <strong style={{ color: 'var(--dim)' }}>Stored on your phone.</strong> The app keeps your sign-in, and a copy of club information such as upcoming runs so it works with a poor signal, in its own storage on your phone. Signing out clears both.
           </p>
           <p style={paraStyle}>
             <strong style={{ color: 'var(--dim)' }}>Deleting your account.</strong> You can delete your account yourself in the app, under Settings. This removes your membership, emergency contact and medical details, and your sign-in.
@@ -159,7 +159,8 @@ export default async function PrivacyPage({ searchParams }: Props) {
                   ['Vercel', 'Website hosting - processes requests to serve the site'],
                   ['Map providers', 'Map display: when you view a route or walk map, your browser or the app loads map tiles directly from MapTiler, Thunderforest, Esri and OpenTopoMap, which receive your IP address in order to deliver the imagery'],
                   ['Expo', 'App updates and notifications: delivers updates to the app and passes app notifications on to Apple and Google. Receives your phone notification address and the message, not your name or email. Based in the USA'],
-                  ['Apple and Google', 'Deliver notifications to iPhones and Android phones, and to web browsers if you turn on browser notifications, and distribute the app through the App Store and Google Play'],
+                  ['Apple and Google', 'Deliver notifications to iPhones and Android phones, and distribute the app through the App Store and Google Play'],
+                  ['Browser push services', 'If you turn on notifications in your web browser, the browser maker (for example Google, Apple, Mozilla or Microsoft) delivers them'],
                   ['Sentry', 'App crash and error reports, stored on servers in the EU'],
                 ].map(([service, purpose], i, arr) => (
                   <tr key={i} style={i < arr.length - 1 ? tableRowStyle : {}}>
@@ -192,7 +193,8 @@ export default async function PrivacyPage({ searchParams }: Props) {
                   ['Email send logs', 'Retained for up to 1 year for troubleshooting purposes.'],
                   ['Run attendance and milestones', 'Kept while you are a member. Deleted with your membership record.'],
                   ['Register correction records', 'When a run leader removes a check-in, a short record is kept so the register can be checked. Once your membership record is deleted it can no longer be linked to you.'],
-                  ['Notification addresses and app version', 'Deleted when you sign out of the app or delete your account, and in any case after 1 year without use.'],
+                  ['App notification address and app version', 'Deleted when you sign out of the app or delete your account, and in any case after 1 year without use.'],
+                  ['Browser notification subscription', 'Deleted when you delete your account, or when your browser reports that the subscription has ended.'],
                   ['App crash reports', 'Deleted automatically by Sentry after at most 90 days.'],
                 ].map(([data, retention], i, arr) => (
                   <tr key={i} style={i < arr.length - 1 ? tableRowStyle : {}}>
@@ -207,7 +209,7 @@ export default async function PrivacyPage({ searchParams }: Props) {
           {/* 7. Cookies */}
           <p style={sectionHeadStyle}>7. Cookies</p>
           <p style={paraStyle}>
-            We use only strictly necessary cookies to keep you signed in. We do not use advertising, tracking, or analytics cookies. No cookie consent banner is required. The app does not use cookies; it keeps your sign-in in your phone&rsquo;s secure storage.
+            We use only strictly necessary cookies to keep you signed in. We do not use advertising, tracking, or analytics cookies. No cookie consent banner is required. The app does not use cookies; it keeps your sign-in in its own storage on your phone.
           </p>
 
           {/* 8. Your rights */}
