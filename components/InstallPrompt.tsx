@@ -1,12 +1,18 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { IOS_APP_URL } from '@/lib/iosApp'
 
 const STORAGE_KEY    = 'rtr-install-dismissed'
+// Separate key for the iPhone app prompt (Nov 2026): people who dismissed the
+// old "Add to Home Screen" prompt should still hear about the native app once.
+const APP_STORAGE_KEY = 'rtr-ios-app-dismissed'
 const VISIT_KEY      = 'rtr-visit-count'
 const VISITS_NEEDED  = 2   // show after this many page loads
 
-type Platform = 'android' | 'ios' | null
+// 'iphone' = the native app on the App Store; 'ios' = Add to Home Screen, kept
+// for iPad, where the app is not offered (it is iPhone-only).
+type Platform = 'android' | 'ios' | 'iphone' | null
 
 /** Chrome's install prompt event - not yet in the standard TS DOM lib. */
 interface BeforeInstallPromptEvent extends Event {
@@ -21,10 +27,20 @@ export default function InstallPrompt() {
   const [installing, setInstalling]   = useState(false)
 
   useEffect(() => {
-    // Already installed (running in standalone mode)
-    if (window.matchMedia('(display-mode: standalone)').matches) return
-    // Already permanently dismissed
-    if (localStorage.getItem(STORAGE_KEY)) return
+    const ua = navigator.userAgent
+    const isIPhone = /iPhone|iPod/.test(ua)
+    const standalone = window.matchMedia('(display-mode: standalone)').matches
+
+    // iPhone: offer the native app - in any browser, and also inside the saved
+    // home-screen site, whose users are the most regular visitors.
+    if (isIPhone) {
+      if (localStorage.getItem(APP_STORAGE_KEY)) return
+    } else {
+      // Already installed (running in standalone mode)
+      if (standalone) return
+      // Already permanently dismissed
+      if (localStorage.getItem(STORAGE_KEY)) return
+    }
 
     // Increment visit counter once per session (not per page navigation)
     const alreadyCountedThisSession = sessionStorage.getItem(VISIT_KEY)
@@ -37,11 +53,16 @@ export default function InstallPrompt() {
     if (newVisits < VISITS_NEEDED) return
 
     // Detect platform
-    const ua = navigator.userAgent
     const isIOS = /iPhone|iPad|iPod/.test(ua) && !(window as Window & { MSStream?: unknown }).MSStream
     const isAndroidChrome = /Android/.test(ua) && /Chrome/.test(ua) && !/Edge|OPR/.test(ua)
 
     /* eslint-disable react-hooks/set-state-in-effect -- one-time platform detection on mount; browser APIs are unavailable during SSR render */
+    if (isIPhone) {
+      setPlatform('iphone')
+      setVisible(true)
+      return
+    }
+
     if (isIOS) {
       // iOS Safari - only show if not already in standalone
       const isSafari = /Safari/.test(ua) && !/CriOS|FxiOS/.test(ua)
@@ -68,7 +89,7 @@ export default function InstallPrompt() {
   }, [])
 
   function dismiss() {
-    localStorage.setItem(STORAGE_KEY, '1')
+    localStorage.setItem(platform === 'iphone' ? APP_STORAGE_KEY : STORAGE_KEY, '1')
     setVisible(false)
   }
 
@@ -96,7 +117,40 @@ export default function InstallPrompt() {
       boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
       fontFamily: 'Inter, sans-serif',
     }}>
-      {platform === 'ios' ? (
+      {platform === 'iphone' ? (
+        /* ── iPhone: the native app on the App Store ── */
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/icon-192.png" alt="" style={{ width: 40, height: 40, borderRadius: 10, flexShrink: 0 }} />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <p style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--white)', marginBottom: 2 }}>Get the iPhone app</p>
+            <p style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)', lineHeight: 1.4 }}>This week&apos;s runs, route maps and run tracking. Free on the App Store.</p>
+          </div>
+          <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+            <button
+              onClick={dismiss}
+              style={{
+                padding: '7px 12px', borderRadius: 7, border: '1px solid var(--border)',
+                background: 'transparent', color: 'var(--faint)', fontSize: 'var(--text-xs)',
+                fontFamily: 'inherit', cursor: 'pointer', fontWeight: 500,
+              }}
+            >
+              Not now
+            </button>
+            <a
+              href={IOS_APP_URL}
+              onClick={() => { localStorage.setItem(APP_STORAGE_KEY, '1'); setVisible(false) }}
+              style={{
+                padding: '7px 14px', borderRadius: 7, border: 'none',
+                background: 'var(--orange)', color: 'var(--bg)', fontSize: 'var(--text-xs)',
+                fontFamily: 'inherit', fontWeight: 700, whiteSpace: 'nowrap', textDecoration: 'none',
+              }}
+            >
+              Get the app
+            </a>
+          </div>
+        </div>
+      ) : platform === 'ios' ? (
         /* ── iOS: explain the Share → Add to Home Screen flow ── */
         <div>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, marginBottom: 12 }}>
