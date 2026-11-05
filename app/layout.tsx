@@ -3,6 +3,7 @@ import './globals.css'
 import NotificationOptIn from '@/components/NotificationOptIn'
 import InstallPrompt from '@/components/InstallPrompt'
 import ThemeProvider from '@/components/ThemeProvider'
+import { IOS_APP_ID } from '@/lib/iosApp'
 import { Analytics } from '@vercel/analytics/next'
 
 const SITE_TITLE = 'Free Running Club & Group in Radcliffe, Bury | radcliffe.run'
@@ -45,6 +46,11 @@ export const metadata: Metadata = {
     capable: true,
     title: 'radcliffe.run',
     statusBarStyle: 'black-translucent',
+  },
+  // Safari's Smart App Banner: iPhone visitors get Apple's own "Open"/"Get"
+  // banner for the native app. Safari draws it, so the page makes no request.
+  itunes: {
+    appId: IOS_APP_ID,
   },
 }
 
