@@ -50,7 +50,7 @@ export default async function PrivacyPage({ searchParams }: Props) {
             Privacy Policy
           </h1>
           <p style={paraStyle}>
-            Last updated: October 2026
+            Last updated: November 2026
           </p>
           <p style={paraStyle}>
             radcliffe.run (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;) is a free community running group based in Radcliffe, Greater Manchester. This policy covers this website and the radcliffe.run app for iPhone and Android. It explains what personal data we collect, why we collect it, and your rights under UK data protection law (UK GDPR and the Data Protection Act 2018).
@@ -136,7 +136,9 @@ export default async function PrivacyPage({ searchParams }: Props) {
             <strong style={{ color: 'var(--dim)' }}>Stored on your phone.</strong> The app keeps your sign-in, and a copy of club information such as upcoming runs so it works with a poor signal, in its own storage on your phone. Signing out clears both.
           </p>
           <p style={paraStyle}>
-            <strong style={{ color: 'var(--dim)' }}>Deleting your account.</strong> You can delete your account yourself in the app, under Settings. This removes your membership, emergency contact and medical details, and your sign-in.
+            <strong style={{ color: 'var(--dim)' }}>Deleting your account.</strong> You can delete your account yourself in the app, under Settings, or on this website from your profile page. This removes your membership, emergency contact and medical details, and your sign-in. See{' '}
+            <a href="#delete-your-data" style={{ color: 'var(--orange)', textDecoration: 'none' }}>Deleting your data</a>{' '}
+            for exactly what is removed and what is kept.
           </p>
 
           {/* 5. Who we share data with */}
@@ -221,7 +223,7 @@ export default async function PrivacyPage({ searchParams }: Props) {
             {[
               ['Right to access', 'Request a copy of the data we hold about you.'],
               ['Right to rectification', 'Ask us to correct inaccurate data. You can update most details yourself on your profile page.'],
-              ['Right to erasure', 'Ask us to delete your data. We will action this within 30 days. You can also delete your account yourself in the app.'],
+              ['Right to erasure', 'Ask us to delete your data. We will action this within 30 days. You can also delete your account yourself in the app or on your profile page - see Deleting your data below.'],
               ['Right to restriction', 'Ask us to limit how we use your data while a dispute is resolved.'],
               ['Right to object', 'Object to processing based on legitimate interests.'],
               ['Right to withdraw consent', 'Where we rely on consent (emails, photos, health data), you can withdraw it at any time - this does not affect the lawfulness of prior processing.'],
@@ -244,6 +246,40 @@ export default async function PrivacyPage({ searchParams }: Props) {
               ico.org.uk
             </a>{' '}
             or by calling 0303 123 1113.
+          </p>
+
+          {/* Deleting your data - the page Google Play's account and data deletion links point to (Nov 2026). Every claim checked against the code: DELETE /api/profile, members FK cascades, PATCH /api/profile ALLOWED_FIELDS. */}
+          <p id="delete-your-data" style={{ ...sectionHeadStyle, scrollMarginTop: 80 }}>Deleting your data</p>
+          <p style={paraStyle}>
+            This applies to the radcliffe.run app for iPhone and Android (published on the App Store and Google Play by Paul Cox for Run Together Radcliffe) and to this website. They share one account, so deleting it in one place deletes it everywhere.
+          </p>
+          <p style={paraStyle}>
+            <strong style={{ color: 'var(--dim)' }}>To delete your account and its data</strong>, do any one of these:
+          </p>
+          <div style={{ border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden', marginBottom: 24 }}>
+            {[
+              ['In the app', 'Open Settings and choose Delete my account, then confirm.'],
+              ['On this website', 'Sign in, open your profile page and choose Delete my account, then confirm.'],
+              ['By email', 'Email runtogetherradcliffe@gmail.com from the address you registered with and ask us to delete your account. We will do it within 30 days.'],
+            ].map(([how, steps], i, arr) => (
+              <div key={i} style={{ padding: '14px 16px', borderBottom: i < arr.length - 1 ? '1px solid var(--border)' : 'none' }}>
+                <p style={{ fontSize: 'var(--text-base)', fontWeight: 600, color: 'var(--dim)', marginBottom: 4 }}>{how}</p>
+                <p style={{ fontSize: 'var(--text-base)', color: 'var(--muted)', lineHeight: 1.6 }}>{steps}</p>
+              </div>
+            ))}
+          </div>
+          <p style={paraStyle}>
+            <strong style={{ color: 'var(--dim)' }}>Deleted straight away:</strong> your membership record (name, email, mobile, emergency contact, medical notes and your consent choices), your sign-in, your run attendance, milestones and awards, and the notification addresses for your phone and browser.
+          </p>
+          <p style={paraStyle}>
+            <strong style={{ color: 'var(--dim)' }}>Kept afterwards:</strong> records of emails we sent you, for up to 1 year; app crash reports, which are not linked to your name or email and are deleted after 30 days; and register correction records, which can no longer be linked to you. If you were a run leader, check-ins you recorded for other runners stay on their records, without your name.
+          </p>
+          <p style={paraStyle}>
+            <strong style={{ color: 'var(--dim)' }}>To delete some data and keep your account</strong>, sign in to this website and edit your profile: you can remove your medical notes and change your emergency contact there. For anything else, email{' '}
+            <a href="mailto:runtogetherradcliffe@gmail.com" style={{ color: 'var(--orange)', textDecoration: 'none' }}>
+              runtogetherradcliffe@gmail.com
+            </a>{' '}
+            and we will delete it within 30 days.
           </p>
 
           {/* 9. Age */}
