@@ -10,6 +10,7 @@ import RunBadges from './RunBadges'
 import GpxButton from './GpxButton'
 import DirectionsLink from '@/components/DirectionsLink'
 import { formatClock, formatRunTimeLine } from '@/lib/runTimes'
+import { isNoRunNight } from '@/lib/noRun'
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 const DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
@@ -63,6 +64,35 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
     .single()
 
   if (!run) notFound()
+
+  // A "No run" week (lib/noRun.ts) is not a run: say so plainly, with none of
+  // the route, map, time or Event markup below. The home page does not link
+  // here, but the app or an old link might.
+  if (isNoRunNight(run)) {
+    return (
+      <>
+        <Nav />
+        <main style={{ minHeight: '100vh' }}>
+          <section style={{ maxWidth: 680, margin: '0 auto', padding: '32px 24px 80px' }}>
+            <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 'var(--text-sm)', color: 'var(--faint)', textDecoration: 'none', marginBottom: 40 }}>
+              ← Upcoming runs
+            </Link>
+            <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--orange)', marginBottom: 12 }}>
+              {fmtRunDate(run.date)}
+            </p>
+            <h1 style={{ fontSize: 32, fontWeight: 800, letterSpacing: '-0.02em', marginBottom: 12 }}>No run this Thursday</h1>
+            {run.description && (
+              <p style={{ fontSize: 'var(--text-base)', color: 'var(--dim)', lineHeight: 1.6, marginBottom: 8 }}>{run.description}</p>
+            )}
+            <p style={{ fontSize: 'var(--text-base)', color: 'var(--muted)', lineHeight: 1.6 }}>
+              The club is taking this week off. See the home page for the next run.
+            </p>
+          </section>
+        </main>
+        <Footer />
+      </>
+    )
+  }
 
   const title  = cleanTitle(run.title)
   const route  = run.route_slug ? ROUTES.find(r => r.slug === run.route_slug) : null

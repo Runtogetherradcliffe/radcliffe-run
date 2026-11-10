@@ -138,6 +138,23 @@ matching doc edit; treat that reminder as a blocking checklist item, not a sugge
   at all, so keep that wording and do not print it as a bare finish time. A run with a
   real `start_time` also gets it in the detail page's `Event` JSON-LD `startDate`
   (plus `endDate` when there is an end time) instead of the 7pm assumption.
+- **The sheet's Event ID (col AC) is a run's identity, so the sheet's DATE wins**
+  (10 Nov 2026). The sync matches existing runs by `google_event_id` across every
+  run from today on (not just the dates in the sheet) and its UPDATE includes `date`,
+  so a date corrected in the sheet MOVES the run. Before this, a bad paste synced
+  60 runs a week early, the corrected sheet updated their names but never their
+  dates, and the bad rows had to be deleted by hand. Keep `date` in the UPDATE list
+  and keep the lookup unbounded by sheet dates. The sync still never deletes a run
+  that has left the sheet.
+- **"No run" weeks** (Nov 2026, `lib/noRun.ts`). A Thursday row whose route name(s)
+  are "No run" (Christmas Eve, New Year's Eve) is stored `cancelled = true` on every
+  sync, so push, check-in, email route blocks and attendance counting all skip it as
+  they skip any cancelled run. The home page and run page SHOW it as "No run this
+  Thursday" instead of hiding it; a run cancelled by hand (real route name) is still
+  hidden as before. The sync only ever sets `cancelled` for those rows (true for "No
+  run", false when a former "No run" row gets a real route) and otherwise leaves it
+  alone, so an admin's manual cancellation survives every sync - do not add a plain
+  `cancelled` to the UPDATE list.
 
 ## Email
 

@@ -467,8 +467,18 @@ Route map imagery: every route has a dark webp and a light webp;
 - `lib/routes.ts` - static route catalogue (slug, distance, terrain, GPX path,
   description, Strava URL). `route_descriptions` table overrides names/descriptions.
 - `POST /api/admin/runs/sync` upserts upcoming runs from two Google Sheets (Thursday
-  schedule + social calendar), preserving `cancelled` and `has_jeffing`, and upserts
-  route names into `route_descriptions`.
+  schedule + social calendar), preserving `has_jeffing` and any hand-set `cancelled`,
+  and upserts route names into `route_descriptions`. Existing runs are matched by
+  `google_event_id` (sheet col AC, suffixed `_1`/`_2` per route) across every run from
+  today on, then by date+title; a match has its `date` updated too, so a date
+  corrected in the sheet moves the run rather than leaving it behind (10 Nov 2026).
+  Runs that leave the sheet are never deleted by the sync.
+- **"No run" weeks** (`lib/noRun.ts`). A Thursday row named "No run" is stored
+  cancelled on every sync (and un-cancelled if it later gets a real route). The home
+  page keeps cancelled runs hidden except these, which show as a single "No run this
+  Thursday" card in Upcoming and, when it is this week, in the hero card with the
+  next run's date; `app/runs/[id]/page.tsx` renders a plain notice for one. Push,
+  check-in, email route blocks and attendance skip them like any cancelled run.
 - **Start times.** The social sheet has "Start Time"/"End Time" columns (cols 2-3);
   `parseTime()` normalises `10:30`, `9:00` and `09:00:00` alike and writes them to
   `runs.start_time`/`end_time`. The Thursday sheet has no time column, so those rows

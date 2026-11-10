@@ -2,6 +2,7 @@ import { requireAdmin } from '@/lib/admin'
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { resolveMapCoords } from '@/lib/mapLink'
+import { isNoRunTitle, syncCancelledUpdate } from '@/lib/noRun'
 
 /* ── Sheet URLs ── */
 const THURSDAY_SHEET =
@@ -178,13 +179,16 @@ function parseThursdayRows(rows: string[][]): RunRow[] {
 
     const meetingPoint = extractMeetingPoint(notes)
     const notesText    = extractNotes(notes)
+    // A week off is written as "No run" in the route name(s): store it
+    // cancelled so nothing treats it as a run (lib/noRun.ts).
+    const noRun = [r1Name, r2Name].filter(Boolean).every(isNoRunTitle)
     const sharedBase = {
       meeting_point:   meetingPoint,
       meeting_map_url: mapUrl || null,
       meeting_lat:     null as number | null,
       meeting_lng:     null as number | null,
       leader_name:     null,
-      cancelled:       false,
+      cancelled:       noRun,
       on_tour:         onTour,
       has_jeffing:     false,
       run_type:        'regular',
@@ -314,12 +318,17 @@ export async function POST() {
     run.meeting_lng = coords?.lng ?? null
   }
 
-  // Fetch existing runs in range - include google_event_id for stable matching
-  const dates = [...new Set(allRuns.map(r => r.date))]
+  // Fetch every existing run from today on - include google_event_id for
+  // stable matching. Deliberately NOT limited to the dates in the sheet: a run
+  // whose date was wrong (a bad paste, then corrected in the sheet) must still
+  // be found by its event ID so its date can be moved, rather than left behind
+  // with a duplicate inserted at the right date (10 Nov 2026).
+  const pad = (n: number) => String(n).padStart(2, '0')
+  const todayStr = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`
   const { data: existing } = await supabaseAdmin()
     .from('runs')
     .select('id, date, title, cancelled, has_jeffing, google_event_id')
-    .in('date', dates)
+    .gte('date', todayStr)
 
   type ExRow = { id: string; date: string; title: string; cancelled: boolean; has_jeffing: boolean; google_event_id: string | null }
 
@@ -348,6 +357,9 @@ export async function POST() {
       const { error } = await supabaseAdmin()
         .from('runs')
         .update({
+          // The event ID is the run's identity, so the sheet's date wins: a
+          // date corrected in the sheet moves the run (10 Nov 2026).
+          date:             run.date,
           title:            run.title,
           start_time:       run.start_time,
           end_time:         run.end_time,
@@ -361,6 +373,8 @@ export async function POST() {
           on_tour:          run.on_tour,
           run_type:         run.run_type,
           google_event_id:  run.google_event_id,
+          // Thursday "No run" weeks only; a hand-cancelled run is left alone.
+          ...(run.run_type === 'regular' ? syncCancelledUpdate(run.title, ex.title) : {}),
           ...(run.route_slug ? { route_slug: run.route_slug } : {}),
           ...(run.strava_url ? { strava_url: run.strava_url } : {}),
         })

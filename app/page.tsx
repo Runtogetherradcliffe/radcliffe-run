@@ -15,6 +15,7 @@ import { existsSync } from 'fs'
 import { join } from 'path'
 import ThemeMapImage from '@/components/ThemeMapImage'
 import { formatClock, formatRunTimeLine } from '@/lib/runTimes'
+import { isNoRunNight } from '@/lib/noRun'
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 const DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
@@ -98,10 +99,9 @@ export default async function HomePage() {
       .single(),
     supabase
       .from('runs')
-      .select('id, date, title, distance_km, terrain, meeting_point, route_slug, on_tour, has_jeffing, run_type, cancelled, start_time, end_time')
+      .select('id, date, title, description, distance_km, terrain, meeting_point, route_slug, on_tour, has_jeffing, run_type, cancelled, start_time, end_time')
       .gte('date', today)
       .lte('date', fourWeeksOutStr)
-      .eq('cancelled', false)
       .neq('run_type', 'social')
       .order('date', { ascending: true })
       .order('distance_km', { ascending: true }),
@@ -134,10 +134,17 @@ export default async function HomePage() {
         .limit(4)
     : { data: [] }
 
+  // Cancelled runs stay hidden, EXCEPT "No run" weeks (lib/noRun.ts): those
+  // are shown as "No run this Thursday" rather than skipped, so nobody turns
+  // up at the market on Christmas Eve wondering where everyone is.
+  const visibleRuns  = (thursdayRuns ?? []).filter(r => !r.cancelled || isNoRunNight(r))
+
   // All runs on the very next Thursday date (may be 1, 2 or more groups)
-  const nextRunDate  = thursdayRuns?.[0]?.date ?? null
-  const nextWeekRuns = nextRunDate ? (thursdayRuns ?? []).filter(r => r.date === nextRunDate) : []
-  const runCards     = thursdayRuns ?? []
+  const nextRunDate  = visibleRuns[0]?.date ?? null
+  const nextWeekRuns = nextRunDate ? visibleRuns.filter(r => r.date === nextRunDate) : []
+  const noRunThisWeek = nextWeekRuns.length > 0 && nextWeekRuns.every(isNoRunNight)
+  const nextRealRun  = noRunThisWeek ? visibleRuns.find(r => !isNoRunNight(r)) ?? null : null
+  const runCards     = visibleRuns
   const socialRuns   = socialRunsData ?? []
 
   // Pre-compute which route slugs have map images once - avoids existsSync inside render loop
@@ -269,8 +276,28 @@ export default async function HomePage() {
               <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(10,10,10,0) 40%, rgba(10,10,10,0.75) 100%)', pointerEvents: 'none' }} />
             </div>
 
+            {/* This week: no run (a planned week off) */}
+            {noRunThisWeek && (
+              <div style={{ position: 'absolute', bottom: -20, left: -20, right: 20, background: 'var(--card)', backdropFilter: 'blur(12px)', borderLeft: '3px solid var(--orange)', borderRadius: '0 12px 12px 0', padding: '16px 20px', boxShadow: '0 16px 48px rgba(0,0,0,0.4)', border: '1px solid var(--border)' }}>
+                <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--orange)', marginBottom: 8 }}>
+                  This week &middot; {fmtRunDate(nextWeekRuns[0].date)}
+                </p>
+                <p style={{ fontSize: 'var(--text-md)', fontWeight: 700, color: 'var(--white)', marginBottom: nextWeekRuns[0].description || nextRealRun ? 6 : 0 }}>
+                  No run this Thursday
+                </p>
+                {nextWeekRuns[0].description && (
+                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)', marginBottom: nextRealRun ? 6 : 0 }}>{nextWeekRuns[0].description}</p>
+                )}
+                {nextRealRun && (
+                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)' }}>
+                    Next run: {fmtRunDate(nextRealRun.date)}, 7pm
+                  </p>
+                )}
+              </div>
+            )}
+
             {/* This week's runs card */}
-            {nextWeekRuns.length > 0 && (
+            {nextWeekRuns.length > 0 && !noRunThisWeek && (
               <div style={{ position: 'absolute', bottom: -20, left: -20, right: 20, background: 'var(--card)', backdropFilter: 'blur(12px)', borderLeft: '3px solid #f5a623', borderRadius: '0 12px 12px 0', padding: '16px 20px', boxShadow: '0 16px 48px rgba(0,0,0,0.4)', border: '1px solid var(--border)' }}>
                 <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#f5a623', marginBottom: 12 }}>
                   This week &middot; {fmtRunDate(nextWeekRuns[0].date)} &middot; 7pm
@@ -386,11 +413,17 @@ export default async function HomePage() {
           // Merge same-route pairs: when two runs on the same date share a route_slug,
           // collapse them into one card showing both distance groups
           type RunItem = NonNullable<typeof runCards>[number]
-          type Card = { primary: RunItem; companion?: RunItem }
+          type Card = { primary: RunItem; companion?: RunItem; noRun?: boolean }
           const cards: Card[] = []
           const seen = new Set<string>()
           for (const run of runCards) {
             if (seen.has(run.id)) continue
+            // A "No run" week is one card for the night, however many rows it has
+            if (isNoRunNight(run)) {
+              for (const r of runCards) if (r.date === run.date && isNoRunNight(r)) seen.add(r.id)
+              cards.push({ primary: run, noRun: true })
+              continue
+            }
             // Merge two runs on the same date if they share the same route_slug OR the same title
             // (same title = both groups running the same named route, e.g. "Outwood OAB")
             const companion = runCards.find(r =>
@@ -447,7 +480,27 @@ export default async function HomePage() {
               <div className="rtr-cards-grid">
                 {cards.length === 0 ? (
                   <p style={{ color: 'var(--faint)', fontSize: 'var(--text-base)' }}>No upcoming runs scheduled yet.</p>
-                ) : cards.map(({ primary: run, companion }) => {
+                ) : cards.map(({ primary: run, companion, noRun }) => {
+                  if (noRun) {
+                    return (
+                      <div key={run.id} style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ height: 100, background: 'var(--card-hi)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--faint)' }}>Week off</span>
+                        </div>
+                        <div style={{ padding: '14px 16px', flex: 1 }}>
+                          <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--orange)', marginBottom: 6 }}>
+                            {fmtRunDate(run.date)}
+                          </p>
+                          <p style={{ fontSize: 'var(--text-md)', fontWeight: 700, marginBottom: run.description ? 8 : 0, lineHeight: 1.3 }}>
+                            No run this Thursday
+                          </p>
+                          {run.description && (
+                            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)', lineHeight: 1.5 }}>{run.description}</p>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  }
                   const linkedRoute = run.route_slug ? ROUTES.find(r => r.slug === run.route_slug) : null
                   const companionRoute = companion?.route_slug ? ROUTES.find(r => r.slug === companion.route_slug) : null
 
