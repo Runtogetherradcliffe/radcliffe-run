@@ -576,6 +576,19 @@ the check-in process should be live and proven well before the cohort arrives.
   with correction, walk-up handling) is the starting wireframe for the autumn
   build; its booking flow is dropped.
 
+**C25K sessions and the Thursday group (added 12 Nov 2026)**
+- Paul, 12 Nov 2026: the January 2027 cohort runs Tue 5 Jan to the graduation
+  parkrun at Heaton Park on Sat 13 Mar 2027.
+- Every C25K session is its own `runs` row (`run_type = 'c25k'`), including
+  Thursday. The Thursday C25K group is NOT checked in as a group on the regular
+  Thursday run. Reasons: attendance maps straight to a programme week, C25K
+  leaders get a short list of their own beginners, and Tuesday and Thursday
+  work the same way. Night counting is unaffected (`COUNT(DISTINCT runs.date)`).
+- The C25K programme itself needs no spreadsheet: dates come from
+  `site_settings.c25k_start_date`. The sheet sync never creates C25K rows, so
+  the site must generate the cohort's sessions (10 Tuesdays, 10 Thursdays,
+  graduation) from the settings. Not built as of 12 Nov 2026.
+
 **Formerly open - settled at the 6 Jul 2026 decision workshop** (full settled
 list with rationales: `docs/NATIVE_APP_SCOPE.md` section 8):
 - Retroactive credit: **backfill YES** - against the first-captured-session
