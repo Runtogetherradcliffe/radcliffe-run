@@ -156,6 +156,13 @@ matching doc edit; treat that reminder as a blocking checklist item, not a sugge
   alone, so an admin's manual cancellation survives every sync - do not add a plain
   `cancelled` to the UPDATE list.
 
+- **Jeffing is set on INSERT from the distance** (17 Nov 2026, `lib/jeffing.ts`).
+  The Thursday sheet has no jeffing column; the 5k row gets `has_jeffing = true`,
+  the 8k row false. It is deliberately NOT in the sync's UPDATE list, so an admin
+  who switches jeffing off for one night keeps that. Before this the sync inserted
+  false for every row, and the runs re-created after the 10 Nov clean-up all lost
+  jeffing (restored by a one-off update on 17 Nov).
+
 ## Email
 
 - **Two separate email systems.** Content email (newsletter, welcome, contact form) goes
