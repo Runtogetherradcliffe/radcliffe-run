@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { resolveMapCoords } from '@/lib/mapLink'
 import { isNoRunTitle, syncCancelledUpdate } from '@/lib/noRun'
+import { defaultHasJeffing } from '@/lib/jeffing'
 
 /* ── Sheet URLs ── */
 const THURSDAY_SHEET =
@@ -206,6 +207,8 @@ function parseThursdayRows(rows: string[][]): RunRow[] {
         title:            r1Name,
         terrain:          normalise(r1Terrain),
         distance_km:      parseDistance(r1Dist),
+        // Set on insert only (not in the UPDATE list): see lib/jeffing.ts.
+        has_jeffing:      defaultHasJeffing(parseDistance(r1Dist), noRun),
         route_slug:       extractSlug(r1Page),
         strava_url:       r1StravaUrl,
         google_event_id:  eventId ? `${eventId}_1` : null,
@@ -220,6 +223,7 @@ function parseThursdayRows(rows: string[][]): RunRow[] {
         title:            r2Name,
         terrain:          normalise(r2Terrain),
         distance_km:      parseDistance(r2Dist),
+        has_jeffing:      defaultHasJeffing(parseDistance(r2Dist), noRun),
         route_slug:       extractSlug(r2Page),
         strava_url:       r2StravaUrl,
         google_event_id:  eventId ? `${eventId}_2` : null,
