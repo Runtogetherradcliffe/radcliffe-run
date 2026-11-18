@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { EDITABLE_WEEKS, PROGRAMME, SLOT_KEYS, effectiveProgramme, type SessionOrder, type SlotKey, type SlotText, type WeekOverrides } from '@/lib/c25kProgramme'
+import { EDITABLE_WEEKS, SLOT_KEYS, effectiveProgramme, type SessionOrder, type SlotKey, type SlotText, type WeekOverrides } from '@/lib/c25kProgramme'
 
 
 type Settings = {
@@ -22,7 +22,7 @@ type Settings = {
   c25k_week_overrides: WeekOverrides | null
 }
 
-type WeekText = Record<string, Record<SlotKey, SlotText>>
+type WeekText = Record<string, Record<SlotKey, SlotText> & { title: string }>
 
 /** Weeks 6 and 7 as Tuesday / Thursday / solo text, from a programme. */
 function weekTextFrom(order: SessionOrder | null, overrides: WeekOverrides | null): WeekText {
@@ -30,7 +30,11 @@ function weekTextFrom(order: SessionOrder | null, overrides: WeekOverrides | nul
   const out: WeekText = {}
   for (const n of EDITABLE_WEEKS) {
     const w = programme.find(p => p.n === n)!
-    out[String(n)] = Object.fromEntries(SLOT_KEYS.map((k, i) => [k, { intervals: w.sessions[i].intervals, totalRun: w.sessions[i].totalRun }])) as Record<SlotKey, SlotText>
+    const at = (i: number) => w.sessions[w.sessions.length === 1 ? 0 : i]
+    out[String(n)] = {
+      title: w.title,
+      ...Object.fromEntries(SLOT_KEYS.map((k, i) => [k, { intervals: at(i).intervals, totalRun: at(i).totalRun }])),
+    } as Record<SlotKey, SlotText> & { title: string }
   }
   return out
 }
@@ -59,6 +63,8 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
   )
   const setSlot = (week: string, slot: SlotKey, field: keyof SlotText, value: string) =>
     setC25kWeekText(prev => ({ ...prev, [week]: { ...prev[week], [slot]: { ...prev[week][slot], [field]: value } } }))
+  const setTitle = (week: string, value: string) =>
+    setC25kWeekText(prev => ({ ...prev, [week]: { ...prev[week], title: value } }))
   const resetWeek = (week: string) =>
     setC25kWeekText(prev => ({ ...prev, [week]: weekTextFrom({ [week]: [0, 1, 2] }, null)[week] }))
   const [c25kSessionsBusy,   setC25kSessionsBusy]   = useState(false)
@@ -388,21 +394,31 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
 
         {/* Weeks 6 and 7: the runs in the admin's own words (lib/c25kProgramme.ts) */}
         <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid var(--border)' }}>
-          <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--muted)', marginBottom: 4 }}>Weeks 6 and 7 runs</p>
+          <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--muted)', marginBottom: 4 }}>Weeks 5, 6 and 7</p>
           <p style={{ fontSize: 'var(--text-xs)', color: 'var(--faint)', marginBottom: 14, lineHeight: 1.5 }}>
-            Write each run as the cohort should see it. It shows on the programme page, on the sessions and in the C25K email. Saving updates any sessions already created.
+            Write each week&apos;s name and runs as the cohort should see them. Week 5 is the bridge between the short intervals and the longer runs: give its three runs the same text to keep one run for the week, or different text for different days. It shows on the programme page, on the sessions and in the C25K email. Saving updates any sessions already created.
           </p>
           {EDITABLE_WEEKS.map(n => {
             const week = String(n)
-            const title = PROGRAMME.find(p => p.n === n)?.title ?? ''
             return (
               <div key={week} style={{ marginBottom: 18 }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, marginBottom: 8 }}>
-                  <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--muted)', margin: 0 }}>Week {n} - {title}</p>
+                  <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--muted)', margin: 0 }}>Week {n}</p>
                   <button type="button" onClick={() => resetWeek(week)} style={{ background: 'none', border: 'none', padding: 0, fontSize: 'var(--text-xs)', color: 'var(--orange)', cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
                     Reset to NHS plan
                   </button>
                 </div>
+                <label style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 10 }}>
+                  <span style={{ fontSize: 'var(--text-xs)', color: 'var(--faint)' }}>Week name</span>
+                  <input
+                    id={`c25k-w${week}-title`}
+                    type="text"
+                    value={c25kWeekText[week].title}
+                    onChange={e => setTitle(week, e.target.value)}
+                    maxLength={80}
+                    style={{ width: '100%', background: 'var(--bg)', border: '1px solid var(--border-2)', borderRadius: 8, padding: '8px 12px', fontSize: 'var(--text-sm)', color: 'var(--dim)', fontFamily: 'Inter, sans-serif', outline: 'none', boxSizing: 'border-box' }}
+                  />
+                </label>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {SLOT_KEYS.map(slot => (
                     <div key={slot} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 3fr) minmax(0, 1fr)', gap: 8 }}>

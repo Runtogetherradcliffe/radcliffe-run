@@ -46,4 +46,30 @@ describe('C25K weeks 6 and 7 in the admin\'s own words', () => {
     const w6 = effectiveProgramme({ '6': [9, 9, 9] } as never, null).find(w => w.n === 6)!
     expect(w6.sessions.every(s => typeof s.intervals === 'string')).toBe(true)
   })
+
+  it('week 5 is the bridge week, not a repeat of week 4', () => {
+    const w5 = effectiveProgramme(null, null).find(w => w.n === 5)!
+    expect(w5.title).toBe('Bridge week')
+    expect(w5.title).not.toMatch(/repeat/i)
+  })
+
+  it('week 5 opens out into different runs per day, and its name can change', () => {
+    const w5 = effectiveProgramme(null, { '5': {
+      title: 'Bridge to 20 minutes',
+      tue: { intervals: '15 min jog, 2 min walk, 3 min jog', totalRun: '18 min running' },
+    } }).find(w => w.n === 5)!
+    expect(w5.title).toBe('Bridge to 20 minutes')
+    expect(w5.sessions).toHaveLength(3)
+    expect(w5.sessions[0].intervals).toBe('15 min jog, 2 min walk, 3 min jog')
+    expect(w5.sessions[1].intervals).toMatch(/^3 min jog/) // Thursday keeps the plan
+  })
+
+  it('week 5 stays one run when all three days are the same', () => {
+    const same = { intervals: '15 min jog, 2 min walk, 5 min jog', totalRun: '20 min running' }
+    const w5 = effectiveProgramme(null, { '5': { tue: same, thu: same, solo: same } }).find(w => w.n === 5)!
+    expect(w5.sessions).toHaveLength(1)
+    expect(w5.sessions[0].intervals).toBe(same.intervals)
+    const rows = buildC25kSessions('2027-01-05', effectiveProgramme(null, { '5': { tue: same, thu: same, solo: same } }))
+    expect(rows.find(r => r.key === 'c25k-2027:w05:thu')!.description).toBe('15 min jog, 2 min walk, 5 min jog (20 min running)')
+  })
 })
