@@ -124,11 +124,26 @@ export function sanitizeWeekOverrides(input: unknown): WeekOverrides | null {
   return Object.keys(out).length ? out : null
 }
 
+/** Keeps only valid orders for weeks 6 and 7: each a permutation of [0, 1, 2]. */
+export function sanitizeSessionOrder(input: unknown): SessionOrder | null {
+  if (!input || typeof input !== 'object') return null
+  const out: SessionOrder = {}
+  for (const w of EDITABLE_WEEKS) {
+    const arr = (input as Record<string, unknown>)[String(w)]
+    if (!Array.isArray(arr) || arr.length !== 3) continue
+    const nums = arr.map(Number)
+    if (nums.some(n => !Number.isInteger(n) || n < 0 || n > 2) || new Set(nums).size !== 3) continue
+    out[String(w)] = nums as [number, number, number]
+  }
+  return Object.keys(out).length ? out : null
+}
+
 /** The programme as members see it: session order applied, then any rewritten runs. */
 export function effectiveProgramme(order: SessionOrder | null | undefined, overrides: WeekOverrides | null | undefined): WeekData[] {
   const clean = sanitizeWeekOverrides(overrides) ?? {}
+  const safeOrder = sanitizeSessionOrder(order) ?? {}
   return PROGRAMME.map(w => {
-    const ordered = w.sessions.length === 3 ? applyOrder(w, order?.[String(w.n)]) : w
+    const ordered = w.sessions.length === 3 ? applyOrder(w, safeOrder[String(w.n)]) : w
     const o = clean[String(w.n)]
     if (!o || ordered.sessions.length !== 3 || ordered.sessions.some(s => s.isSpecial)) return ordered
     return {

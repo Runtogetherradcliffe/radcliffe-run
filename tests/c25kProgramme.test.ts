@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { effectiveProgramme, sanitizeWeekOverrides, slotSession } from '@/lib/c25kProgramme'
+import { effectiveProgramme, sanitizeSessionOrder, sanitizeWeekOverrides, slotSession } from '@/lib/c25kProgramme'
 import { buildC25kSessions } from '@/lib/c25kSessions'
 
 describe('C25K weeks 6 and 7 in the admin\'s own words', () => {
@@ -38,5 +38,12 @@ describe('C25K weeks 6 and 7 in the admin\'s own words', () => {
   it('gives single-run weeks the same run on every slot', () => {
     const w3 = effectiveProgramme(null, null).find(w => w.n === 3)!
     expect(slotSession(w3, 'thu')).toBe(slotSession(w3, 'tue'))
+  })
+
+  it('ignores a malformed session order instead of breaking the programme', () => {
+    expect(sanitizeSessionOrder({ '6': [0, 0, 1], '7': [3, 1, 2], '3': [2, 1, 0] })).toBeNull()
+    expect(sanitizeSessionOrder({ '6': [2, 0, 1] })).toEqual({ '6': [2, 0, 1] })
+    const w6 = effectiveProgramme({ '6': [9, 9, 9] } as never, null).find(w => w.n === 6)!
+    expect(w6.sessions.every(s => typeof s.intervals === 'string')).toBe(true)
   })
 })

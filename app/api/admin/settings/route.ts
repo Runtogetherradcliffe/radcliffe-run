@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { requireAdmin } from '@/lib/admin'
-import { sanitizeWeekOverrides } from '@/lib/c25kProgramme'
+import { sanitizeSessionOrder, sanitizeWeekOverrides } from '@/lib/c25kProgramme'
 
 export async function GET() {
   // Debug: read current settings via service role - admin only
@@ -28,6 +28,7 @@ export async function PATCH(req: Request) {
   }
   // Weeks 6/7 run text: keep only well-formed, trimmed, length-capped entries.
   if ('c25k_week_overrides' in update) update.c25k_week_overrides = sanitizeWeekOverrides(update.c25k_week_overrides)
+  if ('c25k_session_order' in update) update.c25k_session_order = sanitizeSessionOrder(update.c25k_session_order)
 
   // The weekly note self-expires 7 days after its text last CHANGED (it is
   // served by /api/home only while fresh). Stamp on change, not on every

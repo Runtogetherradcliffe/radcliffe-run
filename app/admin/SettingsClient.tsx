@@ -158,7 +158,18 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
       })
       if (!res.ok) throw new Error((await res.json()).error)
       // Edited week 6/7 runs reach C25K sessions that already exist. updateOnly never creates any.
-      fetch('/api/admin/c25k/sessions?updateOnly=1', { method: 'POST' }).catch(() => {})
+      // A 400 means no start date yet, so there are no sessions to update: not an error.
+      try {
+        const sessRes = await fetch('/api/admin/c25k/sessions?updateOnly=1', { method: 'POST' })
+        if (!sessRes.ok && sessRes.status !== 400) {
+          const sessBody = await sessRes.json().catch(() => ({}))
+          setError(`Settings saved, but the C25K sessions were not updated (${sessBody.error ?? sessRes.status}). Press "Create or update C25K sessions" to retry.`)
+          return
+        }
+      } catch {
+        setError('Settings saved, but the C25K sessions could not be updated. Press "Create or update C25K sessions" to retry.')
+        return
+      }
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
     } catch (e) {
