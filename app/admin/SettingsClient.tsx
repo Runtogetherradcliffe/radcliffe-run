@@ -60,6 +60,28 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
   const [c25kSessionOrder,   setC25kSessionOrder]   = useState<SessionOrder>(
     initial.c25k_session_order ?? { '6': [0, 1, 2], '7': [0, 1, 2] }
   )
+  const [c25kSessionsBusy,   setC25kSessionsBusy]   = useState(false)
+  const [c25kSessionsMsg,    setC25kSessionsMsg]    = useState<string | null>(null)
+
+  // C25K sessions as runs rows (lib/c25kSessions.ts), built from the SAVED start date.
+  async function createC25kSessions() {
+    setC25kSessionsBusy(true)
+    setC25kSessionsMsg(null)
+    try {
+      const res = await fetch('/api/admin/c25k/sessions', { method: 'POST' })
+      const body = await res.json().catch(() => ({}))
+      if (!res.ok && res.status !== 207) {
+        setC25kSessionsMsg(body.error ?? `Failed (${res.status})`)
+      } else {
+        const errs = Array.isArray(body.errors) && body.errors.length ? ` ${body.errors.length} failed: ${body.errors[0]}` : ''
+        setC25kSessionsMsg(`Done: ${body.inserted} created, ${body.updated} updated, for the cohort starting ${body.start}.${errs}`)
+      }
+    } catch {
+      setC25kSessionsMsg('Could not reach the server. Try again.')
+    } finally {
+      setC25kSessionsBusy(false)
+    }
+  }
   const [saving,        setSaving]        = useState(false)
   const [uploading,     setUploading]     = useState(false)
   const [saved,         setSaved]         = useState(false)
@@ -317,6 +339,27 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
                 fontFamily: 'Inter, sans-serif', outline: 'none', boxSizing: 'border-box',
               }}
             />
+          </div>
+          <div>
+            <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--muted)', marginBottom: 6 }}>Session schedule</p>
+            <p style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)', margin: '0 0 8px', lineHeight: 1.5 }}>
+              Creates the cohort&apos;s sessions on the runs list from the saved start date: a Tuesday and a Thursday for each of the 10 weeks, and the graduation parkrun. Leaders check runners in against these. Pressing it again updates them, so it is safe to use after moving the start date. Save settings first.
+            </p>
+            <button
+              type="button"
+              onClick={createC25kSessions}
+              disabled={c25kSessionsBusy}
+              style={{
+                background: 'var(--card-hi)', border: '1px solid var(--border-2)', borderRadius: 8,
+                padding: '9px 14px', fontSize: 'var(--text-sm)', color: 'var(--white)', cursor: c25kSessionsBusy ? 'wait' : 'pointer',
+                fontFamily: 'Inter, sans-serif',
+              }}
+            >
+              {c25kSessionsBusy ? 'Creating sessions...' : 'Create or update C25K sessions'}
+            </button>
+            {c25kSessionsMsg && (
+              <p role="status" style={{ fontSize: 'var(--text-xs)', color: 'var(--dim)', margin: '8px 0 0' }}>{c25kSessionsMsg}</p>
+            )}
           </div>
         </div>
 

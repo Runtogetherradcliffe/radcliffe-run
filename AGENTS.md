@@ -163,6 +163,17 @@ matching doc edit; treat that reminder as a blocking checklist item, not a sugge
   false for every row, and the runs re-created after the 10 Nov clean-up all lost
   jeffing (restored by a one-off update on 17 Nov).
 
+- **C25K sessions are generated, not synced** (18 Nov 2026, `lib/c25kSessions.ts`,
+  `POST /api/admin/c25k/sessions`). Every C25K session is its own `runs` row
+  (`run_type = 'c25k'`), Thursday included - never a group on the regular Thursday
+  run (Paul, 12 Nov 2026). The admin button builds them from the saved start date and
+  keys them `c25k-<year>:w<NN>:<tue|thu|grad>` in `google_event_id`; keep that key
+  stable, as re-pressing relies on it to update rather than duplicate. Before the
+  first cohort, check how each consumer shows a `c25k` row: the home page query is
+  `neq('run_type','social')` (so Tuesday sessions join the Thursday list), the
+  newsletter route block takes every non-social run on its Thursday, and the native
+  app's run list does not filter by type.
+
 ## Email
 
 - **Two separate email systems.** Content email (newsletter, welcome, contact form) goes

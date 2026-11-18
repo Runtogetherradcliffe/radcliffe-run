@@ -473,6 +473,16 @@ Route map imagery: every route has a dark webp and a light webp;
   today on, then by date+title; a match has its `date` updated too, so a date
   corrected in the sheet moves the run rather than leaving it behind (10 Nov 2026).
   Runs that leave the sheet are never deleted by the sync.
+- `POST /api/admin/c25k/sessions` (admin only, `requireAdmin()`) creates or updates the
+  C25K cohort's session rows from the SAVED `site_settings.c25k_start_date`
+  (`lib/c25kSessions.ts`): `run_type = 'c25k'`, a Tuesday (Aldi, Whitefield) and a
+  Thursday (Radcliffe Market) row for each of 10 weeks, `start_time` NULL (7pm
+  convention), plus the graduation parkrun on the Saturday of week 10 at 09:00.
+  Rows are keyed in `google_event_id` as `c25k-<year>:w<NN>:<tue|thu|grad>`, so a
+  second press updates them in place; it never changes `cancelled` and never
+  deletes. `?dryRun=1` returns the rows without writing. Triggered by the "Create or
+  update C25K sessions" button in admin Settings. The sheet sync never creates C25K
+  rows (Nov 2026).
 - **"No run" weeks** (`lib/noRun.ts`). A Thursday row named "No run" is stored
   cancelled on every sync (and un-cancelled if it later gets a real route). The home
   page keeps cancelled runs hidden except these, which show as a single "No run this
