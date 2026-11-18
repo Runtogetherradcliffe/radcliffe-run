@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { requireAdmin } from '@/lib/admin'
+import { sanitizeWeekOverrides } from '@/lib/c25kProgramme'
 
 export async function GET() {
   // Debug: read current settings via service role - admin only
@@ -20,11 +21,13 @@ export async function PATCH(req: Request) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await req.json()
-  const allowed = ['hero_image_url', 'sync_thursday_sheet', 'sync_social_sheet', 'show_social_calendar', 'email_default_subject', 'email_default_opening', 'email_default_closing', 'c25k_enabled', 'c25k_registration_open', 'c25k_start_date', 'c25k_cohort_label', 'c25k_max_registrations', 'c25k_session_order', 'weekly_note']
+  const allowed = ['hero_image_url', 'sync_thursday_sheet', 'sync_social_sheet', 'show_social_calendar', 'email_default_subject', 'email_default_opening', 'email_default_closing', 'c25k_enabled', 'c25k_registration_open', 'c25k_start_date', 'c25k_cohort_label', 'c25k_max_registrations', 'c25k_session_order', 'c25k_week_overrides', 'weekly_note']
   const update: Record<string, unknown> = {}
   for (const key of allowed) {
     if (key in body) update[key] = body[key]
   }
+  // Weeks 6/7 run text: keep only well-formed, trimmed, length-capped entries.
+  if ('c25k_week_overrides' in update) update.c25k_week_overrides = sanitizeWeekOverrides(update.c25k_week_overrides)
 
   // The weekly note self-expires 7 days after its text last CHANGED (it is
   // served by /api/home only while fresh). Stamp on change, not on every

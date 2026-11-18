@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { requireAdmin } from '@/lib/admin'
 import { buildC25kSessions, isTuesday } from '@/lib/c25kSessions'
+import { effectiveProgramme, type SessionOrder, type WeekOverrides } from '@/lib/c25kProgramme'
 
 /**
  * POST /api/admin/c25k/sessions - create or update the C25K cohort's session
@@ -10,6 +11,9 @@ import { buildC25kSessions, isTuesday } from '@/lib/c25kSessions'
  * sessions are built from it, so the button needs no separate Save (Paul,
  * 18 Nov 2026). With no body it uses the saved date.
  * `?dryRun=1` returns the sessions it would write without touching anything.
+ * `?updateOnly=1` refreshes sessions that already exist and creates none: the
+ * Settings save calls it so edited week 6/7 runs reach existing sessions,
+ * without ever creating rows before the app is ready for them.
  *
  * Idempotent: rows are matched on their stable key in `google_event_id`, so a
  * second press updates dates, titles and meeting points in place. It never
@@ -20,12 +24,14 @@ export async function POST(req: Request) {
   const user = await requireAdmin()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const dryRun = new URL(req.url).searchParams.get('dryRun') === '1'
+  const params = new URL(req.url).searchParams
+  const dryRun = params.get('dryRun') === '1'
+  const updateOnly = params.get('updateOnly') === '1'
   const db = supabaseAdmin()
 
   const { data: settings, error: settingsError } = await db
     .from('site_settings')
-    .select('c25k_start_date')
+    .select('c25k_start_date, c25k_session_order, c25k_week_overrides')
     .single()
   if (settingsError) return NextResponse.json({ error: settingsError.message }, { status: 500 })
 
@@ -35,12 +41,16 @@ export async function POST(req: Request) {
   if (!start) return NextResponse.json({ error: 'Set a C25K start date first.' }, { status: 400 })
   if (!isTuesday(start)) return NextResponse.json({ error: `The start date (${start}) is not a Tuesday. C25K starts on a Tuesday.` }, { status: 400 })
 
-  const sessions = buildC25kSessions(start)
+  const programme = effectiveProgramme(
+    (settings?.c25k_session_order as SessionOrder | null) ?? null,
+    (settings?.c25k_week_overrides as WeekOverrides | null) ?? null,
+  )
+  const sessions = buildC25kSessions(start, programme)
   if (dryRun) return NextResponse.json({ dryRun: true, sessions })
 
   // The form's date becomes the saved one, so the /c25k page, the programme and
   // the sessions can never disagree.
-  if (fromForm && fromForm !== settings?.c25k_start_date) {
+  if (!updateOnly && fromForm && fromForm !== settings?.c25k_start_date) {
     const { error: saveError } = await db.from('site_settings').update({ c25k_start_date: fromForm }).eq('id', 1)
     if (saveError) return NextResponse.json({ error: saveError.message }, { status: 500 })
   }
@@ -61,6 +71,7 @@ export async function POST(req: Request) {
       title: s.title,
       meeting_point: s.meeting_point,
       start_time: s.start_time,
+      description: s.description,
       run_type: 'c25k',
     }
     const id = idByKey.get(s.key)
@@ -68,7 +79,7 @@ export async function POST(req: Request) {
       const { error } = await db.from('runs').update(fields).eq('id', id)
       if (error) errors.push(`UPDATE ${s.key}: ${error.message}`)
       else updated++
-    } else {
+    } else if (!updateOnly) {
       const { error } = await db.from('runs').insert({
         ...fields,
         google_event_id: s.key,

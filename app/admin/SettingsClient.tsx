@@ -1,10 +1,8 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import { EDITABLE_WEEKS, PROGRAMME, SLOT_KEYS, effectiveProgramme, type SessionOrder, type SlotKey, type SlotText, type WeekOverrides } from '@/lib/c25kProgramme'
 
-// Session order: { "6": [tuesdayIdx, thursdayIdx, soloIdx], "7": [...] }
-// Indices refer to position in the canonical sessions array for that week
-type SessionOrder = { [week: string]: [number, number, number] }
 
 type Settings = {
   hero_image_url: string | null
@@ -21,27 +19,22 @@ type Settings = {
   c25k_cohort_label: string | null
   c25k_max_registrations: number | null
   c25k_session_order: SessionOrder | null
+  c25k_week_overrides: WeekOverrides | null
 }
 
-// Canonical session descriptions for the two varying weeks
-const VARYING_WEEKS: { n: number; title: string; sessions: { label: string; short: string }[] }[] = [
-  {
-    n: 6, title: 'Week 6 - 20-min milestone',
-    sessions: [
-      { label: 'Run 1 - 5+5+5 min intervals',  short: '5+5+5 (15 min)' },
-      { label: 'Run 2 - 8+8 min intervals',     short: '8+8 (16 min)' },
-      { label: 'Run 3 - 20 min non-stop',       short: '20 min non-stop' },
-    ],
-  },
-  {
-    n: 7, title: 'Week 7 - Stretch to 25 min',
-    sessions: [
-      { label: 'Run 1 - 5+8+5 min intervals',  short: '5+8+5 (18 min)' },
-      { label: 'Run 2 - 10+10 min intervals',   short: '10+10 (20 min)' },
-      { label: 'Run 3 - 25 min non-stop',       short: '25 min non-stop' },
-    ],
-  },
-]
+type WeekText = Record<string, Record<SlotKey, SlotText>>
+
+/** Weeks 6 and 7 as Tuesday / Thursday / solo text, from a programme. */
+function weekTextFrom(order: SessionOrder | null, overrides: WeekOverrides | null): WeekText {
+  const programme = effectiveProgramme(order, overrides)
+  const out: WeekText = {}
+  for (const n of EDITABLE_WEEKS) {
+    const w = programme.find(p => p.n === n)!
+    out[String(n)] = Object.fromEntries(SLOT_KEYS.map((k, i) => [k, { intervals: w.sessions[i].intervals, totalRun: w.sessions[i].totalRun }])) as Record<SlotKey, SlotText>
+  }
+  return out
+}
+const SLOT_NAMES: Record<SlotKey, string> = { tue: 'Tuesday group', thu: 'Thursday group', solo: 'Solo run' }
 
 export default function SettingsClient({ initial }: { initial: Settings }) {
   const [heroUrl,            setHeroUrl]            = useState(initial.hero_image_url ?? '')
@@ -57,9 +50,17 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
   const [c25kStartDate,      setC25kStartDate]      = useState(initial.c25k_start_date ?? '')
   const [c25kCohortLabel,    setC25kCohortLabel]    = useState(initial.c25k_cohort_label ?? '')
   const [c25kMaxReg,         setC25kMaxReg]         = useState<string>(initial.c25k_max_registrations?.toString() ?? '')
-  const [c25kSessionOrder,   setC25kSessionOrder]   = useState<SessionOrder>(
+  // Kept as saved: weeks 6 and 7 are now edited as text, which starts from this order.
+  const [c25kSessionOrder] = useState<SessionOrder>(
     initial.c25k_session_order ?? { '6': [0, 1, 2], '7': [0, 1, 2] }
   )
+  const [c25kWeekText, setC25kWeekText] = useState<WeekText>(
+    () => weekTextFrom(initial.c25k_session_order, initial.c25k_week_overrides)
+  )
+  const setSlot = (week: string, slot: SlotKey, field: keyof SlotText, value: string) =>
+    setC25kWeekText(prev => ({ ...prev, [week]: { ...prev[week], [slot]: { ...prev[week][slot], [field]: value } } }))
+  const resetWeek = (week: string) =>
+    setC25kWeekText(prev => ({ ...prev, [week]: weekTextFrom({ [week]: [0, 1, 2] }, null)[week] }))
   const [c25kSessionsBusy,   setC25kSessionsBusy]   = useState(false)
   const ukDate = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' })
   const [c25kSessionsMsg,    setC25kSessionsMsg]    = useState<string | null>(null)
@@ -152,9 +153,12 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
           c25k_cohort_label:        c25kCohortLabel.trim() || null,
           c25k_max_registrations:   c25kMaxReg.trim() ? parseInt(c25kMaxReg, 10) : null,
           c25k_session_order:       c25kSessionOrder,
+          c25k_week_overrides:      c25kWeekText,
         }),
       })
       if (!res.ok) throw new Error((await res.json()).error)
+      // Edited week 6/7 runs reach C25K sessions that already exist. updateOnly never creates any.
+      fetch('/api/admin/c25k/sessions?updateOnly=1', { method: 'POST' }).catch(() => {})
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
     } catch (e) {
@@ -371,49 +375,48 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
           </div>
         </div>
 
-        {/* Session order for varying weeks */}
+        {/* Weeks 6 and 7: the runs in the admin's own words (lib/c25kProgramme.ts) */}
         <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid var(--border)' }}>
-          <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--muted)', marginBottom: 4 }}>Session order</p>
-          <p style={{ fontSize: 12, color: 'var(--faint)', marginBottom: 14, lineHeight: 1.5 }}>
-            For weeks 6 and 7, assign which run goes on each day. The longest run shouldn&rsquo;t be left as the solo session.
+          <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--muted)', marginBottom: 4 }}>Weeks 6 and 7 runs</p>
+          <p style={{ fontSize: 'var(--text-xs)', color: 'var(--faint)', marginBottom: 14, lineHeight: 1.5 }}>
+            Write each run as the cohort should see it. It shows on the programme page, on the sessions and in the C25K email. Saving updates any sessions already created.
           </p>
-          {VARYING_WEEKS.map(wk => {
-            const order = c25kSessionOrder[wk.n.toString()] ?? [0, 1, 2]
-            const slots: { key: 0 | 1 | 2; label: string }[] = [
-              { key: 0, label: 'Tuesday group' },
-              { key: 1, label: 'Thursday group' },
-              { key: 2, label: 'Solo run' },
-            ]
-            const selectStyle: React.CSSProperties = {
-              background: 'var(--bg)', border: '1px solid var(--border-2)',
-              borderRadius: 8, padding: '8px 12px', fontSize: 12, color: 'var(--dim)',
-              fontFamily: 'Inter, sans-serif', outline: 'none', colorScheme: 'dark',
-              width: '100%', cursor: 'pointer',
-            }
+          {EDITABLE_WEEKS.map(n => {
+            const week = String(n)
+            const title = PROGRAMME.find(p => p.n === n)?.title ?? ''
             return (
-              <div key={wk.n} style={{ marginBottom: 16 }}>
-                <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--muted)', marginBottom: 8 }}>{wk.title}</p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  {slots.map(slot => (
-                    <div key={slot.key} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                      <span style={{ fontSize: 'var(--text-xs)', color: 'var(--faint)', width: 108, flexShrink: 0 }}>{slot.label}</span>
-                      <select
-                        value={order[slot.key]}
-                        onChange={e => {
-                          const newIdx = parseInt(e.target.value, 10)
-                          const newOrder: [number, number, number] = [...order] as [number, number, number]
-                          // Swap with whatever slot currently holds newIdx
-                          const swapSlot = newOrder.indexOf(newIdx)
-                          if (swapSlot !== -1) newOrder[swapSlot] = newOrder[slot.key]
-                          newOrder[slot.key] = newIdx
-                          setC25kSessionOrder({ ...c25kSessionOrder, [wk.n.toString()]: newOrder })
-                        }}
-                        style={selectStyle}
-                      >
-                        {wk.sessions.map((s, i) => (
-                          <option key={i} value={i}>{s.short}</option>
-                        ))}
-                      </select>
+              <div key={week} style={{ marginBottom: 18 }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, marginBottom: 8 }}>
+                  <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--muted)', margin: 0 }}>Week {n} - {title}</p>
+                  <button type="button" onClick={() => resetWeek(week)} style={{ background: 'none', border: 'none', padding: 0, fontSize: 'var(--text-xs)', color: 'var(--orange)', cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+                    Reset to NHS plan
+                  </button>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {SLOT_KEYS.map(slot => (
+                    <div key={slot} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 3fr) minmax(0, 1fr)', gap: 8 }}>
+                      <label style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
+                        <span style={{ fontSize: 'var(--text-xs)', color: 'var(--faint)' }}>{SLOT_NAMES[slot]}</span>
+                        <input
+                          id={`c25k-w${week}-${slot}-intervals`}
+                          type="text"
+                          value={c25kWeekText[week][slot].intervals}
+                          onChange={e => setSlot(week, slot, 'intervals', e.target.value)}
+                          maxLength={200}
+                          style={{ width: '100%', background: 'var(--bg)', border: '1px solid var(--border-2)', borderRadius: 8, padding: '8px 12px', fontSize: 'var(--text-sm)', color: 'var(--dim)', fontFamily: 'Inter, sans-serif', outline: 'none', boxSizing: 'border-box' as const }}
+                        />
+                      </label>
+                      <label style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
+                        <span style={{ fontSize: 'var(--text-xs)', color: 'var(--faint)' }}>Running time</span>
+                        <input
+                          id={`c25k-w${week}-${slot}-total`}
+                          type="text"
+                          value={c25kWeekText[week][slot].totalRun}
+                          onChange={e => setSlot(week, slot, 'totalRun', e.target.value)}
+                          maxLength={200}
+                          style={{ width: '100%', background: 'var(--bg)', border: '1px solid var(--border-2)', borderRadius: 8, padding: '8px 12px', fontSize: 'var(--text-sm)', color: 'var(--dim)', fontFamily: 'Inter, sans-serif', outline: 'none', boxSizing: 'border-box' as const }}
+                        />
+                      </label>
                     </div>
                   ))}
                 </div>

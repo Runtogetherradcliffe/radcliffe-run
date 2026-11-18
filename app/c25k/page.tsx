@@ -328,8 +328,8 @@ export default async function C25KPage() {
                 },
                 {
                   icon: '📱',
-                  title: 'Use the NHS app',
-                  body: 'Download the free NHS Couch to 5K app for audio coaching and interval timers - it fits perfectly alongside our sessions.',
+                  title: 'Use the RTR app',
+                  body: 'Download the free Run Together Radcliffe app for your programme week by week, with the dates and meeting places of your sessions.',
                 },
               ].map(item => (
                 <div key={item.title} style={{

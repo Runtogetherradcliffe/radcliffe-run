@@ -18,6 +18,8 @@
  * within the same year moves every session instead of duplicating it.
  */
 
+import { PROGRAMME, slotSession, type WeekData } from '@/lib/c25kProgramme'
+
 export const C25K_WEEKS = 10
 
 export const C25K_TUESDAY_MEETING = 'Aldi, Higher Lane, Whitefield, M45 7EA'
@@ -35,6 +37,8 @@ export interface C25kSessionRow {
   title: string
   meeting_point: string
   start_time: string | null
+  /** That session's run, from the programme (weeks 6 and 7 may be the admin's own words). */
+  description: string
 }
 
 function addDays(iso: string, days: number): string {
@@ -50,23 +54,32 @@ export function isTuesday(iso: string): boolean {
   return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === iso && d.getUTCDay() === 2
 }
 
-/** The cohort's 21 sessions: Tuesday and Thursday for weeks 1-10, then graduation. */
-export function buildC25kSessions(startDate: string): C25kSessionRow[] {
+/** The cohort's 21 sessions: Tuesday and Thursday for weeks 1-10, then graduation.
+ * `programme` is the effective programme (lib/c25kProgramme.ts `effectiveProgramme`). */
+export function buildC25kSessions(startDate: string, programme: WeekData[] = PROGRAMME): C25kSessionRow[] {
   if (!isTuesday(startDate)) {
     throw new Error(`C25K start date must be a Tuesday (YYYY-MM-DD), got "${startDate}"`)
   }
   const cohort = `c25k-${startDate.slice(0, 4)}`
   const rows: C25kSessionRow[] = []
+  const run = (week: number, slot: 'tue' | 'thu'): string => {
+    const w = programme.find(p => p.n === week)
+    if (!w) return ''
+    const sess = slotSession(w, slot)
+    return sess.totalRun ? `${sess.intervals} (${sess.totalRun})` : sess.intervals
+  }
   for (let week = 1; week <= C25K_WEEKS; week++) {
     const w = String(week).padStart(2, '0')
     const tuesday = addDays(startDate, (week - 1) * 7)
     rows.push({
       key: `${cohort}:w${w}:tue`, slot: 'tue', week, date: tuesday,
       title: `C25K week ${week} - Tuesday`, meeting_point: C25K_TUESDAY_MEETING, start_time: null,
+      description: run(week, 'tue'),
     })
     rows.push({
       key: `${cohort}:w${w}:thu`, slot: 'thu', week, date: addDays(tuesday, 2),
       title: `C25K week ${week} - Thursday`, meeting_point: C25K_THURSDAY_MEETING, start_time: null,
+      description: run(week, 'thu'),
     })
   }
   rows.push({
@@ -74,6 +87,7 @@ export function buildC25kSessions(startDate: string): C25kSessionRow[] {
     date: addDays(startDate, (C25K_WEEKS - 1) * 7 + 4),
     title: 'C25K graduation - Heaton Park parkrun', meeting_point: C25K_GRADUATION_MEETING,
     start_time: C25K_GRADUATION_START,
+    description: 'Graduation: run your first 5K together at Heaton Park parkrun.',
   })
   return rows
 }

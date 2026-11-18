@@ -76,7 +76,11 @@ Full DDL in `supabase-schema-production.sql`. Tables:
   stamped on text change by `/api/admin/settings`, served by `/api/home` until
   the morning after the week's last scheduled run), and all C25K settings (`c25k_enabled`, `c25k_registration_open`,
   `c25k_start_date`, `c25k_cohort_label`, `c25k_max_registrations`,
-  `c25k_session_order`).
+  `c25k_session_order`, and `c25k_week_overrides` (jsonb, 18 Nov 2026,
+  `supabase-migration-c25k-week-overrides.sql`: weeks 6 and 7's Tuesday / Thursday /
+  solo runs in the admin's own words, edited in Settings; NULL = the NHS plan in the
+  chosen order; applied by `lib/c25kProgramme.ts` `effectiveProgramme`, which the
+  programme page, the session generator and the C25K email all use)).
 - **scheduled_emails** - newsletter drafts/schedule. `status`
   ('draft'|'scheduled'|'sent'|'cancelled'), content fields, `recipient_filter`
   ('all' | 'selected' | a cohort), `recipient_member_ids uuid[]`.

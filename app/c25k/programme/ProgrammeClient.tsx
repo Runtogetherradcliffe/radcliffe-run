@@ -1,78 +1,10 @@
 'use client'
 
 import Link from 'next/link'
+import { effectiveProgramme, type SessionOrder, type WeekData, type WeekOverrides } from '@/lib/c25kProgramme'
 
 /* ── Programme data ─────────────────────────────────────────────────────── */
 
-type Session = {
-  label: string
-  intervals: string
-  totalRun: string
-  isSpecial?: boolean   // e.g. graduation parkrun
-}
-
-type WeekData = {
-  n: number
-  title: string
-  sessions: Session[]
-}
-
-const PROGRAMME: WeekData[] = [
-  {
-    n: 1, title: 'Ease in',
-    sessions: [{ label: 'All sessions', intervals: '8 × (60s jog + 90s walk)', totalRun: '8 min running' }],
-  },
-  {
-    n: 2, title: 'Build to 90 seconds',
-    sessions: [{ label: 'All sessions', intervals: '6 × (90s jog + 2 min walk)', totalRun: '9 min running' }],
-  },
-  {
-    n: 3, title: 'First 3-minute run',
-    sessions: [{ label: 'All sessions', intervals: '2 × (90s jog, 90s walk, 3 min jog, 3 min walk)', totalRun: '9 min running' }],
-  },
-  {
-    n: 4, title: 'Five-minute intervals',
-    sessions: [{ label: 'All sessions', intervals: '3 min jog, 90s walk, 5 min jog, 2½ min walk - repeat', totalRun: '16 min running' }],
-  },
-  {
-    n: 5, title: 'Consolidate (repeat of week 4)',
-    sessions: [{ label: 'All sessions', intervals: '3 min jog, 90s walk, 5 min jog, 2½ min walk - repeat', totalRun: '16 min running' }],
-  },
-  {
-    n: 6, title: '20-minute milestone',
-    sessions: [
-      { label: 'Tuesday group',  intervals: '5 min jog, 3 min walk, 5 min jog, 3 min walk, 5 min jog',  totalRun: '15 min running' },
-      { label: 'Thursday group', intervals: '8 min jog, 5 min walk, 8 min jog',                          totalRun: '16 min running' },
-      { label: 'Solo run',       intervals: '20 min non-stop',                                            totalRun: '20 min running' },
-    ],
-  },
-  {
-    n: 7, title: 'Stretch to 25 minutes',
-    sessions: [
-      { label: 'Tuesday group',  intervals: '5 min jog, 3 min walk, 8 min jog, 3 min walk, 5 min jog',  totalRun: '18 min running' },
-      { label: 'Thursday group', intervals: '10 min jog, 3 min walk, 10 min jog',                        totalRun: '20 min running' },
-      { label: 'Solo run',       intervals: '25 min non-stop',                                            totalRun: '25 min running' },
-    ],
-  },
-  {
-    n: 8, title: '25 minutes non-stop',
-    sessions: [{ label: 'All sessions', intervals: '25 min non-stop', totalRun: '25 min running' }],
-  },
-  {
-    n: 9, title: 'Nearly there',
-    sessions: [{ label: 'All sessions', intervals: '28 min non-stop', totalRun: '28 min running' }],
-  },
-  {
-    n: 10, title: 'You run a 5K! 🎉',
-    sessions: [
-      { label: 'Tuesday group',  intervals: '30 min non-stop',                                                    totalRun: '30 min running' },
-      { label: 'Thursday group', intervals: '30 min non-stop',                                                    totalRun: '30 min running' },
-      { label: 'Graduation run', intervals: '🎓 Group graduation - Heaton Park parkrun', totalRun: '5K',  isSpecial: true },
-    ],
-  },
-]
-
-const SLOT_LABELS = ['Tuesday group', 'Thursday group', 'Solo run']
 
 const SESSION_COLOURS: Record<string, string> = {
   'Tuesday group':  '#4a9eff',
@@ -101,23 +33,6 @@ function weekDates(startDate: string, weekN: number): [Date, Date, Date] {
     addDays(base, offset + 2),     // Thursday
     addDays(base, offset + 4),     // Saturday
   ]
-}
-
-/* ── Apply session order to varying weeks ───────────────────────────────── */
-
-function applyOrder(week: WeekData, order: [number, number, number] | undefined): WeekData {
-  if (week.sessions.length !== 3 || !order) return week
-  const canonical = week.sessions
-  // W10 graduation run always stays in slot 2 (Saturday), don't remap it
-  if (canonical.some(s => s.isSpecial)) return week
-  return {
-    ...week,
-    sessions: [
-      { ...canonical[order[0]], label: SLOT_LABELS[0] },
-      { ...canonical[order[1]], label: SLOT_LABELS[1] },
-      { ...canonical[order[2]], label: SLOT_LABELS[2] },
-    ],
-  }
 }
 
 /* ── Week row ── */
@@ -206,20 +121,17 @@ type Props = {
   firstName: string
   session: string | null
   isLeader: boolean
-  sessionOrder: Record<string, [number, number, number]>
+  sessionOrder: SessionOrder
+  weekOverrides: WeekOverrides | null
   startDate: string | null
 }
 
-export default function ProgrammeClient({ firstName, session, isLeader, sessionOrder, startDate }: Props) {
+export default function ProgrammeClient({ firstName, session, isLeader, sessionOrder, weekOverrides, startDate }: Props) {
   const sessionLabel = session === 'tuesday'  ? 'Tuesdays'
     : session === 'thursday' ? 'Thursdays'
     : 'Tuesdays and Thursdays'
 
-  const programme = PROGRAMME.map(w =>
-    w.sessions.length === 3
-      ? applyOrder(w, sessionOrder[w.n.toString()] as [number, number, number] | undefined)
-      : w
-  )
+  const programme = effectiveProgramme(sessionOrder, weekOverrides)
 
   return (
     <div>
@@ -243,7 +155,7 @@ export default function ProgrammeClient({ firstName, session, isLeader, sessionO
               Full programme - {firstName}
             </h1>
             <p style={{ fontSize: 'var(--text-md)', fontWeight: 300, color: 'var(--dim)', lineHeight: 1.7, margin: 0 }}>
-              Leader view of all 10 weeks. Session order for weeks 6 and 7 reflects the admin settings.
+              Leader view of all 10 weeks. Weeks 6 and 7 show the runs set in admin Settings.
               {startDate && ' Dates are shown based on the configured start date.'}
             </p>
           </>
