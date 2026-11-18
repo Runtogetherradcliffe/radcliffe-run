@@ -219,7 +219,8 @@ Native-app API surface (all in this repo): `GET /api/routes` (public
 catalogue - static `lib/routes.ts` merged with `route_descriptions`, light
 map webp URLs), `GET /api/leader/contacts` (full active-member emergency set
 for the app's encrypted offline cache), `GET /api/leader/register?run_id=`
-(check-in roster + counters), `POST /api/leader/checkin` (idempotent
+(check-in roster + counters; each member carries `cohort`, 'c25k' or null, since
+18 Nov 2026 so a C25K session can show the cohort first), `POST /api/leader/checkin` (idempotent
 attendance upsert/delete), `POST/DELETE /api/push/register`,
 `GET /api/cron/send-push` (Thursday announcement; cron-job.org, CRON_SECRET,
 claim-locked), `GET /api/attendance/summary` (member's own lifetime ladders),
