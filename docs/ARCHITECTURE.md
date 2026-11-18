@@ -475,7 +475,8 @@ Route map imagery: every route has a dark webp and a light webp;
   corrected in the sheet moves the run rather than leaving it behind (10 Nov 2026).
   Runs that leave the sheet are never deleted by the sync.
 - `POST /api/admin/c25k/sessions` (admin only, `requireAdmin()`) creates or updates the
-  C25K cohort's session rows from the SAVED `site_settings.c25k_start_date`
+  C25K cohort's session rows from the start date on the Settings form, which it also
+  saves as `site_settings.c25k_start_date` (no separate Save needed)
   (`lib/c25kSessions.ts`): `run_type = 'c25k'`, a Tuesday (Aldi, Whitefield) and a
   Thursday (Radcliffe Market) row for each of 10 weeks, `start_time` NULL (7pm
   convention), plus the graduation parkrun on the Saturday of week 10 at 09:00.

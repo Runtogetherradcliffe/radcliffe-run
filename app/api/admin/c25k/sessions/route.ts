@@ -5,8 +5,11 @@ import { buildC25kSessions, isTuesday } from '@/lib/c25kSessions'
 
 /**
  * POST /api/admin/c25k/sessions - create or update the C25K cohort's session
- * rows from the SAVED start date (lib/c25kSessions.ts). Admin only.
- * `?dryRun=1` returns the sessions it would write without touching the table.
+ * rows (lib/c25kSessions.ts). Admin only. Body `{ start_date }` is the date on
+ * the Settings form: it is SAVED as `site_settings.c25k_start_date` and the
+ * sessions are built from it, so the button needs no separate Save (Paul,
+ * 18 Nov 2026). With no body it uses the saved date.
+ * `?dryRun=1` returns the sessions it would write without touching anything.
  *
  * Idempotent: rows are matched on their stable key in `google_event_id`, so a
  * second press updates dates, titles and meeting points in place. It never
@@ -26,12 +29,21 @@ export async function POST(req: Request) {
     .single()
   if (settingsError) return NextResponse.json({ error: settingsError.message }, { status: 500 })
 
-  const start = (settings?.c25k_start_date as string | null) ?? null
-  if (!start) return NextResponse.json({ error: 'Set and save the C25K start date first.' }, { status: 400 })
-  if (!isTuesday(start)) return NextResponse.json({ error: `The saved start date (${start}) is not a Tuesday.` }, { status: 400 })
+  const body = await req.json().catch(() => ({})) as { start_date?: unknown }
+  const fromForm = typeof body.start_date === 'string' && body.start_date.trim() ? body.start_date.trim() : null
+  const start = fromForm ?? ((settings?.c25k_start_date as string | null) ?? null)
+  if (!start) return NextResponse.json({ error: 'Set a C25K start date first.' }, { status: 400 })
+  if (!isTuesday(start)) return NextResponse.json({ error: `The start date (${start}) is not a Tuesday. C25K starts on a Tuesday.` }, { status: 400 })
 
   const sessions = buildC25kSessions(start)
   if (dryRun) return NextResponse.json({ dryRun: true, sessions })
+
+  // The form's date becomes the saved one, so the /c25k page, the programme and
+  // the sessions can never disagree.
+  if (fromForm && fromForm !== settings?.c25k_start_date) {
+    const { error: saveError } = await db.from('site_settings').update({ c25k_start_date: fromForm }).eq('id', 1)
+    if (saveError) return NextResponse.json({ error: saveError.message }, { status: 500 })
+  }
 
   const cohortPrefix = sessions[0].key.split(':')[0]
   const { data: existing, error: existingError } = await db

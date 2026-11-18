@@ -166,7 +166,8 @@ matching doc edit; treat that reminder as a blocking checklist item, not a sugge
 - **C25K sessions are generated, not synced** (18 Nov 2026, `lib/c25kSessions.ts`,
   `POST /api/admin/c25k/sessions`). Every C25K session is its own `runs` row
   (`run_type = 'c25k'`), Thursday included - never a group on the regular Thursday
-  run (Paul, 12 Nov 2026). The admin button builds them from the saved start date and
+  run (Paul, 12 Nov 2026). The admin button saves the form's start date and builds them
+  from it, and
   keys them `c25k-<year>:w<NN>:<tue|thu|grad>` in `google_event_id`; keep that key
   stable, as re-pressing relies on it to update rather than duplicate. Before the
   C25K sessions appear ONLY in the cohort's own area (Paul, 18 Nov 2026): the home

@@ -61,9 +61,6 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
     initial.c25k_session_order ?? { '6': [0, 1, 2], '7': [0, 1, 2] }
   )
   const [c25kSessionsBusy,   setC25kSessionsBusy]   = useState(false)
-  // The button builds from the SAVED date, so it must not run while the form shows an unsaved one.
-  const [c25kSavedStart,     setC25kSavedStart]     = useState(initial.c25k_start_date ?? '')
-  const c25kStartUnsaved = c25kStartDate.trim() !== c25kSavedStart
   const ukDate = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' })
   const [c25kSessionsMsg,    setC25kSessionsMsg]    = useState<string | null>(null)
 
@@ -72,7 +69,11 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
     setC25kSessionsBusy(true)
     setC25kSessionsMsg(null)
     try {
-      const res = await fetch('/api/admin/c25k/sessions', { method: 'POST' })
+      const res = await fetch('/api/admin/c25k/sessions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ start_date: c25kStartDate.trim() || null }),
+      })
       const body = await res.json().catch(() => ({}))
       if (!res.ok && res.status !== 207) {
         setC25kSessionsMsg(body.error ?? `Failed (${res.status})`)
@@ -154,7 +155,6 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
         }),
       })
       if (!res.ok) throw new Error((await res.json()).error)
-      setC25kSavedStart(c25kStartDate.trim())
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
     } catch (e) {
@@ -348,24 +348,22 @@ export default function SettingsClient({ initial }: { initial: Settings }) {
           <div>
             <p style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--muted)', marginBottom: 6 }}>Session schedule</p>
             <p style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)', margin: '0 0 8px', lineHeight: 1.5 }}>
-              Creates the cohort&apos;s sessions on the runs list from the saved start date: a Tuesday and a Thursday for each of the 10 weeks, and the graduation parkrun. Leaders check runners in against these. Pressing it again updates them, so it is safe to use after moving the start date. Save settings first.
+              Uses the start date above (and saves it) to create the cohort&apos;s sessions: a Tuesday and a Thursday for each of the 10 weeks, and the graduation parkrun. Leaders check runners in against these. Pressing it again updates them, so it is safe to use after moving the start date.
             </p>
             <button
               type="button"
               onClick={createC25kSessions}
-              disabled={c25kSessionsBusy || c25kStartUnsaved || !c25kSavedStart}
+              disabled={c25kSessionsBusy || !c25kStartDate.trim()}
               style={{
                 background: 'var(--card-hi)', border: '1px solid var(--border-2)', borderRadius: 8,
-                padding: '9px 14px', fontSize: 'var(--text-sm)', color: 'var(--white)', cursor: c25kSessionsBusy ? 'wait' : (c25kStartUnsaved || !c25kSavedStart) ? 'not-allowed' : 'pointer', opacity: (c25kStartUnsaved || !c25kSavedStart) ? 0.5 : 1,
+                padding: '9px 14px', fontSize: 'var(--text-sm)', color: 'var(--white)', cursor: c25kSessionsBusy ? 'wait' : !c25kStartDate.trim() ? 'not-allowed' : 'pointer', opacity: !c25kStartDate.trim() ? 0.5 : 1,
                 fontFamily: 'Inter, sans-serif',
               }}
             >
               {c25kSessionsBusy ? 'Creating sessions...' : 'Create or update C25K sessions'}
             </button>
-            {(c25kStartUnsaved || !c25kSavedStart) && (
-              <p role="status" style={{ fontSize: 'var(--text-xs)', color: 'var(--orange)', margin: '8px 0 0' }}>
-                {c25kSavedStart ? `Save settings first: the saved start date is ${ukDate(c25kSavedStart)}.` : 'Set and save a start date first.'}
-              </p>
+            {!c25kStartDate.trim() && (
+              <p role="status" style={{ fontSize: 'var(--text-xs)', color: 'var(--orange)', margin: '8px 0 0' }}>Set a start date above first.</p>
             )}
             {c25kSessionsMsg && (
               <p role="status" style={{ fontSize: 'var(--text-xs)', color: 'var(--dim)', margin: '8px 0 0' }}>{c25kSessionsMsg}</p>
