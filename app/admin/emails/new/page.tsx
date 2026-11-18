@@ -30,7 +30,7 @@ export default async function NewEmailPage() {
     db.from('runs')
       .select('date, distance_km')
       .gte('date', today)
-      .neq('run_type', 'social')
+      .not('run_type', 'in', '(social,c25k)')
       .eq('cancelled', false)
       .order('date', { ascending: true }),
     db.from('site_settings')

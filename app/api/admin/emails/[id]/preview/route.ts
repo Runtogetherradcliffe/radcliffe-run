@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/admin'
 import { supabaseAdmin } from '@/lib/supabase'
 import { buildEmailHtml, RunInfo } from '@/lib/buildEmail'
-import { ROUTES } from '@/lib/routes'
-import { getRouteOverrides } from '@/lib/routeDescriptions'
+import { loadEmailRuns } from '@/lib/emailRuns'
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.radcliffe.run'
 
@@ -35,30 +34,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   let runs: RunInfo[] = []
   const thursdayDate = merged.thursday_date as string | null
   if (merged.show_route_block !== false && thursdayDate) {
-    const { data: runRows } = await db
-      .from('runs')
-      .select('id, date, title, description, route_slug, distance_km, terrain, meeting_point, meeting_map_url, on_tour, has_jeffing, cancelled')
-      .eq('date', thursdayDate)
-      .eq('cancelled', false)
-      .order('distance_km', { ascending: true })
-
-    const overrides = await getRouteOverrides()
-
-    runs = (runRows ?? []).map(r => {
-      const route = r.route_slug ? ROUTES.find(ro => ro.slug === r.route_slug) : null
-      return {
-        date:            r.date,
-        title:           r.title,
-        distance_km:     r.distance_km,
-        description:     (r.route_slug && overrides[r.route_slug]?.description) ? overrides[r.route_slug].description! : (route?.description ?? r.description ?? null),
-        route_slug:      r.route_slug,
-        meeting_point:   r.meeting_point,
-        meeting_map_url: r.meeting_map_url ?? null,
-        on_tour:         r.on_tour ?? false,
-        has_jeffing:     r.has_jeffing ?? false,
-        terrain:         r.terrain,
-      }
-    })
+    runs = await loadEmailRuns(db, thursdayDate, merged.recipient_filter as string | null)
   }
 
   const html = buildEmailHtml({

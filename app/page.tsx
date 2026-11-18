@@ -102,7 +102,8 @@ export default async function HomePage() {
       .select('id, date, title, description, distance_km, terrain, meeting_point, route_slug, on_tour, has_jeffing, run_type, cancelled, start_time, end_time')
       .gte('date', today)
       .lte('date', fourWeeksOutStr)
-      .neq('run_type', 'social')
+      // C25K sessions live in the cohort's own area (/c25k/programme), not here.
+      .not('run_type', 'in', '(social,c25k)')
       .order('date', { ascending: true })
       .order('distance_km', { ascending: true }),
     supabaseAdmin()

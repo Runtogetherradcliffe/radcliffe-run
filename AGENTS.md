@@ -169,10 +169,13 @@ matching doc edit; treat that reminder as a blocking checklist item, not a sugge
   run (Paul, 12 Nov 2026). The admin button builds them from the saved start date and
   keys them `c25k-<year>:w<NN>:<tue|thu|grad>` in `google_event_id`; keep that key
   stable, as re-pressing relies on it to update rather than duplicate. Before the
-  first cohort, check how each consumer shows a `c25k` row: the home page query is
-  `neq('run_type','social')` (so Tuesday sessions join the Thursday list), the
-  newsletter route block takes every non-social run on its Thursday, and the native
-  app's run list does not filter by type.
+  C25K sessions appear ONLY in the cohort's own area (Paul, 18 Nov 2026): the home
+  page, the sitemap and the weekly note's anchor exclude `c25k`, and the general weekly
+  email's route block excludes it (`lib/emailRuns.ts`, shared by send and preview). An
+  email sent to the "C25K cohort" (`recipient_filter = 'c25k'`) shows that week's C25K
+  sessions instead, each linking to `/c25k/programme`. Any NEW query that lists runs
+  generally must exclude `c25k` too. The native app does the same in its own code (a
+  C25K tab for cohort members).
 
 ## Email
 

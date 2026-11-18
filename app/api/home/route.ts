@@ -51,6 +51,7 @@ export async function GET(req: NextRequest) {
         .select('date')
         .gte('date', window.from)
         .lte('date', window.to)
+        .neq('run_type', 'c25k') // a Tuesday C25K session must not anchor the club's weekly note
       anchorDates = (anchorRuns ?? []).map((r) => r.date as string)
     }
     return NextResponse.json({

@@ -273,6 +273,7 @@ export default function EmailComposer({ draft: initial, runOptions, members, isN
         custom_text:      draft.custom_text,
         show_closing:     draft.show_closing,
         closing_text:     draft.closing_text,
+        recipient_filter: draft.recipient_filter,
       }),
     })
     const html = await res.text()
@@ -512,6 +513,7 @@ export default function EmailComposer({ draft: initial, runOptions, members, isN
           >
             <option value="all">All registered runners</option>
             <option value="selected">Specific members…</option>
+            <option value="c25k">C25K cohort (shows that week&apos;s C25K sessions)</option>
           </select>
           {draft.recipient_filter === 'selected' && (
             <MemberPicker

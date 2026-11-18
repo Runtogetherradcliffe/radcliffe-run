@@ -4,6 +4,8 @@
  * Light background with radcliffe.run brand accents.
  */
 
+import { formatClock } from '@/lib/runTimes'
+
 export interface RunInfo {
   date: string        // ISO date string e.g. '2026-04-24'
   title: string
@@ -15,6 +17,8 @@ export interface RunInfo {
   on_tour: boolean
   has_jeffing: boolean
   terrain: string | null
+  run_type?: string | null    // 'c25k' sessions link to the programme, not a route
+  start_time?: string | null  // NULL = the club's 7pm
 }
 
 export interface EmailData {
@@ -125,14 +129,17 @@ function runBlock(group: RunInfo[], siteUrl: string, showTerrain = false): strin
     ? `📍 ${location} <strong style="color:#f5a623;">(On Tour)</strong>`
     : `📍 ${location}`
 
-  const routeUrl = routeUrlFor(longest, siteUrl)
+  const isC25k   = lead.run_type === 'c25k'
+  const time     = formatClock(lead.start_time) ?? '7pm'
+  const routeUrl = isC25k ? safeUrl(`${siteUrl}/c25k/programme`, `${siteUrl}/c25k/programme`) : routeUrlFor(longest, siteUrl)
+  const buttonLabel = isC25k ? 'Your C25K programme &rarr;' : 'View route details &rarr;'
 
   return `
 <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
   <tr>
     <td style="background:#f9f9f9;border-left:3px solid #f5a623;border-radius:0 6px 6px 0;padding:20px 24px;">
       <p style="margin:0 0 6px;font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#f5a623;font-family:${FONT};">
-        ${dateStr} &bull; 7pm${distance ? ` &bull; <span style="text-transform:none;">${distance}</span>` : ''}${terrainLabel ? ` &bull; ${terrainLabel}` : ''}
+        ${dateStr} &bull; ${time}${distance ? ` &bull; <span style="text-transform:none;">${distance}</span>` : ''}${terrainLabel ? ` &bull; ${terrainLabel}` : ''}
       </p>
       <p style="margin:0 0 10px;font-size:18px;font-weight:700;color:#0a0a0a;letter-spacing:-0.02em;font-family:${FONT};">
         ${title}${jeffingBadge}
@@ -143,7 +150,7 @@ function runBlock(group: RunInfo[], siteUrl: string, showTerrain = false): strin
       </p>
       <a href="${routeUrl}"
          style="display:inline-block;padding:10px 20px;background:#f5a623;color:#0a0a0a;font-size:13px;font-weight:700;text-decoration:none;border-radius:6px;font-family:${FONT};">
-        View route details &rarr;
+        ${buttonLabel}
       </a>
     </td>
   </tr>
@@ -299,14 +306,16 @@ export function buildEmailText(data: EmailData): string {
         .map(d => `${d}km`)
         .join(' & ') || '?km'
       const anyJeffing = sorted.some(r => r.has_jeffing)
-      lines.push(`${dateStr} · 7pm · ${distances}${anyJeffing ? ' · Run or Jeff' : ''}`)
+      const time = formatClock(lead.start_time) ?? '7pm'
+      lines.push(lead.run_type === 'c25k' ? `${dateStr} · ${time}` : `${dateStr} · ${time} · ${distances}${anyJeffing ? ' · Run or Jeff' : ''}`)
       lines.push(cleanTitle(lead.title))
       const description = sorted.map(r => r.description).find(d => d && d.trim())
       if (description) lines.push('', description)
       const tourNote = lead.on_tour ? ' (On Tour)' : ''
       lines.push(`📍 ${lead.meeting_point}${tourNote}`)
       if (lead.on_tour && lead.meeting_map_url) lines.push(`Map: ${lead.meeting_map_url}`)
-      if (longest.route_slug) lines.push(`Route: ${siteUrl}/routes#${longest.route_slug}`)
+      if (lead.run_type === 'c25k') lines.push(`Your programme: ${siteUrl}/c25k/programme`)
+      else if (longest.route_slug) lines.push(`Route: ${siteUrl}/routes#${longest.route_slug}`)
       lines.push('')
     }
     lines.push('-'.repeat(40), '')

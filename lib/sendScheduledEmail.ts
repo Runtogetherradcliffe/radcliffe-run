@@ -6,8 +6,7 @@
 
 import { supabaseAdmin } from '@/lib/supabase'
 import { buildEmailHtml, buildEmailText, RunInfo } from '@/lib/buildEmail'
-import { ROUTES } from '@/lib/routes'
-import { getRouteOverrides } from '@/lib/routeDescriptions'
+import { loadEmailRuns } from '@/lib/emailRuns'
 import { sendBrevoEmail } from '@/lib/brevo'
 import { makeUnsubscribeToken } from '@/lib/unsubscribe'
 
@@ -57,31 +56,7 @@ export async function sendScheduledEmail(emailId: string): Promise<SendResult> {
   // Load runs for the Thursday date
   let runs: RunInfo[] = []
   if (email.show_route_block && email.thursday_date) {
-    const { data: runRows } = await db
-      .from('runs')
-      .select('id, date, title, description, route_slug, distance_km, terrain, meeting_point, meeting_map_url, on_tour, has_jeffing, cancelled')
-      .eq('date', email.thursday_date)
-      .eq('cancelled', false)
-      .neq('run_type', 'social')
-      .order('distance_km', { ascending: true })
-
-    const overrides = await getRouteOverrides()
-
-    runs = (runRows ?? []).map(r => {
-      const route = r.route_slug ? ROUTES.find(ro => ro.slug === r.route_slug) : null
-      return {
-        date:            r.date,
-        title:           r.title,
-        distance_km:     r.distance_km,
-        description:     (r.route_slug && overrides[r.route_slug]?.description) ? overrides[r.route_slug].description! : (route?.description ?? r.description ?? null),
-        route_slug:      r.route_slug,
-        meeting_point:   r.meeting_point,
-        meeting_map_url: r.meeting_map_url ?? null,
-        on_tour:         r.on_tour ?? false,
-        has_jeffing:     r.has_jeffing ?? false,
-        terrain:         r.terrain,
-      }
-    })
+    runs = await loadEmailRuns(db, email.thursday_date, email.recipient_filter)
   }
 
   // Build email content
