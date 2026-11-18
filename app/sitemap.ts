@@ -44,6 +44,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .from('runs')
     .select('id, date')
     .eq('cancelled', false)
+    .neq('run_type', 'c25k') // cohort sessions are not public listings
     .gte('date', today)
     .order('date', { ascending: true })
 

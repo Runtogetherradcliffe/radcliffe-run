@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
     await Promise.all([
       db
         .from('members')
-        .select('id, first_name, last_name')
+        .select('id, first_name, last_name, cohort')
         .eq('status', 'active')
         .order('first_name', { ascending: true }),
       db.from('attendance').select('member_id, group_key').eq('run_id', runId),
@@ -81,6 +81,8 @@ export async function GET(req: NextRequest) {
       id: m.id,
       first_name: m.first_name,
       last_name: m.last_name,
+      // 'c25k' or null: lets the app's check-in narrow the roster on a C25K session.
+      cohort: m.cohort ?? null,
       checked_in: tonight.has(m.id),
       group_key: tonight.get(m.id) ?? lastGroup.get(m.id) ?? null,
       milestoneTonight: milestones.get(m.id) ?? null,

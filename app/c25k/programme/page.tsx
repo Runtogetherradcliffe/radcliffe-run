@@ -3,6 +3,7 @@ import { createClient } from '@/utils/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import Nav from '@/components/layout/Nav'
 import ProgrammeClient from './ProgrammeClient'
+import type { WeekOverrides } from '@/lib/c25kProgramme'
 import Link from 'next/link'
 
 export const metadata = {
@@ -14,7 +15,7 @@ export default async function ProgrammePage() {
   // C25K must be enabled
   const { data: settings } = await supabaseAdmin()
     .from('site_settings')
-    .select('c25k_enabled, c25k_session_order, c25k_start_date')
+    .select('c25k_enabled, c25k_session_order, c25k_week_overrides, c25k_start_date')
     .single()
 
   if (!settings?.c25k_enabled) notFound()
@@ -113,6 +114,7 @@ export default async function ProgrammePage() {
             session={member!.c25k_session ?? null}
             isLeader={isLeader}
             sessionOrder={sessionOrder}
+            weekOverrides={(settings.c25k_week_overrides as WeekOverrides | null) ?? null}
             startDate={startDate}
           />
         </div>

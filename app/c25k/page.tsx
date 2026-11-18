@@ -26,7 +26,7 @@ const WEEKS: Week[] = [
   { n: 2,  heading: 'W2',  title: 'Build to 90s',       desc: 'Build to 90-second jogs',       duration: '31 min', runRatio: 0.47 },
   { n: 3,  heading: 'W3',  title: 'First 3-min run',    desc: 'First 3-minute run appears',    duration: '28 min', runRatio: 0.60 },
   { n: 4,  heading: 'W4',  title: 'Five-min intervals', desc: '3 + 5 min run intervals',       duration: '36 min', runRatio: 0.74 },
-  { n: 5,  heading: 'W5',  title: 'Consolidate',        desc: 'Repeat of week 4 - consolidate before week 6', duration: '36 min', runRatio: 0.74 },
+  { n: 5,  heading: 'W5',  title: 'Bridge week',        desc: 'A step up between the intervals and the longer runs', duration: '36 min', runRatio: 0.74 },
   { n: 6,  heading: 'W6',  title: '20 min milestone!',  desc: 'Build to first 20-min run',     duration: '38 min', runRatio: 0.76, sessionsVary: true },
   { n: 7,  heading: 'W7',  title: 'Stretch to 25 min',  desc: 'Work toward 25 min non-stop',   duration: '42 min', runRatio: 0.87, sessionsVary: true },
   { n: 8,  heading: 'W8',  title: '25 min non-stop',    desc: 'Jog 25 minutes continuously',   duration: '35 min', runRatio: 0.71 },
@@ -140,21 +140,26 @@ export default async function C25KPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   let joinHref = '/join?c25k=true'
+  let isLeader = false
   if (user?.email) {
     const { data: member } = await supabaseAdmin()
       .from('members')
-      .select('cohort')
+      .select('cohort, is_run_leader')
       .eq('email', user.email)
       .eq('status', 'active')
       .maybeSingle()
-    if (member?.cohort === 'c25k') {
+    isLeader = !!member?.is_run_leader
+    if (member?.cohort === 'c25k' || isLeader) {
       joinHref = '/c25k/programme'
     } else if (member) {
       joinHref = '/c25k/join'
     }
   }
 
+  // Cohort members and leaders see the programme instead of the join prompts
+  // (the programme page admits exactly these two groups).
   const isRegistered = joinHref === '/c25k/programme'
+  const viewLabel = isLeader ? 'View the programme →' : 'View your programme →'
 
   const formattedStart = startDate
     ? new Date(startDate + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -213,13 +218,13 @@ export default async function C25KPage() {
 
           {/* CTA buttons */}
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: registrationOpen && !isRegistered ? 20 : 0 }}>
-            {registrationOpen ? (
+            {registrationOpen || isRegistered ? (
               <Link href={joinHref} style={{
                 background: '#f5a623', color: '#0a0a0a',
                 fontSize: 'var(--text-md)', fontWeight: 700, padding: '14px 28px',
                 borderRadius: 10, textDecoration: 'none', letterSpacing: '-0.01em',
               }}>
-                {isRegistered ? 'View your programme →' : 'Join programme →'}
+                {isRegistered ? viewLabel : 'Join programme →'}
               </Link>
             ) : (
               <RegistrationClosed startDate={startDate} cohortLabel={cohortLabel} />
@@ -261,7 +266,7 @@ export default async function C25KPage() {
               Week by week
             </h2>
             <p style={{ fontSize: 'var(--text-base)', fontWeight: 300, color: 'var(--muted)', margin: 0 }}>
-              Based on the NHS Couch to 5K plan, with an extra consolidation week added at week 5.
+              Based on the NHS Couch to 5K plan, with an extra bridge week added at week 5.
               Every session starts with a 5-minute warm-up walk and ends with a 5-minute cool-down.
             </p>
           </div>
@@ -285,11 +290,11 @@ export default async function C25KPage() {
 
           <div style={{ marginTop: 16, display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', gap: '4px 8px' }}>
             <p style={{ fontSize: 12, fontWeight: 300, color: 'var(--muted)', margin: 0, lineHeight: 1.6 }}>
-              * Week 5 is an addition to the standard NHS plan - we repeat Week 4 to consolidate before the longer runs begin.
+              * Week 5 is an addition to the standard NHS plan: a bridge week that eases you from the short intervals towards the longer runs.
               Weeks marked <span style={{ fontWeight: 600, color: 'var(--dim)' }}>varies</span> have a different workout for each session.
             </p>
             <a href="/c25k/programme" style={{ fontSize: 12, color: '#f5a623', textDecoration: 'none', whiteSpace: 'nowrap' }}>
-              {isRegistered ? 'View your full programme →' : 'Registered? View the full session breakdown →'}
+              {isRegistered ? (isLeader ? 'View the full programme →' : 'View your full programme →') : 'Registered? View the full session breakdown →'}
             </a>
           </div>
         </section>
@@ -328,8 +333,8 @@ export default async function C25KPage() {
                 },
                 {
                   icon: '📱',
-                  title: 'Use the NHS app',
-                  body: 'Download the free NHS Couch to 5K app for audio coaching and interval timers - it fits perfectly alongside our sessions.',
+                  title: 'Use the RTR app',
+                  body: 'Download the free Run Together Radcliffe app for your programme week by week, with the dates and meeting places of your sessions.',
                 },
               ].map(item => (
                 <div key={item.title} style={{

@@ -163,6 +163,21 @@ matching doc edit; treat that reminder as a blocking checklist item, not a sugge
   false for every row, and the runs re-created after the 10 Nov clean-up all lost
   jeffing (restored by a one-off update on 17 Nov).
 
+- **C25K sessions are generated, not synced** (18 Nov 2026, `lib/c25kSessions.ts`,
+  `POST /api/admin/c25k/sessions`). Every C25K session is its own `runs` row
+  (`run_type = 'c25k'`), Thursday included - never a group on the regular Thursday
+  run (Paul, 12 Nov 2026). The admin button saves the form's start date and builds them
+  from it, and
+  keys them `c25k-<year>:w<NN>:<tue|thu|grad>` in `google_event_id`; keep that key
+  stable, as re-pressing relies on it to update rather than duplicate. Before the
+  C25K sessions appear ONLY in the cohort's own area (Paul, 18 Nov 2026): the home
+  page, the sitemap and the weekly note's anchor exclude `c25k`, and the general weekly
+  email's route block excludes it (`lib/emailRuns.ts`, shared by send and preview). An
+  email sent to the "C25K cohort" (`recipient_filter = 'c25k'`) shows that week's C25K
+  sessions instead, each linking to `/c25k/programme`. Any NEW query that lists runs
+  generally must exclude `c25k` too. The native app does the same in its own code (a
+  C25K tab for cohort members).
+
 ## Email
 
 - **Two separate email systems.** Content email (newsletter, welcome, contact form) goes

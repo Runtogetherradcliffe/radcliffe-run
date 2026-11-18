@@ -11,7 +11,7 @@ export default function Nav() {
   const [signedIn, setSignedIn] = useState(false)
   const [isLeader, setIsLeader] = useState(false)
   const [isAdmin,  setIsAdmin]  = useState(false)
-  const [isC25K,   setIsC25K]   = useState(false)
+  const [c25kOn,   setC25kOn]   = useState(false)
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 768px)')
@@ -24,6 +24,11 @@ export default function Nav() {
   useEffect(() => {
     const supabase = createClient()
 
+    // One "Couch to 5K" menu item while C25K is switched on (site_settings is readable by anyone).
+    // The programme is reached from that page: cohort members and leaders get a View programme button.
+    supabase.from('site_settings').select('c25k_enabled').single()
+      .then(({ data }) => setC25kOn(!!data?.c25k_enabled), () => { /* ignore */ })
+
     async function loadRoles() {
       const { data: { session } } = await supabase.auth.getSession()
       setSignedIn(!!session)
@@ -34,7 +39,6 @@ export default function Nav() {
             const me = await res.json()
             setIsLeader(me.isLeader)
             setIsAdmin(me.isAdmin)
-            setIsC25K(me.isC25K)
           }
         } catch { /* ignore network errors */ }
       }
@@ -46,7 +50,6 @@ export default function Nav() {
       if (!session) {
         setIsLeader(false)
         setIsAdmin(false)
-        setIsC25K(false)
       } else {
         // Re-fetch roles when session is established (e.g. after magic link sign-in)
         fetch('/api/me')
@@ -55,8 +58,7 @@ export default function Nav() {
             if (me) {
               setIsLeader(me.isLeader)
               setIsAdmin(me.isAdmin)
-              setIsC25K(me.isC25K)
-            }
+              }
           })
           .catch(() => { /* ignore */ })
       }
@@ -75,6 +77,7 @@ export default function Nav() {
     { href: '/about',    label: 'About'   },
     { href: '/routes',   label: 'Routes'  },
     { href: '/walks',    label: 'Walks'   },
+    ...(c25kOn ? [{ href: '/c25k', label: 'Couch to 5K' }] : []),
     { href: '/news',     label: 'Roundup' },
     { href: '/contact',  label: 'Contact' },
   ]
@@ -121,14 +124,6 @@ export default function Nav() {
               Merch
             </a>
           </div>
-          {isC25K && (
-            <Link href="/c25k/programme" style={{
-              fontSize: 'var(--text-sm)', fontWeight: 500, textDecoration: 'none',
-              color: active('/c25k/programme') ? 'var(--orange)' : 'var(--muted)',
-            }}>
-              My programme
-            </Link>
-          )}
           {isAdmin && (
             <Link href="/admin" style={{
               fontSize: 'var(--text-sm)', fontWeight: 500, textDecoration: 'none',
@@ -237,19 +232,6 @@ export default function Nav() {
             </Link>
           )}
 
-          {isC25K && (
-            <Link
-              href="/c25k/programme"
-              style={{
-                fontSize: 22, fontWeight: 600,
-                color: active('/c25k/programme') ? 'var(--orange)' : 'var(--muted)',
-                textDecoration: 'none', letterSpacing: '-0.02em',
-              }}
-              onClick={() => setOpen(false)}
-            >
-              My programme
-            </Link>
-          )}
 
           {/* Primary CTA */}
           {signedIn ? (

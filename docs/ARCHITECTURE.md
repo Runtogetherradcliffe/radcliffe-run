@@ -76,7 +76,12 @@ Full DDL in `supabase-schema-production.sql`. Tables:
   stamped on text change by `/api/admin/settings`, served by `/api/home` until
   the morning after the week's last scheduled run), and all C25K settings (`c25k_enabled`, `c25k_registration_open`,
   `c25k_start_date`, `c25k_cohort_label`, `c25k_max_registrations`,
-  `c25k_session_order`).
+  `c25k_session_order`, and `c25k_week_overrides` (jsonb, 18 Nov 2026,
+  `supabase-migration-c25k-week-overrides.sql`: weeks 5, 6 and 7's name and Tuesday /
+  Thursday / solo runs in the admin's own words (week 5 is RTR's bridge week and opens
+  out into per-day runs only when they differ), edited in Settings; NULL = the NHS plan in the
+  chosen order; applied by `lib/c25kProgramme.ts` `effectiveProgramme`, which the
+  programme page, the session generator and the C25K email all use)).
 - **scheduled_emails** - newsletter drafts/schedule. `status`
   ('draft'|'scheduled'|'sent'|'cancelled'), content fields, `recipient_filter`
   ('all' | 'selected' | a cohort), `recipient_member_ids uuid[]`.
@@ -219,7 +224,8 @@ Native-app API surface (all in this repo): `GET /api/routes` (public
 catalogue - static `lib/routes.ts` merged with `route_descriptions`, light
 map webp URLs), `GET /api/leader/contacts` (full active-member emergency set
 for the app's encrypted offline cache), `GET /api/leader/register?run_id=`
-(check-in roster + counters), `POST /api/leader/checkin` (idempotent
+(check-in roster + counters; each member carries `cohort`, 'c25k' or null, since
+18 Nov 2026 so a C25K session can show the cohort first), `POST /api/leader/checkin` (idempotent
 attendance upsert/delete), `POST/DELETE /api/push/register`,
 `GET /api/cron/send-push` (Thursday announcement; cron-job.org, CRON_SECRET,
 claim-locked), `GET /api/attendance/summary` (member's own lifetime ladders),
@@ -473,6 +479,17 @@ Route map imagery: every route has a dark webp and a light webp;
   today on, then by date+title; a match has its `date` updated too, so a date
   corrected in the sheet moves the run rather than leaving it behind (10 Nov 2026).
   Runs that leave the sheet are never deleted by the sync.
+- `POST /api/admin/c25k/sessions` (admin only, `requireAdmin()`) creates or updates the
+  C25K cohort's session rows from the start date on the Settings form, which it also
+  saves as `site_settings.c25k_start_date` (no separate Save needed)
+  (`lib/c25kSessions.ts`): `run_type = 'c25k'`, a Tuesday (Aldi, Whitefield) and a
+  Thursday (Radcliffe Market) row for each of 10 weeks, `start_time` NULL (7pm
+  convention), plus the graduation parkrun on the Saturday of week 10 at 09:00.
+  Rows are keyed in `google_event_id` as `c25k-<year>:w<NN>:<tue|thu|grad>`, so a
+  second press updates them in place; it never changes `cancelled` and never
+  deletes. `?dryRun=1` returns the rows without writing. Triggered by the "Create or
+  update C25K sessions" button in admin Settings. The sheet sync never creates C25K
+  rows (Nov 2026).
 - **"No run" weeks** (`lib/noRun.ts`). A Thursday row named "No run" is stored
   cancelled on every sync (and un-cancelled if it later gets a real route). The home
   page keeps cancelled runs hidden except these, which show as a single "No run this
