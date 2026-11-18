@@ -12,6 +12,7 @@ export default function Nav() {
   const [isLeader, setIsLeader] = useState(false)
   const [isAdmin,  setIsAdmin]  = useState(false)
   const [isC25K,   setIsC25K]   = useState(false)
+  const [c25kOn,   setC25kOn]   = useState(false)
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 768px)')
@@ -23,6 +24,10 @@ export default function Nav() {
 
   useEffect(() => {
     const supabase = createClient()
+
+    // C25K menu links appear only while C25K is switched on (site_settings is readable by anyone).
+    supabase.from('site_settings').select('c25k_enabled').single()
+      .then(({ data }) => setC25kOn(!!data?.c25k_enabled), () => { /* ignore */ })
 
     async function loadRoles() {
       const { data: { session } } = await supabase.auth.getSession()
@@ -68,16 +73,21 @@ export default function Nav() {
   // eslint-disable-next-line react-hooks/set-state-in-effect -- standard close-menu-on-navigation pattern; also covers browser back/forward where no link onClick fires
   useEffect(() => { setOpen(false) }, [path])
 
-  const active = (href: string) => href === '/' ? path === '/' : path.startsWith(href)
+  // '/c25k' is exact so it does not light up on the programme page.
+  const active = (href: string) => (href === '/' || href === '/c25k') ? path === href : path.startsWith(href)
 
   const links = [
     { href: '/',         label: 'Home'    },
     { href: '/about',    label: 'About'   },
     { href: '/routes',   label: 'Routes'  },
     { href: '/walks',    label: 'Walks'   },
+    ...(c25kOn ? [{ href: '/c25k', label: 'Couch to 5K' }] : []),
     { href: '/news',     label: 'Roundup' },
     { href: '/contact',  label: 'Contact' },
   ]
+  // The programme is only for the cohort and leaders (the page itself enforces the same).
+  const showProgramme = c25kOn && (isC25K || isLeader)
+  const programmeLabel = isC25K ? 'My programme' : 'C25K programme'
 
   return (
     <>
@@ -121,12 +131,12 @@ export default function Nav() {
               Merch
             </a>
           </div>
-          {isC25K && (
+          {showProgramme && (
             <Link href="/c25k/programme" style={{
               fontSize: 'var(--text-sm)', fontWeight: 500, textDecoration: 'none',
               color: active('/c25k/programme') ? 'var(--orange)' : 'var(--muted)',
             }}>
-              My programme
+              {programmeLabel}
             </Link>
           )}
           {isAdmin && (
@@ -237,7 +247,7 @@ export default function Nav() {
             </Link>
           )}
 
-          {isC25K && (
+          {showProgramme && (
             <Link
               href="/c25k/programme"
               style={{
@@ -247,7 +257,7 @@ export default function Nav() {
               }}
               onClick={() => setOpen(false)}
             >
-              My programme
+              {programmeLabel}
             </Link>
           )}
 
