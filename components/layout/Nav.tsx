@@ -11,7 +11,6 @@ export default function Nav() {
   const [signedIn, setSignedIn] = useState(false)
   const [isLeader, setIsLeader] = useState(false)
   const [isAdmin,  setIsAdmin]  = useState(false)
-  const [isC25K,   setIsC25K]   = useState(false)
   const [c25kOn,   setC25kOn]   = useState(false)
 
   useEffect(() => {
@@ -25,7 +24,8 @@ export default function Nav() {
   useEffect(() => {
     const supabase = createClient()
 
-    // C25K menu links appear only while C25K is switched on (site_settings is readable by anyone).
+    // One "Couch to 5K" menu item while C25K is switched on (site_settings is readable by anyone).
+    // The programme is reached from that page: cohort members and leaders get a View programme button.
     supabase.from('site_settings').select('c25k_enabled').single()
       .then(({ data }) => setC25kOn(!!data?.c25k_enabled), () => { /* ignore */ })
 
@@ -39,7 +39,6 @@ export default function Nav() {
             const me = await res.json()
             setIsLeader(me.isLeader)
             setIsAdmin(me.isAdmin)
-            setIsC25K(me.isC25K)
           }
         } catch { /* ignore network errors */ }
       }
@@ -51,7 +50,6 @@ export default function Nav() {
       if (!session) {
         setIsLeader(false)
         setIsAdmin(false)
-        setIsC25K(false)
       } else {
         // Re-fetch roles when session is established (e.g. after magic link sign-in)
         fetch('/api/me')
@@ -60,8 +58,7 @@ export default function Nav() {
             if (me) {
               setIsLeader(me.isLeader)
               setIsAdmin(me.isAdmin)
-              setIsC25K(me.isC25K)
-            }
+              }
           })
           .catch(() => { /* ignore */ })
       }
@@ -73,8 +70,7 @@ export default function Nav() {
   // eslint-disable-next-line react-hooks/set-state-in-effect -- standard close-menu-on-navigation pattern; also covers browser back/forward where no link onClick fires
   useEffect(() => { setOpen(false) }, [path])
 
-  // '/c25k' is exact so it does not light up on the programme page.
-  const active = (href: string) => (href === '/' || href === '/c25k') ? path === href : path.startsWith(href)
+  const active = (href: string) => href === '/' ? path === '/' : path.startsWith(href)
 
   const links = [
     { href: '/',         label: 'Home'    },
@@ -85,9 +81,6 @@ export default function Nav() {
     { href: '/news',     label: 'Roundup' },
     { href: '/contact',  label: 'Contact' },
   ]
-  // The programme is only for the cohort and leaders (the page itself enforces the same).
-  const showProgramme = c25kOn && (isC25K || isLeader)
-  const programmeLabel = isC25K ? 'My programme' : 'C25K programme'
 
   return (
     <>
@@ -131,14 +124,6 @@ export default function Nav() {
               Merch
             </a>
           </div>
-          {showProgramme && (
-            <Link href="/c25k/programme" style={{
-              fontSize: 'var(--text-sm)', fontWeight: 500, textDecoration: 'none',
-              color: active('/c25k/programme') ? 'var(--orange)' : 'var(--muted)',
-            }}>
-              {programmeLabel}
-            </Link>
-          )}
           {isAdmin && (
             <Link href="/admin" style={{
               fontSize: 'var(--text-sm)', fontWeight: 500, textDecoration: 'none',
@@ -247,19 +232,6 @@ export default function Nav() {
             </Link>
           )}
 
-          {showProgramme && (
-            <Link
-              href="/c25k/programme"
-              style={{
-                fontSize: 22, fontWeight: 600,
-                color: active('/c25k/programme') ? 'var(--orange)' : 'var(--muted)',
-                textDecoration: 'none', letterSpacing: '-0.02em',
-              }}
-              onClick={() => setOpen(false)}
-            >
-              {programmeLabel}
-            </Link>
-          )}
 
           {/* Primary CTA */}
           {signedIn ? (

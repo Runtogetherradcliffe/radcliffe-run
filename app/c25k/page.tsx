@@ -140,21 +140,26 @@ export default async function C25KPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   let joinHref = '/join?c25k=true'
+  let isLeader = false
   if (user?.email) {
     const { data: member } = await supabaseAdmin()
       .from('members')
-      .select('cohort')
+      .select('cohort, is_run_leader')
       .eq('email', user.email)
       .eq('status', 'active')
       .maybeSingle()
-    if (member?.cohort === 'c25k') {
+    isLeader = !!member?.is_run_leader
+    if (member?.cohort === 'c25k' || isLeader) {
       joinHref = '/c25k/programme'
     } else if (member) {
       joinHref = '/c25k/join'
     }
   }
 
+  // Cohort members and leaders see the programme instead of the join prompts
+  // (the programme page admits exactly these two groups).
   const isRegistered = joinHref === '/c25k/programme'
+  const viewLabel = isLeader ? 'View the programme →' : 'View your programme →'
 
   const formattedStart = startDate
     ? new Date(startDate + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -213,13 +218,13 @@ export default async function C25KPage() {
 
           {/* CTA buttons */}
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: registrationOpen && !isRegistered ? 20 : 0 }}>
-            {registrationOpen ? (
+            {registrationOpen || isRegistered ? (
               <Link href={joinHref} style={{
                 background: '#f5a623', color: '#0a0a0a',
                 fontSize: 'var(--text-md)', fontWeight: 700, padding: '14px 28px',
                 borderRadius: 10, textDecoration: 'none', letterSpacing: '-0.01em',
               }}>
-                {isRegistered ? 'View your programme →' : 'Join programme →'}
+                {isRegistered ? viewLabel : 'Join programme →'}
               </Link>
             ) : (
               <RegistrationClosed startDate={startDate} cohortLabel={cohortLabel} />
@@ -289,7 +294,7 @@ export default async function C25KPage() {
               Weeks marked <span style={{ fontWeight: 600, color: 'var(--dim)' }}>varies</span> have a different workout for each session.
             </p>
             <a href="/c25k/programme" style={{ fontSize: 12, color: '#f5a623', textDecoration: 'none', whiteSpace: 'nowrap' }}>
-              {isRegistered ? 'View your full programme →' : 'Registered? View the full session breakdown →'}
+              {isRegistered ? (isLeader ? 'View the full programme →' : 'View your full programme →') : 'Registered? View the full session breakdown →'}
             </a>
           </div>
         </section>
