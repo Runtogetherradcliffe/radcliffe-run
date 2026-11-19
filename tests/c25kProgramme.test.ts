@@ -29,10 +29,12 @@ describe('C25K weeks 6 and 7 in the admin\'s own words', () => {
     const p = effectiveProgramme(null, { '6': { tue: { intervals: 'Hill reps', totalRun: '15 min running' } } })
     const rows = buildC25kSessions('2027-01-05', p)
     const w6tue = rows.find(r => r.key === 'c25k-2027:w06:tue')!
-    expect(w6tue.description).toBe('Hill reps (15 min running)')
+    expect(w6tue.description).toBe('Hill reps (15 min running), with a 5 min warm-up walk before and a 5 min cool-down walk after.')
     const w1thu = rows.find(r => r.key === 'c25k-2027:w01:thu')!
     expect(w1thu.description).toMatch(/60s jog/)
     expect(rows.find(r => r.slot === 'grad')!.description).toMatch(/Heaton Park/)
+    expect(rows.find(r => r.slot === 'grad')!.description).not.toMatch(/warm-up/)
+    expect(rows.filter(r => r.slot !== 'grad').every(r => r.description.includes('5 min warm-up walk'))).toBe(true)
   })
 
   it('gives single-run weeks the same run on every slot', () => {
@@ -70,6 +72,6 @@ describe('C25K weeks 6 and 7 in the admin\'s own words', () => {
     expect(w5.sessions).toHaveLength(1)
     expect(w5.sessions[0].intervals).toBe(same.intervals)
     const rows = buildC25kSessions('2027-01-05', effectiveProgramme(null, { '5': { tue: same, thu: same, solo: same } }))
-    expect(rows.find(r => r.key === 'c25k-2027:w05:thu')!.description).toBe('15 min jog, 2 min walk, 5 min jog (20 min running)')
+    expect(rows.find(r => r.key === 'c25k-2027:w05:thu')!.description).toBe('15 min jog, 2 min walk, 5 min jog (20 min running), with a 5 min warm-up walk before and a 5 min cool-down walk after.')
   })
 })

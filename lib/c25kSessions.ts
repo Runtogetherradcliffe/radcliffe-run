@@ -41,6 +41,12 @@ export interface C25kSessionRow {
   description: string
 }
 
+/** Every group session starts with a 5-minute warm-up walk and ends with a
+ * 5-minute cool-down walk (the programme page says so too). Appended to each
+ * Tuesday/Thursday description; the app's C25K card looks for "warm-up" in a
+ * row description and skips its own line when it is already there. */
+export const C25K_WARMUP_SUFFIX = ', with a 5 min warm-up walk before and a 5 min cool-down walk after.'
+
 function addDays(iso: string, days: number): string {
   const d = new Date(`${iso}T00:00:00Z`)
   d.setUTCDate(d.getUTCDate() + days)
@@ -66,7 +72,8 @@ export function buildC25kSessions(startDate: string, programme: WeekData[] = PRO
     const w = programme.find(p => p.n === week)
     if (!w) return ''
     const sess = slotSession(w, slot)
-    return sess.totalRun ? `${sess.intervals} (${sess.totalRun})` : sess.intervals
+    const core = sess.totalRun ? `${sess.intervals} (${sess.totalRun})` : sess.intervals
+    return `${core}${C25K_WARMUP_SUFFIX}`
   }
   for (let week = 1; week <= C25K_WEEKS; week++) {
     const w = String(week).padStart(2, '0')
